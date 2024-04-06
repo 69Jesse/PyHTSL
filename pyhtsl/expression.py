@@ -30,11 +30,11 @@ EXPR_HANDLER = ExpressionHandler()
 
 
 class ExpressionType(Enum):
-    Increment = 0
-    Decrement = 1
-    Set = 2
-    Multiply = 3
-    Divide = 4
+    Increment = '+='
+    Decrement = '-='
+    Set = '='
+    Multiply = '*='
+    Divide = '//='
 
 
 class Expression:

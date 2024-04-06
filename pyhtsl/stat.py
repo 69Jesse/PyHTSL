@@ -2,7 +2,7 @@ from .team import Team
 from .expression import EXPR_HANDLER, Expression, ExpressionType
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, final
+from typing import TYPE_CHECKING, final, Optional
 if TYPE_CHECKING:
     from typing import Self
 
@@ -12,6 +12,7 @@ __all__ = (
     'PlayerStat',
     'GlobalStat',
     'TeamStat',
+    'TemporaryStat',
 )
 
 
@@ -145,3 +146,21 @@ class TeamStat(Stat):
 
     def get_htsl_formatted(self) -> str:
         return f'{super().get_htsl_formatted()} {self.team.name}'
+
+
+@final
+class TemporaryStat(Stat):
+    name: Optional[str]
+    def __init__(
+        self,
+        name: Optional[str] = None,
+    ) -> None:
+        self.name = name
+
+    @staticmethod
+    def get_prefix() -> str:
+        return 'stat'
+
+    @staticmethod
+    def get_placeholder_word() -> str:
+        return 'player'
