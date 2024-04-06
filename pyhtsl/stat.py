@@ -1,10 +1,10 @@
 from .team import Team
-from .expression import Expression
+from .expression import HANDLER, Expression, ExpressionType
 
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, final
 if TYPE_CHECKING:
-    from typing_extensions import Self
+    from typing import Self
 
 
 __all__ = (
@@ -43,18 +43,24 @@ class Stat(ABC):
         return self.get_htsl_formatted()
 
     def __iadd__(self, other: 'Expression | Stat | int') -> 'Self':
-        raise NotImplementedError
+        expr = Expression(self, other, ExpressionType.Increment)
+        HANDLER.add_expression(expr)
         return self
 
     def __add__(self, other: 'Expression | Stat | int') -> Expression:
-        raise NotImplementedError
+        expr = Expression(self, other, ExpressionType.Increment)
+        HANDLER.add_expression(expr)
+        return expr
 
     def __isub__(self, other: 'Expression | Stat | int') -> 'Self':
-        raise NotImplementedError
+        expr = Expression(self, other, ExpressionType.Decrement)
+        HANDLER.add_expression(expr)
         return self
 
     def __sub__(self, other: 'Expression | Stat | int') -> Expression:
-        raise NotImplementedError
+        expr = Expression(self, other, ExpressionType.Decrement)
+        HANDLER.add_expression(expr)
+        return expr
 
     @property
     def value(self) -> None:
@@ -62,27 +68,37 @@ class Stat(ABC):
 
     @value.setter
     def value(self, value: 'Expression | Stat | int') -> None:
-        raise NotImplementedError
+        expr = Expression(self, value, ExpressionType.Set)
+        HANDLER.add_expression(expr)
 
     def __imul__(self, other: 'Expression | Stat | int') -> 'Self':
-        raise NotImplementedError
+        expr = Expression(self, other, ExpressionType.Multiply)
+        HANDLER.add_expression(expr)
         return self
 
     def __mul__(self, other: 'Expression | Stat | int') -> Expression:
-        raise NotImplementedError
+        expr = Expression(self, other, ExpressionType.Multiply)
+        HANDLER.add_expression(expr)
+        return expr
 
     def __itruediv__(self, other: 'Expression | Stat | int') -> 'Self':
-        raise NotImplementedError
+        expr = Expression(self, other, ExpressionType.Divide)
+        HANDLER.add_expression(expr)
         return self
 
     def __truediv__(self, other: 'Expression | Stat | int') -> Expression:
-        raise NotImplementedError
+        expr = Expression(self, other, ExpressionType.Divide)
+        HANDLER.add_expression(expr)
+        return expr
 
     def __ifloordiv__(self, other: 'Expression | Stat | int') -> 'Self':
         return self.__itruediv__(other)
 
     def __floordiv__(self, other: 'Expression | Stat | int') -> Expression:
         return self.__truediv__(other)
+
+    def __neg__(self) -> Expression:
+        return self.__mul__(-1)
 
 
 @final
