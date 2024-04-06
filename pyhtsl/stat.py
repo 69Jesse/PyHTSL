@@ -17,13 +17,13 @@ class Stat(ABC):
     def __init__(self, name: str) -> None:
         self.name = name
 
-    @abstractmethod
     @staticmethod
+    @abstractmethod
     def get_prefix() -> str:
         raise NotImplementedError
 
-    @abstractmethod
     @staticmethod
+    @abstractmethod
     def get_placeholder_word() -> str:
         raise NotImplementedError
 
