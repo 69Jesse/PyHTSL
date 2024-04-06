@@ -155,7 +155,7 @@ class TemporaryStat(Stat):
         self,
         name: Optional[str] = None,
     ) -> None:
-        self.name = name
+        super().__init__(name)  # type: ignore
 
     @staticmethod
     def get_prefix() -> str:
