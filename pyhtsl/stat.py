@@ -1,7 +1,10 @@
 from .team import Team
+from .expression import Expression
 
 from abc import ABC, abstractmethod
-from typing import final
+from typing import TYPE_CHECKING, final
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 
 __all__ = (
@@ -39,6 +42,47 @@ class Stat(ABC):
     def __repr__(self) -> str:
         return self.get_htsl_formatted()
 
+    def __iadd__(self, other: 'Expression | Stat | int') -> 'Self':
+        raise NotImplementedError
+        return self
+
+    def __add__(self, other: 'Expression | Stat | int') -> Expression:
+        raise NotImplementedError
+
+    def __isub__(self, other: 'Expression | Stat | int') -> 'Self':
+        raise NotImplementedError
+        return self
+
+    def __sub__(self, other: 'Expression | Stat | int') -> Expression:
+        raise NotImplementedError
+
+    @property
+    def value(self) -> None:
+        raise ValueError('`value` is a write-only property')
+
+    @value.setter
+    def value(self, value: 'Expression | Stat | int') -> None:
+        raise NotImplementedError
+
+    def __imul__(self, other: 'Expression | Stat | int') -> 'Self':
+        raise NotImplementedError
+        return self
+
+    def __mul__(self, other: 'Expression | Stat | int') -> Expression:
+        raise NotImplementedError
+
+    def __itruediv__(self, other: 'Expression | Stat | int') -> 'Self':
+        raise NotImplementedError
+        return self
+
+    def __truediv__(self, other: 'Expression | Stat | int') -> Expression:
+        raise NotImplementedError
+
+    def __ifloordiv__(self, other: 'Expression | Stat | int') -> 'Self':
+        return self.__itruediv__(other)
+
+    def __floordiv__(self, other: 'Expression | Stat | int') -> Expression:
+        return self.__truediv__(other)
 
 
 @final

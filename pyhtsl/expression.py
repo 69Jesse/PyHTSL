@@ -1,9 +1,9 @@
 from enum import Enum
 import os
 
-from .stat import Stat
-
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
+if TYPE_CHECKING:
+    from .stat import Stat
 
 
 __all__ = (
