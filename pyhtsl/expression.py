@@ -22,7 +22,8 @@ class ExpressionHandler:
         self.__expressions.append(expression)
 
     def push(self) -> None:
-        pass
+        print(f'pushing with {len(self.__expressions)} expressions')
+        self.__expressions.clear()
 
 
 EXPR_HANDLER = ExpressionHandler()

@@ -45,6 +45,7 @@ class Stat(ABC):
     def __iadd__(self, other: 'Expression | Stat | int') -> 'Self':
         expr = Expression(self, other, ExpressionType.Increment)
         EXPR_HANDLER.add(expr)
+        EXPR_HANDLER.push()
         return self
 
     def __add__(self, other: 'Expression | Stat | int') -> Expression:
@@ -55,6 +56,7 @@ class Stat(ABC):
     def __isub__(self, other: 'Expression | Stat | int') -> 'Self':
         expr = Expression(self, other, ExpressionType.Decrement)
         EXPR_HANDLER.add(expr)
+        EXPR_HANDLER.push()
         return self
 
     def __sub__(self, other: 'Expression | Stat | int') -> Expression:
@@ -75,6 +77,7 @@ class Stat(ABC):
     def __imul__(self, other: 'Expression | Stat | int') -> 'Self':
         expr = Expression(self, other, ExpressionType.Multiply)
         EXPR_HANDLER.add(expr)
+        EXPR_HANDLER.push()
         return self
 
     def __mul__(self, other: 'Expression | Stat | int') -> Expression:
@@ -85,6 +88,7 @@ class Stat(ABC):
     def __itruediv__(self, other: 'Expression | Stat | int') -> 'Self':
         expr = Expression(self, other, ExpressionType.Divide)
         EXPR_HANDLER.add(expr)
+        EXPR_HANDLER.push()
         return self
 
     def __truediv__(self, other: 'Expression | Stat | int') -> Expression:
