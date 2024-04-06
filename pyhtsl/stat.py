@@ -1,5 +1,5 @@
 from .team import Team
-from .expression import HANDLER, Expression, ExpressionType
+from .expression import EXPR_HANDLER, Expression, ExpressionType
 
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, final
@@ -44,22 +44,22 @@ class Stat(ABC):
 
     def __iadd__(self, other: 'Expression | Stat | int') -> 'Self':
         expr = Expression(self, other, ExpressionType.Increment)
-        HANDLER.add_expression(expr)
+        EXPR_HANDLER.add(expr)
         return self
 
     def __add__(self, other: 'Expression | Stat | int') -> Expression:
         expr = Expression(self, other, ExpressionType.Increment)
-        HANDLER.add_expression(expr)
+        EXPR_HANDLER.add(expr)
         return expr
 
     def __isub__(self, other: 'Expression | Stat | int') -> 'Self':
         expr = Expression(self, other, ExpressionType.Decrement)
-        HANDLER.add_expression(expr)
+        EXPR_HANDLER.add(expr)
         return self
 
     def __sub__(self, other: 'Expression | Stat | int') -> Expression:
         expr = Expression(self, other, ExpressionType.Decrement)
-        HANDLER.add_expression(expr)
+        EXPR_HANDLER.add(expr)
         return expr
 
     @property
@@ -69,26 +69,27 @@ class Stat(ABC):
     @value.setter
     def value(self, value: 'Expression | Stat | int') -> None:
         expr = Expression(self, value, ExpressionType.Set)
-        HANDLER.add_expression(expr)
+        EXPR_HANDLER.add(expr)
+        EXPR_HANDLER.push()
 
     def __imul__(self, other: 'Expression | Stat | int') -> 'Self':
         expr = Expression(self, other, ExpressionType.Multiply)
-        HANDLER.add_expression(expr)
+        EXPR_HANDLER.add(expr)
         return self
 
     def __mul__(self, other: 'Expression | Stat | int') -> Expression:
         expr = Expression(self, other, ExpressionType.Multiply)
-        HANDLER.add_expression(expr)
+        EXPR_HANDLER.add(expr)
         return expr
 
     def __itruediv__(self, other: 'Expression | Stat | int') -> 'Self':
         expr = Expression(self, other, ExpressionType.Divide)
-        HANDLER.add_expression(expr)
+        EXPR_HANDLER.add(expr)
         return self
 
     def __truediv__(self, other: 'Expression | Stat | int') -> Expression:
         expr = Expression(self, other, ExpressionType.Divide)
-        HANDLER.add_expression(expr)
+        EXPR_HANDLER.add(expr)
         return expr
 
     def __ifloordiv__(self, other: 'Expression | Stat | int') -> 'Self':

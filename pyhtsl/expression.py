@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 
 __all__ = (
-    'HANDLER',
+    'EXPR_HANDLER',
     'ExpressionType',
     'Expression',
 )
@@ -18,11 +18,14 @@ class ExpressionHandler:
     
     __expressions: list['Expression'] = []
 
-    def add_expression(self, expression: 'Expression') -> None:
+    def add(self, expression: 'Expression') -> None:
         self.__expressions.append(expression)
 
+    def push(self) -> None:
+        pass
 
-HANDLER = ExpressionHandler()
+
+EXPR_HANDLER = ExpressionHandler()
 
 
 class ExpressionType(Enum):
@@ -52,22 +55,22 @@ class Expression:
 
     def __add__(self, other: 'Expression | Stat | int') -> 'Expression':
         expr = Expression(self, other, ExpressionType.Increment)
-        HANDLER.add_expression(expr)
+        EXPR_HANDLER.add(expr)
         return expr
 
     def __sub__(self, other: 'Expression | Stat | int') -> 'Expression':
         expr = Expression(self, other, ExpressionType.Decrement)
-        HANDLER.add_expression(expr)
+        EXPR_HANDLER.add(expr)
         return expr
 
     def __mul__(self, other: 'Expression | Stat | int') -> 'Expression':
         expr = Expression(self, other, ExpressionType.Multiply)
-        HANDLER.add_expression(expr)
+        EXPR_HANDLER.add(expr)
         return expr
 
     def __truediv__(self, other: 'Expression | Stat | int') -> 'Expression':
         expr = Expression(self, other, ExpressionType.Divide)
-        HANDLER.add_expression(expr)
+        EXPR_HANDLER.add(expr)
         return expr
 
     def __floordiv__(self, other: 'Expression | Stat | int') -> 'Expression':
