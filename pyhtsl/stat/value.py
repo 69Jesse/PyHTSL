@@ -1,4 +1,5 @@
 from ..expression import Expression
+from ..condition import Condition, Operator, OperatorCondition, PlaceholderValue
 
 from typing import TYPE_CHECKING, final
 if TYPE_CHECKING:
@@ -60,3 +61,6 @@ class StatValue:
 
     def __neg__(self) -> Expression:
         return Expression.neg(self.stat)
+
+    def __eq__(self, other: 'Stat | PlaceholderValue | int') -> Condition:
+        return OperatorCondition(self.stat, other, Operator.Equal)

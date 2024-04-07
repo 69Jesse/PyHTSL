@@ -1,12 +1,14 @@
 from ..team import Team
 from .value import StatValue
 from ..expression import EXPR_HANDLER
+from ..condition import PlaceholderValue
 
 from abc import ABC, abstractmethod
 
 from typing import TYPE_CHECKING, final, Any
 if TYPE_CHECKING:
     from ..expression import Expression
+    from ..condition import Condition, IfStatement
     from typing import Self
 
 
@@ -53,9 +55,6 @@ class Stat(ABC):
 
     def __repr__(self) -> str:
         return self.get_htsl_formatted()
-
-    def __eq__(self, other: Any) -> bool:
-        return id(self) == id(other)
 
     @property
     def value(self) -> StatValue:
@@ -105,6 +104,42 @@ class Stat(ABC):
 
     def __neg__(self) -> 'Expression':
         return -self.value
+
+    def __eq__(
+        self,
+        other: 'Stat | PlaceholderValue | int',
+    ) -> 'Condition':
+        return PlaceholderValue.equals(self, other)
+
+    def __ne__(
+        self,
+        other: 'Stat | PlaceholderValue | int',
+    ) -> 'IfStatement':
+        return PlaceholderValue.not_equal(self, other)
+
+    def __gt__(
+        self,
+        other: 'Stat | PlaceholderValue | int',
+    ) -> 'Condition':
+        return PlaceholderValue.greater_than(self, other)
+
+    def __lt__(
+        self,
+        other: 'Stat | PlaceholderValue | int',
+    ) -> 'Condition':
+        return PlaceholderValue.less_than(self, other)
+
+    def __ge__(
+        self,
+        other: 'Stat | PlaceholderValue | int',
+    ) -> 'Condition':
+        return PlaceholderValue.greater_than_or_equal(self, other)
+
+    def __le__(
+        self,
+        other: 'Stat | PlaceholderValue | int',
+    ) -> 'Condition':
+        return PlaceholderValue.less_than_or_equal(self, other)
 
 
 @final

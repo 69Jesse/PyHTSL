@@ -27,7 +27,9 @@ class ExpressionHandler:
         temporary_stats: list['TemporaryStat'] = []
         for expression in self.__expressions:
             stat = expression.fetch_stat_or_int(expression.left)
-            if isinstance(stat, self.temporary_stat_cls) and stat not in temporary_stats:
+            if isinstance(stat, self.temporary_stat_cls) and not any(
+                id(stat) == id(temp_stat) for temp_stat in temporary_stats
+            ):
                 temporary_stats.append(stat)
         for i, stat in enumerate(temporary_stats, start=TEMP_STATS_NUMBER_START):
             stat.number = i
@@ -42,7 +44,7 @@ class ExpressionHandler:
 
     def optimize_lines(self, lines: list[tuple['Stat', 'ExpressionType', 'Stat | int']]) -> None:
         for i in range(len(lines)):
-            left, type, right = lines[i]
+            left, _, _ = lines[i]
             if not isinstance(left, self.temporary_stat_cls):
                 continue
             for number in range(TEMP_STATS_NUMBER_START, left.number):

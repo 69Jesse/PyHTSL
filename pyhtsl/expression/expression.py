@@ -57,10 +57,6 @@ class Expression:
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
 
-    def __iadd__(self, other: 'Expression | Stat | int') -> 'Self':
-        Expression.iadd(self, other)
-        return self
-
     @staticmethod
     def add(
         left: 'Expression | Stat',
@@ -73,9 +69,6 @@ class Expression:
         EXPR_HANDLER.add(expr)
         return expr
 
-    def __add__(self, other: 'Expression | Stat | int') -> 'Expression':
-        return Expression.add(self, other)
-
     @staticmethod
     def isub(
         left: 'Expression | Stat',
@@ -84,10 +77,6 @@ class Expression:
         expr = Expression(left, right, ExpressionType.Decrement)
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
-
-    def __isub__(self, other: 'Expression | Stat | int') -> 'Self':
-        Expression.isub(self, other)
-        return self
 
     @staticmethod
     def sub(
@@ -100,9 +89,6 @@ class Expression:
         expr = Expression(temp_stat, right, ExpressionType.Decrement)
         EXPR_HANDLER.add(expr)
         return expr
-
-    def __sub__(self, other: 'Expression | Stat | int') -> 'Expression':
-        return Expression.sub(self, other)
 
     @staticmethod
     def set(
@@ -122,10 +108,6 @@ class Expression:
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
 
-    def __imul__(self, other: 'Expression | Stat | int') -> 'Self':
-        Expression.imul(self, other)
-        return self
-
     @staticmethod
     def mul(
         left: 'Expression | Stat',
@@ -138,9 +120,6 @@ class Expression:
         EXPR_HANDLER.add(expr)
         return expr
 
-    def __mul__(self, other: 'Expression | Stat | int') -> 'Expression':
-        return Expression.mul(self, other)
-
     @staticmethod
     def itruediv(
         left: 'Expression | Stat',
@@ -149,10 +128,6 @@ class Expression:
         expr = Expression(left, right, ExpressionType.Divide)
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
-
-    def __itruediv__(self, other: 'Expression | Stat | int') -> 'Self':
-        Expression.itruediv(self, other)
-        return self
 
     @staticmethod
     def truediv(
@@ -166,19 +141,12 @@ class Expression:
         EXPR_HANDLER.add(expr)
         return expr
 
-    def __truediv__(self, other: 'Expression | Stat | int') -> 'Expression':
-        return Expression.truediv(self, other)
-
     @staticmethod
     def ifloordiv(
         left: 'Expression | Stat',
         right: 'Expression | Stat | int',
     ) -> None:
         return Expression.itruediv(left, right)
-
-    def __ifloordiv__(self, other: 'Expression | Stat | int') -> 'Self':
-        Expression.ifloordiv(self, other)
-        return self
 
     @staticmethod
     def floordiv(
@@ -187,12 +155,44 @@ class Expression:
     ) -> 'Expression':
         return Expression.truediv(left, right)
 
-    def __floordiv__(self, other: 'Expression | Stat | int') -> 'Expression':
-        return Expression.truediv(self, other)
-
     @staticmethod
     def neg(value: 'Expression | Stat') -> 'Expression':
         return Expression.mul(value, -1)
+
+    def __iadd__(self, other: 'Expression | Stat | int') -> 'Self':
+        Expression.iadd(self, other)
+        return self
+
+    def __add__(self, other: 'Expression | Stat | int') -> 'Expression':
+        return Expression.add(self, other)
+
+    def __isub__(self, other: 'Expression | Stat | int') -> 'Self':
+        Expression.isub(self, other)
+        return self
+
+    def __sub__(self, other: 'Expression | Stat | int') -> 'Expression':
+        return Expression.sub(self, other)
+
+    def __imul__(self, other: 'Expression | Stat | int') -> 'Self':
+        Expression.imul(self, other)
+        return self
+
+    def __mul__(self, other: 'Expression | Stat | int') -> 'Expression':
+        return Expression.mul(self, other)
+
+    def __itruediv__(self, other: 'Expression | Stat | int') -> 'Self':
+        Expression.itruediv(self, other)
+        return self
+
+    def __truediv__(self, other: 'Expression | Stat | int') -> 'Expression':
+        return Expression.truediv(self, other)
+
+    def __ifloordiv__(self, other: 'Expression | Stat | int') -> 'Self':
+        Expression.ifloordiv(self, other)
+        return self
+
+    def __floordiv__(self, other: 'Expression | Stat | int') -> 'Expression':
+        return Expression.truediv(self, other)
 
     def __neg__(self) -> 'Expression':
         return Expression.neg(self)
