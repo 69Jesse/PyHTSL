@@ -22,8 +22,14 @@ __all__ = (
 class Stat(ABC):
     name: str
     __value: StatValue
-    def __init__(self, name: str) -> None:
-        self.name = name
+    def __init__(
+        self,
+        name: str,
+        *,
+        set_name: bool = True,
+    ) -> None:
+        if set_name:
+            self.name = name
         self.__value = StatValue(self)
 
     @staticmethod
@@ -144,14 +150,14 @@ class TeamStat(Stat):
 
 @final
 class TemporaryStat(Stat):
-    name: Optional[str]
     number: int
-    def __init__(
-        self,
-        name: Optional[str] = None,
-    ) -> None:
-        super().__init__(name)  # type: ignore
-        self.number = -1
+    def __init__(self) -> None:
+        super().__init__(None, set_name=False)  # type: ignore
+        self.number = 0
+
+    @property
+    def name(self) -> str:
+        return f'temp{self.number}'
 
     @staticmethod
     def get_prefix() -> str:

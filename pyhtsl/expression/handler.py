@@ -29,7 +29,6 @@ class ExpressionHandler:
             if isinstance(stat, self.temporary_stat_cls) and stat not in temporary_stats:
                 temporary_stats.append(stat)
         for i, stat in enumerate(temporary_stats, start=TEMP_STATS_NUMBER_START):
-            stat.name = f'temp{i}'
             stat.number = i
 
     def create_lines(self) -> list[tuple['Stat', 'ExpressionType', 'Stat | int']]:
@@ -41,7 +40,27 @@ class ExpressionHandler:
         return lines
 
     def optimize_lines(self, lines: list[tuple['Stat', 'ExpressionType', 'Stat | int']]) -> None:
-        pass
+        for i in range(len(lines)):
+            left, type, right = lines[i]
+            if not isinstance(left, self.temporary_stat_cls):
+                continue
+            for number in range(TEMP_STATS_NUMBER_START, left.number):
+                for j in range(i + 1, len(lines)):
+                    new_left, new_type, new_right = lines[j]
+                    if (
+                        isinstance(new_left, self.temporary_stat_cls)
+                        and new_left.number == number
+                        and new_type is not ExpressionType.Set
+                    ):
+                        break
+                    if (
+                        isinstance(new_right, self.temporary_stat_cls)
+                        and new_right.number == number
+                    ):
+                        break
+                else:
+                    left.number = number
+                    break
 
     def take_out_useless(self, lines: list[tuple['Stat', 'ExpressionType', 'Stat | int']]) -> None:
         for i in range(len(lines) - 1, -1, -1):
