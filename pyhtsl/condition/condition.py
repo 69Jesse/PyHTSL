@@ -11,18 +11,6 @@ if TYPE_CHECKING:
 class Condition(ABC):
     __slots__ = ()
 
-    def __and__(
-        self,
-        other: 'Condition',
-    ) -> IfStatement:
-        return IfStatement.logical_and(self, other)
-
-    def __or__(
-        self,
-        other: 'Condition',
-    ) -> IfStatement:
-        return IfStatement.logical_or(self, other)
-
     @abstractmethod
     def __str__(self) -> str:
         raise NotImplementedError

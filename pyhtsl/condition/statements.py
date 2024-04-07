@@ -2,14 +2,15 @@ from ..write import write
 
 from enum import Enum
 
-from typing import Optional, TYPE_CHECKING, Iterable
+from typing import Optional, TYPE_CHECKING
 from types import TracebackType
 if TYPE_CHECKING:
     from .condition import Condition
 
 
 __all__ = (
-    'If',
+    'IfAnd',
+    'IfOr',
     'Else',
 )
 
@@ -44,38 +45,6 @@ class IfStatement:
             return [left] + right.conditions  # type: ignore
         return [left, right]  # type: ignore
 
-    @staticmethod
-    def logical_and(
-        left: 'Condition | IfStatement',
-        right: 'Condition | IfStatement',
-    ) -> 'IfStatement':
-        new_conditions = IfStatement.get_new_conditions(left, right)
-        if len(new_conditions) > 2 and (
-            isinstance(left, IfStatement) and left.mode is ConditionalMode.OR
-            or isinstance(right, IfStatement) and right.mode is ConditionalMode.OR
-        ):
-            raise ValueError('Cannot mix AND and OR conditions')
-        return IfStatement(new_conditions, ConditionalMode.AND)
-
-    @staticmethod
-    def logical_or(
-        left: 'Condition | IfStatement',
-        right: 'Condition | IfStatement',
-    ) -> 'IfStatement':
-        new_conditions = IfStatement.get_new_conditions(left, right)
-        if len(new_conditions) > 2 and (
-            isinstance(left, IfStatement) and left.mode is ConditionalMode.AND
-            or isinstance(right, IfStatement) and right.mode is ConditionalMode.AND
-        ):
-            raise ValueError('Cannot mix AND and OR conditions')
-        return IfStatement(new_conditions, ConditionalMode.OR)
-
-    def __and__(self, other: 'Condition | IfStatement') -> 'IfStatement':
-        return IfStatement.logical_and(self, other)
-
-    def __or__(self, other: 'Condition | IfStatement') -> 'IfStatement':
-        return IfStatement.logical_or(self, other)
-
     def __enter__(self) -> None:
         write(f'if {self.mode.value} (' + ', '.join(map(str, self.conditions)) + ') {')
 
@@ -103,14 +72,16 @@ class ElseStatement:
         write('}')
 
 
-def If(
-    condition: 'Condition | Iterable[Condition] | IfStatement',
+def IfAnd(
+    *conditions: 'Condition',
 ) -> IfStatement:
-    if isinstance(condition, IfStatement):
-        return condition
-    if isinstance(condition, Iterable):
-        return IfStatement(list(condition))
-    return IfStatement(condition)
+    return IfStatement(list(conditions), mode=ConditionalMode.AND)
+
+
+def IfOr(
+    *conditions: 'Condition',
+) -> IfStatement:
+    return IfStatement(list(conditions), mode=ConditionalMode.OR)
 
 
 Else = ElseStatement()
