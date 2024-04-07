@@ -41,10 +41,7 @@ class ExpressionHandler:
         return lines
 
     def optimize_lines(self, lines: list[tuple['Stat', 'ExpressionType', 'Stat | int']]) -> None:
-        for l in lines:
-            l, _, _ = l
-            if l.name == 'temp3':
-                l.name = 'temp1'
+        pass
 
     def take_out_useless(self, lines: list[tuple['Stat', 'ExpressionType', 'Stat | int']]) -> None:
         for i in range(len(lines) - 1, -1, -1):
