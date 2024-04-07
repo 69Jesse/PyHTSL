@@ -1,4 +1,5 @@
 from .expression_type import ExpressionType
+from ..write import write
 
 from typing import TYPE_CHECKING, final, ClassVar
 if TYPE_CHECKING:
@@ -84,12 +85,16 @@ class ExpressionHandler:
             ):
                 lines.pop(i)
 
+    def write_lines(self, lines: list[tuple['Stat', 'ExpressionType', 'Stat | int']]) -> None:
+        for left, type, right in lines:
+            write(f'{repr(left)} {type.value} {str(right)}')
+
     def push(self) -> None:
         self.rename_temporary_stats()
         lines = self.create_lines()
         self.optimize_lines(lines)
         self.take_out_useless(lines)
-        print('\n'.join(f'{repr(left)} {type.value} {repr(right)}' for left, type, right in lines))
+        self.write_lines(lines)
         self.__expressions.clear()
 
 
