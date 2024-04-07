@@ -4,7 +4,8 @@ from .stat import (
     TeamStat as TeamStat,
 )
 from .condition import (
-    If as If,
+    IfAnd as IfAnd,
+    IfOr as IfOr,
     Else as Else,
 )
 from .tiny import (
