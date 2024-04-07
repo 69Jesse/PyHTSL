@@ -1,7 +1,7 @@
 import os
 
 from .handler import EXPR_HANDLER
-from .expr_type import ExpressionType
+from .expression_type import ExpressionType
 
 from typing import TYPE_CHECKING, Optional, overload
 if TYPE_CHECKING:

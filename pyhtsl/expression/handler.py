@@ -1,8 +1,8 @@
-from .expr_type import ExpressionType
+from .expression_type import ExpressionType
 
 from typing import TYPE_CHECKING, final, ClassVar
 if TYPE_CHECKING:
-    from .expr_class import Expression
+    from .expression import Expression
     from ..stat import Stat, TemporaryStat
 
 

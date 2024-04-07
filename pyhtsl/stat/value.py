@@ -3,7 +3,7 @@ from ..expression import Expression
 from typing import TYPE_CHECKING, final
 if TYPE_CHECKING:
     from typing import Self
-    from .classes import Stat
+    from .stat_classes import Stat
 
 
 __all__ = (

@@ -4,7 +4,7 @@ from ..expression import EXPR_HANDLER
 
 from abc import ABC, abstractmethod
 
-from typing import TYPE_CHECKING, final, Optional, Any
+from typing import TYPE_CHECKING, final, Any
 if TYPE_CHECKING:
     from ..expression import Expression
     from typing import Self
