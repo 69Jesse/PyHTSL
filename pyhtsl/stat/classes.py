@@ -1,9 +1,12 @@
-from .team import Team
-from .expression import EXPR_HANDLER, Expression, ExpressionType
+from ..team import Team
+from .value import StatValue
+from ..expression import EXPR_HANDLER
 
 from abc import ABC, abstractmethod
+
 from typing import TYPE_CHECKING, final, Optional
 if TYPE_CHECKING:
+    from ..expression import Expression
     from typing import Self
 
 
@@ -18,8 +21,10 @@ __all__ = (
 
 class Stat(ABC):
     name: str
+    __value: StatValue
     def __init__(self, name: str) -> None:
         self.name = name
+        self.__value = StatValue(self)
 
     @staticmethod
     @abstractmethod
@@ -43,68 +48,54 @@ class Stat(ABC):
     def __repr__(self) -> str:
         return self.get_htsl_formatted()
 
-    def __iadd__(self, other: 'Expression | Stat | int') -> 'Self':
-        expr = Expression(self, other, ExpressionType.Increment)
-        EXPR_HANDLER.add(expr)
-        EXPR_HANDLER.push()
-        return self
-
-    def __add__(self, other: 'Expression | Stat | int') -> Expression:
-        expr = Expression(self, other, ExpressionType.Increment)
-        EXPR_HANDLER.add(expr)
-        return expr
-
-    def __isub__(self, other: 'Expression | Stat | int') -> 'Self':
-        expr = Expression(self, other, ExpressionType.Decrement)
-        EXPR_HANDLER.add(expr)
-        EXPR_HANDLER.push()
-        return self
-
-    def __sub__(self, other: 'Expression | Stat | int') -> Expression:
-        expr = Expression(self, other, ExpressionType.Decrement)
-        EXPR_HANDLER.add(expr)
-        return expr
-
     @property
-    def value(self) -> None:
-        raise ValueError('`value` is a write-only property')
+    def value(self) -> StatValue:
+        return self.__value
 
     @value.setter
-    def value(self, value: 'Expression | Stat | int') -> None:
-        expr = Expression(self, value, ExpressionType.Set)
-        EXPR_HANDLER.add(expr)
-        EXPR_HANDLER.push()
+    def value(self, value: 'StatValue | Expression | Stat | int') -> None:
+        if isinstance(value, StatValue):
+            assert value is self.__value, 'Cannot set value to another StatValue instance'
+            return
+        self.__value.set(value)
+
+    def __iadd__(self, other: 'Expression | Stat | int') -> 'Self':
+        self.value += other
+        return self
+
+    def __add__(self, other: 'Expression | Stat | int') -> 'Expression':
+        return self.value + other
+
+    def __isub__(self, other: 'Expression | Stat | int') -> 'Self':
+        self.value -= other
+        return self
+
+    def __sub__(self, other: 'Expression | Stat | int') -> 'Expression':
+        return self.value - other
 
     def __imul__(self, other: 'Expression | Stat | int') -> 'Self':
-        expr = Expression(self, other, ExpressionType.Multiply)
-        EXPR_HANDLER.add(expr)
-        EXPR_HANDLER.push()
+        self.value *= other
         return self
 
-    def __mul__(self, other: 'Expression | Stat | int') -> Expression:
-        expr = Expression(self, other, ExpressionType.Multiply)
-        EXPR_HANDLER.add(expr)
-        return expr
+    def __mul__(self, other: 'Expression | Stat | int') -> 'Expression':
+        return self.value * other
 
     def __itruediv__(self, other: 'Expression | Stat | int') -> 'Self':
-        expr = Expression(self, other, ExpressionType.Divide)
-        EXPR_HANDLER.add(expr)
-        EXPR_HANDLER.push()
+        self.value /= other
         return self
 
-    def __truediv__(self, other: 'Expression | Stat | int') -> Expression:
-        expr = Expression(self, other, ExpressionType.Divide)
-        EXPR_HANDLER.add(expr)
-        return expr
+    def __truediv__(self, other: 'Expression | Stat | int') -> 'Expression':
+        return self.value / other
 
     def __ifloordiv__(self, other: 'Expression | Stat | int') -> 'Self':
-        return self.__itruediv__(other)
+        self.value //= other
+        return self
 
-    def __floordiv__(self, other: 'Expression | Stat | int') -> Expression:
-        return self.__truediv__(other)
+    def __floordiv__(self, other: 'Expression | Stat | int') -> 'Expression':
+        return self.value // other
 
-    def __neg__(self) -> Expression:
-        return self.__mul__(-1)
+    def __neg__(self) -> 'Expression':
+        return -self.value
 
 
 @final
@@ -164,3 +155,6 @@ class TemporaryStat(Stat):
     @staticmethod
     def get_placeholder_word() -> str:
         return 'player'
+
+
+EXPR_HANDLER.temporary_stat_cls = TemporaryStat  # type: ignore
