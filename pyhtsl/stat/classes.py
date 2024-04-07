@@ -4,7 +4,7 @@ from ..expression import EXPR_HANDLER
 
 from abc import ABC, abstractmethod
 
-from typing import TYPE_CHECKING, final, Optional
+from typing import TYPE_CHECKING, final, Optional, Any
 if TYPE_CHECKING:
     from ..expression import Expression
     from typing import Self
@@ -47,6 +47,9 @@ class Stat(ABC):
 
     def __repr__(self) -> str:
         return self.get_htsl_formatted()
+
+    def __eq__(self, other: Any) -> bool:
+        return id(self) == id(other)
 
     @property
     def value(self) -> StatValue:
@@ -142,11 +145,13 @@ class TeamStat(Stat):
 @final
 class TemporaryStat(Stat):
     name: Optional[str]
+    number: int
     def __init__(
         self,
         name: Optional[str] = None,
     ) -> None:
         super().__init__(name)  # type: ignore
+        self.number = -1
 
     @staticmethod
     def get_prefix() -> str:

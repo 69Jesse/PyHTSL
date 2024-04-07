@@ -1,7 +1,7 @@
-from enum import Enum
 import os
 
 from .handler import EXPR_HANDLER
+from .expr_type import ExpressionType
 
 from typing import TYPE_CHECKING, Optional, overload
 if TYPE_CHECKING:
@@ -10,17 +10,8 @@ if TYPE_CHECKING:
 
 
 __all__ = (
-    'ExpressionType',
     'Expression',
 )
-
-
-class ExpressionType(Enum):
-    Increment = '+='
-    Decrement = '-='
-    Set = '='
-    Multiply = '*='
-    Divide = '/='
 
 
 class Expression:
