@@ -6,6 +6,8 @@ from .if_and import IfAnd as IfAnd
 from .if_or import IfOr as IfOr
 from ._else import Else as Else
 
+from .chat import chat as chat
+
 from .group import Group as Group
 from .team import Team as Team
 from .region import Region as Region

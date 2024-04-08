@@ -1,4 +1,9 @@
-from .write import write
+from ..write import write
+
+
+__all__ = (
+    'chat',
+)
 
 
 def chat(
