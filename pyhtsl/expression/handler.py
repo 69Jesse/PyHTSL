@@ -23,6 +23,9 @@ class ExpressionHandler:
     def add(self, expression: 'Expression') -> None:
         self.__expressions.append(expression)
 
+    def is_empty(self) -> bool:
+        return not self.__expressions
+
     def rename_temporary_stats(self) -> None:
         temporary_stats: list['TemporaryStat'] = []
         for expression in self.__expressions:
@@ -89,9 +92,11 @@ class ExpressionHandler:
 
     def write_lines(self, lines: list[tuple['Stat', 'ExpressionType', 'Stat | int']]) -> None:
         for left, type, right in lines:
-            write(f'{repr(left)} {type.value} {str(right)}')
+            write(f'{repr(left)} {type.value} "{str(right)}"')
 
     def push(self) -> None:
+        if self.is_empty():
+            raise RuntimeWarning('No expressions to push, what are you doing?')
         self.rename_temporary_stats()
         lines = self.create_lines()
         self.optimize_lines(lines)

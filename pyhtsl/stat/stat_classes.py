@@ -27,21 +27,25 @@ STAT_CACHE: dict[type['Stat'], dict[str, 'Stat']] = {}
 class Stat(ABC):
     name: str
     __value: StatValue
-    def __init__(
-        self,
-        name: str,
-        *,
-        set_name: bool = True,
-    ) -> None:
-        if set_name:
-            self.name = name
-        self.__value = StatValue(self)
+    if TYPE_CHECKING:
+        def __init__(self, name: str) -> None:
+            ...
+    else:
+        def __init__(
+            self,
+            name: str,
+            *,
+            set_name: bool = True,
+        ) -> None:
+            if set_name:
+                self.name = name
+            self.__value = StatValue(self)
 
     def __new__(
         cls,
         *args: Any,
         **kwargs: Any,
-    ) -> 'Stat':
+    ) -> 'Self':
         """Caching stats based on its name so I can just compare id() and always have it be correct."""
         if cls is Stat:
             raise TypeError('Cannot instantiate Stat class')
@@ -51,7 +55,7 @@ class Stat(ABC):
             name = args[0]
             if isinstance(name, str) and name not in STAT_CACHE[cls]:
                 STAT_CACHE[cls][name] = super(Stat, cls).__new__(cls)
-            return STAT_CACHE[cls][name]
+            return STAT_CACHE[cls][name]  # type: ignore
         return super(Stat, cls).__new__(cls)
 
     @staticmethod
@@ -87,12 +91,18 @@ class Stat(ABC):
             return
         self.__value.set(value)
 
+    def set(self, value: 'Expression | Stat | int') -> None:
+        self.value = value
+
     def __iadd__(self, other: 'Expression | Stat | int') -> 'Self':
         self.value += other
         return self
 
     def __add__(self, other: 'Expression | Stat | int') -> 'Expression':
         return self.value + other
+
+    def __radd__(self, other: 'Expression | Stat | int') -> 'Expression':
+        return other + self.value
 
     def __isub__(self, other: 'Expression | Stat | int') -> 'Self':
         self.value -= other
@@ -101,12 +111,18 @@ class Stat(ABC):
     def __sub__(self, other: 'Expression | Stat | int') -> 'Expression':
         return self.value - other
 
+    def __rsub__(self, other: 'Expression | Stat | int') -> 'Expression':
+        return other - self.value
+
     def __imul__(self, other: 'Expression | Stat | int') -> 'Self':
         self.value *= other
         return self
 
     def __mul__(self, other: 'Expression | Stat | int') -> 'Expression':
         return self.value * other
+
+    def __rmul__(self, other: 'Expression | Stat | int') -> 'Expression':
+        return other * self.value
 
     def __itruediv__(self, other: 'Expression | Stat | int') -> 'Self':
         self.value /= other

@@ -70,6 +70,13 @@ class Expression:
         return expr
 
     @staticmethod
+    def radd(
+        left: 'Expression | Stat',
+        right: 'Expression | Stat | int',
+    ) -> 'Expression':
+        return Expression.add(left, right)
+
+    @staticmethod
     def isub(
         left: 'Expression | Stat',
         right: 'Expression | Stat | int',
@@ -88,6 +95,19 @@ class Expression:
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat, right, ExpressionType.Decrement)
         EXPR_HANDLER.add(expr)
+        return expr
+
+    @staticmethod
+    def rsub(
+        left: 'Expression | Stat',
+        right: 'Expression | Stat | int',
+    ) -> 'Expression':
+        temp_stat = EXPR_HANDLER.temporary_stat_cls()
+        expr = Expression(temp_stat, right, ExpressionType.Set)
+        EXPR_HANDLER.add(expr)
+        EXPR_HANDLER.add(
+            Expression(temp_stat, left, ExpressionType.Decrement),
+        )
         return expr
 
     @staticmethod
@@ -119,6 +139,13 @@ class Expression:
         expr = Expression(temp_stat, right, ExpressionType.Multiply)
         EXPR_HANDLER.add(expr)
         return expr
+
+    @staticmethod
+    def rmul(
+        left: 'Expression | Stat',
+        right: 'Expression | Stat | int',
+    ) -> 'Expression':
+        return Expression.mul(left, right)
 
     @staticmethod
     def itruediv(
@@ -166,6 +193,9 @@ class Expression:
     def __add__(self, other: 'Expression | Stat | int') -> 'Expression':
         return Expression.add(self, other)
 
+    def __radd__(self, other: 'Expression | Stat | int') -> 'Expression':
+        return Expression.radd(self, other)
+
     def __isub__(self, other: 'Expression | Stat | int') -> 'Self':
         Expression.isub(self, other)
         return self
@@ -173,12 +203,18 @@ class Expression:
     def __sub__(self, other: 'Expression | Stat | int') -> 'Expression':
         return Expression.sub(self, other)
 
+    def __rsub__(self, other: 'Expression | Stat | int') -> 'Expression':
+        return Expression.rsub(self, other)
+
     def __imul__(self, other: 'Expression | Stat | int') -> 'Self':
         Expression.imul(self, other)
         return self
 
     def __mul__(self, other: 'Expression | Stat | int') -> 'Expression':
         return Expression.mul(self, other)
+
+    def __rmul__(self, other: 'Expression | Stat | int') -> 'Expression':
+        return Expression.rmul(self, other)
 
     def __itruediv__(self, other: 'Expression | Stat | int') -> 'Self':
         Expression.itruediv(self, other)
@@ -197,5 +233,14 @@ class Expression:
     def __neg__(self) -> 'Expression':
         return Expression.neg(self)
 
-    def __repr__(self) -> str:
-        return f'{repr(self.fetch_stat_or_int(self.left))} {self.type.value} {self.fetch_stat_or_int(self.right)}'
+    def __str__(self) -> str:
+        """Do NOT call this method when it is not used inside of a f-string! It will break things.
+        
+        The reason that this pushes is that you can make something like this work:
+        ```py
+        stat = PlayerStat('stat')
+        chat(f'&aYour stat is &6{stat + 1}g')
+        ```
+        """
+        EXPR_HANDLER.push()
+        return str(self.fetch_stat_or_int(self.left))
