@@ -1,10 +1,10 @@
 
 __all__ = (
-    'Team',
+    'Group',
 )
 
 
-class Team:
+class Group:
     name: str
     def __init__(self, name: str) -> None:
         self.name = name

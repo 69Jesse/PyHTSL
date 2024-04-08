@@ -8,6 +8,14 @@ if TYPE_CHECKING:
     from ..stat import Stat
 
 
+__all__ = (
+    'Condition',
+    'Operator',
+    'PlaceholderValue',
+    'OperatorCondition',
+)
+
+
 class Condition(ABC):
     __slots__ = ()
 
@@ -136,34 +144,3 @@ class OperatorCondition(Condition):
 
     def __str__(self) -> str:
         return f'{repr(self.left)} {self.operator.value} {str(self.right)}'
-
-
-@final
-class RawCondition(Condition):
-    name: str
-    def __init__(
-        self,
-        name: str,
-    ) -> None:
-        self.name = name
-
-    def __str__(self) -> str:
-        return self.name
-
-
-PlayerPing = PlaceholderValue('%player.ping%')
-PlayerHealth = PlaceholderValue('%player.health%')
-PlayerMaxHealth = PlaceholderValue('%player.max_health%')
-PlayerHunger = PlaceholderValue('%player.hunger%')
-PlayerExperience = PlaceholderValue('%player.experience%')
-PlayerLevel = PlaceholderValue('%player.level%')
-PlayerProtocol = PlaceholderValue('%player.protocol%')
-PlayerLocationX = PlaceholderValue('%player.location.x%')
-PlayerLocationY = PlaceholderValue('%player.location.y%')
-PlayerLocationZ = PlaceholderValue('%player.location.z%')
-PlayerLocationYaw = PlaceholderValue('%player.location.yaw%')
-PlayerLocationPitch = PlaceholderValue('%player.location.pitch%')
-PlayerGroupPriority = PlaceholderValue('%player.group.priority%')
-HouseGuests = PlaceholderValue('%house.guests%')
-HouseCookies = PlaceholderValue('%house.cookies%')
-DateUnix = PlaceholderValue('%date.unix%')

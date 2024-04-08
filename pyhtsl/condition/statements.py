@@ -9,6 +9,9 @@ if TYPE_CHECKING:
 
 
 __all__ = (
+    'ConditionalMode',
+    'IfStatement',
+    'ElseStatement',
     'IfAnd',
     'IfOr',
     'Else',

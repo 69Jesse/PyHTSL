@@ -5,7 +5,7 @@ from ..condition import PlaceholderValue
 
 from abc import ABC, abstractmethod
 
-from typing import TYPE_CHECKING, final, Any
+from typing import TYPE_CHECKING, final
 if TYPE_CHECKING:
     from ..expression import Expression
     from ..condition import Condition, IfStatement
