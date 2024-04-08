@@ -5,7 +5,7 @@ from ..condition import PlaceholderValue
 
 from abc import ABC, abstractmethod
 
-from typing import TYPE_CHECKING, final
+from typing import TYPE_CHECKING, final, Any
 if TYPE_CHECKING:
     from ..expression import Expression
     from ..condition import Condition, IfStatement
@@ -21,6 +21,9 @@ __all__ = (
 )
 
 
+STAT_CACHE: dict[type['Stat'], dict[str, 'Stat']] = {}
+
+
 class Stat(ABC):
     name: str
     __value: StatValue
@@ -33,6 +36,23 @@ class Stat(ABC):
         if set_name:
             self.name = name
         self.__value = StatValue(self)
+
+    def __new__(
+        cls,
+        *args: Any,
+        **kwargs: Any,
+    ) -> 'Stat':
+        """Caching stats based on its name so I can just compare id() and always have it be correct."""
+        if cls is Stat:
+            raise TypeError('Cannot instantiate Stat class')
+        if len(args) > 0:
+            if cls not in STAT_CACHE:
+                STAT_CACHE[cls] = {}
+            name = args[0]
+            if isinstance(name, str) and name not in STAT_CACHE[cls]:
+                STAT_CACHE[cls][name] = super(Stat, cls).__new__(cls)
+            return STAT_CACHE[cls][name]
+        return super(Stat, cls).__new__(cls)
 
     @staticmethod
     @abstractmethod

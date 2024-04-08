@@ -64,7 +64,7 @@ class ElseStatement:
     __slots__ = ()
 
     def __enter__(self) -> None:
-        write('else {')
+        write('else {', append_to_previous_line=True)
 
     def __exit__(
         self,
