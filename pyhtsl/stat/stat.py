@@ -1,11 +1,9 @@
-from ..team import Team
 from .value import StatValue
-from ..expression import EXPR_HANDLER
 from ..condition import PlaceholderValue
 
 from abc import ABC, abstractmethod
 
-from typing import TYPE_CHECKING, final, Any
+from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from ..expression import Expression
     from ..condition import Condition, IfStatement
@@ -14,10 +12,6 @@ if TYPE_CHECKING:
 
 __all__ = (
     'Stat',
-    'PlayerStat',
-    'GlobalStat',
-    'TeamStat',
-    'TemporaryStat',
 )
 
 
@@ -177,66 +171,5 @@ class Stat(ABC):
     ) -> 'Condition':
         return PlaceholderValue.less_than_or_equal(self, other)
 
-
-@final
-class PlayerStat(Stat):
-    @staticmethod
-    def get_prefix() -> str:
-        return 'stat'
-
-    @staticmethod
-    def get_placeholder_word() -> str:
-        return 'player'
-
-
-@final
-class GlobalStat(Stat):
-    @staticmethod
-    def get_prefix() -> str:
-        return 'globalstat'
-
-    @staticmethod
-    def get_placeholder_word() -> str:
-        return 'global'
-
-
-@final
-class TeamStat(Stat):
-    team: Team
-    def __init__(self, name: str, team: Team | str) -> None:
-        super().__init__(name)
-        self.team = team if isinstance(team, Team) else Team(team)
-
-    @staticmethod
-    def get_prefix() -> str:
-        return 'teamstat'
-
-    @staticmethod
-    def get_placeholder_word() -> str:
-        return 'team'
-
-    def get_htsl_formatted(self) -> str:
-        return f'{super().get_htsl_formatted()} {self.team.name}'
-
-
-@final
-class TemporaryStat(Stat):
-    number: int
-    def __init__(self) -> None:
-        super().__init__(None, set_name=False)  # type: ignore
-        self.number = 0
-
-    @property
-    def name(self) -> str:
-        return f'temp{self.number}'
-
-    @staticmethod
-    def get_prefix() -> str:
-        return 'stat'
-
-    @staticmethod
-    def get_placeholder_word() -> str:
-        return 'player'
-
-
-EXPR_HANDLER.temporary_stat_cls = TemporaryStat  # type: ignore
+    def operational_expression_left_side(self) -> str:
+        return repr(self)

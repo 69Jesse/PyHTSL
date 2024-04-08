@@ -12,9 +12,6 @@ __all__ = (
     'ConditionalMode',
     'IfStatement',
     'ElseStatement',
-    'IfAnd',
-    'IfOr',
-    'Else',
 )
 
 
@@ -73,18 +70,3 @@ class ElseStatement:
         traceback: Optional[TracebackType],
     ) -> None:
         write('}')
-
-
-def IfAnd(
-    *conditions: 'Condition',
-) -> IfStatement:
-    return IfStatement(list(conditions), mode=ConditionalMode.AND)
-
-
-def IfOr(
-    *conditions: 'Condition',
-) -> IfStatement:
-    return IfStatement(list(conditions), mode=ConditionalMode.OR)
-
-
-Else = ElseStatement()

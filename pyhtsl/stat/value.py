@@ -4,7 +4,7 @@ from ..condition import Condition, Operator, OperatorCondition, PlaceholderValue
 from typing import TYPE_CHECKING, final
 if TYPE_CHECKING:
     from typing import Self
-    from .stat_classes import Stat
+    from .stat import Stat
 
 
 __all__ = (

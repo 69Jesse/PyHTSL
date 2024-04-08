@@ -32,7 +32,6 @@ class Operator(Enum):
     LessThanOrEqual = '<='
 
 
-@final
 class PlaceholderValue:
     name: str
     def __init__(

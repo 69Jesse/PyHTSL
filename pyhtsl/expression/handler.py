@@ -92,7 +92,7 @@ class ExpressionHandler:
 
     def write_lines(self, lines: list[tuple['Stat', 'ExpressionType', 'Stat | int']]) -> None:
         for left, type, right in lines:
-            write(f'{repr(left)} {type.value} "{str(right)}"')
+            write(f'{left.operational_expression_left_side()} {type.value} "{str(right)}"')
 
     def push(self) -> None:
         if self.is_empty():
