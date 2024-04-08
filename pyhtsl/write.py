@@ -47,7 +47,8 @@ def write(
 @atexit.register
 def on_exit() -> None:
     print((
-        '\nAll done! Your HTSL file is written to the following location:'
+        '\nAll done! Your .htsl file is written to the following location:'
         f'\n{HTSL_FILE.absolute()}'
         f'\nExecute it with HTSL by using the following name: \x1b[38;2;255;0;0m{FILE_NAME}\x1b[0m'
+        '\n'
     ))
