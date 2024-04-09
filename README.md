@@ -29,7 +29,7 @@ multiplier = PlayerStat('multiplier')
 global_multiplier = GlobalStat('multiplier')
 
 experience += reward * multiplier * global_multiplier
-chat(f'&aYour EXP has been updated to &6{experience}g')
+chat(f'&eYour EXP has been updated to &a{experience}&e!')
 
 level = PlayerStat('level')
 EXP_TO_LEVEL_UP = 100  # Python variable, ! not ! a stat
@@ -51,7 +51,7 @@ stat temp1 = "%stat.player/reward%"
 stat temp1 *= "%stat.player/multiplier%"
 stat temp1 *= "%stat.global/multiplier%"
 stat experience += "%stat.player/temp1%"
-chat "&aYour EXP has been updated to &6%stat.player/experience%g"
+chat "&eYour EXP has been updated to &a%stat.player/experience%&e!"
 if and (stat experience >= 100) {
 stat experience -= "100"
 stat level += "1"
