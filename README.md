@@ -8,7 +8,7 @@ PyHTSL is a Python wrapper for [HTSL](https://github.com/BusterBrown1218/HTSL) c
 ## Installation
 To install PyHTSL, run the following command:
 ```
-pip install "git+https://github.com/69Jesse/PyHTSL.git --upgrade"
+pip install "git+https://github.com/69Jesse/PyHTSL.git" --upgrade
 ```
 
 ## Usage
