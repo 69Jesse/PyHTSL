@@ -1,5 +1,5 @@
 # PyHTSL
-PyHTSL is a Python wrapper for HTSL used to simplify the process of making housings on [Hypixel](https://hypixel.net/)
+PyHTSL is a Python wrapper for [HTSL](https://github.com/BusterBrown1218/HTSL) created to simplify the process of making housings on [Hypixel](https://hypixel.net/)
 
 ## Prerequisites
 - [ChatTriggers](https://www.chattriggers.com/) and [HTSL](https://github.com/BusterBrown1218/HTSL)

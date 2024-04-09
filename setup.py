@@ -10,7 +10,7 @@ setup(
     url='https://github.com/69Jesse/PyHTSL',
     version='0.2',
     packages=find_packages(),
-    description='Python wrapper for HTSL https://github.com/BusterBrown1218/HTSL',
+    description='Python wrapper for HTSL created to simplify the process of making housings on Hypixel',
     python_requires='>=3.12',
     include_package_data=True,
 )
