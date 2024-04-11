@@ -170,4 +170,4 @@ class OperatorCondition(Condition):
         self.operator = operator
 
     def __str__(self) -> str:
-        return f'{repr(self.left)} {self.operator.value} {str(self.right)}'
+        return f'{repr(self.left)} {self.operator.value} "{str(self.right)}"'
