@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Optional, overload
 if TYPE_CHECKING:
     from typing import Self
     from ..stat import Stat
+    from ..condition import PlaceholderValue
 
 
 __all__ = (
@@ -15,14 +16,14 @@ __all__ = (
 
 
 class Expression:
-    left: 'Expression | Stat'
-    right: 'Expression | Stat | int'
+    left: 'Expression | Stat | PlaceholderValue'
+    right: 'Expression | Stat | int | PlaceholderValue'
     type: ExpressionType
     id: str
     def __init__(
         self,
-        left: 'Expression | Stat',
-        right: 'Expression | Stat | int',
+        left: 'Expression | Stat | PlaceholderValue',
+        right: 'Expression | Stat | int | PlaceholderValue',
         type: ExpressionType,
         id: Optional[str] = None,
     ) -> None:
@@ -32,7 +33,7 @@ class Expression:
         self.id = id or os.urandom(8).hex()
 
     @overload
-    def fetch_stat_or_int(self, maybe_stat: 'Expression | Stat') -> 'Stat':
+    def fetch_stat_or_int(self, maybe_stat: 'Expression | Stat | PlaceholderValue') -> 'Stat | PlaceholderValue':
         ...
 
     @overload
@@ -40,10 +41,10 @@ class Expression:
         ...
 
     @overload
-    def fetch_stat_or_int(self, maybe_stat: 'Expression | Stat | int') -> 'Stat | int':
+    def fetch_stat_or_int(self, maybe_stat: 'Expression | Stat | int | PlaceholderValue') -> 'Stat | int | PlaceholderValue':
         ...
 
-    def fetch_stat_or_int(self, maybe_stat: 'Expression | Stat | int') -> 'Stat | int':
+    def fetch_stat_or_int(self, maybe_stat: 'Expression | Stat | int | PlaceholderValue') -> 'Stat | int | PlaceholderValue':
         while isinstance(maybe_stat, Expression):
             maybe_stat = maybe_stat.left
         return maybe_stat
@@ -51,7 +52,7 @@ class Expression:
     @staticmethod
     def iadd(
         left: 'Expression | Stat',
-        right: 'Expression | Stat | int',
+        right: 'Expression | Stat | int | PlaceholderValue',
     ) -> None:
         expr = Expression(left, right, ExpressionType.Increment)
         EXPR_HANDLER.add(expr)
@@ -59,8 +60,8 @@ class Expression:
 
     @staticmethod
     def add(
-        left: 'Expression | Stat',
-        right: 'Expression | Stat | int',
+        left: 'Expression | Stat | PlaceholderValue',
+        right: 'Expression | Stat | int | PlaceholderValue',
     ) -> 'Expression':
         temp_stat = EXPR_HANDLER.temporary_stat_cls()
         expr = Expression(temp_stat, left, ExpressionType.Set)
@@ -71,15 +72,15 @@ class Expression:
 
     @staticmethod
     def radd(
-        left: 'Expression | Stat',
-        right: 'Expression | Stat | int',
+        left: 'Expression | Stat | PlaceholderValue',
+        right: 'Expression | Stat | int | PlaceholderValue',
     ) -> 'Expression':
         return Expression.add(left, right)
 
     @staticmethod
     def isub(
         left: 'Expression | Stat',
-        right: 'Expression | Stat | int',
+        right: 'Expression | Stat | int | PlaceholderValue',
     ) -> None:
         expr = Expression(left, right, ExpressionType.Decrement)
         EXPR_HANDLER.add(expr)
@@ -87,8 +88,8 @@ class Expression:
 
     @staticmethod
     def sub(
-        left: 'Expression | Stat',
-        right: 'Expression | Stat | int',
+        left: 'Expression | Stat | PlaceholderValue',
+        right: 'Expression | Stat | int | PlaceholderValue',
     ) -> 'Expression':
         temp_stat = EXPR_HANDLER.temporary_stat_cls()
         expr = Expression(temp_stat, left, ExpressionType.Set)
@@ -99,8 +100,8 @@ class Expression:
 
     @staticmethod
     def rsub(
-        left: 'Expression | Stat',
-        right: 'Expression | Stat | int',
+        left: 'Expression | Stat | PlaceholderValue',
+        right: 'Expression | Stat | int | PlaceholderValue',
     ) -> 'Expression':
         temp_stat = EXPR_HANDLER.temporary_stat_cls()
         expr = Expression(temp_stat, right, ExpressionType.Set)
@@ -113,7 +114,7 @@ class Expression:
     @staticmethod
     def set(
         left: 'Expression | Stat',
-        right: 'Expression | Stat | int',
+        right: 'Expression | Stat | int | PlaceholderValue',
     ) -> None:
         expr = Expression(left, right, ExpressionType.Set)
         EXPR_HANDLER.add(expr)
@@ -122,7 +123,7 @@ class Expression:
     @staticmethod
     def imul(
         left: 'Expression | Stat',
-        right: 'Expression | Stat | int',
+        right: 'Expression | Stat | int | PlaceholderValue',
     ) -> None:
         expr = Expression(left, right, ExpressionType.Multiply)
         EXPR_HANDLER.add(expr)
@@ -130,8 +131,8 @@ class Expression:
 
     @staticmethod
     def mul(
-        left: 'Expression | Stat',
-        right: 'Expression | Stat | int',
+        left: 'Expression | Stat | PlaceholderValue',
+        right: 'Expression | Stat | int | PlaceholderValue',
     ) -> 'Expression':
         temp_stat = EXPR_HANDLER.temporary_stat_cls()
         expr = Expression(temp_stat, left, ExpressionType.Set)
@@ -142,15 +143,15 @@ class Expression:
 
     @staticmethod
     def rmul(
-        left: 'Expression | Stat',
-        right: 'Expression | Stat | int',
+        left: 'Expression | Stat | PlaceholderValue',
+        right: 'Expression | Stat | int | PlaceholderValue',
     ) -> 'Expression':
         return Expression.mul(left, right)
 
     @staticmethod
     def itruediv(
         left: 'Expression | Stat',
-        right: 'Expression | Stat | int',
+        right: 'Expression | Stat | int | PlaceholderValue',
     ) -> None:
         expr = Expression(left, right, ExpressionType.Divide)
         EXPR_HANDLER.add(expr)
@@ -158,8 +159,8 @@ class Expression:
 
     @staticmethod
     def truediv(
-        left: 'Expression | Stat',
-        right: 'Expression | Stat | int',
+        left: 'Expression | Stat | PlaceholderValue',
+        right: 'Expression | Stat | int | PlaceholderValue',
     ) -> 'Expression':
         temp_stat = EXPR_HANDLER.temporary_stat_cls()
         expr = Expression(temp_stat, left, ExpressionType.Set)
@@ -171,63 +172,63 @@ class Expression:
     @staticmethod
     def ifloordiv(
         left: 'Expression | Stat',
-        right: 'Expression | Stat | int',
+        right: 'Expression | Stat | int | PlaceholderValue',
     ) -> None:
         return Expression.itruediv(left, right)
 
     @staticmethod
     def floordiv(
-        left: 'Expression | Stat',
-        right: 'Expression | Stat | int',
+        left: 'Expression | Stat | PlaceholderValue',
+        right: 'Expression | Stat | int | PlaceholderValue',
     ) -> 'Expression':
         return Expression.truediv(left, right)
 
     @staticmethod
-    def neg(value: 'Expression | Stat') -> 'Expression':
+    def neg(value: 'Expression | Stat | PlaceholderValue') -> 'Expression':
         return Expression.mul(value, -1)
 
-    def __iadd__(self, other: 'Expression | Stat | int') -> 'Self':
+    def __iadd__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         Expression.iadd(self, other)
         return self
 
-    def __add__(self, other: 'Expression | Stat | int') -> 'Expression':
+    def __add__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return Expression.add(self, other)
 
-    def __radd__(self, other: 'Expression | Stat | int') -> 'Expression':
+    def __radd__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return Expression.radd(self, other)
 
-    def __isub__(self, other: 'Expression | Stat | int') -> 'Self':
+    def __isub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         Expression.isub(self, other)
         return self
 
-    def __sub__(self, other: 'Expression | Stat | int') -> 'Expression':
+    def __sub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return Expression.sub(self, other)
 
-    def __rsub__(self, other: 'Expression | Stat | int') -> 'Expression':
+    def __rsub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return Expression.rsub(self, other)
 
-    def __imul__(self, other: 'Expression | Stat | int') -> 'Self':
+    def __imul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         Expression.imul(self, other)
         return self
 
-    def __mul__(self, other: 'Expression | Stat | int') -> 'Expression':
+    def __mul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return Expression.mul(self, other)
 
-    def __rmul__(self, other: 'Expression | Stat | int') -> 'Expression':
+    def __rmul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return Expression.rmul(self, other)
 
-    def __itruediv__(self, other: 'Expression | Stat | int') -> 'Self':
+    def __itruediv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         Expression.itruediv(self, other)
         return self
 
-    def __truediv__(self, other: 'Expression | Stat | int') -> 'Expression':
+    def __truediv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return Expression.truediv(self, other)
 
-    def __ifloordiv__(self, other: 'Expression | Stat | int') -> 'Self':
+    def __ifloordiv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         Expression.ifloordiv(self, other)
         return self
 
-    def __floordiv__(self, other: 'Expression | Stat | int') -> 'Expression':
+    def __floordiv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return Expression.truediv(self, other)
 
     def __neg__(self) -> 'Expression':

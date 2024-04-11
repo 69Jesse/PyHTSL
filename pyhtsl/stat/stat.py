@@ -79,57 +79,56 @@ class Stat(ABC):
         return self.__value
 
     @value.setter
-    def value(self, value: 'StatValue | Expression | Stat | int') -> None:
+    def value(self, value: 'StatValue | Expression | Stat | int | PlaceholderValue') -> None:
         if isinstance(value, StatValue):
-            assert value is self.__value, 'Cannot set value to another StatValue instance'
-            return
+            value = value.stat
         self.__value.set(value)
 
-    def set(self, value: 'Expression | Stat | int') -> None:
+    def set(self, value: 'Expression | Stat | int | PlaceholderValue') -> None:
         self.value = value
 
-    def __iadd__(self, other: 'Expression | Stat | int') -> 'Self':
+    def __iadd__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         self.value += other
         return self
 
-    def __add__(self, other: 'Expression | Stat | int') -> 'Expression':
+    def __add__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return self.value + other
 
-    def __radd__(self, other: 'Expression | Stat | int') -> 'Expression':
+    def __radd__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return other + self.value
 
-    def __isub__(self, other: 'Expression | Stat | int') -> 'Self':
+    def __isub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         self.value -= other
         return self
 
-    def __sub__(self, other: 'Expression | Stat | int') -> 'Expression':
+    def __sub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return self.value - other
 
-    def __rsub__(self, other: 'Expression | Stat | int') -> 'Expression':
+    def __rsub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return other - self.value
 
-    def __imul__(self, other: 'Expression | Stat | int') -> 'Self':
+    def __imul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         self.value *= other
         return self
 
-    def __mul__(self, other: 'Expression | Stat | int') -> 'Expression':
+    def __mul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return self.value * other
 
-    def __rmul__(self, other: 'Expression | Stat | int') -> 'Expression':
+    def __rmul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return other * self.value
 
-    def __itruediv__(self, other: 'Expression | Stat | int') -> 'Self':
+    def __itruediv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         self.value /= other
         return self
 
-    def __truediv__(self, other: 'Expression | Stat | int') -> 'Expression':
+    def __truediv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return self.value / other
 
-    def __ifloordiv__(self, other: 'Expression | Stat | int') -> 'Self':
+    def __ifloordiv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         self.value //= other
         return self
 
-    def __floordiv__(self, other: 'Expression | Stat | int') -> 'Expression':
+    def __floordiv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return self.value // other
 
     def __neg__(self) -> 'Expression':

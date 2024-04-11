@@ -1,4 +1,5 @@
 from .statements import IfStatement, ConditionalMode
+from ..expression import Expression
 
 from abc import ABC, abstractmethod
 from enum import Enum
@@ -39,6 +40,33 @@ class PlaceholderValue:
         name: str,
     ) -> None:
         self.name = name
+
+    def __add__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
+        return Expression.add(self, other)
+
+    def __radd__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
+        return Expression.radd(self, other)
+
+    def __sub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
+        return Expression.sub(self, other)
+
+    def __rsub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
+        return Expression.rsub(self, other)
+
+    def __mul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
+        return Expression.mul(self, other)
+
+    def __rmul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
+        return Expression.rmul(self, other)
+
+    def __truediv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
+        return Expression.truediv(self, other)
+
+    def __floordiv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
+        return Expression.floordiv(self, other)
+
+    def __neg__(self) -> Expression:
+        return Expression.neg(self)
 
     @staticmethod
     def equals(
