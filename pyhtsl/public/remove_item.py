@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 
 
 __all__ = (
@@ -9,4 +9,4 @@ __all__ = (
 def remove_item(
     item: str,
 ) -> None:
-    write(f'removeItem "{item}"')
+    WRITER.write(f'removeItem "{item}"')

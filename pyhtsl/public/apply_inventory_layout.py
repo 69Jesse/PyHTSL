@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 from .layout import Layout
 
 
@@ -11,4 +11,4 @@ def apply_inventory_layout(
     layout: Layout | str,
 ) -> None:
     layout = layout if isinstance(layout, Layout) else Layout(layout)
-    write(f'applyLayout "{layout.name}"')
+    WRITER.write(f'applyLayout "{layout.name}"')

@@ -1,5 +1,5 @@
 from .expression_type import ExpressionType
-from ..write import write
+from ..writer import WRITER
 
 from typing import TYPE_CHECKING, final, ClassVar
 if TYPE_CHECKING:
@@ -92,7 +92,7 @@ class ExpressionHandler:
 
     def write_lines(self, lines: list[tuple['Stat', 'ExpressionType', 'Stat | int']]) -> None:
         for left, type, right in lines:
-            write(f'{left.operational_expression_left_side()} {type.value} "{str(right)}"')
+            WRITER.write(f'{left.operational_expression_left_side()} {type.value} "{str(right)}"')
 
     def push(self) -> None:
         if self.is_empty():

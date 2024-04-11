@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 from .function import Function
 
 
@@ -12,4 +12,4 @@ def trigger_function(
     trigger_for_all_players: bool = False,
 ) -> None:
     function = function if isinstance(function, Function) else Function(function)
-    write(f'function "{function.name}" {str(trigger_for_all_players).lower()}')
+    WRITER.write(f'function "{function.name}" {str(trigger_for_all_players).lower()}')

@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 
 
 __all__ = (
@@ -7,4 +7,4 @@ __all__ = (
 
 
 def clear_potion_effects() -> None:
-    write('clearEffects')
+    WRITER.write('clearEffects')

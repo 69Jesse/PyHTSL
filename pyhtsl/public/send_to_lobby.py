@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 
 
 __all__ = (
@@ -9,4 +9,4 @@ __all__ = (
 def send_to_lobby(
     lobby: str,
 ) -> None:
-    write(f'lobby "{lobby}"')
+    WRITER.write(f'lobby "{lobby}"')

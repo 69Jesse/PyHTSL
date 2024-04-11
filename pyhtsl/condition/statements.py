@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 
 from enum import Enum
 
@@ -46,7 +46,7 @@ class IfStatement:
         return [left, right]  # type: ignore
 
     def __enter__(self) -> None:
-        write(f'if {self.mode.value} (' + ', '.join(map(str, self.conditions)) + ') {')
+        WRITER.write(f'if {self.mode.value} (' + ', '.join(map(str, self.conditions)) + ') {')
 
     def __exit__(
         self,
@@ -54,14 +54,14 @@ class IfStatement:
         exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
     ) -> None:
-        write('}')
+        WRITER.write('}')
 
 
 class ElseStatement:
     __slots__ = ()
 
     def __enter__(self) -> None:
-        write('else {', append_to_previous_line=True)
+        WRITER.write('else {', append_to_previous_line=True)
 
     def __exit__(
         self,
@@ -69,4 +69,4 @@ class ElseStatement:
         exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
     ) -> None:
-        write('}')
+        WRITER.write('}')

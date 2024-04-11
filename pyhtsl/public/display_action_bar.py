@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 
 
 __all__ = (
@@ -9,4 +9,4 @@ __all__ = (
 def display_action_bar(
     text: str,
 ) -> None:
-    write(f'actionBar "{text}"')
+    WRITER.write(f'actionBar "{text}"')

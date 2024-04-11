@@ -1,5 +1,5 @@
 from .group import Group
-from ..write import write
+from ..writer import WRITER
 
 
 __all__ = (
@@ -12,4 +12,4 @@ def change_player_group(
     demotion_protection: bool = True,
 ) -> None:
     group = group if isinstance(group, Group) else Group(group)
-    write(f'changePlayerGroup "{group.name}" {str(demotion_protection).lower()}')
+    WRITER.write(f'changePlayerGroup "{group.name}" {str(demotion_protection).lower()}')

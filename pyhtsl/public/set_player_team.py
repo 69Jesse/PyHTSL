@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 from .team import Team
 
 
@@ -11,4 +11,4 @@ def set_player_team(
     team: Team | str,
 ) -> None:
     team = team if isinstance(team, Team) else Team(team)
-    write(f'setTeam "{team.name}"')
+    WRITER.write(f'setTeam "{team.name}"')

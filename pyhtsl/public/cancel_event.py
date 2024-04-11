@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 
 
 __all__ = (
@@ -7,4 +7,4 @@ __all__ = (
 
 
 def cancel_event() -> None:
-    write('cancelEvent')
+    WRITER.write('cancelEvent')

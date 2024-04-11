@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 
 
 __all__ = (
@@ -9,4 +9,4 @@ __all__ = (
 def give_experience_levels(
     levels: int,
 ) -> None:
-    write(f'xpLevel {levels}')
+    WRITER.write(f'xpLevel {levels}')

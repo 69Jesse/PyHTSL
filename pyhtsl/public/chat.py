@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 
 
 __all__ = (
@@ -9,4 +9,4 @@ __all__ = (
 def chat(
     line: str,
 ) -> None:
-    write(f'chat "{line}"')
+    WRITER.write(f'chat "{line}"')

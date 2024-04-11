@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 
 
 __all__ = (
@@ -9,4 +9,4 @@ __all__ = (
 def fail_parkour(
     reason: str = 'Failed!',
 ) -> None:
-    write(f'failParkour "{reason}"')
+    WRITER.write(f'failParkour "{reason}"')

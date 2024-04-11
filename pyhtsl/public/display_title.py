@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 
 
 __all__ = (
@@ -13,4 +13,4 @@ def display_title(
     stay: int = 5,
     fadeout: int = 1,
 ) -> None:
-    write(f'title "{title}" "{subtitle}" {fadein} {stay} {fadeout}')
+    WRITER.write(f'title "{title}" "{subtitle}" {fadein} {stay} {fadeout}')

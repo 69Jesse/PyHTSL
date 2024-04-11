@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 
 
 __all__ = (
@@ -7,4 +7,4 @@ __all__ = (
 
 
 def consume_item() -> None:
-    write('consumeItem')
+    WRITER.write('consumeItem')

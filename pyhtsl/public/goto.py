@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 
 from typing import Literal
 
@@ -19,4 +19,4 @@ def goto(
     ],
     name: str,
 ) -> None:
-    write(f'goto {container} "{name}"')
+    WRITER.write(f'goto {container} "{name}"')

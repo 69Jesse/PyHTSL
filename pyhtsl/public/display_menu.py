@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 from .menu import Menu
 
 
@@ -11,4 +11,4 @@ def display_menu(
     menu: Menu | str,
 ) -> None:
     menu = menu if isinstance(menu, Menu) else Menu(menu)
-    write(f'displayMenu "{menu.name}"')
+    WRITER.write(f'displayMenu "{menu.name}"')

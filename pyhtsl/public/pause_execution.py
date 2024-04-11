@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 
 
 __all__ = (
@@ -9,4 +9,4 @@ __all__ = (
 def pause_execution(
     ticks: int = 20,
 ) -> None:
-    write(f'pause {ticks}')
+    WRITER.write(f'pause {ticks}')

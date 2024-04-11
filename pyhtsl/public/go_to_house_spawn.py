@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 
 
 __all__ = (
@@ -7,4 +7,4 @@ __all__ = (
 
 
 def go_to_house_spawn() -> None:
-    write('houseSpawn')
+    WRITER.write('houseSpawn')

@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 
 from typing import Literal
 
@@ -36,4 +36,4 @@ def enchant_held_item(
     ],
     level: int = 1,
 ) -> None:
-    write(f'enchant "{enchantment}" {level}')
+    WRITER.write(f'enchant "{enchantment}" {level}')

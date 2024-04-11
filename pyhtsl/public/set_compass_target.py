@@ -1,4 +1,4 @@
-from ..write import write
+from ..writer import WRITER
 
 from typing import Literal, Optional
 
@@ -23,4 +23,4 @@ def set_compass_target(
         if coordinates is None:
             raise ValueError('coordinates must be provided when location is custom_coordinates')
         line += f' "{coordinates}"'
-    write(line)
+    WRITER.write(line)
