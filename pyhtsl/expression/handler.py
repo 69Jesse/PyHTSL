@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, final, ClassVar
 if TYPE_CHECKING:
     from .expression import Expression
     from ..stat import Stat, TemporaryStat
+    from ..condition import PlaceholderValue
 
 
 __all__ = (
@@ -37,18 +38,29 @@ class ExpressionHandler:
         for i, stat in enumerate(temporary_stats, start=TEMP_STATS_NUMBER_START):
             stat.number = i
 
-    def create_lines(self) -> list[tuple['Stat', 'ExpressionType', 'Stat | int']]:
-        lines: list[tuple['Stat', 'ExpressionType', 'Stat | int']] = []
+    def create_lines(self) -> list[tuple['Stat | PlaceholderValue', ExpressionType, 'Stat | int | PlaceholderValue']]:
+        lines: list[tuple['Stat | PlaceholderValue', ExpressionType, 'Stat | int | PlaceholderValue']] = []
         for expression in self.__expressions:
             left = expression.fetch_stat_or_int(expression.left)
             right = expression.fetch_stat_or_int(expression.right)
             lines.append((left, expression.type, right))
         return lines
 
-    def optimize_lines(self, lines: list[tuple['Stat', 'ExpressionType', 'Stat | int']]) -> None:
+    def optimize_lines(self, lines: list[tuple['Stat | PlaceholderValue', ExpressionType, 'Stat | int | PlaceholderValue']]) -> None:
         for i in range(len(lines)):
-            left, _, _ = lines[i]
+            left, type, right = lines[i]
             if not isinstance(left, self.temporary_stat_cls):
+                if not isinstance(right, self.temporary_stat_cls):
+                    continue
+                if type is not ExpressionType.Set:
+                    continue
+                for j in range(i, -1, -1):
+                    new_left, new_type, new_right = lines[j]
+                    if isinstance(new_left, self.temporary_stat_cls) and new_left.number == right.number:
+                        new_left = left
+                    if isinstance(new_right, self.temporary_stat_cls) and new_right.number == right.number:
+                        new_right = left
+                    lines[j] = (new_left, new_type, new_right)
                 continue
             for number in range(TEMP_STATS_NUMBER_START, left.number):
                 for j in range(i + 1, len(lines)):
@@ -68,13 +80,14 @@ class ExpressionHandler:
                     left.number = number
                     break
 
-    def take_out_useless(self, lines: list[tuple['Stat', 'ExpressionType', 'Stat | int']]) -> None:
+    def take_out_useless(self, lines: list[tuple['Stat | PlaceholderValue', ExpressionType, 'Stat | int | PlaceholderValue']]) -> None:
         for i in range(len(lines) - 1, -1, -1):
             left, type, right = lines[i]
             if (
                 type is ExpressionType.Set
                 and not isinstance(right, int)
-                and right.name == left.name
+                and left.name == right.name
+                and left.__class__ is right.__class__
             ):
                 lines.pop(i)
             elif (
@@ -90,7 +103,7 @@ class ExpressionHandler:
             ):
                 lines.pop(i)
 
-    def write_lines(self, lines: list[tuple['Stat', 'ExpressionType', 'Stat | int']]) -> None:
+    def write_lines(self, lines: list[tuple['Stat | PlaceholderValue', ExpressionType, 'Stat | int | PlaceholderValue']]) -> None:
         for left, type, right in lines:
             WRITER.write(f'{left.operational_expression_left_side()} {type.value} "{str(right)}"')
 
