@@ -27,6 +27,7 @@ class Writer:
     lines: list[str] = []
     exception_raised: bool = False
     registered_functions: list[Callable[[], None]] = []
+    in_front_index: int = 0
     file_name: str
     htsl_file: Path
     python_save_file: Path
@@ -42,7 +43,8 @@ class Writer:
             self.lines[-1] += ' ' + line
         else:
             if add_to_front:
-                self.lines.insert(0, line)
+                self.lines.insert(self.in_front_index, line)
+                self.in_front_index += 1
             else:
                 self.lines.append(line)
 
