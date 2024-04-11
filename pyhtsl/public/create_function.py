@@ -13,6 +13,7 @@ __all__ = (
 def create_function(name: str) -> Callable[[Callable[[], None]], Function]:
     def decorator(func: Callable[[], None]) -> Function:
         def wrapper() -> None:
+            goto(container='function', name=name, add_to_front=True)  # type: ignore
             goto(container='function', name=name)
             func()
         WRITER.registered_functions.append(wrapper)

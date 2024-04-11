@@ -35,11 +35,16 @@ class Writer:
         line: str,
         *,
         append_to_previous_line: bool = False,
+        add_to_front: bool = False,
     ) -> None:
         if append_to_previous_line:
+            assert not add_to_front
             self.lines[-1] += ' ' + line
         else:
-            self.lines.append(line)
+            if add_to_front:
+                self.lines.insert(0, line)
+            else:
+                self.lines.append(line)
 
     def write_to_files(self) -> None:
         self.file_name = os.path.basename(sys.argv[0]).rsplit('.', 1)[0]
