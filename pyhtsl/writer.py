@@ -2,12 +2,14 @@ import os
 from pathlib import Path
 import atexit
 import sys
+from enum import Enum
 
 from types import TracebackType
 from typing import Optional, Callable
 
 
 __all__ = (
+    'LineType',
     'WRITER',
 )
 
@@ -23,8 +25,14 @@ if not PYHTSL_FOLDER.exists():
     PYHTSL_FOLDER.mkdir()
 
 
+class LineType(Enum):
+    player_stat_change = 0
+    global_stat_change = 1
+    team_stat_change = 2
+
+
 class Writer:
-    lines: list[str] = []
+    lines: list[tuple[str, LineType]] = []
     exception_raised: bool = False
     registered_functions: list[Callable[[], None]] = []
     in_front_index: int = 0
@@ -34,19 +42,20 @@ class Writer:
     def write(
         self,
         line: str,
+        line_type: LineType,
         *,
         append_to_previous_line: bool = False,
         add_to_front: bool = False,
     ) -> None:
         if append_to_previous_line:
             assert not add_to_front
-            self.lines[-1] += ' ' + line
+            self.lines[-1] = (self.lines[-1][0] + ' ' + line, line_type)
         else:
             if add_to_front:
-                self.lines.insert(self.in_front_index, line)
+                self.lines.insert(self.in_front_index, (line, line_type))
                 self.in_front_index += 1
             else:
-                self.lines.append(line)
+                self.lines.append((line, line_type))
 
     def write_to_files(self) -> None:
         self.file_name = os.path.basename(sys.argv[0]).rsplit('.', 1)[0]
@@ -54,7 +63,7 @@ class Writer:
         self.htsl_file = HTSL_IMPORTS_FOLDER / f'{self.file_name}.htsl'
         self.htsl_file.write_text(
             '// Generated with PyHTSL https://github.com/69Jesse/PyHTSL\n'
-            + '\n'.join(self.lines)
+            + '\n'.join((line for line, _ in self.lines))
         )
 
         self.python_save_file = PYHTSL_FOLDER / f'{self.file_name}.py'
