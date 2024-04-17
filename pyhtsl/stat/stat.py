@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from ..expression import Expression
     from ..condition import Condition, IfStatement
+    from ..writer import LineType
     from typing import Self
 
 
@@ -67,6 +68,11 @@ class Stat(ABC):
 
     def get_htsl_formatted(self) -> str:
         return f'{self.get_prefix()} {self.name}'
+
+    @property
+    @abstractmethod
+    def line_type(self) -> 'LineType':
+        raise NotImplementedError
 
     def __str__(self) -> str:
         return self.get_placeholder()

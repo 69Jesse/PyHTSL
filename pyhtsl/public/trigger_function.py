@@ -1,4 +1,4 @@
-from ..writer import WRITER
+from ..writer import WRITER, LineType
 from .function import Function
 
 
@@ -12,4 +12,7 @@ def trigger_function(
     trigger_for_all_players: bool = False,
 ) -> None:
     function = function if isinstance(function, Function) else Function(function)
-    WRITER.write(f'function "{function.name}" {str(trigger_for_all_players).lower()}')
+    WRITER.write(
+        f'function "{function.name}" {str(trigger_for_all_players).lower()}',
+        LineType.trigger_function,
+    )

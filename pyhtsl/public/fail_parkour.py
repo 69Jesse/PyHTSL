@@ -1,4 +1,4 @@
-from ..writer import WRITER
+from ..writer import WRITER, LineType
 
 
 __all__ = (
@@ -9,4 +9,7 @@ __all__ = (
 def fail_parkour(
     reason: str = 'Failed!',
 ) -> None:
-    WRITER.write(f'failParkour "{reason}"')
+    WRITER.write(
+        f'failParkour "{reason}"',
+        LineType.miscellaneous,
+    )

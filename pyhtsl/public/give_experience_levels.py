@@ -1,4 +1,4 @@
-from ..writer import WRITER
+from ..writer import WRITER, LineType
 
 
 __all__ = (
@@ -9,4 +9,7 @@ __all__ = (
 def give_experience_levels(
     levels: int,
 ) -> None:
-    WRITER.write(f'xpLevel {levels}')
+    WRITER.write(
+        f'xpLevel {levels}',
+        LineType.miscellaneous,
+    )

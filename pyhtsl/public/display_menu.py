@@ -1,4 +1,4 @@
-from ..writer import WRITER
+from ..writer import WRITER, LineType
 from .menu import Menu
 
 
@@ -11,4 +11,7 @@ def display_menu(
     menu: Menu | str,
 ) -> None:
     menu = menu if isinstance(menu, Menu) else Menu(menu)
-    WRITER.write(f'displayMenu "{menu.name}"')
+    WRITER.write(
+        f'displayMenu "{menu.name}"',
+        LineType.miscellaneous,
+    )

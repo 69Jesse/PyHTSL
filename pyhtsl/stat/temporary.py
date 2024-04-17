@@ -1,5 +1,6 @@
 from ..expression import EXPR_HANDLER
 from .stat import Stat
+from ..writer import LineType
 
 from typing import final
 
@@ -27,6 +28,11 @@ class TemporaryStat(Stat):
     @staticmethod
     def get_placeholder_word() -> str:
         return 'player'
+
+    @property
+    def line_type(self) -> LineType:
+        return LineType.player_stat_change
+
 
 
 EXPR_HANDLER.temporary_stat_cls = TemporaryStat  # type: ignore

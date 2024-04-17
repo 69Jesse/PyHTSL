@@ -38,15 +38,17 @@ class ExpressionHandler:
         for i, stat in enumerate(temporary_stats, start=TEMP_STATS_NUMBER_START):
             stat.number = i
 
-    def create_lines(self) -> list[tuple['Stat | PlaceholderValue', ExpressionType, 'Stat | int | PlaceholderValue']]:
-        lines: list[tuple['Stat | PlaceholderValue', ExpressionType, 'Stat | int | PlaceholderValue']] = []
+    def create_lines(self) -> list[tuple['Stat', ExpressionType, 'Stat | int | PlaceholderValue']]:
+        lines: list[tuple['Stat', ExpressionType, 'Stat | int | PlaceholderValue']] = []
         for expression in self.__expressions:
             left = expression.fetch_stat_or_int(expression.left)
+            if TYPE_CHECKING:
+                assert isinstance(left, Stat)
             right = expression.fetch_stat_or_int(expression.right)
             lines.append((left, expression.type, right))
         return lines
 
-    def optimize_lines(self, lines: list[tuple['Stat | PlaceholderValue', ExpressionType, 'Stat | int | PlaceholderValue']]) -> None:
+    def optimize_lines(self, lines: list[tuple['Stat', ExpressionType, 'Stat | int | PlaceholderValue']]) -> None:
         skipping_temporary_stats: set['TemporaryStat'] = set()
         for i in range(len(lines)):
             left, type, right = lines[i]
@@ -101,32 +103,35 @@ class ExpressionHandler:
             else:
                 skipping_temporary_stats.add(left)
 
-    def take_out_useless(self, lines: list[tuple['Stat | PlaceholderValue', ExpressionType, 'Stat | int | PlaceholderValue']]) -> None:
+    def take_out_useless(self, lines: list[tuple['Stat', ExpressionType, 'Stat | int | PlaceholderValue']]) -> None:
         for i in range(len(lines) - 1, -1, -1):
-            left, type, right = lines[i]
+            left, expr_type, right = lines[i]
             if (
-                type is ExpressionType.Set
+                expr_type is ExpressionType.Set
                 and not isinstance(right, int)
                 and left.name == right.name
-                and left.__class__ is right.__class__
+                and type(left) is type(right)
             ):
                 lines.pop(i)
             elif (
-                (type is ExpressionType.Increment or type is ExpressionType.Decrement)
+                (expr_type is ExpressionType.Increment or expr_type is ExpressionType.Decrement)
                 and isinstance(right, int)
                 and right == 0
             ):
                 lines.pop(i)
             elif (
-                (type is ExpressionType.Multiply or type is ExpressionType.Divide)
+                (expr_type is ExpressionType.Multiply or expr_type is ExpressionType.Divide)
                 and isinstance(right, int)
                 and right == 1
             ):
                 lines.pop(i)
 
-    def write_lines(self, lines: list[tuple['Stat | PlaceholderValue', ExpressionType, 'Stat | int | PlaceholderValue']]) -> None:
+    def write_lines(self, lines: list[tuple['Stat', ExpressionType, 'Stat | int | PlaceholderValue']]) -> None:
         for left, type, right in lines:
-            WRITER.write(f'{left.operational_expression_left_side()} {type.value} "{str(right)}"')
+            WRITER.write(
+                f'{left.operational_expression_left_side()} {type.value} "{str(right)}"',
+                left.line_type,
+            )
 
     def push(self) -> None:
         if self.is_empty():

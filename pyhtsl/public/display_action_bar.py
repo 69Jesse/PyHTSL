@@ -1,4 +1,4 @@
-from ..writer import WRITER
+from ..writer import WRITER, LineType
 
 
 __all__ = (
@@ -9,4 +9,7 @@ __all__ = (
 def display_action_bar(
     text: str,
 ) -> None:
-    WRITER.write(f'actionBar "{text}"')
+    WRITER.write(
+        f'actionBar "{text}"',
+        LineType.miscellaneous,
+    )

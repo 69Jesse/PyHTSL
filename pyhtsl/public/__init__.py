@@ -24,7 +24,7 @@ from .display_menu import display_menu as display_menu
 from .display_action_bar import display_action_bar as display_action_bar
 from .display_title import display_title as display_title
 from .enchant_held_item import enchant_held_item as enchant_held_item
-from .exit import exit_function as exit_function
+from .exit_function import exit_function as exit_function
 from .fail_parkour import fail_parkour as fail_parkour
 from .full_heal import full_heal as full_heal
 from .give_experience_levels import give_experience_levels as give_experience_levels

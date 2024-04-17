@@ -1,4 +1,4 @@
-from ..writer import WRITER
+from ..writer import WRITER, LineType
 
 
 __all__ = (
@@ -7,4 +7,7 @@ __all__ = (
 
 
 def full_heal() -> None:
-    WRITER.write('fullHeal')
+    WRITER.write(
+        'fullHeal',
+        LineType.miscellaneous,
+    )

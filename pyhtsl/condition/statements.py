@@ -1,4 +1,4 @@
-from ..writer import WRITER
+from ..writer import WRITER, LineType
 
 from enum import Enum
 
@@ -16,8 +16,8 @@ __all__ = (
 
 
 class ConditionalMode(Enum):
-    AND = 'and'
-    OR = 'or'
+    AND = LineType.if_and_enter
+    OR = LineType.if_or_enter
 
 
 class IfStatement:
@@ -46,7 +46,10 @@ class IfStatement:
         return [left, right]  # type: ignore
 
     def __enter__(self) -> None:
-        WRITER.write(f'if {self.mode.value} (' + ', '.join(map(str, self.conditions)) + ') {')
+        WRITER.write(
+            f'if {self.mode.name.lower()} (' + ', '.join(map(str, self.conditions)) + ') {',
+            self.mode.value,
+        )
 
     def __exit__(
         self,
@@ -54,14 +57,21 @@ class IfStatement:
         exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
     ) -> None:
-        WRITER.write('}')
+        WRITER.write(
+            '}',
+            LineType.if_exit,
+        )
 
 
 class ElseStatement:
     __slots__ = ()
 
     def __enter__(self) -> None:
-        WRITER.write('else {', append_to_previous_line=True)
+        WRITER.write(
+            'else {',
+            LineType.else_enter,
+            append_to_previous_line=True,
+        )
 
     def __exit__(
         self,
@@ -69,4 +79,7 @@ class ElseStatement:
         exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
     ) -> None:
-        WRITER.write('}')
+        WRITER.write(
+            '}',
+            LineType.else_exit,
+        )
