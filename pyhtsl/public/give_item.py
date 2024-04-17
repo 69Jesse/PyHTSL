@@ -1,4 +1,4 @@
-from ..writer import WRITER
+from ..writer import WRITER, LineType
 
 from typing import Literal
 
@@ -57,4 +57,7 @@ def give_item(
     ] = 'first_slot',
     replace_existing_item: bool = False,
 ) -> None:
-    WRITER.write(f'giveItem "{item}" {str(allow_multiple).lower()} {inventory_slot} {str(replace_existing_item).lower()}')
+    WRITER.write(
+        f'giveItem "{item}" {str(allow_multiple).lower()} {inventory_slot} {str(replace_existing_item).lower()}',
+        LineType.miscellaneous,
+    )

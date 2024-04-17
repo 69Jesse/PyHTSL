@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import atexit
 import sys
-from enum import Enum
+from enum import Enum, auto
 
 from types import TracebackType
 from typing import Optional, Callable
@@ -26,9 +26,18 @@ if not PYHTSL_FOLDER.exists():
 
 
 class LineType(Enum):
-    player_stat_change = 0
-    global_stat_change = 1
-    team_stat_change = 2
+    player_stat_change = auto()
+    global_stat_change = auto()
+    team_stat_change = auto()
+    if_and_enter = auto()
+    if_or_enter = auto()
+    if_exit = auto()
+    else_enter = auto()
+    else_exit = auto()
+    trigger_function = auto()
+    exit_function = auto()
+    cancel_event = auto()
+    miscellaneous = auto()
 
 
 class Writer:

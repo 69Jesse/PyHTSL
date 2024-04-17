@@ -1,7 +1,9 @@
 from ..condition import PlaceholderValue
 from .stat import Stat
 
-from typing import final, Optional
+from typing import TYPE_CHECKING, final, Optional
+if TYPE_CHECKING:
+    from ..writer import LineType
 
 
 @final
@@ -22,6 +24,10 @@ class ComparableStat(Stat, PlaceholderValue):
         raise NotImplementedError
 
     def get_placeholder_word(self) -> str:
+        raise NotImplementedError
+
+    @property
+    def line_type(self) -> 'LineType':
         raise NotImplementedError
 
     def __str__(self) -> str:

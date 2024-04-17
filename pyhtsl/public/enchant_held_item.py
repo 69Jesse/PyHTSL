@@ -1,4 +1,4 @@
-from ..writer import WRITER
+from ..writer import WRITER, LineType
 
 from typing import Literal
 
@@ -36,4 +36,7 @@ def enchant_held_item(
     ],
     level: int = 1,
 ) -> None:
-    WRITER.write(f'enchant "{enchantment}" {level}')
+    WRITER.write(
+        f'enchant "{enchantment}" {level}',
+        LineType.miscellaneous,
+    )

@@ -128,7 +128,10 @@ class ExpressionHandler:
 
     def write_lines(self, lines: list[tuple['Stat', ExpressionType, 'Stat | int | PlaceholderValue']]) -> None:
         for left, type, right in lines:
-            WRITER.write(f'{left.operational_expression_left_side()} {type.value} "{str(right)}"', left.line_type)
+            WRITER.write(
+                f'{left.operational_expression_left_side()} {type.value} "{str(right)}"',
+                left.line_type,
+            )
 
     def push(self) -> None:
         if self.is_empty():

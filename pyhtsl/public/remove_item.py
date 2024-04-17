@@ -1,4 +1,4 @@
-from ..writer import WRITER
+from ..writer import WRITER, LineType
 
 
 __all__ = (
@@ -9,4 +9,7 @@ __all__ = (
 def remove_item(
     item: str,
 ) -> None:
-    WRITER.write(f'removeItem "{item}"')
+    WRITER.write(
+        f'removeItem "{item}"',
+        LineType.miscellaneous,
+    )

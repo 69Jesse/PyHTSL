@@ -1,5 +1,5 @@
 from .group import Group
-from ..writer import WRITER
+from ..writer import WRITER, LineType
 
 
 __all__ = (
@@ -12,4 +12,7 @@ def change_player_group(
     demotion_protection: bool = True,
 ) -> None:
     group = group if isinstance(group, Group) else Group(group)
-    WRITER.write(f'changePlayerGroup "{group.name}" {str(demotion_protection).lower()}')
+    WRITER.write(
+        f'changePlayerGroup "{group.name}" {str(demotion_protection).lower()}',
+        LineType.miscellaneous,
+    )

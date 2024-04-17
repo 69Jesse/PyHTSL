@@ -1,4 +1,4 @@
-from ..writer import WRITER
+from ..writer import WRITER, LineType
 
 
 __all__ = (
@@ -7,4 +7,7 @@ __all__ = (
 
 
 def clear_potion_effects() -> None:
-    WRITER.write('clearEffects')
+    WRITER.write(
+        'clearEffects',
+        LineType.miscellaneous,
+    )

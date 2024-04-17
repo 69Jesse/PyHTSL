@@ -1,4 +1,4 @@
-from ..writer import WRITER
+from ..writer import WRITER, LineType
 
 from typing import Optional, Literal
 
@@ -22,4 +22,7 @@ def teleport_player(
         if coordinates is None:
             raise ValueError('coordinates must be provided when location is custom_coordinates')
         line += f' "{coordinates}"'
-    WRITER.write(line)
+    WRITER.write(
+        line,
+        LineType.miscellaneous,
+    )

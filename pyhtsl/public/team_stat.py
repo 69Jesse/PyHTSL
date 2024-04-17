@@ -1,3 +1,4 @@
+from ..writer import LineType
 from ..stat.stat import Stat
 
 from typing import TYPE_CHECKING, final
@@ -24,6 +25,10 @@ class TeamStat(Stat):
     @staticmethod
     def get_placeholder_word() -> str:
         return 'team'
+
+    @property
+    def line_type(self) -> LineType:
+        return LineType.team_stat_change
 
     def get_htsl_formatted(self) -> str:
         return f'{super().get_htsl_formatted()} {self.team.name}'

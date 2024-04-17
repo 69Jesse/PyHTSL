@@ -1,4 +1,4 @@
-from ..writer import WRITER
+from ..writer import WRITER, LineType
 
 from typing import Literal
 
@@ -37,4 +37,7 @@ def apply_potion_effect(
     level: int = 1,
     override_existing_effects: bool = False,
 ) -> None:
-    WRITER.write(f'applyPotion "{potion}" {duration} {level} {str(override_existing_effects).lower()}')
+    WRITER.write(
+        f'applyPotion "{potion}" {duration} {level} {str(override_existing_effects).lower()}',
+        LineType.miscellaneous,
+    )

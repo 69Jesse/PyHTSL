@@ -1,4 +1,4 @@
-from ..writer import WRITER
+from ..writer import WRITER, LineType
 
 
 __all__ = (
@@ -9,4 +9,7 @@ __all__ = (
 def chat(
     line: str,
 ) -> None:
-    WRITER.write(f'chat "{line}"')
+    WRITER.write(
+        f'chat "{line}"',
+        LineType.miscellaneous,
+    )

@@ -1,4 +1,4 @@
-from ..writer import WRITER
+from ..writer import WRITER, LineType
 
 
 __all__ = (
@@ -7,4 +7,7 @@ __all__ = (
 
 
 def cancel_event() -> None:
-    WRITER.write('cancelEvent')
+    WRITER.write(
+        'cancelEvent',
+        LineType.cancel_event,
+    )
