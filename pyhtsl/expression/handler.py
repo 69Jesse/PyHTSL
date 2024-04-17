@@ -49,13 +49,16 @@ class ExpressionHandler:
         return lines
 
     def optimize_lines(self, lines: list[tuple['Stat', ExpressionType, 'Stat | int | PlaceholderValue']]) -> None:
+        skipping_temporary_stats: set['TemporaryStat'] = set()
         for i in range(len(lines)):
             left, type, right = lines[i]
+
             if not isinstance(left, self.temporary_stat_cls):
                 if not isinstance(right, self.temporary_stat_cls):
                     continue
                 if type is not ExpressionType.Set:
                     continue
+                # stat = tempstat -> all previous tempstat to stat
                 for j in range(i, -1, -1):
                     new_left, new_type, new_right = lines[j]
                     if isinstance(new_left, self.temporary_stat_cls) and new_left.number == right.number:
@@ -64,8 +67,24 @@ class ExpressionHandler:
                         new_right = left
                     lines[j] = (new_left, new_type, new_right)
                 continue
-            for number in range(TEMP_STATS_NUMBER_START, left.number):
+
+            if isinstance(right, self.temporary_stat_cls) and type is ExpressionType.Set:
+                # l-tempstat = r-tempstat -> all next l-tempstat to r-tempstat
+                lines[i] = (right, type, right)
                 for j in range(i + 1, len(lines)):
+                    new_left, new_type, new_right = lines[j]
+                    if isinstance(new_left, self.temporary_stat_cls) and new_left.number == left.number:
+                        new_left = right
+                    if isinstance(new_right, self.temporary_stat_cls) and new_right.number == left.number:
+                        new_right = right
+                    lines[j] = (new_left, new_type, new_right)
+                continue
+
+            # check for possible lower number to avoid using unnecessary temporary stats
+            if left in skipping_temporary_stats:
+                continue
+            for number in range(TEMP_STATS_NUMBER_START, left.number):
+                for j in range(i, len(lines)):
                     new_left, new_type, new_right = lines[j]
                     if (
                         isinstance(new_left, self.temporary_stat_cls)
@@ -81,6 +100,8 @@ class ExpressionHandler:
                 else:
                     left.number = number
                     break
+            else:
+                skipping_temporary_stats.add(left)
 
     def take_out_useless(self, lines: list[tuple['Stat', ExpressionType, 'Stat | int | PlaceholderValue']]) -> None:
         for i in range(len(lines) - 1, -1, -1):
