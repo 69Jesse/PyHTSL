@@ -74,6 +74,9 @@ class Stat(ABC):
     def __repr__(self) -> str:
         return self.get_htsl_formatted()
 
+    def __hash__(self) -> int:
+        return hash(id(self))
+
     @property
     def value(self) -> StatValue:
         return self.__value

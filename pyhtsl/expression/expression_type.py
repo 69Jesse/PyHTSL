@@ -12,3 +12,6 @@ class ExpressionType(Enum):
     Set = '='
     Multiply = '*='
     Divide = '/='
+
+    def __repr__(self) -> str:
+        return self.value
