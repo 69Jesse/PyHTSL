@@ -38,6 +38,7 @@ class LineType(Enum):
     exit_function = auto()
     cancel_event = auto()
     miscellaneous = auto()
+    goto = auto()
 
 
 class Writer:
