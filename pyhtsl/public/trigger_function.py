@@ -23,8 +23,8 @@ def trigger_function(
         if len(parameters) != len(function.parameters):
             raise TypeError(f'Expected {len(function.parameters)} parameters, got {len(parameters)}.')
         for i, (param, expected_param) in enumerate(zip(parameters, function.parameters)):
-            if not isinstance(param, expected_param.cls) and not isinstance(param, int):
-                raise TypeError(f'Expected parameter {i} to be of type "{expected_param.cls.__name__}", got "{param.__class__.__name__}".')
+            if type(param) not in (PlayerStat, GlobalStat, TeamStat, int):
+                raise TypeError(f'Parameter {i} must be either "{PlayerStat.__name__}", "{GlobalStat.__name__}", "{TeamStat.__name__}", or "{int.__name__}", not "{type(param).__name__}".')
             stat: PlayerStat | GlobalStat | TeamStat = expected_param.cls(name=expected_param.name)
             stat.value = param
     WRITER.write(
