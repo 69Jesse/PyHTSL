@@ -1,7 +1,7 @@
 from .value import StatValue
 from ..condition import PlaceholderValue
 
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, ABCMeta
 
 from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
@@ -13,13 +13,31 @@ if TYPE_CHECKING:
 
 __all__ = (
     'Stat',
+    'StatParameter',
 )
 
 
 STAT_CACHE: dict[type['Stat'], dict[str, 'Stat']] = {}
 
 
-class Stat(ABC):
+class StatParameter:
+    name: str
+    cls: 'StatMeta'
+    def __init__(
+        self,
+        name: str,
+        cls: 'StatMeta',
+    ) -> None:
+        self.name = name
+        self.cls = cls
+
+
+class StatMeta(ABCMeta):
+    def __getitem__(cls, name: str) -> StatParameter:
+        return StatParameter(name, cls) 
+
+
+class Stat(ABC, metaclass=StatMeta):
     name: str
     __value: StatValue
     if TYPE_CHECKING:

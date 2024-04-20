@@ -135,7 +135,7 @@ class ExpressionHandler:
 
     def push(self) -> None:
         if self.is_empty():
-            raise RuntimeWarning('No expressions to push, what are you doing?')
+            return
         self.rename_temporary_stats()
         lines = self.create_lines()
         self.optimize_lines(lines)
