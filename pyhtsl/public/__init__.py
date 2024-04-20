@@ -45,7 +45,7 @@ from .trigger_function import trigger_function as trigger_function
 from .consume_item import consume_item as consume_item
 
 from .goto import goto as goto
-from .create_function import create_function as create_function
+from .create_function import create_function as create_function, rename as rename
 
 from .player_ping import PlayerPing as PlayerPing
 from .player_experience import PlayerExperience as PlayerExperience
