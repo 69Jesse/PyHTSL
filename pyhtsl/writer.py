@@ -75,6 +75,8 @@ class Writer:
             '// Generated with PyHTSL https://github.com/69Jesse/PyHTSL\n'
             + '\n'.join((line for line, _ in self.lines))
         )
+        if len(sys.argv) > 1 and sys.argv[1] == 'code':
+            os.system(f'code "{self.htsl_file.absolute()}"')
 
         self.python_save_file = PYHTSL_FOLDER / f'{self.file_name}.py'
         index: int = 1

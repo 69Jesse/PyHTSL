@@ -163,3 +163,4 @@ cython_debug/
 install.bat
 package.bat
 test/
+htsl-imports.lnk
