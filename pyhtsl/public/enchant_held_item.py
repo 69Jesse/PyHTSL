@@ -1,6 +1,7 @@
 from ..writer import WRITER, LineType
+from .enchantment import Enchantment, POSSIBLE_ENCHANTMENT
 
-from typing import Literal
+from typing import Optional
 
 
 __all__ = (
@@ -9,34 +10,18 @@ __all__ = (
 
 
 def enchant_held_item(
-    enchantment: Literal[
-        'protection',
-        'fire_protection',
-        'feather_falling',
-        'blast_protection',
-        'projectile_protection',
-        'respiration',
-        'aqua_affinity',
-        'thorns',
-        'depth_strider',
-        'sharpness',
-        'smite',
-        'bane_of_arthropods',
-        'knockback',
-        'fire_aspect',
-        'looting',
-        'efficiency',
-        'silk_touch',
-        'unbreaking',
-        'fortune',
-        'power',
-        'punch',
-        'flame',
-        'infinity',
-    ],
-    level: int = 1,
+    enchantment: POSSIBLE_ENCHANTMENT | Enchantment,
+    level: Optional[int] = None,
 ) -> None:
+    if isinstance(enchantment, Enchantment):
+        name = enchantment.name
+        if level is None:
+            level = enchantment.level
+    else:
+        name = enchantment
+    if level is None:
+        level = 1
     WRITER.write(
-        f'enchant "{enchantment}" {level}',
+        f'enchant "{name}" {level}',
         LineType.miscellaneous,
     )

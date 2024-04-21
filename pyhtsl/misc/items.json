@@ -1,0 +1,4890 @@
+{
+    "stone": {
+        "key": "stone",
+        "title": "Stone",
+        "name": "minecraft:stone",
+        "id": 1,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "granite": {
+        "key": "granite",
+        "title": "Granite",
+        "name": "minecraft:stone",
+        "id": 1,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "polished_granite": {
+        "key": "polished_granite",
+        "title": "Polished Granite",
+        "name": "minecraft:stone",
+        "id": 1,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "diorite": {
+        "key": "diorite",
+        "title": "Diorite",
+        "name": "minecraft:stone",
+        "id": 1,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "polished_diorite": {
+        "key": "polished_diorite",
+        "title": "Polished Diorite",
+        "name": "minecraft:stone",
+        "id": 1,
+        "data_value": 4,
+        "can_be_damaged": false
+    },
+    "andesite": {
+        "key": "andesite",
+        "title": "Andesite",
+        "name": "minecraft:stone",
+        "id": 1,
+        "data_value": 5,
+        "can_be_damaged": false
+    },
+    "polished_andesite": {
+        "key": "polished_andesite",
+        "title": "Polished Andesite",
+        "name": "minecraft:stone",
+        "id": 1,
+        "data_value": 6,
+        "can_be_damaged": false
+    },
+    "grass_block": {
+        "key": "grass_block",
+        "title": "Grass Block",
+        "name": "minecraft:grass",
+        "id": 2,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "dirt": {
+        "key": "dirt",
+        "title": "Dirt",
+        "name": "minecraft:dirt",
+        "id": 3,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "coarse_dirt": {
+        "key": "coarse_dirt",
+        "title": "Coarse Dirt",
+        "name": "minecraft:dirt",
+        "id": 3,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "podzol": {
+        "key": "podzol",
+        "title": "Podzol",
+        "name": "minecraft:dirt",
+        "id": 3,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "cobblestone": {
+        "key": "cobblestone",
+        "title": "Cobblestone",
+        "name": "minecraft:cobblestone",
+        "id": 4,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "oak_planks": {
+        "key": "oak_planks",
+        "title": "Oak Planks",
+        "name": "minecraft:planks",
+        "id": 5,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "spruce_planks": {
+        "key": "spruce_planks",
+        "title": "Spruce Planks",
+        "name": "minecraft:planks",
+        "id": 5,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "birch_planks": {
+        "key": "birch_planks",
+        "title": "Birch Planks",
+        "name": "minecraft:planks",
+        "id": 5,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "jungle_planks": {
+        "key": "jungle_planks",
+        "title": "Jungle Planks",
+        "name": "minecraft:planks",
+        "id": 5,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "acacia_planks": {
+        "key": "acacia_planks",
+        "title": "Acacia Planks",
+        "name": "minecraft:planks",
+        "id": 5,
+        "data_value": 4,
+        "can_be_damaged": false
+    },
+    "dark_oak_planks": {
+        "key": "dark_oak_planks",
+        "title": "Dark Oak Planks",
+        "name": "minecraft:planks",
+        "id": 5,
+        "data_value": 5,
+        "can_be_damaged": false
+    },
+    "oak_sapling": {
+        "key": "oak_sapling",
+        "title": "Oak Sapling",
+        "name": "minecraft:sapling",
+        "id": 6,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "spruce_sapling": {
+        "key": "spruce_sapling",
+        "title": "Spruce Sapling",
+        "name": "minecraft:sapling",
+        "id": 6,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "birch_sapling": {
+        "key": "birch_sapling",
+        "title": "Birch Sapling",
+        "name": "minecraft:sapling",
+        "id": 6,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "jungle_sapling": {
+        "key": "jungle_sapling",
+        "title": "Jungle Sapling",
+        "name": "minecraft:sapling",
+        "id": 6,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "acacia_sapling": {
+        "key": "acacia_sapling",
+        "title": "Acacia Sapling",
+        "name": "minecraft:sapling",
+        "id": 6,
+        "data_value": 4,
+        "can_be_damaged": false
+    },
+    "dark_oak_sapling": {
+        "key": "dark_oak_sapling",
+        "title": "Dark Oak Sapling",
+        "name": "minecraft:sapling",
+        "id": 6,
+        "data_value": 5,
+        "can_be_damaged": false
+    },
+    "bedrock": {
+        "key": "bedrock",
+        "title": "Bedrock",
+        "name": "minecraft:bedrock",
+        "id": 7,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "sand": {
+        "key": "sand",
+        "title": "Sand",
+        "name": "minecraft:sand",
+        "id": 12,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "red_sand": {
+        "key": "red_sand",
+        "title": "Red Sand",
+        "name": "minecraft:sand",
+        "id": 12,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "gravel": {
+        "key": "gravel",
+        "title": "Gravel",
+        "name": "minecraft:gravel",
+        "id": 13,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "gold_ore": {
+        "key": "gold_ore",
+        "title": "Gold Ore",
+        "name": "minecraft:gold_ore",
+        "id": 14,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "iron_ore": {
+        "key": "iron_ore",
+        "title": "Iron Ore",
+        "name": "minecraft:iron_ore",
+        "id": 15,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "coal_ore": {
+        "key": "coal_ore",
+        "title": "Coal Ore",
+        "name": "minecraft:coal_ore",
+        "id": 16,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "oak_log": {
+        "key": "oak_log",
+        "title": "Oak Log",
+        "name": "minecraft:log",
+        "id": 17,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "spruce_log": {
+        "key": "spruce_log",
+        "title": "Spruce Log",
+        "name": "minecraft:log",
+        "id": 17,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "birch_log": {
+        "key": "birch_log",
+        "title": "Birch Log",
+        "name": "minecraft:log",
+        "id": 17,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "jungle_log": {
+        "key": "jungle_log",
+        "title": "Jungle Log",
+        "name": "minecraft:log",
+        "id": 17,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "oak_leaves": {
+        "key": "oak_leaves",
+        "title": "Oak Leaves",
+        "name": "minecraft:leaves",
+        "id": 18,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "spruce_leaves": {
+        "key": "spruce_leaves",
+        "title": "Spruce Leaves",
+        "name": "minecraft:leaves",
+        "id": 18,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "birch_leaves": {
+        "key": "birch_leaves",
+        "title": "Birch Leaves",
+        "name": "minecraft:leaves",
+        "id": 18,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "jungle_leaves": {
+        "key": "jungle_leaves",
+        "title": "Jungle Leaves",
+        "name": "minecraft:leaves",
+        "id": 18,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "sponge": {
+        "key": "sponge",
+        "title": "Sponge",
+        "name": "minecraft:sponge",
+        "id": 19,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "wet_sponge": {
+        "key": "wet_sponge",
+        "title": "Wet Sponge",
+        "name": "minecraft:sponge",
+        "id": 19,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "glass": {
+        "key": "glass",
+        "title": "Glass",
+        "name": "minecraft:glass",
+        "id": 20,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "lapis_lazuli_ore": {
+        "key": "lapis_lazuli_ore",
+        "title": "Lapis Lazuli Ore",
+        "name": "minecraft:lapis_ore",
+        "id": 21,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "lapis_lazuli_block": {
+        "key": "lapis_lazuli_block",
+        "title": "Lapis Lazuli Block",
+        "name": "minecraft:lapis_block",
+        "id": 22,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "dispenser": {
+        "key": "dispenser",
+        "title": "Dispenser",
+        "name": "minecraft:dispenser",
+        "id": 23,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "sandstone": {
+        "key": "sandstone",
+        "title": "Sandstone",
+        "name": "minecraft:sandstone",
+        "id": 24,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "chiseled_sandstone": {
+        "key": "chiseled_sandstone",
+        "title": "Chiseled Sandstone",
+        "name": "minecraft:sandstone",
+        "id": 24,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "smooth_sandstone": {
+        "key": "smooth_sandstone",
+        "title": "Smooth Sandstone",
+        "name": "minecraft:sandstone",
+        "id": 24,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "note_block": {
+        "key": "note_block",
+        "title": "Note Block",
+        "name": "minecraft:noteblock",
+        "id": 25,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "powered_rails": {
+        "key": "powered_rails",
+        "title": "Powered Rails",
+        "name": "minecraft:golden_rail",
+        "id": 27,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "detector_rails": {
+        "key": "detector_rails",
+        "title": "Detector Rails",
+        "name": "minecraft:detector_rail",
+        "id": 28,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "sticky_piston": {
+        "key": "sticky_piston",
+        "title": "Sticky Piston",
+        "name": "minecraft:sticky_piston",
+        "id": 29,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "cobweb": {
+        "key": "cobweb",
+        "title": "Cobweb",
+        "name": "minecraft:web",
+        "id": 30,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "grass": {
+        "key": "grass",
+        "title": "Grass",
+        "name": "minecraft:tallgrass",
+        "id": 31,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "fern": {
+        "key": "fern",
+        "title": "Fern",
+        "name": "minecraft:tallgrass",
+        "id": 31,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "dead_bush": {
+        "key": "dead_bush",
+        "title": "Dead Bush",
+        "name": "minecraft:deadbush",
+        "id": 32,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "piston": {
+        "key": "piston",
+        "title": "Piston",
+        "name": "minecraft:piston",
+        "id": 33,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "white_wool": {
+        "key": "white_wool",
+        "title": "White Wool",
+        "name": "minecraft:wool",
+        "id": 35,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "orange_wool": {
+        "key": "orange_wool",
+        "title": "Orange Wool",
+        "name": "minecraft:wool",
+        "id": 35,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "magenta_wool": {
+        "key": "magenta_wool",
+        "title": "Magenta Wool",
+        "name": "minecraft:wool",
+        "id": 35,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "light_blue_wool": {
+        "key": "light_blue_wool",
+        "title": "Light Blue Wool",
+        "name": "minecraft:wool",
+        "id": 35,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "yellow_wool": {
+        "key": "yellow_wool",
+        "title": "Yellow Wool",
+        "name": "minecraft:wool",
+        "id": 35,
+        "data_value": 4,
+        "can_be_damaged": false
+    },
+    "lime_wool": {
+        "key": "lime_wool",
+        "title": "Lime Wool",
+        "name": "minecraft:wool",
+        "id": 35,
+        "data_value": 5,
+        "can_be_damaged": false
+    },
+    "pink_wool": {
+        "key": "pink_wool",
+        "title": "Pink Wool",
+        "name": "minecraft:wool",
+        "id": 35,
+        "data_value": 6,
+        "can_be_damaged": false
+    },
+    "gray_wool": {
+        "key": "gray_wool",
+        "title": "Gray Wool",
+        "name": "minecraft:wool",
+        "id": 35,
+        "data_value": 7,
+        "can_be_damaged": false
+    },
+    "light_gray_wool": {
+        "key": "light_gray_wool",
+        "title": "Light Gray Wool",
+        "name": "minecraft:wool",
+        "id": 35,
+        "data_value": 8,
+        "can_be_damaged": false
+    },
+    "cyan_wool": {
+        "key": "cyan_wool",
+        "title": "Cyan Wool",
+        "name": "minecraft:wool",
+        "id": 35,
+        "data_value": 9,
+        "can_be_damaged": false
+    },
+    "purple_wool": {
+        "key": "purple_wool",
+        "title": "Purple Wool",
+        "name": "minecraft:wool",
+        "id": 35,
+        "data_value": 10,
+        "can_be_damaged": false
+    },
+    "blue_wool": {
+        "key": "blue_wool",
+        "title": "Blue Wool",
+        "name": "minecraft:wool",
+        "id": 35,
+        "data_value": 11,
+        "can_be_damaged": false
+    },
+    "brown_wool": {
+        "key": "brown_wool",
+        "title": "Brown Wool",
+        "name": "minecraft:wool",
+        "id": 35,
+        "data_value": 12,
+        "can_be_damaged": false
+    },
+    "green_wool": {
+        "key": "green_wool",
+        "title": "Green Wool",
+        "name": "minecraft:wool",
+        "id": 35,
+        "data_value": 13,
+        "can_be_damaged": false
+    },
+    "red_wool": {
+        "key": "red_wool",
+        "title": "Red Wool",
+        "name": "minecraft:wool",
+        "id": 35,
+        "data_value": 14,
+        "can_be_damaged": false
+    },
+    "black_wool": {
+        "key": "black_wool",
+        "title": "Black Wool",
+        "name": "minecraft:wool",
+        "id": 35,
+        "data_value": 15,
+        "can_be_damaged": false
+    },
+    "dandelion": {
+        "key": "dandelion",
+        "title": "Dandelion",
+        "name": "minecraft:yellow_flower",
+        "id": 37,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "poppy": {
+        "key": "poppy",
+        "title": "Poppy",
+        "name": "minecraft:red_flower",
+        "id": 38,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "blue_orchid": {
+        "key": "blue_orchid",
+        "title": "Blue Orchid",
+        "name": "minecraft:red_flower",
+        "id": 38,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "allium": {
+        "key": "allium",
+        "title": "Allium",
+        "name": "minecraft:red_flower",
+        "id": 38,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "azure_bluet": {
+        "key": "azure_bluet",
+        "title": "Azure Bluet",
+        "name": "minecraft:red_flower",
+        "id": 38,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "red_tulip": {
+        "key": "red_tulip",
+        "title": "Red Tulip",
+        "name": "minecraft:red_flower",
+        "id": 38,
+        "data_value": 4,
+        "can_be_damaged": false
+    },
+    "orange_tulip": {
+        "key": "orange_tulip",
+        "title": "Orange Tulip",
+        "name": "minecraft:red_flower",
+        "id": 38,
+        "data_value": 5,
+        "can_be_damaged": false
+    },
+    "white_tulip": {
+        "key": "white_tulip",
+        "title": "White Tulip",
+        "name": "minecraft:red_flower",
+        "id": 38,
+        "data_value": 6,
+        "can_be_damaged": false
+    },
+    "pink_tulip": {
+        "key": "pink_tulip",
+        "title": "Pink Tulip",
+        "name": "minecraft:red_flower",
+        "id": 38,
+        "data_value": 7,
+        "can_be_damaged": false
+    },
+    "oxeye_daisy": {
+        "key": "oxeye_daisy",
+        "title": "Oxeye Daisy",
+        "name": "minecraft:red_flower",
+        "id": 38,
+        "data_value": 8,
+        "can_be_damaged": false
+    },
+    "brown_mushroom": {
+        "key": "brown_mushroom",
+        "title": "Brown Mushroom",
+        "name": "minecraft:brown_mushroom",
+        "id": 39,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "red_mushroom": {
+        "key": "red_mushroom",
+        "title": "Red Mushroom",
+        "name": "minecraft:red_mushroom",
+        "id": 40,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "block_of_gold": {
+        "key": "block_of_gold",
+        "title": "Block of Gold",
+        "name": "minecraft:gold_block",
+        "id": 41,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "block_of_iron": {
+        "key": "block_of_iron",
+        "title": "Block of Iron",
+        "name": "minecraft:iron_block",
+        "id": 42,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "stone_slab": {
+        "key": "stone_slab",
+        "title": "Stone Slab",
+        "name": "minecraft:stone_slab",
+        "id": 44,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "sandstone_slab": {
+        "key": "sandstone_slab",
+        "title": "Sandstone Slab",
+        "name": "minecraft:stone_slab",
+        "id": 44,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "cobblestone_slab": {
+        "key": "cobblestone_slab",
+        "title": "Cobblestone Slab",
+        "name": "minecraft:stone_slab",
+        "id": 44,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "brick_slab": {
+        "key": "brick_slab",
+        "title": "Brick Slab",
+        "name": "minecraft:stone_slab",
+        "id": 44,
+        "data_value": 4,
+        "can_be_damaged": false
+    },
+    "stone_brick_slab": {
+        "key": "stone_brick_slab",
+        "title": "Stone Brick Slab",
+        "name": "minecraft:stone_slab",
+        "id": 44,
+        "data_value": 5,
+        "can_be_damaged": false
+    },
+    "nether_brick_slab": {
+        "key": "nether_brick_slab",
+        "title": "Nether Brick Slab",
+        "name": "minecraft:stone_slab",
+        "id": 44,
+        "data_value": 6,
+        "can_be_damaged": false
+    },
+    "quartz_slab": {
+        "key": "quartz_slab",
+        "title": "Quartz Slab",
+        "name": "minecraft:stone_slab",
+        "id": 44,
+        "data_value": 7,
+        "can_be_damaged": false
+    },
+    "bricks": {
+        "key": "bricks",
+        "title": "Bricks",
+        "name": "minecraft:brick_block",
+        "id": 45,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "tnt": {
+        "key": "tnt",
+        "title": "TNT",
+        "name": "minecraft:tnt",
+        "id": 46,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "bookshelf": {
+        "key": "bookshelf",
+        "title": "Bookshelf",
+        "name": "minecraft:bookshelf",
+        "id": 47,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "mossy_cobblestone": {
+        "key": "mossy_cobblestone",
+        "title": "Mossy Cobblestone",
+        "name": "minecraft:mossy_cobblestone",
+        "id": 48,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "obsidian": {
+        "key": "obsidian",
+        "title": "Obsidian",
+        "name": "minecraft:obsidian",
+        "id": 49,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "torch": {
+        "key": "torch",
+        "title": "Torch",
+        "name": "minecraft:torch",
+        "id": 50,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "monster_spawner": {
+        "key": "monster_spawner",
+        "title": "Monster Spawner",
+        "name": "minecraft:mob_spawner",
+        "id": 52,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "oak_stairs": {
+        "key": "oak_stairs",
+        "title": "Oak Stairs",
+        "name": "minecraft:oak_stairs",
+        "id": 53,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "chest": {
+        "key": "chest",
+        "title": "Chest",
+        "name": "minecraft:chest",
+        "id": 54,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "diamond_ore": {
+        "key": "diamond_ore",
+        "title": "Diamond Ore",
+        "name": "minecraft:diamond_ore",
+        "id": 56,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "block_of_diamond": {
+        "key": "block_of_diamond",
+        "title": "Block of Diamond",
+        "name": "minecraft:diamond_block",
+        "id": 57,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "crafting_table": {
+        "key": "crafting_table",
+        "title": "Crafting Table",
+        "name": "minecraft:crafting_table",
+        "id": 58,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "farmland": {
+        "key": "farmland",
+        "title": "Farmland",
+        "name": "minecraft:farmland",
+        "id": 60,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "furnace": {
+        "key": "furnace",
+        "title": "Furnace",
+        "name": "minecraft:furnace",
+        "id": 61,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "ladder": {
+        "key": "ladder",
+        "title": "Ladder",
+        "name": "minecraft:ladder",
+        "id": 65,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "rails": {
+        "key": "rails",
+        "title": "Rails",
+        "name": "minecraft:rail",
+        "id": 66,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "cobblestone_stairs": {
+        "key": "cobblestone_stairs",
+        "title": "Cobblestone Stairs",
+        "name": "minecraft:stone_stairs",
+        "id": 67,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "lever": {
+        "key": "lever",
+        "title": "Lever",
+        "name": "minecraft:lever",
+        "id": 69,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "stone_pressure_plate": {
+        "key": "stone_pressure_plate",
+        "title": "Stone Pressure Plate",
+        "name": "minecraft:stone_pressure_plate",
+        "id": 70,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "oak_pressure_plate": {
+        "key": "oak_pressure_plate",
+        "title": "Oak Pressure Plate",
+        "name": "minecraft:wooden_pressure_plate",
+        "id": 72,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "redstone_ore": {
+        "key": "redstone_ore",
+        "title": "Redstone Ore",
+        "name": "minecraft:redstone_ore",
+        "id": 73,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "redstone_torch": {
+        "key": "redstone_torch",
+        "title": "Redstone Torch",
+        "name": "minecraft:redstone_torch",
+        "id": 76,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "stone_button": {
+        "key": "stone_button",
+        "title": "Stone Button",
+        "name": "minecraft:stone_button",
+        "id": 77,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "snow": {
+        "key": "snow",
+        "title": "Snow",
+        "name": "minecraft:snow_layer",
+        "id": 78,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "ice": {
+        "key": "ice",
+        "title": "Ice",
+        "name": "minecraft:ice",
+        "id": 79,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "snow_block": {
+        "key": "snow_block",
+        "title": "Snow Block",
+        "name": "minecraft:snow",
+        "id": 80,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "cactus": {
+        "key": "cactus",
+        "title": "Cactus",
+        "name": "minecraft:cactus",
+        "id": 81,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "clay_block": {
+        "key": "clay_block",
+        "title": "Clay Block",
+        "name": "minecraft:clay",
+        "id": 82,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "jukebox": {
+        "key": "jukebox",
+        "title": "Jukebox",
+        "name": "minecraft:jukebox",
+        "id": 84,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "oak_fence": {
+        "key": "oak_fence",
+        "title": "Oak Fence",
+        "name": "minecraft:fence",
+        "id": 85,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "pumpkin": {
+        "key": "pumpkin",
+        "title": "Pumpkin",
+        "name": "minecraft:pumpkin",
+        "id": 86,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "netherrack": {
+        "key": "netherrack",
+        "title": "Netherrack",
+        "name": "minecraft:netherrack",
+        "id": 87,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "soul_sand": {
+        "key": "soul_sand",
+        "title": "Soul Sand",
+        "name": "minecraft:soul_sand",
+        "id": 88,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "glowstone": {
+        "key": "glowstone",
+        "title": "Glowstone",
+        "name": "minecraft:glowstone",
+        "id": 89,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "jack_o_lantern": {
+        "key": "jack_o_lantern",
+        "title": "Jack o'Lantern",
+        "name": "minecraft:lit_pumpkin",
+        "id": 91,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "white_stained_glass": {
+        "key": "white_stained_glass",
+        "title": "White Stained Glass",
+        "name": "minecraft:stained_glass",
+        "id": 95,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "orange_stained_glass": {
+        "key": "orange_stained_glass",
+        "title": "Orange Stained Glass",
+        "name": "minecraft:stained_glass",
+        "id": 95,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "magenta_stained_glass": {
+        "key": "magenta_stained_glass",
+        "title": "Magenta Stained Glass",
+        "name": "minecraft:stained_glass",
+        "id": 95,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "light_blue_stained_glass": {
+        "key": "light_blue_stained_glass",
+        "title": "Light Blue Stained Glass",
+        "name": "minecraft:stained_glass",
+        "id": 95,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "yellow_stained_glass": {
+        "key": "yellow_stained_glass",
+        "title": "Yellow Stained Glass",
+        "name": "minecraft:stained_glass",
+        "id": 95,
+        "data_value": 4,
+        "can_be_damaged": false
+    },
+    "lime_stained_glass": {
+        "key": "lime_stained_glass",
+        "title": "Lime Stained Glass",
+        "name": "minecraft:stained_glass",
+        "id": 95,
+        "data_value": 5,
+        "can_be_damaged": false
+    },
+    "pink_stained_glass": {
+        "key": "pink_stained_glass",
+        "title": "Pink Stained Glass",
+        "name": "minecraft:stained_glass",
+        "id": 95,
+        "data_value": 6,
+        "can_be_damaged": false
+    },
+    "gray_stained_glass": {
+        "key": "gray_stained_glass",
+        "title": "Gray Stained Glass",
+        "name": "minecraft:stained_glass",
+        "id": 95,
+        "data_value": 7,
+        "can_be_damaged": false
+    },
+    "light_gray_stained_glass": {
+        "key": "light_gray_stained_glass",
+        "title": "Light Gray Stained Glass",
+        "name": "minecraft:stained_glass",
+        "id": 95,
+        "data_value": 8,
+        "can_be_damaged": false
+    },
+    "cyan_stained_glass": {
+        "key": "cyan_stained_glass",
+        "title": "Cyan Stained Glass",
+        "name": "minecraft:stained_glass",
+        "id": 95,
+        "data_value": 9,
+        "can_be_damaged": false
+    },
+    "purple_stained_glass": {
+        "key": "purple_stained_glass",
+        "title": "Purple Stained Glass",
+        "name": "minecraft:stained_glass",
+        "id": 95,
+        "data_value": 10,
+        "can_be_damaged": false
+    },
+    "blue_stained_glass": {
+        "key": "blue_stained_glass",
+        "title": "Blue Stained Glass",
+        "name": "minecraft:stained_glass",
+        "id": 95,
+        "data_value": 11,
+        "can_be_damaged": false
+    },
+    "brown_stained_glass": {
+        "key": "brown_stained_glass",
+        "title": "Brown Stained Glass",
+        "name": "minecraft:stained_glass",
+        "id": 95,
+        "data_value": 12,
+        "can_be_damaged": false
+    },
+    "green_stained_glass": {
+        "key": "green_stained_glass",
+        "title": "Green Stained Glass",
+        "name": "minecraft:stained_glass",
+        "id": 95,
+        "data_value": 13,
+        "can_be_damaged": false
+    },
+    "red_stained_glass": {
+        "key": "red_stained_glass",
+        "title": "Red Stained Glass",
+        "name": "minecraft:stained_glass",
+        "id": 95,
+        "data_value": 14,
+        "can_be_damaged": false
+    },
+    "black_stained_glass": {
+        "key": "black_stained_glass",
+        "title": "Black Stained Glass",
+        "name": "minecraft:stained_glass",
+        "id": 95,
+        "data_value": 15,
+        "can_be_damaged": false
+    },
+    "oak_trapdoor": {
+        "key": "oak_trapdoor",
+        "title": "Oak Trapdoor",
+        "name": "minecraft:trapdoor",
+        "id": 96,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "infested_stone": {
+        "key": "infested_stone",
+        "title": "Infested Stone",
+        "name": "minecraft:monster_egg",
+        "id": 97,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "infested_cobblestone": {
+        "key": "infested_cobblestone",
+        "title": "Infested Cobblestone",
+        "name": "minecraft:monster_egg",
+        "id": 97,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "infested_stone_bricks": {
+        "key": "infested_stone_bricks",
+        "title": "Infested Stone Bricks",
+        "name": "minecraft:monster_egg",
+        "id": 97,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "infested_mossy_stone_bricks": {
+        "key": "infested_mossy_stone_bricks",
+        "title": "Infested Mossy Stone Bricks",
+        "name": "minecraft:monster_egg",
+        "id": 97,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "infested_cracked_stone_bricks": {
+        "key": "infested_cracked_stone_bricks",
+        "title": "Infested Cracked Stone Bricks",
+        "name": "minecraft:monster_egg",
+        "id": 97,
+        "data_value": 4,
+        "can_be_damaged": false
+    },
+    "infested_chiseled_stone_bricks": {
+        "key": "infested_chiseled_stone_bricks",
+        "title": "Infested Chiseled Stone Bricks",
+        "name": "minecraft:monster_egg",
+        "id": 97,
+        "data_value": 5,
+        "can_be_damaged": false
+    },
+    "stone_bricks": {
+        "key": "stone_bricks",
+        "title": "Stone Bricks",
+        "name": "minecraft:stonebrick",
+        "id": 98,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "mossy_stone_bricks": {
+        "key": "mossy_stone_bricks",
+        "title": "Mossy Stone Bricks",
+        "name": "minecraft:stonebrick",
+        "id": 98,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "cracked_stone_bricks": {
+        "key": "cracked_stone_bricks",
+        "title": "Cracked Stone Bricks",
+        "name": "minecraft:stonebrick",
+        "id": 98,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "chiseled_stone_bricks": {
+        "key": "chiseled_stone_bricks",
+        "title": "Chiseled Stone Bricks",
+        "name": "minecraft:stonebrick",
+        "id": 98,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "brown_mushroom_block": {
+        "key": "brown_mushroom_block",
+        "title": "Brown Mushroom Block",
+        "name": "minecraft:brown_mushroom_block",
+        "id": 99,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "red_mushroom_block": {
+        "key": "red_mushroom_block",
+        "title": "Red Mushroom Block",
+        "name": "minecraft:red_mushroom_block",
+        "id": 100,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "iron_bars": {
+        "key": "iron_bars",
+        "title": "Iron Bars",
+        "name": "minecraft:iron_bars",
+        "id": 101,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "glass_pane": {
+        "key": "glass_pane",
+        "title": "Glass Pane",
+        "name": "minecraft:glass_pane",
+        "id": 102,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "block_of_melon": {
+        "key": "block_of_melon",
+        "title": "Block of Melon",
+        "name": "minecraft:melon_block",
+        "id": 103,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "vines": {
+        "key": "vines",
+        "title": "Vines",
+        "name": "minecraft:vine",
+        "id": 106,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "oak_fence_gate": {
+        "key": "oak_fence_gate",
+        "title": "Oak Fence Gate",
+        "name": "minecraft:fence_gate",
+        "id": 107,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "brick_stairs": {
+        "key": "brick_stairs",
+        "title": "Brick Stairs",
+        "name": "minecraft:brick_stairs",
+        "id": 108,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "stone_brick_stairs": {
+        "key": "stone_brick_stairs",
+        "title": "Stone Brick Stairs",
+        "name": "minecraft:stone_brick_stairs",
+        "id": 109,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "mycelium": {
+        "key": "mycelium",
+        "title": "Mycelium",
+        "name": "minecraft:mycelium",
+        "id": 110,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "lily_pad": {
+        "key": "lily_pad",
+        "title": "Lily Pad",
+        "name": "minecraft:waterlily",
+        "id": 111,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "block_of_nether_bricks": {
+        "key": "block_of_nether_bricks",
+        "title": "Block of Nether Bricks",
+        "name": "minecraft:nether_brick",
+        "id": 112,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "nether_brick_fence": {
+        "key": "nether_brick_fence",
+        "title": "Nether Brick Fence",
+        "name": "minecraft:nether_brick_fence",
+        "id": 113,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "nether_brick_stairs": {
+        "key": "nether_brick_stairs",
+        "title": "Nether Brick Stairs",
+        "name": "minecraft:nether_brick_stairs",
+        "id": 114,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "enchanting_table": {
+        "key": "enchanting_table",
+        "title": "Enchanting Table",
+        "name": "minecraft:enchanting_table",
+        "id": 116,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "end_portal_frame": {
+        "key": "end_portal_frame",
+        "title": "End Portal Frame",
+        "name": "minecraft:end_portal_frame",
+        "id": 120,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "end_stone": {
+        "key": "end_stone",
+        "title": "End Stone",
+        "name": "minecraft:end_stone",
+        "id": 121,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "dragon_egg": {
+        "key": "dragon_egg",
+        "title": "Dragon Egg",
+        "name": "minecraft:dragon_egg",
+        "id": 122,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "redstone_lamp": {
+        "key": "redstone_lamp",
+        "title": "Redstone Lamp",
+        "name": "minecraft:redstone_lamp",
+        "id": 123,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "oak_slab": {
+        "key": "oak_slab",
+        "title": "Oak Slab",
+        "name": "minecraft:wooden_slab",
+        "id": 126,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "spruce_slab": {
+        "key": "spruce_slab",
+        "title": "Spruce Slab",
+        "name": "minecraft:wooden_slab",
+        "id": 126,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "birch_slab": {
+        "key": "birch_slab",
+        "title": "Birch Slab",
+        "name": "minecraft:wooden_slab",
+        "id": 126,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "jungle_slab": {
+        "key": "jungle_slab",
+        "title": "Jungle Slab",
+        "name": "minecraft:wooden_slab",
+        "id": 126,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "acacia_slab": {
+        "key": "acacia_slab",
+        "title": "Acacia Slab",
+        "name": "minecraft:wooden_slab",
+        "id": 126,
+        "data_value": 4,
+        "can_be_damaged": false
+    },
+    "dark_oak_slab": {
+        "key": "dark_oak_slab",
+        "title": "Dark Oak Slab",
+        "name": "minecraft:wooden_slab",
+        "id": 126,
+        "data_value": 5,
+        "can_be_damaged": false
+    },
+    "sandstone_stairs": {
+        "key": "sandstone_stairs",
+        "title": "Sandstone Stairs",
+        "name": "minecraft:sandstone_stairs",
+        "id": 128,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "emerald_ore": {
+        "key": "emerald_ore",
+        "title": "Emerald Ore",
+        "name": "minecraft:emerald_ore",
+        "id": 129,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "ender_chest": {
+        "key": "ender_chest",
+        "title": "Ender Chest",
+        "name": "minecraft:ender_chest",
+        "id": 130,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "tripwire_hook": {
+        "key": "tripwire_hook",
+        "title": "Tripwire Hook",
+        "name": "minecraft:tripwire_hook",
+        "id": 131,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "block_of_emerald": {
+        "key": "block_of_emerald",
+        "title": "Block of Emerald",
+        "name": "minecraft:emerald_block",
+        "id": 133,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "spruce_stairs": {
+        "key": "spruce_stairs",
+        "title": "Spruce Stairs",
+        "name": "minecraft:spruce_stairs",
+        "id": 134,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "birch_stairs": {
+        "key": "birch_stairs",
+        "title": "Birch Stairs",
+        "name": "minecraft:birch_stairs",
+        "id": 135,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "jungle_stairs": {
+        "key": "jungle_stairs",
+        "title": "Jungle Stairs",
+        "name": "minecraft:jungle_stairs",
+        "id": 136,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "command_block": {
+        "key": "command_block",
+        "title": "Command Block",
+        "name": "minecraft:command_block",
+        "id": 137,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "beacon": {
+        "key": "beacon",
+        "title": "Beacon",
+        "name": "minecraft:beacon",
+        "id": 138,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "cobblestone_wall": {
+        "key": "cobblestone_wall",
+        "title": "Cobblestone Wall",
+        "name": "minecraft:cobblestone_wall",
+        "id": 139,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "mossy_cobblestone_wall": {
+        "key": "mossy_cobblestone_wall",
+        "title": "Mossy Cobblestone Wall",
+        "name": "minecraft:cobblestone_wall",
+        "id": 139,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "oak_button": {
+        "key": "oak_button",
+        "title": "Oak Button",
+        "name": "minecraft:wooden_button",
+        "id": 143,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "anvil": {
+        "key": "anvil",
+        "title": "Anvil",
+        "name": "minecraft:anvil",
+        "id": 145,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "slightly_damaged_anvil": {
+        "key": "slightly_damaged_anvil",
+        "title": "Slightly Damaged Anvil",
+        "name": "minecraft:anvil",
+        "id": 145,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "very_damaged_anvil": {
+        "key": "very_damaged_anvil",
+        "title": "Very Damaged Anvil",
+        "name": "minecraft:anvil",
+        "id": 145,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "trapped_chest": {
+        "key": "trapped_chest",
+        "title": "Trapped Chest",
+        "name": "minecraft:trapped_chest",
+        "id": 146,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "light_weighted_pressure_plate": {
+        "key": "light_weighted_pressure_plate",
+        "title": "Light Weighted Pressure Plate",
+        "name": "minecraft:light_weighted_pressure_plate",
+        "id": 147,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "heavy_weighted_pressure_plate": {
+        "key": "heavy_weighted_pressure_plate",
+        "title": "Heavy Weighted Pressure Plate",
+        "name": "minecraft:heavy_weighted_pressure_plate",
+        "id": 148,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "daylight_detector": {
+        "key": "daylight_detector",
+        "title": "Daylight Detector",
+        "name": "minecraft:daylight_detector",
+        "id": 151,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "block_of_redstone": {
+        "key": "block_of_redstone",
+        "title": "Block of Redstone",
+        "name": "minecraft:redstone_block",
+        "id": 152,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "nether_quartz_ore": {
+        "key": "nether_quartz_ore",
+        "title": "Nether Quartz Ore",
+        "name": "minecraft:quartz_ore",
+        "id": 153,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "hopper": {
+        "key": "hopper",
+        "title": "Hopper",
+        "name": "minecraft:hopper",
+        "id": 154,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "block_of_quartz": {
+        "key": "block_of_quartz",
+        "title": "Block of Quartz",
+        "name": "minecraft:quartz_block",
+        "id": 155,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "chiseled_quartz_block": {
+        "key": "chiseled_quartz_block",
+        "title": "Chiseled Quartz Block",
+        "name": "minecraft:quartz_block",
+        "id": 155,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "quartz_pillar": {
+        "key": "quartz_pillar",
+        "title": "Quartz Pillar",
+        "name": "minecraft:quartz_block",
+        "id": 155,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "quartz_stairs": {
+        "key": "quartz_stairs",
+        "title": "Quartz Stairs",
+        "name": "minecraft:quartz_stairs",
+        "id": 156,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "activator_rails": {
+        "key": "activator_rails",
+        "title": "Activator Rails",
+        "name": "minecraft:activator_rail",
+        "id": 157,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "dropper": {
+        "key": "dropper",
+        "title": "Dropper",
+        "name": "minecraft:dropper",
+        "id": 158,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "white_terracotta": {
+        "key": "white_terracotta",
+        "title": "White Terracotta",
+        "name": "minecraft:stained_hardened_clay",
+        "id": 159,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "orange_terracotta": {
+        "key": "orange_terracotta",
+        "title": "Orange Terracotta",
+        "name": "minecraft:stained_hardened_clay",
+        "id": 159,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "magenta_terracotta": {
+        "key": "magenta_terracotta",
+        "title": "Magenta Terracotta",
+        "name": "minecraft:stained_hardened_clay",
+        "id": 159,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "light_blue_terracotta": {
+        "key": "light_blue_terracotta",
+        "title": "Light Blue Terracotta",
+        "name": "minecraft:stained_hardened_clay",
+        "id": 159,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "yellow_terracotta": {
+        "key": "yellow_terracotta",
+        "title": "Yellow Terracotta",
+        "name": "minecraft:stained_hardened_clay",
+        "id": 159,
+        "data_value": 4,
+        "can_be_damaged": false
+    },
+    "lime_terracotta": {
+        "key": "lime_terracotta",
+        "title": "Lime Terracotta",
+        "name": "minecraft:stained_hardened_clay",
+        "id": 159,
+        "data_value": 5,
+        "can_be_damaged": false
+    },
+    "pink_terracotta": {
+        "key": "pink_terracotta",
+        "title": "Pink Terracotta",
+        "name": "minecraft:stained_hardened_clay",
+        "id": 159,
+        "data_value": 6,
+        "can_be_damaged": false
+    },
+    "gray_terracotta": {
+        "key": "gray_terracotta",
+        "title": "Gray Terracotta",
+        "name": "minecraft:stained_hardened_clay",
+        "id": 159,
+        "data_value": 7,
+        "can_be_damaged": false
+    },
+    "light_gray_terracotta": {
+        "key": "light_gray_terracotta",
+        "title": "Light Gray Terracotta",
+        "name": "minecraft:stained_hardened_clay",
+        "id": 159,
+        "data_value": 8,
+        "can_be_damaged": false
+    },
+    "cyan_terracotta": {
+        "key": "cyan_terracotta",
+        "title": "Cyan Terracotta",
+        "name": "minecraft:stained_hardened_clay",
+        "id": 159,
+        "data_value": 9,
+        "can_be_damaged": false
+    },
+    "purple_terracotta": {
+        "key": "purple_terracotta",
+        "title": "Purple Terracotta",
+        "name": "minecraft:stained_hardened_clay",
+        "id": 159,
+        "data_value": 10,
+        "can_be_damaged": false
+    },
+    "blue_terracotta": {
+        "key": "blue_terracotta",
+        "title": "Blue Terracotta",
+        "name": "minecraft:stained_hardened_clay",
+        "id": 159,
+        "data_value": 11,
+        "can_be_damaged": false
+    },
+    "brown_terracotta": {
+        "key": "brown_terracotta",
+        "title": "Brown Terracotta",
+        "name": "minecraft:stained_hardened_clay",
+        "id": 159,
+        "data_value": 12,
+        "can_be_damaged": false
+    },
+    "green_terracotta": {
+        "key": "green_terracotta",
+        "title": "Green Terracotta",
+        "name": "minecraft:stained_hardened_clay",
+        "id": 159,
+        "data_value": 13,
+        "can_be_damaged": false
+    },
+    "red_terracotta": {
+        "key": "red_terracotta",
+        "title": "Red Terracotta",
+        "name": "minecraft:stained_hardened_clay",
+        "id": 159,
+        "data_value": 14,
+        "can_be_damaged": false
+    },
+    "black_terracotta": {
+        "key": "black_terracotta",
+        "title": "Black Terracotta",
+        "name": "minecraft:stained_hardened_clay",
+        "id": 159,
+        "data_value": 15,
+        "can_be_damaged": false
+    },
+    "white_stained_glass_pane": {
+        "key": "white_stained_glass_pane",
+        "title": "White Stained Glass Pane",
+        "name": "minecraft:stained_glass_pane",
+        "id": 160,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "orange_stained_glass_pane": {
+        "key": "orange_stained_glass_pane",
+        "title": "Orange Stained Glass Pane",
+        "name": "minecraft:stained_glass_pane",
+        "id": 160,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "magenta_stained_glass_pane": {
+        "key": "magenta_stained_glass_pane",
+        "title": "Magenta Stained Glass Pane",
+        "name": "minecraft:stained_glass_pane",
+        "id": 160,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "light_blue_stained_glass_pane": {
+        "key": "light_blue_stained_glass_pane",
+        "title": "Light Blue Stained Glass Pane",
+        "name": "minecraft:stained_glass_pane",
+        "id": 160,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "yellow_stained_glass_pane": {
+        "key": "yellow_stained_glass_pane",
+        "title": "Yellow Stained Glass Pane",
+        "name": "minecraft:stained_glass_pane",
+        "id": 160,
+        "data_value": 4,
+        "can_be_damaged": false
+    },
+    "lime_stained_glass_pane": {
+        "key": "lime_stained_glass_pane",
+        "title": "Lime Stained Glass Pane",
+        "name": "minecraft:stained_glass_pane",
+        "id": 160,
+        "data_value": 5,
+        "can_be_damaged": false
+    },
+    "pink_stained_glass_pane": {
+        "key": "pink_stained_glass_pane",
+        "title": "Pink Stained Glass Pane",
+        "name": "minecraft:stained_glass_pane",
+        "id": 160,
+        "data_value": 6,
+        "can_be_damaged": false
+    },
+    "gray_stained_glass_pane": {
+        "key": "gray_stained_glass_pane",
+        "title": "Gray Stained Glass Pane",
+        "name": "minecraft:stained_glass_pane",
+        "id": 160,
+        "data_value": 7,
+        "can_be_damaged": false
+    },
+    "light_gray_stained_glass_pane": {
+        "key": "light_gray_stained_glass_pane",
+        "title": "Light Gray Stained Glass Pane",
+        "name": "minecraft:stained_glass_pane",
+        "id": 160,
+        "data_value": 8,
+        "can_be_damaged": false
+    },
+    "cyan_stained_glass_pane": {
+        "key": "cyan_stained_glass_pane",
+        "title": "Cyan Stained Glass Pane",
+        "name": "minecraft:stained_glass_pane",
+        "id": 160,
+        "data_value": 9,
+        "can_be_damaged": false
+    },
+    "purple_stained_glass_pane": {
+        "key": "purple_stained_glass_pane",
+        "title": "Purple Stained Glass Pane",
+        "name": "minecraft:stained_glass_pane",
+        "id": 160,
+        "data_value": 10,
+        "can_be_damaged": false
+    },
+    "blue_stained_glass_pane": {
+        "key": "blue_stained_glass_pane",
+        "title": "Blue Stained Glass Pane",
+        "name": "minecraft:stained_glass_pane",
+        "id": 160,
+        "data_value": 11,
+        "can_be_damaged": false
+    },
+    "brown_stained_glass_pane": {
+        "key": "brown_stained_glass_pane",
+        "title": "Brown Stained Glass Pane",
+        "name": "minecraft:stained_glass_pane",
+        "id": 160,
+        "data_value": 12,
+        "can_be_damaged": false
+    },
+    "green_stained_glass_pane": {
+        "key": "green_stained_glass_pane",
+        "title": "Green Stained Glass Pane",
+        "name": "minecraft:stained_glass_pane",
+        "id": 160,
+        "data_value": 13,
+        "can_be_damaged": false
+    },
+    "red_stained_glass_pane": {
+        "key": "red_stained_glass_pane",
+        "title": "Red Stained Glass Pane",
+        "name": "minecraft:stained_glass_pane",
+        "id": 160,
+        "data_value": 14,
+        "can_be_damaged": false
+    },
+    "black_stained_glass_pane": {
+        "key": "black_stained_glass_pane",
+        "title": "Black Stained Glass Pane",
+        "name": "minecraft:stained_glass_pane",
+        "id": 160,
+        "data_value": 15,
+        "can_be_damaged": false
+    },
+    "acacia_leaves": {
+        "key": "acacia_leaves",
+        "title": "Acacia Leaves",
+        "name": "minecraft:leaves2",
+        "id": 161,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "dark_oak_leaves": {
+        "key": "dark_oak_leaves",
+        "title": "Dark Oak Leaves",
+        "name": "minecraft:leaves2",
+        "id": 161,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "acacia_log": {
+        "key": "acacia_log",
+        "title": "Acacia Log",
+        "name": "minecraft:log2",
+        "id": 162,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "dark_oak_log": {
+        "key": "dark_oak_log",
+        "title": "Dark Oak Log",
+        "name": "minecraft:log2",
+        "id": 162,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "acacia_stairs": {
+        "key": "acacia_stairs",
+        "title": "Acacia Stairs",
+        "name": "minecraft:acacia_stairs",
+        "id": 163,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "dark_oak_stairs": {
+        "key": "dark_oak_stairs",
+        "title": "Dark Oak Stairs",
+        "name": "minecraft:dark_oak_stairs",
+        "id": 164,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "slime_block": {
+        "key": "slime_block",
+        "title": "Slime Block",
+        "name": "minecraft:slime",
+        "id": 165,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "barrier": {
+        "key": "barrier",
+        "title": "Barrier",
+        "name": "minecraft:barrier",
+        "id": 166,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "iron_trapdoor": {
+        "key": "iron_trapdoor",
+        "title": "Iron Trapdoor",
+        "name": "minecraft:iron_trapdoor",
+        "id": 167,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "prismarine": {
+        "key": "prismarine",
+        "title": "Prismarine",
+        "name": "minecraft:prismarine",
+        "id": 168,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "prismarine_bricks": {
+        "key": "prismarine_bricks",
+        "title": "Prismarine Bricks",
+        "name": "minecraft:prismarine",
+        "id": 168,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "dark_prismarine": {
+        "key": "dark_prismarine",
+        "title": "Dark Prismarine",
+        "name": "minecraft:prismarine",
+        "id": 168,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "sea_lantern": {
+        "key": "sea_lantern",
+        "title": "Sea Lantern",
+        "name": "minecraft:sea_lantern",
+        "id": 169,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "hay_bale": {
+        "key": "hay_bale",
+        "title": "Hay Bale",
+        "name": "minecraft:hay_block",
+        "id": 170,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "white_carpet": {
+        "key": "white_carpet",
+        "title": "White Carpet",
+        "name": "minecraft:carpet",
+        "id": 171,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "orange_carpet": {
+        "key": "orange_carpet",
+        "title": "Orange Carpet",
+        "name": "minecraft:carpet",
+        "id": 171,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "magenta_carpet": {
+        "key": "magenta_carpet",
+        "title": "Magenta Carpet",
+        "name": "minecraft:carpet",
+        "id": 171,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "light_blue_carpet": {
+        "key": "light_blue_carpet",
+        "title": "Light Blue Carpet",
+        "name": "minecraft:carpet",
+        "id": 171,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "yellow_carpet": {
+        "key": "yellow_carpet",
+        "title": "Yellow Carpet",
+        "name": "minecraft:carpet",
+        "id": 171,
+        "data_value": 4,
+        "can_be_damaged": false
+    },
+    "lime_carpet": {
+        "key": "lime_carpet",
+        "title": "Lime Carpet",
+        "name": "minecraft:carpet",
+        "id": 171,
+        "data_value": 5,
+        "can_be_damaged": false
+    },
+    "pink_carpet": {
+        "key": "pink_carpet",
+        "title": "Pink Carpet",
+        "name": "minecraft:carpet",
+        "id": 171,
+        "data_value": 6,
+        "can_be_damaged": false
+    },
+    "gray_carpet": {
+        "key": "gray_carpet",
+        "title": "Gray Carpet",
+        "name": "minecraft:carpet",
+        "id": 171,
+        "data_value": 7,
+        "can_be_damaged": false
+    },
+    "light_gray_carpet": {
+        "key": "light_gray_carpet",
+        "title": "Light Gray Carpet",
+        "name": "minecraft:carpet",
+        "id": 171,
+        "data_value": 8,
+        "can_be_damaged": false
+    },
+    "cyan_carpet": {
+        "key": "cyan_carpet",
+        "title": "Cyan Carpet",
+        "name": "minecraft:carpet",
+        "id": 171,
+        "data_value": 9,
+        "can_be_damaged": false
+    },
+    "purple_carpet": {
+        "key": "purple_carpet",
+        "title": "Purple Carpet",
+        "name": "minecraft:carpet",
+        "id": 171,
+        "data_value": 10,
+        "can_be_damaged": false
+    },
+    "blue_carpet": {
+        "key": "blue_carpet",
+        "title": "Blue Carpet",
+        "name": "minecraft:carpet",
+        "id": 171,
+        "data_value": 11,
+        "can_be_damaged": false
+    },
+    "brown_carpet": {
+        "key": "brown_carpet",
+        "title": "Brown Carpet",
+        "name": "minecraft:carpet",
+        "id": 171,
+        "data_value": 12,
+        "can_be_damaged": false
+    },
+    "green_carpet": {
+        "key": "green_carpet",
+        "title": "Green Carpet",
+        "name": "minecraft:carpet",
+        "id": 171,
+        "data_value": 13,
+        "can_be_damaged": false
+    },
+    "red_carpet": {
+        "key": "red_carpet",
+        "title": "Red Carpet",
+        "name": "minecraft:carpet",
+        "id": 171,
+        "data_value": 14,
+        "can_be_damaged": false
+    },
+    "black_carpet": {
+        "key": "black_carpet",
+        "title": "Black Carpet",
+        "name": "minecraft:carpet",
+        "id": 171,
+        "data_value": 15,
+        "can_be_damaged": false
+    },
+    "terracotta": {
+        "key": "terracotta",
+        "title": "Terracotta",
+        "name": "minecraft:hardened_clay",
+        "id": 172,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "coal_block": {
+        "key": "coal_block",
+        "title": "Coal Block",
+        "name": "minecraft:coal_block",
+        "id": 173,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "packed_ice": {
+        "key": "packed_ice",
+        "title": "Packed Ice",
+        "name": "minecraft:packed_ice",
+        "id": 174,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "sunflower": {
+        "key": "sunflower",
+        "title": "Sunflower",
+        "name": "minecraft:double_plant",
+        "id": 175,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "lilac": {
+        "key": "lilac",
+        "title": "Lilac",
+        "name": "minecraft:double_plant",
+        "id": 175,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "tall_grass": {
+        "key": "tall_grass",
+        "title": "Tall Grass",
+        "name": "minecraft:double_plant",
+        "id": 175,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "large_fern": {
+        "key": "large_fern",
+        "title": "Large Fern",
+        "name": "minecraft:double_plant",
+        "id": 175,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "rose_bush": {
+        "key": "rose_bush",
+        "title": "Rose Bush",
+        "name": "minecraft:double_plant",
+        "id": 175,
+        "data_value": 4,
+        "can_be_damaged": false
+    },
+    "peony": {
+        "key": "peony",
+        "title": "Peony",
+        "name": "minecraft:double_plant",
+        "id": 175,
+        "data_value": 5,
+        "can_be_damaged": false
+    },
+    "red_sandstone": {
+        "key": "red_sandstone",
+        "title": "Red Sandstone",
+        "name": "minecraft:red_sandstone",
+        "id": 179,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "chiseled_red_sandstone": {
+        "key": "chiseled_red_sandstone",
+        "title": "Chiseled Red Sandstone",
+        "name": "minecraft:red_sandstone",
+        "id": 179,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "smooth_red_sandstone": {
+        "key": "smooth_red_sandstone",
+        "title": "Smooth Red Sandstone",
+        "name": "minecraft:red_sandstone",
+        "id": 179,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "red_sandstone_stairs": {
+        "key": "red_sandstone_stairs",
+        "title": "Red Sandstone Stairs",
+        "name": "minecraft:red_sandstone_stairs",
+        "id": 180,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "red_sandstone_slab": {
+        "key": "red_sandstone_slab",
+        "title": "Red Sandstone Slab",
+        "name": "minecraft:stone_slab2",
+        "id": 182,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "spruce_fence_gate": {
+        "key": "spruce_fence_gate",
+        "title": "Spruce Fence Gate",
+        "name": "minecraft:spruce_fence_gate",
+        "id": 183,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "birch_fence_gate": {
+        "key": "birch_fence_gate",
+        "title": "Birch Fence Gate",
+        "name": "minecraft:birch_fence_gate",
+        "id": 184,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "jungle_fence_gate": {
+        "key": "jungle_fence_gate",
+        "title": "Jungle Fence Gate",
+        "name": "minecraft:jungle_fence_gate",
+        "id": 185,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "dark_oak_fence_gate": {
+        "key": "dark_oak_fence_gate",
+        "title": "Dark Oak Fence Gate",
+        "name": "minecraft:dark_oak_fence_gate",
+        "id": 186,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "acacia_fence_gate": {
+        "key": "acacia_fence_gate",
+        "title": "Acacia Fence Gate",
+        "name": "minecraft:acacia_fence_gate",
+        "id": 187,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "spruce_fence": {
+        "key": "spruce_fence",
+        "title": "Spruce Fence",
+        "name": "minecraft:spruce_fence",
+        "id": 188,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "birch_fence": {
+        "key": "birch_fence",
+        "title": "Birch Fence",
+        "name": "minecraft:birch_fence",
+        "id": 189,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "jungle_fence": {
+        "key": "jungle_fence",
+        "title": "Jungle Fence",
+        "name": "minecraft:jungle_fence",
+        "id": 190,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "dark_oak_fence": {
+        "key": "dark_oak_fence",
+        "title": "Dark Oak Fence",
+        "name": "minecraft:dark_oak_fence",
+        "id": 191,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "acacia_fence": {
+        "key": "acacia_fence",
+        "title": "Acacia Fence",
+        "name": "minecraft:acacia_fence",
+        "id": 192,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "iron_shovel": {
+        "key": "iron_shovel",
+        "title": "Iron Shovel",
+        "name": "minecraft:iron_shovel",
+        "id": 256,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "iron_pickaxe": {
+        "key": "iron_pickaxe",
+        "title": "Iron Pickaxe",
+        "name": "minecraft:iron_pickaxe",
+        "id": 257,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "iron_axe": {
+        "key": "iron_axe",
+        "title": "Iron Axe",
+        "name": "minecraft:iron_axe",
+        "id": 258,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "flint_and_steel": {
+        "key": "flint_and_steel",
+        "title": "Flint and Steel",
+        "name": "minecraft:flint_and_steel",
+        "id": 259,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "apple": {
+        "key": "apple",
+        "title": "Apple",
+        "name": "minecraft:apple",
+        "id": 260,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "bow": {
+        "key": "bow",
+        "title": "Bow",
+        "name": "minecraft:bow",
+        "id": 261,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "arrow": {
+        "key": "arrow",
+        "title": "Arrow",
+        "name": "minecraft:arrow",
+        "id": 262,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "coal": {
+        "key": "coal",
+        "title": "Coal",
+        "name": "minecraft:coal",
+        "id": 263,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "charcoal": {
+        "key": "charcoal",
+        "title": "Charcoal",
+        "name": "minecraft:coal",
+        "id": 263,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "diamond": {
+        "key": "diamond",
+        "title": "Diamond",
+        "name": "minecraft:diamond",
+        "id": 264,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "iron_ingot": {
+        "key": "iron_ingot",
+        "title": "Iron Ingot",
+        "name": "minecraft:iron_ingot",
+        "id": 265,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "gold_ingot": {
+        "key": "gold_ingot",
+        "title": "Gold Ingot",
+        "name": "minecraft:gold_ingot",
+        "id": 266,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "iron_sword": {
+        "key": "iron_sword",
+        "title": "Iron Sword",
+        "name": "minecraft:iron_sword",
+        "id": 267,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "wooden_sword": {
+        "key": "wooden_sword",
+        "title": "Wooden Sword",
+        "name": "minecraft:wooden_sword",
+        "id": 268,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "wooden_shovel": {
+        "key": "wooden_shovel",
+        "title": "Wooden Shovel",
+        "name": "minecraft:wooden_shovel",
+        "id": 269,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "wooden_pickaxe": {
+        "key": "wooden_pickaxe",
+        "title": "Wooden Pickaxe",
+        "name": "minecraft:wooden_pickaxe",
+        "id": 270,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "wooden_axe": {
+        "key": "wooden_axe",
+        "title": "Wooden Axe",
+        "name": "minecraft:wooden_axe",
+        "id": 271,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "stone_sword": {
+        "key": "stone_sword",
+        "title": "Stone Sword",
+        "name": "minecraft:stone_sword",
+        "id": 272,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "stone_shovel": {
+        "key": "stone_shovel",
+        "title": "Stone Shovel",
+        "name": "minecraft:stone_shovel",
+        "id": 273,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "stone_pickaxe": {
+        "key": "stone_pickaxe",
+        "title": "Stone Pickaxe",
+        "name": "minecraft:stone_pickaxe",
+        "id": 274,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "stone_axe": {
+        "key": "stone_axe",
+        "title": "Stone Axe",
+        "name": "minecraft:stone_axe",
+        "id": 275,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "diamond_sword": {
+        "key": "diamond_sword",
+        "title": "Diamond Sword",
+        "name": "minecraft:diamond_sword",
+        "id": 276,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "diamond_shovel": {
+        "key": "diamond_shovel",
+        "title": "Diamond Shovel",
+        "name": "minecraft:diamond_shovel",
+        "id": 277,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "diamond_pickaxe": {
+        "key": "diamond_pickaxe",
+        "title": "Diamond Pickaxe",
+        "name": "minecraft:diamond_pickaxe",
+        "id": 278,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "diamond_axe": {
+        "key": "diamond_axe",
+        "title": "Diamond Axe",
+        "name": "minecraft:diamond_axe",
+        "id": 279,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "stick": {
+        "key": "stick",
+        "title": "Stick",
+        "name": "minecraft:stick",
+        "id": 280,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "bowl": {
+        "key": "bowl",
+        "title": "Bowl",
+        "name": "minecraft:bowl",
+        "id": 281,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "mushroom_stew": {
+        "key": "mushroom_stew",
+        "title": "Mushroom Stew",
+        "name": "minecraft:mushroom_stew",
+        "id": 282,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "golden_sword": {
+        "key": "golden_sword",
+        "title": "Golden Sword",
+        "name": "minecraft:golden_sword",
+        "id": 283,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "golden_shovel": {
+        "key": "golden_shovel",
+        "title": "Golden Shovel",
+        "name": "minecraft:golden_shovel",
+        "id": 284,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "golden_pickaxe": {
+        "key": "golden_pickaxe",
+        "title": "Golden Pickaxe",
+        "name": "minecraft:golden_pickaxe",
+        "id": 285,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "golden_axe": {
+        "key": "golden_axe",
+        "title": "Golden Axe",
+        "name": "minecraft:golden_axe",
+        "id": 286,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "string": {
+        "key": "string",
+        "title": "String",
+        "name": "minecraft:string",
+        "id": 287,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "feather": {
+        "key": "feather",
+        "title": "Feather",
+        "name": "minecraft:feather",
+        "id": 288,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "gunpowder": {
+        "key": "gunpowder",
+        "title": "Gunpowder",
+        "name": "minecraft:gunpowder",
+        "id": 289,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "wooden_hoe": {
+        "key": "wooden_hoe",
+        "title": "Wooden Hoe",
+        "name": "minecraft:wooden_hoe",
+        "id": 290,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "stone_hoe": {
+        "key": "stone_hoe",
+        "title": "Stone Hoe",
+        "name": "minecraft:stone_hoe",
+        "id": 291,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "iron_hoe": {
+        "key": "iron_hoe",
+        "title": "Iron Hoe",
+        "name": "minecraft:iron_hoe",
+        "id": 292,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "diamond_hoe": {
+        "key": "diamond_hoe",
+        "title": "Diamond Hoe",
+        "name": "minecraft:diamond_hoe",
+        "id": 293,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "golden_hoe": {
+        "key": "golden_hoe",
+        "title": "Golden Hoe",
+        "name": "minecraft:golden_hoe",
+        "id": 294,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "seeds": {
+        "key": "seeds",
+        "title": "Seeds",
+        "name": "minecraft:wheat_seeds",
+        "id": 295,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "wheat": {
+        "key": "wheat",
+        "title": "Wheat",
+        "name": "minecraft:wheat",
+        "id": 296,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "bread": {
+        "key": "bread",
+        "title": "Bread",
+        "name": "minecraft:bread",
+        "id": 297,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "leather_cap": {
+        "key": "leather_cap",
+        "title": "Leather Cap",
+        "name": "minecraft:leather_helmet",
+        "id": 298,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "leather_tunic": {
+        "key": "leather_tunic",
+        "title": "Leather Tunic",
+        "name": "minecraft:leather_chestplate",
+        "id": 299,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "leather_pants": {
+        "key": "leather_pants",
+        "title": "Leather Pants",
+        "name": "minecraft:leather_leggings",
+        "id": 300,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "leather_boots": {
+        "key": "leather_boots",
+        "title": "Leather Boots",
+        "name": "minecraft:leather_boots",
+        "id": 301,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "chain_helmet": {
+        "key": "chain_helmet",
+        "title": "Chain Helmet",
+        "name": "minecraft:chainmail_helmet",
+        "id": 302,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "chain_chestplate": {
+        "key": "chain_chestplate",
+        "title": "Chain Chestplate",
+        "name": "minecraft:chainmail_chestplate",
+        "id": 303,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "chain_leggings": {
+        "key": "chain_leggings",
+        "title": "Chain Leggings",
+        "name": "minecraft:chainmail_leggings",
+        "id": 304,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "chain_boots": {
+        "key": "chain_boots",
+        "title": "Chain Boots",
+        "name": "minecraft:chainmail_boots",
+        "id": 305,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "iron_helmet": {
+        "key": "iron_helmet",
+        "title": "Iron Helmet",
+        "name": "minecraft:iron_helmet",
+        "id": 306,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "iron_chestplate": {
+        "key": "iron_chestplate",
+        "title": "Iron Chestplate",
+        "name": "minecraft:iron_chestplate",
+        "id": 307,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "iron_leggings": {
+        "key": "iron_leggings",
+        "title": "Iron Leggings",
+        "name": "minecraft:iron_leggings",
+        "id": 308,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "iron_boots": {
+        "key": "iron_boots",
+        "title": "Iron Boots",
+        "name": "minecraft:iron_boots",
+        "id": 309,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "diamond_helmet": {
+        "key": "diamond_helmet",
+        "title": "Diamond Helmet",
+        "name": "minecraft:diamond_helmet",
+        "id": 310,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "diamond_chestplate": {
+        "key": "diamond_chestplate",
+        "title": "Diamond Chestplate",
+        "name": "minecraft:diamond_chestplate",
+        "id": 311,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "diamond_leggings": {
+        "key": "diamond_leggings",
+        "title": "Diamond Leggings",
+        "name": "minecraft:diamond_leggings",
+        "id": 312,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "diamond_boots": {
+        "key": "diamond_boots",
+        "title": "Diamond Boots",
+        "name": "minecraft:diamond_boots",
+        "id": 313,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "golden_helmet": {
+        "key": "golden_helmet",
+        "title": "Golden Helmet",
+        "name": "minecraft:golden_helmet",
+        "id": 314,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "golden_chestplate": {
+        "key": "golden_chestplate",
+        "title": "Golden Chestplate",
+        "name": "minecraft:golden_chestplate",
+        "id": 315,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "golden_leggings": {
+        "key": "golden_leggings",
+        "title": "Golden Leggings",
+        "name": "minecraft:golden_leggings",
+        "id": 316,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "golden_boots": {
+        "key": "golden_boots",
+        "title": "Golden Boots",
+        "name": "minecraft:golden_boots",
+        "id": 317,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "flint": {
+        "key": "flint",
+        "title": "Flint",
+        "name": "minecraft:flint",
+        "id": 318,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "raw_porkchop": {
+        "key": "raw_porkchop",
+        "title": "Raw Porkchop",
+        "name": "minecraft:porkchop",
+        "id": 319,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "cooked_porkchop": {
+        "key": "cooked_porkchop",
+        "title": "Cooked Porkchop",
+        "name": "minecraft:cooked_porkchop",
+        "id": 320,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "painting": {
+        "key": "painting",
+        "title": "Painting",
+        "name": "minecraft:painting",
+        "id": 321,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "golden_apple": {
+        "key": "golden_apple",
+        "title": "Golden Apple",
+        "name": "minecraft:golden_apple",
+        "id": 322,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "enchanted_golden_apple": {
+        "key": "enchanted_golden_apple",
+        "title": "Enchanted Golden Apple",
+        "name": "minecraft:golden_apple",
+        "id": 322,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "oak_sign": {
+        "key": "oak_sign",
+        "title": "Oak Sign",
+        "name": "minecraft:sign",
+        "id": 323,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "oak_door": {
+        "key": "oak_door",
+        "title": "Oak Door",
+        "name": "minecraft:wooden_door",
+        "id": 324,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "bucket": {
+        "key": "bucket",
+        "title": "Bucket",
+        "name": "minecraft:bucket",
+        "id": 325,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "water_bucket": {
+        "key": "water_bucket",
+        "title": "Water Bucket",
+        "name": "minecraft:water_bucket",
+        "id": 326,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "lava_bucket": {
+        "key": "lava_bucket",
+        "title": "Lava Bucket",
+        "name": "minecraft:lava_bucket",
+        "id": 327,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "minecart": {
+        "key": "minecart",
+        "title": "Minecart",
+        "name": "minecraft:minecart",
+        "id": 328,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "saddle": {
+        "key": "saddle",
+        "title": "Saddle",
+        "name": "minecraft:saddle",
+        "id": 329,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "iron_door": {
+        "key": "iron_door",
+        "title": "Iron Door",
+        "name": "minecraft:iron_door",
+        "id": 330,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "redstone_dust": {
+        "key": "redstone_dust",
+        "title": "Redstone Dust",
+        "name": "minecraft:redstone",
+        "id": 331,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "snowball": {
+        "key": "snowball",
+        "title": "Snowball",
+        "name": "minecraft:snowball",
+        "id": 332,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "oak_boat": {
+        "key": "oak_boat",
+        "title": "Oak Boat",
+        "name": "minecraft:boat",
+        "id": 333,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "leather": {
+        "key": "leather",
+        "title": "Leather",
+        "name": "minecraft:leather",
+        "id": 334,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "milk_bucket": {
+        "key": "milk_bucket",
+        "title": "Milk Bucket",
+        "name": "minecraft:milk_bucket",
+        "id": 335,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "brick": {
+        "key": "brick",
+        "title": "Brick",
+        "name": "minecraft:brick",
+        "id": 336,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "clay_ball": {
+        "key": "clay_ball",
+        "title": "Clay Ball",
+        "name": "minecraft:clay_ball",
+        "id": 337,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "sugar_canes": {
+        "key": "sugar_canes",
+        "title": "Sugar Canes",
+        "name": "minecraft:reeds",
+        "id": 338,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "paper": {
+        "key": "paper",
+        "title": "Paper",
+        "name": "minecraft:paper",
+        "id": 339,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "book": {
+        "key": "book",
+        "title": "Book",
+        "name": "minecraft:book",
+        "id": 340,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "slimeball": {
+        "key": "slimeball",
+        "title": "Slimeball",
+        "name": "minecraft:slime_ball",
+        "id": 341,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "minecart_with_chest": {
+        "key": "minecart_with_chest",
+        "title": "Minecart with Chest",
+        "name": "minecraft:chest_minecart",
+        "id": 342,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "minecart_with_furnace": {
+        "key": "minecart_with_furnace",
+        "title": "Minecart with Furnace",
+        "name": "minecraft:furnace_minecart",
+        "id": 343,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "egg": {
+        "key": "egg",
+        "title": "Egg",
+        "name": "minecraft:egg",
+        "id": 344,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "compass": {
+        "key": "compass",
+        "title": "Compass",
+        "name": "minecraft:compass",
+        "id": 345,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "fishing_rod": {
+        "key": "fishing_rod",
+        "title": "Fishing Rod",
+        "name": "minecraft:fishing_rod",
+        "id": 346,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "clock": {
+        "key": "clock",
+        "title": "Clock",
+        "name": "minecraft:clock",
+        "id": 347,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "glowstone_dust": {
+        "key": "glowstone_dust",
+        "title": "Glowstone Dust",
+        "name": "minecraft:glowstone_dust",
+        "id": 348,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "raw_fish": {
+        "key": "raw_fish",
+        "title": "Raw Fish",
+        "name": "minecraft:fish",
+        "id": 349,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "raw_salmon": {
+        "key": "raw_salmon",
+        "title": "Raw Salmon",
+        "name": "minecraft:fish",
+        "id": 349,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "clownfish": {
+        "key": "clownfish",
+        "title": "Tropical Fish (Clownfish)",
+        "name": "minecraft:fish",
+        "id": 349,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "pufferfish": {
+        "key": "pufferfish",
+        "title": "Pufferfish",
+        "name": "minecraft:fish",
+        "id": 349,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "cooked_fish": {
+        "key": "cooked_fish",
+        "title": "Cooked Fish",
+        "name": "minecraft:cooked_fish",
+        "id": 350,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "cooked_salmon": {
+        "key": "cooked_salmon",
+        "title": "Cooked Salmon",
+        "name": "minecraft:cooked_fish",
+        "id": 350,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "ink_sac": {
+        "key": "ink_sac",
+        "title": "Ink Sac",
+        "name": "minecraft:dye",
+        "id": 351,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "red_dye": {
+        "key": "red_dye",
+        "title": "Red Dye",
+        "name": "minecraft:dye",
+        "id": 351,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "green_dye": {
+        "key": "green_dye",
+        "title": "Green Dye",
+        "name": "minecraft:dye",
+        "id": 351,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "cocoa_beans": {
+        "key": "cocoa_beans",
+        "title": "Cocoa Beans",
+        "name": "minecraft:dye",
+        "id": 351,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "lapis_lazuli": {
+        "key": "lapis_lazuli",
+        "title": "Lapis Lazuli",
+        "name": "minecraft:dye",
+        "id": 351,
+        "data_value": 4,
+        "can_be_damaged": false
+    },
+    "purple_dye": {
+        "key": "purple_dye",
+        "title": "Purple Dye",
+        "name": "minecraft:dye",
+        "id": 351,
+        "data_value": 5,
+        "can_be_damaged": false
+    },
+    "cyan_dye": {
+        "key": "cyan_dye",
+        "title": "Cyan Dye",
+        "name": "minecraft:dye",
+        "id": 351,
+        "data_value": 6,
+        "can_be_damaged": false
+    },
+    "light_gray_dye": {
+        "key": "light_gray_dye",
+        "title": "Light Gray Dye",
+        "name": "minecraft:dye",
+        "id": 351,
+        "data_value": 7,
+        "can_be_damaged": false
+    },
+    "gray_dye": {
+        "key": "gray_dye",
+        "title": "Gray Dye",
+        "name": "minecraft:dye",
+        "id": 351,
+        "data_value": 8,
+        "can_be_damaged": false
+    },
+    "pink_dye": {
+        "key": "pink_dye",
+        "title": "Pink Dye",
+        "name": "minecraft:dye",
+        "id": 351,
+        "data_value": 9,
+        "can_be_damaged": false
+    },
+    "lime_dye": {
+        "key": "lime_dye",
+        "title": "Lime Dye",
+        "name": "minecraft:dye",
+        "id": 351,
+        "data_value": 10,
+        "can_be_damaged": false
+    },
+    "yellow_dye": {
+        "key": "yellow_dye",
+        "title": "Yellow Dye",
+        "name": "minecraft:dye",
+        "id": 351,
+        "data_value": 11,
+        "can_be_damaged": false
+    },
+    "light_blue_dye": {
+        "key": "light_blue_dye",
+        "title": "Light Blue Dye",
+        "name": "minecraft:dye",
+        "id": 351,
+        "data_value": 12,
+        "can_be_damaged": false
+    },
+    "magenta_dye": {
+        "key": "magenta_dye",
+        "title": "Magenta Dye",
+        "name": "minecraft:dye",
+        "id": 351,
+        "data_value": 13,
+        "can_be_damaged": false
+    },
+    "orange_dye": {
+        "key": "orange_dye",
+        "title": "Orange Dye",
+        "name": "minecraft:dye",
+        "id": 351,
+        "data_value": 14,
+        "can_be_damaged": false
+    },
+    "bone_meal": {
+        "key": "bone_meal",
+        "title": "Bone Meal",
+        "name": "minecraft:dye",
+        "id": 351,
+        "data_value": 15,
+        "can_be_damaged": false
+    },
+    "bone": {
+        "key": "bone",
+        "title": "Bone",
+        "name": "minecraft:bone",
+        "id": 352,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "sugar": {
+        "key": "sugar",
+        "title": "Sugar",
+        "name": "minecraft:sugar",
+        "id": 353,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "cake": {
+        "key": "cake",
+        "title": "Cake",
+        "name": "minecraft:cake",
+        "id": 354,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "red_bed": {
+        "key": "red_bed",
+        "title": "Red Bed",
+        "name": "minecraft:bed",
+        "id": 355,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "redstone_repeater": {
+        "key": "redstone_repeater",
+        "title": "Redstone Repeater",
+        "name": "minecraft:repeater",
+        "id": 356,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "cookie": {
+        "key": "cookie",
+        "title": "Cookie",
+        "name": "minecraft:cookie",
+        "id": 357,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "filled_map": {
+        "key": "filled_map",
+        "title": "Map (Filled)",
+        "name": "minecraft:filled_map",
+        "id": 358,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "shears": {
+        "key": "shears",
+        "title": "Shears",
+        "name": "minecraft:shears",
+        "id": 359,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "melon_slice": {
+        "key": "melon_slice",
+        "title": "Melon Slice",
+        "name": "minecraft:melon",
+        "id": 360,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "pumpkin_seeds": {
+        "key": "pumpkin_seeds",
+        "title": "Pumpkin Seeds",
+        "name": "minecraft:pumpkin_seeds",
+        "id": 361,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "melon_seeds": {
+        "key": "melon_seeds",
+        "title": "Melon Seeds",
+        "name": "minecraft:melon_seeds",
+        "id": 362,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "raw_beef": {
+        "key": "raw_beef",
+        "title": "Raw Beef",
+        "name": "minecraft:beef",
+        "id": 363,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "steak": {
+        "key": "steak",
+        "title": "Steak",
+        "name": "minecraft:cooked_beef",
+        "id": 364,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "raw_chicken": {
+        "key": "raw_chicken",
+        "title": "Raw Chicken",
+        "name": "minecraft:chicken",
+        "id": 365,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "cooked_chicken": {
+        "key": "cooked_chicken",
+        "title": "Cooked Chicken",
+        "name": "minecraft:cooked_chicken",
+        "id": 366,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "rotten_flesh": {
+        "key": "rotten_flesh",
+        "title": "Rotten Flesh",
+        "name": "minecraft:rotten_flesh",
+        "id": 367,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "ender_pearl": {
+        "key": "ender_pearl",
+        "title": "Ender Pearl",
+        "name": "minecraft:ender_pearl",
+        "id": 368,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "blaze_rod": {
+        "key": "blaze_rod",
+        "title": "Blaze Rod",
+        "name": "minecraft:blaze_rod",
+        "id": 369,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "ghast_tear": {
+        "key": "ghast_tear",
+        "title": "Ghast Tear",
+        "name": "minecraft:ghast_tear",
+        "id": 370,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "gold_nugget": {
+        "key": "gold_nugget",
+        "title": "Gold Nugget",
+        "name": "minecraft:gold_nugget",
+        "id": 371,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "nether_wart": {
+        "key": "nether_wart",
+        "title": "Nether Wart",
+        "name": "minecraft:nether_wart",
+        "id": 372,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "water_bottle": {
+        "key": "water_bottle",
+        "title": "Water Bottle",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "potion_of_regeneration": {
+        "key": "potion_of_regeneration",
+        "title": "Potion of Regeneration (0:45)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8193,
+        "can_be_damaged": false
+    },
+    "potion_of_swiftness": {
+        "key": "potion_of_swiftness",
+        "title": "Potion of Swiftness (3:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8194,
+        "can_be_damaged": false
+    },
+    "potion_of_poison": {
+        "key": "potion_of_poison",
+        "title": "Potion of Poison (0:45)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8196,
+        "can_be_damaged": false
+    },
+    "potion_of_strength": {
+        "key": "potion_of_strength",
+        "title": "Potion of Strength (3:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8201,
+        "can_be_damaged": false
+    },
+    "potion_of_leaping": {
+        "key": "potion_of_leaping",
+        "title": "Potion of Leaping (3:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8203,
+        "can_be_damaged": false
+    },
+    "potion_of_regeneration_2": {
+        "key": "potion_of_regeneration_2",
+        "title": "Potion of Regeneration II (0:22)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8225,
+        "can_be_damaged": false
+    },
+    "potion_of_swiftness_2": {
+        "key": "potion_of_swiftness_2",
+        "title": "Potion of Swiftness II (1:30)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8226,
+        "can_be_damaged": false
+    },
+    "potion_of_fire_resistance": {
+        "key": "potion_of_fire_resistance",
+        "title": "Potion of Fire Resistance (3:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8227,
+        "can_be_damaged": false
+    },
+    "potion_of_poison_2": {
+        "key": "potion_of_poison_2",
+        "title": "Potion of Poison II (0:22)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8228,
+        "can_be_damaged": false
+    },
+    "potion_of_healing": {
+        "key": "potion_of_healing",
+        "title": "Potion of Healing II",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8229,
+        "can_be_damaged": false
+    },
+    "potion_of_night_vision": {
+        "key": "potion_of_night_vision",
+        "title": "Potion of Night Vision (3:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8230,
+        "can_be_damaged": false
+    },
+    "potion_of_weakness": {
+        "key": "potion_of_weakness",
+        "title": "Potion of Weakness (1:30)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8232,
+        "can_be_damaged": false
+    },
+    "potion_of_strength_2": {
+        "key": "potion_of_strength_2",
+        "title": "Potion of Strength II (1:30)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8233,
+        "can_be_damaged": false
+    },
+    "potion_of_slowness": {
+        "key": "potion_of_slowness",
+        "title": "Potion of Slowness (1:30)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8234,
+        "can_be_damaged": false
+    },
+    "potion_of_leaping_2": {
+        "key": "potion_of_leaping_2",
+        "title": "Potion of Leaping II (1:30)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8235,
+        "can_be_damaged": false
+    },
+    "potion_of_harming": {
+        "key": "potion_of_harming",
+        "title": "Potion of Harming II",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8236,
+        "can_be_damaged": false
+    },
+    "potion_of_water_breathing": {
+        "key": "potion_of_water_breathing",
+        "title": "Potion of Water Breathing (3:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8237,
+        "can_be_damaged": false
+    },
+    "potion_of_invisibility": {
+        "key": "potion_of_invisibility",
+        "title": "Potion of Invisibility (3:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8238,
+        "can_be_damaged": false
+    },
+    "potion_of_regeneration_long": {
+        "key": "potion_of_regeneration_long",
+        "title": "Potion of Regeneration (2:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8257,
+        "can_be_damaged": false
+    },
+    "potion_of_swiftness_long": {
+        "key": "potion_of_swiftness_long",
+        "title": "Potion of Swiftness (8:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8258,
+        "can_be_damaged": false
+    },
+    "potion_of_fire_resistance_long": {
+        "key": "potion_of_fire_resistance_long",
+        "title": "Potion of Fire Resistance (8:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8259,
+        "can_be_damaged": false
+    },
+    "potion_of_poison_long": {
+        "key": "potion_of_poison_long",
+        "title": "Potion of Poison (2:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8260,
+        "can_be_damaged": false
+    },
+    "potion_of_healing_long": {
+        "key": "potion_of_healing_long",
+        "title": "Potion of Healing",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8261,
+        "can_be_damaged": false
+    },
+    "potion_of_night_vision_long": {
+        "key": "potion_of_night_vision_long",
+        "title": "Potion of Night Vision (8:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8262,
+        "can_be_damaged": false
+    },
+    "potion_of_weakness_long": {
+        "key": "potion_of_weakness_long",
+        "title": "Potion of Weakness (4:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8264,
+        "can_be_damaged": false
+    },
+    "potion_of_strength_long": {
+        "key": "potion_of_strength_long",
+        "title": "Potion of Strength (8:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8265,
+        "can_be_damaged": false
+    },
+    "potion_of_slowness_long": {
+        "key": "potion_of_slowness_long",
+        "title": "Potion of Slowness (4:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8266,
+        "can_be_damaged": false
+    },
+    "potion_of_leaping_long": {
+        "key": "potion_of_leaping_long",
+        "title": "Potion of Leaping (8:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8267,
+        "can_be_damaged": false
+    },
+    "potion_of_harming_long": {
+        "key": "potion_of_harming_long",
+        "title": "Potion of Harming",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8268,
+        "can_be_damaged": false
+    },
+    "potion_of_water_breathing_long": {
+        "key": "potion_of_water_breathing_long",
+        "title": "Potion of Water Breathing (8:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8269,
+        "can_be_damaged": false
+    },
+    "potion_of_invisibility_long": {
+        "key": "potion_of_invisibility_long",
+        "title": "Potion of Invisibility (8:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 8270,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_regeneration": {
+        "key": "splash_potion_of_regeneration",
+        "title": "Splash Potion of Regeneration (0:33)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16385,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_swiftness": {
+        "key": "splash_potion_of_swiftness",
+        "title": "Splash Potion of Swiftness (2:15)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16386,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_poison": {
+        "key": "splash_potion_of_poison",
+        "title": "Splash Potion of Poison (0:33)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16388,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_strength": {
+        "key": "splash_potion_of_strength",
+        "title": "Splash Potion of Strength (2:15)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16393,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_leaping": {
+        "key": "splash_potion_of_leaping",
+        "title": "Splash Potion of Leaping (2:15)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16395,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_regeneration_2": {
+        "key": "splash_potion_of_regeneration_2",
+        "title": "Splash Potion of Regeneration II (0:16)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16417,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_swiftness_2": {
+        "key": "splash_potion_of_swiftness_2",
+        "title": "Splash Potion of Swiftness II (1:07)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16418,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_fire_resistance": {
+        "key": "splash_potion_of_fire_resistance",
+        "title": "Splash Potion of Fire Resistance (2:15)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16419,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_poison_2": {
+        "key": "splash_potion_of_poison_2",
+        "title": "Splash Potion of Poison II (0:16)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16420,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_healing": {
+        "key": "splash_potion_of_healing",
+        "title": "Splash Potion of Healing II",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16421,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_night_vision": {
+        "key": "splash_potion_of_night_vision",
+        "title": "Splash Potion of Night Vision (2:15)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16422,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_weakness": {
+        "key": "splash_potion_of_weakness",
+        "title": "Splash Potion of Weakness (1:07)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16424,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_strength_2": {
+        "key": "splash_potion_of_strength_2",
+        "title": "Splash Potion of Strength II (1:07)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16425,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_slowness": {
+        "key": "splash_potion_of_slowness",
+        "title": "Splash Potion of Slowness (1:07)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16426,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_leaping_2": {
+        "key": "splash_potion_of_leaping_2",
+        "title": "Splash Potion of Leaping II (1:07)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16427,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_harming": {
+        "key": "splash_potion_of_harming",
+        "title": "Splash Potion of Harming II",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16428,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_water_breathing": {
+        "key": "splash_potion_of_water_breathing",
+        "title": "Splash Potion of Water Breathing (2:15)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16429,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_invisibility": {
+        "key": "splash_potion_of_invisibility",
+        "title": "Splash Potion of Invisibility (2:15)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16430,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_regeneration_long": {
+        "key": "splash_potion_of_regeneration_long",
+        "title": "Splash Potion of Regeneration (1:30)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16449,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_swiftness_long": {
+        "key": "splash_potion_of_swiftness_long",
+        "title": "Splash Potion of Swiftness (6:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16450,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_fire_resistance_long": {
+        "key": "splash_potion_of_fire_resistance_long",
+        "title": "Splash Potion of Fire Resistance (6:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16451,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_poison_long": {
+        "key": "splash_potion_of_poison_long",
+        "title": "Splash Potion of Poison (1:30)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16452,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_healing_long": {
+        "key": "splash_potion_of_healing_long",
+        "title": "Splash Potion of Healing",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16453,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_night_vision_long": {
+        "key": "splash_potion_of_night_vision_long",
+        "title": "Splash Potion of Night Vision (6:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16454,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_weakness_long": {
+        "key": "splash_potion_of_weakness_long",
+        "title": "Splash Potion of Weakness (3:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16456,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_strength_long": {
+        "key": "splash_potion_of_strength_long",
+        "title": "Splash Potion of Strength (6:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16457,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_slowness_long": {
+        "key": "splash_potion_of_slowness_long",
+        "title": "Splash Potion of Slowness (3:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16458,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_leaping_long": {
+        "key": "splash_potion_of_leaping_long",
+        "title": "Splash Potion of Leaping (6:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16459,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_harming_long": {
+        "key": "splash_potion_of_harming_long",
+        "title": "Splash Potion of Harming",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16460,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_water_breathing_long": {
+        "key": "splash_potion_of_water_breathing_long",
+        "title": "Splash Potion of Water Breathing (6:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16461,
+        "can_be_damaged": false
+    },
+    "splash_potion_of_invisibility_long": {
+        "key": "splash_potion_of_invisibility_long",
+        "title": "Splash Potion of Invisibility (6:00)",
+        "name": "minecraft:potion",
+        "id": 373,
+        "data_value": 16462,
+        "can_be_damaged": false
+    },
+    "glass_bottle": {
+        "key": "glass_bottle",
+        "title": "Glass Bottle",
+        "name": "minecraft:glass_bottle",
+        "id": 374,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "spider_eye": {
+        "key": "spider_eye",
+        "title": "Spider Eye",
+        "name": "minecraft:spider_eye",
+        "id": 375,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "fermented_spider_eye": {
+        "key": "fermented_spider_eye",
+        "title": "Fermented Spider Eye",
+        "name": "minecraft:fermented_spider_eye",
+        "id": 376,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "blaze_powder": {
+        "key": "blaze_powder",
+        "title": "Blaze Powder",
+        "name": "minecraft:blaze_powder",
+        "id": 377,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "magma_cream": {
+        "key": "magma_cream",
+        "title": "Magma Cream",
+        "name": "minecraft:magma_cream",
+        "id": 378,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "brewing_stand": {
+        "key": "brewing_stand",
+        "title": "Brewing Stand",
+        "name": "minecraft:brewing_stand",
+        "id": 379,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "cauldron": {
+        "key": "cauldron",
+        "title": "Cauldron",
+        "name": "minecraft:cauldron",
+        "id": 380,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "eye_of_ender": {
+        "key": "eye_of_ender",
+        "title": "Eye of Ender",
+        "name": "minecraft:ender_eye",
+        "id": 381,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "glistering_melon_slice": {
+        "key": "glistering_melon_slice",
+        "title": "Glistering Melon Slice",
+        "name": "minecraft:speckled_melon",
+        "id": 382,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "creeper_spawn_egg": {
+        "key": "creeper_spawn_egg",
+        "title": "Creeper Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 50,
+        "can_be_damaged": false
+    },
+    "skeleton_spawn_egg": {
+        "key": "skeleton_spawn_egg",
+        "title": "Skeleton Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 51,
+        "can_be_damaged": false
+    },
+    "spider_spawn_egg": {
+        "key": "spider_spawn_egg",
+        "title": "Spider Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 52,
+        "can_be_damaged": false
+    },
+    "zombie_spawn_egg": {
+        "key": "zombie_spawn_egg",
+        "title": "Zombie Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 54,
+        "can_be_damaged": false
+    },
+    "slime_spawn_egg": {
+        "key": "slime_spawn_egg",
+        "title": "Slime Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 55,
+        "can_be_damaged": false
+    },
+    "ghast_spawn_egg": {
+        "key": "ghast_spawn_egg",
+        "title": "Ghast Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 56,
+        "can_be_damaged": false
+    },
+    "zombified_piglin_spawn_egg": {
+        "key": "zombified_piglin_spawn_egg",
+        "title": "Zombified Piglin Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 57,
+        "can_be_damaged": false
+    },
+    "enderman_spawn_egg": {
+        "key": "enderman_spawn_egg",
+        "title": "Enderman Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 58,
+        "can_be_damaged": false
+    },
+    "cave_spider_spawn_egg": {
+        "key": "cave_spider_spawn_egg",
+        "title": "Cave Spider Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 59,
+        "can_be_damaged": false
+    },
+    "silverfish_spawn_egg": {
+        "key": "silverfish_spawn_egg",
+        "title": "Silverfish Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 60,
+        "can_be_damaged": false
+    },
+    "blaze_spawn_egg": {
+        "key": "blaze_spawn_egg",
+        "title": "Blaze Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 61,
+        "can_be_damaged": false
+    },
+    "magma_cube_spawn_egg": {
+        "key": "magma_cube_spawn_egg",
+        "title": "Magma Cube Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 62,
+        "can_be_damaged": false
+    },
+    "bat_spawn_egg": {
+        "key": "bat_spawn_egg",
+        "title": "Bat Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 65,
+        "can_be_damaged": false
+    },
+    "witch_spawn_egg": {
+        "key": "witch_spawn_egg",
+        "title": "Witch Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 66,
+        "can_be_damaged": false
+    },
+    "endermite_spawn_egg": {
+        "key": "endermite_spawn_egg",
+        "title": "Endermite Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 67,
+        "can_be_damaged": false
+    },
+    "guardian_spawn_egg": {
+        "key": "guardian_spawn_egg",
+        "title": "Guardian Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 68,
+        "can_be_damaged": false
+    },
+    "pig_spawn_egg": {
+        "key": "pig_spawn_egg",
+        "title": "Pig Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 90,
+        "can_be_damaged": false
+    },
+    "sheep_spawn_egg": {
+        "key": "sheep_spawn_egg",
+        "title": "Sheep Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 91,
+        "can_be_damaged": false
+    },
+    "cow_spawn_egg": {
+        "key": "cow_spawn_egg",
+        "title": "Cow Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 92,
+        "can_be_damaged": false
+    },
+    "chicken_spawn_egg": {
+        "key": "chicken_spawn_egg",
+        "title": "Chicken Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 93,
+        "can_be_damaged": false
+    },
+    "squid_spawn_egg": {
+        "key": "squid_spawn_egg",
+        "title": "Squid Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 94,
+        "can_be_damaged": false
+    },
+    "wolf_spawn_egg": {
+        "key": "wolf_spawn_egg",
+        "title": "Wolf Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 95,
+        "can_be_damaged": false
+    },
+    "mooshroom_spawn_egg": {
+        "key": "mooshroom_spawn_egg",
+        "title": "Mooshroom Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 96,
+        "can_be_damaged": false
+    },
+    "ocelot_spawn_egg": {
+        "key": "ocelot_spawn_egg",
+        "title": "Ocelot Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 98,
+        "can_be_damaged": false
+    },
+    "horse_spawn_egg": {
+        "key": "horse_spawn_egg",
+        "title": "Horse Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 100,
+        "can_be_damaged": false
+    },
+    "rabbit_spawn_egg": {
+        "key": "rabbit_spawn_egg",
+        "title": "Rabbit Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 101,
+        "can_be_damaged": false
+    },
+    "villager_spawn_egg": {
+        "key": "villager_spawn_egg",
+        "title": "Villager Spawn Egg",
+        "name": "minecraft:spawn_egg",
+        "id": 383,
+        "data_value": 120,
+        "can_be_damaged": false
+    },
+    "bottle_o_enchanting": {
+        "key": "bottle_o_enchanting",
+        "title": "Bottle o'Enchanting",
+        "name": "minecraft:experience_bottle",
+        "id": 384,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "fire_charge": {
+        "key": "fire_charge",
+        "title": "Fire Charge",
+        "name": "minecraft:fire_charge",
+        "id": 385,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "book_and_quill": {
+        "key": "book_and_quill",
+        "title": "Book and Quill",
+        "name": "minecraft:writable_book",
+        "id": 386,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "written_book": {
+        "key": "written_book",
+        "title": "Written Book",
+        "name": "minecraft:written_book",
+        "id": 387,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "emerald": {
+        "key": "emerald",
+        "title": "Emerald",
+        "name": "minecraft:emerald",
+        "id": 388,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "item_frame": {
+        "key": "item_frame",
+        "title": "Item Frame",
+        "name": "minecraft:item_frame",
+        "id": 389,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "flower_pot": {
+        "key": "flower_pot",
+        "title": "Flower Pot",
+        "name": "minecraft:flower_pot",
+        "id": 390,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "carrot": {
+        "key": "carrot",
+        "title": "Carrot",
+        "name": "minecraft:carrot",
+        "id": 391,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "potato": {
+        "key": "potato",
+        "title": "Potato",
+        "name": "minecraft:potato",
+        "id": 392,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "baked_potato": {
+        "key": "baked_potato",
+        "title": "Baked Potato",
+        "name": "minecraft:baked_potato",
+        "id": 393,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "poisonous_potato": {
+        "key": "poisonous_potato",
+        "title": "Poisonous Potato",
+        "name": "minecraft:poisonous_potato",
+        "id": 394,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "map": {
+        "key": "map",
+        "title": "Map",
+        "name": "minecraft:map",
+        "id": 395,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "golden_carrot": {
+        "key": "golden_carrot",
+        "title": "Golden Carrot",
+        "name": "minecraft:golden_carrot",
+        "id": 396,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "skeleton_skull": {
+        "key": "skeleton_skull",
+        "title": "Skeleton Skull",
+        "name": "minecraft:skull",
+        "id": 397,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "wither_skeleton_skull": {
+        "key": "wither_skeleton_skull",
+        "title": "Wither Skeleton Skull",
+        "name": "minecraft:skull",
+        "id": 397,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "zombie_head": {
+        "key": "zombie_head",
+        "title": "Zombie Head",
+        "name": "minecraft:skull",
+        "id": 397,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "player_head": {
+        "key": "player_head",
+        "title": "Player Head",
+        "name": "minecraft:skull",
+        "id": 397,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "creeper_head": {
+        "key": "creeper_head",
+        "title": "Creeper Head",
+        "name": "minecraft:skull",
+        "id": 397,
+        "data_value": 4,
+        "can_be_damaged": false
+    },
+    "carrot_on_a_stick": {
+        "key": "carrot_on_a_stick",
+        "title": "Carrot on a Stick",
+        "name": "minecraft:carrot_on_a_stick",
+        "id": 398,
+        "data_value": 0,
+        "can_be_damaged": true
+    },
+    "nether_star": {
+        "key": "nether_star",
+        "title": "Nether Star",
+        "name": "minecraft:nether_star",
+        "id": 399,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "pumpkin_pie": {
+        "key": "pumpkin_pie",
+        "title": "Pumpkin Pie",
+        "name": "minecraft:pumpkin_pie",
+        "id": 400,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "firework_rocket": {
+        "key": "firework_rocket",
+        "title": "Firework Rocket",
+        "name": "minecraft:fireworks",
+        "id": 401,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "firework_star": {
+        "key": "firework_star",
+        "title": "Firework Star",
+        "name": "minecraft:firework_charge",
+        "id": 402,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "enchanted_book": {
+        "key": "enchanted_book",
+        "title": "Enchanted Book",
+        "name": "minecraft:enchanted_book",
+        "id": 403,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "redstone_comparator": {
+        "key": "redstone_comparator",
+        "title": "Redstone Comparator",
+        "name": "minecraft:comparator",
+        "id": 404,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "nether_brick": {
+        "key": "nether_brick",
+        "title": "Nether Brick",
+        "name": "minecraft:netherbrick",
+        "id": 405,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "nether_quartz": {
+        "key": "nether_quartz",
+        "title": "Nether Quartz",
+        "name": "minecraft:quartz",
+        "id": 406,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "minecart_with_tnt": {
+        "key": "minecart_with_tnt",
+        "title": "Minecart with TNT",
+        "name": "minecraft:tnt_minecart",
+        "id": 407,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "minecart_with_hopper": {
+        "key": "minecart_with_hopper",
+        "title": "Minecart with Hopper",
+        "name": "minecraft:hopper_minecart",
+        "id": 408,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "prismarine_shard": {
+        "key": "prismarine_shard",
+        "title": "Prismarine Shard",
+        "name": "minecraft:prismarine_shard",
+        "id": 409,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "prismarine_crystals": {
+        "key": "prismarine_crystals",
+        "title": "Prismarine Crystals",
+        "name": "minecraft:prismarine_crystals",
+        "id": 410,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "raw_rabbit": {
+        "key": "raw_rabbit",
+        "title": "Raw Rabbit",
+        "name": "minecraft:rabbit",
+        "id": 411,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "cooked_rabbit": {
+        "key": "cooked_rabbit",
+        "title": "Cooked Rabbit",
+        "name": "minecraft:cooked_rabbit",
+        "id": 412,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "rabbit_stew": {
+        "key": "rabbit_stew",
+        "title": "Rabbit Stew",
+        "name": "minecraft:rabbit_stew",
+        "id": 413,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "rabbits_foot": {
+        "key": "rabbits_foot",
+        "title": "Rabbit's Foot",
+        "name": "minecraft:rabbit_foot",
+        "id": 414,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "rabbit_hide": {
+        "key": "rabbit_hide",
+        "title": "Rabbit Hide",
+        "name": "minecraft:rabbit_hide",
+        "id": 415,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "armor_stand": {
+        "key": "armor_stand",
+        "title": "Armor Stand",
+        "name": "minecraft:armor_stand",
+        "id": 416,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "iron_horse_armor": {
+        "key": "iron_horse_armor",
+        "title": "Iron Horse Armor",
+        "name": "minecraft:iron_horse_armor",
+        "id": 417,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "gold_horse_armor": {
+        "key": "gold_horse_armor",
+        "title": "Gold Horse Armor",
+        "name": "minecraft:golden_horse_armor",
+        "id": 418,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "diamond_horse_armor": {
+        "key": "diamond_horse_armor",
+        "title": "Diamond Horse Armor",
+        "name": "minecraft:diamond_horse_armor",
+        "id": 419,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "lead": {
+        "key": "lead",
+        "title": "Lead",
+        "name": "minecraft:lead",
+        "id": 420,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "name_tag": {
+        "key": "name_tag",
+        "title": "Name Tag",
+        "name": "minecraft:name_tag",
+        "id": 421,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "minecart_with_command_block": {
+        "key": "minecart_with_command_block",
+        "title": "Minecart with Command Block",
+        "name": "minecraft:command_block_minecart",
+        "id": 422,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "raw_mutton": {
+        "key": "raw_mutton",
+        "title": "Raw Mutton",
+        "name": "minecraft:mutton",
+        "id": 423,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "cooked_mutton": {
+        "key": "cooked_mutton",
+        "title": "Cooked Mutton",
+        "name": "minecraft:cooked_mutton",
+        "id": 424,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "black_banner": {
+        "key": "black_banner",
+        "title": "Black Banner",
+        "name": "minecraft:banner",
+        "id": 425,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "red_banner": {
+        "key": "red_banner",
+        "title": "Red Banner",
+        "name": "minecraft:banner",
+        "id": 425,
+        "data_value": 1,
+        "can_be_damaged": false
+    },
+    "green_banner": {
+        "key": "green_banner",
+        "title": "Green Banner",
+        "name": "minecraft:banner",
+        "id": 425,
+        "data_value": 2,
+        "can_be_damaged": false
+    },
+    "brown_banner": {
+        "key": "brown_banner",
+        "title": "Brown Banner",
+        "name": "minecraft:banner",
+        "id": 425,
+        "data_value": 3,
+        "can_be_damaged": false
+    },
+    "blue_banner": {
+        "key": "blue_banner",
+        "title": "Blue Banner",
+        "name": "minecraft:banner",
+        "id": 425,
+        "data_value": 4,
+        "can_be_damaged": false
+    },
+    "purple_banner": {
+        "key": "purple_banner",
+        "title": "Purple Banner",
+        "name": "minecraft:banner",
+        "id": 425,
+        "data_value": 5,
+        "can_be_damaged": false
+    },
+    "cyan_banner": {
+        "key": "cyan_banner",
+        "title": "Cyan Banner",
+        "name": "minecraft:banner",
+        "id": 425,
+        "data_value": 6,
+        "can_be_damaged": false
+    },
+    "light_gray_banner": {
+        "key": "light_gray_banner",
+        "title": "Light Gray Banner",
+        "name": "minecraft:banner",
+        "id": 425,
+        "data_value": 7,
+        "can_be_damaged": false
+    },
+    "gray_banner": {
+        "key": "gray_banner",
+        "title": "Gray Banner",
+        "name": "minecraft:banner",
+        "id": 425,
+        "data_value": 8,
+        "can_be_damaged": false
+    },
+    "pink_banner": {
+        "key": "pink_banner",
+        "title": "Pink Banner",
+        "name": "minecraft:banner",
+        "id": 425,
+        "data_value": 9,
+        "can_be_damaged": false
+    },
+    "lime_banner": {
+        "key": "lime_banner",
+        "title": "Lime Banner",
+        "name": "minecraft:banner",
+        "id": 425,
+        "data_value": 10,
+        "can_be_damaged": false
+    },
+    "yellow_banner": {
+        "key": "yellow_banner",
+        "title": "Yellow Banner",
+        "name": "minecraft:banner",
+        "id": 425,
+        "data_value": 11,
+        "can_be_damaged": false
+    },
+    "light_blue_banner": {
+        "key": "light_blue_banner",
+        "title": "Light Blue Banner",
+        "name": "minecraft:banner",
+        "id": 425,
+        "data_value": 12,
+        "can_be_damaged": false
+    },
+    "magenta_banner": {
+        "key": "magenta_banner",
+        "title": "Magenta Banner",
+        "name": "minecraft:banner",
+        "id": 425,
+        "data_value": 13,
+        "can_be_damaged": false
+    },
+    "orange_banner": {
+        "key": "orange_banner",
+        "title": "Orange Banner",
+        "name": "minecraft:banner",
+        "id": 425,
+        "data_value": 14,
+        "can_be_damaged": false
+    },
+    "white_banner": {
+        "key": "white_banner",
+        "title": "White Banner",
+        "name": "minecraft:banner",
+        "id": 425,
+        "data_value": 15,
+        "can_be_damaged": false
+    },
+    "spruce_door": {
+        "key": "spruce_door",
+        "title": "Spruce Door",
+        "name": "minecraft:spruce_door",
+        "id": 427,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "birch_door": {
+        "key": "birch_door",
+        "title": "Birch Door",
+        "name": "minecraft:birch_door",
+        "id": 428,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "jungle_door": {
+        "key": "jungle_door",
+        "title": "Jungle Door",
+        "name": "minecraft:jungle_door",
+        "id": 429,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "acacia_door": {
+        "key": "acacia_door",
+        "title": "Acacia Door",
+        "name": "minecraft:acacia_door",
+        "id": 430,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "dark_oak_door": {
+        "key": "dark_oak_door",
+        "title": "Dark Oak Door",
+        "name": "minecraft:dark_oak_door",
+        "id": 431,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "music_disc_13": {
+        "key": "music_disc_13",
+        "title": "Music Disc (C418 - 13)",
+        "name": "minecraft:record_13",
+        "id": 2256,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "music_disc_cat": {
+        "key": "music_disc_cat",
+        "title": "Music Disc (C418 - cat)",
+        "name": "minecraft:record_cat",
+        "id": 2257,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "music_disc_blocks": {
+        "key": "music_disc_blocks",
+        "title": "Music Disc (C418 - blocks)",
+        "name": "minecraft:record_blocks",
+        "id": 2258,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "music_disc_chirp": {
+        "key": "music_disc_chirp",
+        "title": "Music Disc (C418 - chirp)",
+        "name": "minecraft:record_chirp",
+        "id": 2259,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "music_disc_far": {
+        "key": "music_disc_far",
+        "title": "Music Disc (C418 - far)",
+        "name": "minecraft:record_far",
+        "id": 2260,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "music_disc_mall": {
+        "key": "music_disc_mall",
+        "title": "Music Disc (C418 - mall)",
+        "name": "minecraft:record_mall",
+        "id": 2261,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "music_disc_mellohi": {
+        "key": "music_disc_mellohi",
+        "title": "Music Disc (C418 - mellohi)",
+        "name": "minecraft:record_mellohi",
+        "id": 2262,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "music_disc_stal": {
+        "key": "music_disc_stal",
+        "title": "Music Disc (C418 - stal)",
+        "name": "minecraft:record_stal",
+        "id": 2263,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "music_disc_strad": {
+        "key": "music_disc_strad",
+        "title": "Music Disc (C418 - strad)",
+        "name": "minecraft:record_strad",
+        "id": 2264,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "music_disc_ward": {
+        "key": "music_disc_ward",
+        "title": "Music Disc (C418 - ward)",
+        "name": "minecraft:record_ward",
+        "id": 2265,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "music_disc_11": {
+        "key": "music_disc_11",
+        "title": "Music Disc (C418 - 11)",
+        "name": "minecraft:record_11",
+        "id": 2266,
+        "data_value": 0,
+        "can_be_damaged": false
+    },
+    "music_disc_wait": {
+        "key": "music_disc_wait",
+        "title": "Music Disc (C418 - wait)",
+        "name": "minecraft:record_wait",
+        "id": 2267,
+        "data_value": 0,
+        "can_be_damaged": false
+    }
+}

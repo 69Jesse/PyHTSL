@@ -9,17 +9,23 @@ from typing import Optional, Callable
 
 
 __all__ = (
+    'HERE',
+    'HTSL_IMPORTS_FOLDER',
     'LineType',
     'WRITER',
 )
 
 
+HERE: Path = Path(__file__).parent
+
 DOT_MINECRAFT: Path = Path(os.getenv('APPDATA')) / '.minecraft'  # type: ignore
 if not DOT_MINECRAFT.exists():
     raise FileNotFoundError('Could not find your .minecraft folder')
+
 HTSL_IMPORTS_FOLDER: Path = DOT_MINECRAFT / 'config' / 'ChatTriggers' / 'modules' / 'HTSL' / 'imports'
 if not HTSL_IMPORTS_FOLDER.exists():
     raise FileNotFoundError('Could not find your HTSL imports folder')
+
 PYHTSL_FOLDER: Path = HTSL_IMPORTS_FOLDER / 'pyhtsl'
 if not PYHTSL_FOLDER.exists():
     PYHTSL_FOLDER.mkdir()
@@ -101,7 +107,7 @@ class Writer:
             func()
         self.write_to_files()
         print((
-            '\nAll done! Your .htsl file is written to the following location:'
+            '\n\x1b[38;2;0;255;0mAll done! Your .htsl file is written to the following location:\x1b[0m'
             f'\n{self.htsl_file.absolute()}'
             f'\nExecute it with HTSL by using the following name: \x1b[38;2;255;0;0m{self.file_name}\x1b[0m'
             '\n'

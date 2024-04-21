@@ -1,4 +1,5 @@
 from ..condition import TinyCondition
+from .item import Item
 
 from typing import final, Literal
 
@@ -10,13 +11,13 @@ __all__ = (
 
 @final
 class HasItem(TinyCondition):
-    item: str
+    item: Item | str
     what_to_check: str
     where_to_check: str
     required_amount: str
     def __init__(
         self,
-        item: str,
+        item: Item | str,
         what_to_check: Literal['item_type', 'metadata'] = 'metadata',
         where_to_check: Literal['hand', 'armor', 'hotbar', 'inventory', 'anywhere'] = 'anywhere',
         required_amount: Literal['any_amount', 'equal_or_greater_amount'] = 'any_amount',
@@ -27,4 +28,8 @@ class HasItem(TinyCondition):
         self.required_amount = required_amount
 
     def __str__(self) -> str:
-        return f'hasItem "{self.item}" {self.what_to_check} {self.where_to_check} {self.required_amount}'
+        if isinstance(self.item, Item):
+            name = self.item.save()
+        else:
+            name = self.item
+        return f'hasItem "{name}" {self.what_to_check} {self.where_to_check} {self.required_amount}'
