@@ -152,7 +152,7 @@ SAVED_CACHE: dict[str, str] = {}
 
 class Item:
     key: str
-    info: dict[str, Any]
+    extras: dict[str, Any]
 
     @overload
     def __init__(
@@ -214,17 +214,26 @@ class Item:
     def __init__(
         self,
         key: ALL_POSSIBLE_ITEM_KEYS,
-        **info: Any,
+        *,
+        name: Optional[str] = None,
+        lore: Optional[str | Iterable[str]] = None,
+        count: int = 1,
+        enchantments: Optional[EnchantmentsType] = None,
+        hide_all_flags: bool = False,
+        hide_enchantments_flag: bool = False,
+        hide_modifiers_flag: bool = False,
+        hide_additional_flag: bool = False,
+        **extras: Any,
     ) -> None:
         ...
 
     def __init__(
         self,
         key: ALL_POSSIBLE_ITEM_KEYS,
-        **info: Any,
+        **extras: Any,
     ) -> None:
         self.key = key
-        self.info = info
+        self.extras = extras
         self.key_check()
 
     def as_title(self) -> str:
@@ -257,19 +266,19 @@ class Item:
         return '{' + ','.join(f'{k}:{self.one_lineify(v)}' for k, v in data.items()) + '}'  # type: ignore
 
     def fetch_line(self, item: ItemJsonData) -> str:
-        info_copy = self.info.copy()
+        extras_copy = self.extras.copy()
         # cant be arsed to annotate the following because look at `one_lineify`
         data = {
             'id': (item['name'], DataType.string),
-            'Count': (info_copy.pop('count', 1), DataType.byte),
+            'Count': (extras_copy.pop('count', 1), DataType.byte),
             'tag': {},
             'Damage': (item['data_value'], DataType.short),
         }
         if item['can_be_damaged']:
-            data['Damage'] = (info_copy.pop('damage', 0), DataType.short)
+            data['Damage'] = (extras_copy.pop('damage', 0), DataType.short)
         tags = data['tag']
 
-        enchantments: Optional[EnchantmentsType] = info_copy.pop('enchantments', None)
+        enchantments: Optional[EnchantmentsType] = extras_copy.pop('enchantments', None)
         if enchantments is not None:
             if isinstance(enchantments, str):
                 enchantments = Enchantment(enchantments)
@@ -286,19 +295,19 @@ class Item:
                     'id': ENCHANTMENT_TO_ID[enchantment if isinstance(enchantment, str) else enchantment.name],
                 } for enchantment in enchantments], DataType.short)
 
-        unbreakable: int = int(info_copy.pop('unbreakable', False))
+        unbreakable: int = int(extras_copy.pop('unbreakable', False))
         if unbreakable:
             if not item['can_be_damaged']:
                 raise ValueError(f'Item "{self.key}" cannot be unbreakable.')
             tags['Unbreakable'] = (1, DataType.byte)
 
         hide_flags: int = min(sum(
-            value for key, value in HIDE_FLAGS.items() if info_copy.pop(key, False)
+            value for key, value in HIDE_FLAGS.items() if extras_copy.pop(key, False)
         ), HIDE_FLAGS['hide_all_flags'])
         if hide_flags:
             tags['HideFlags'] = (hide_flags, DataType.integer)
 
-        lore: Optional[str | Iterable[str]] = info_copy.pop('lore', None)
+        lore: Optional[str | Iterable[str]] = extras_copy.pop('lore', None)
         if lore is not None:
             if not isinstance(lore, str):
                 lore = '\n'.join(lore)
@@ -307,7 +316,7 @@ class Item:
                 display = tags.setdefault('display', {})
                 display['Lore'] = (lore.split('\n'), DataType.string)
 
-        name: Optional[str] = info_copy.pop('name', None)
+        name: Optional[str] = extras_copy.pop('name', None)
         if name is not None:
             name = self.replace_placeholders(name)
             display = tags.setdefault('display', {})
@@ -316,8 +325,8 @@ class Item:
         if not tags:
             del data['tag']
 
-        if info_copy:
-            raise ValueError(f'Invalid keys: {", ".join(info_copy.keys())}')
+        if extras_copy:
+            raise ValueError(f'Invalid keys: {", ".join(extras_copy.keys())}')
 
         return '{"item": "' + self.one_lineify(data) + '"}'
 
