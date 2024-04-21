@@ -4,6 +4,7 @@ from .enchantment import POSSIBLE_ENCHANTMENT, Enchantment, ENCHANTMENT_TO_ID
 import json
 import re
 from enum import Enum
+import hashlib
 
 from typing import Literal, TypedDict, overload, Iterable, Optional, Any, Callable
 
@@ -27,21 +28,11 @@ with ITEMS_JSON_FILE.open('r', encoding='utf-8') as file:
     ITEMS: dict[str, ItemJsonData] = json.load(file)
 
 
-# items = list(ITEMS.items())
-# n = 8
-# yes = [(key, value) for key, value in items if not value['can_be_damaged']]
-# print('Literal[\n' + '\n'.join('    ' + (' '.join(f'\'{k}\',' for k, _ in yes[i:i + n])) for i in range(0, len(yes), n)) + '\n]')
-# yes = [(key, value) for key, value in items if value['can_be_damaged'] and 'leather' not in key]
-# print('Literal[\n' + '\n'.join('    ' + (' '.join(f'\'{k}\',' for k, _ in yes[i:i + n])) for i in range(0, len(yes), n)) + '\n]')
-# yes = [(key, value) for key, value in items if value['can_be_damaged'] and 'leather' in key]
-# print('Literal[\n' + '\n'.join('    ' + (' '.join(f'\'{k}\',' for k, _ in yes[i:i + n])) for i in range(0, len(yes), n)) + '\n]')
-
-
 HIDE_FLAGS: dict[str, int] = {
     'hide_enchantments_flag': 1,
     'hide_modifiers_flag': 2,
     'hide_unbreakable_flag': 4,
-    # 'hide_can_destroy_flag': 8,    # IDK what these do and if theyre actually implemented, if they are let me know..
+    # 'hide_can_destroy_flag': 8,    # Not sure what these do and if theyre actually implemented, if they are let me know..
     # 'hide_can_place_on_flag': 16,  #
     'hide_additional_flag': 32,
     'hide_dye_flag': 64,
@@ -153,6 +144,9 @@ ALL_ITEM_KEYS = NON_SPECIAL_ITEM_KEY | DAMAGEABLE_ITEM_KEY | LEATHER_ARMOR_KEY
 
 
 EnchantmentsType = dict[Enchantment | POSSIBLE_ENCHANTMENT, int] | Iterable[Enchantment | POSSIBLE_ENCHANTMENT] | Enchantment | POSSIBLE_ENCHANTMENT
+
+
+SAVED_CACHE: dict[str, str] = {}
 
 
 class Item:
@@ -267,23 +261,20 @@ class Item:
                 raise TypeError(f'Invalid type: {type(left)}')
         return '{' + ','.join(f'{k}:{self.one_lineify(v)}' for k, v in data.items()) + '}'  # type: ignore
 
-    def fetch_line(self) -> str:
-        item = ITEMS.get(self.key, None)
-        if item is None:
-            raise ValueError(f'Invalid item key: "{self.key}". If you have already saved this in your imports folder, please use solely the string "{self.key}" instead.')
-
+    def fetch_line(self, item: ItemJsonData) -> str:
+        info_copy = self.info.copy()
         # cant be arsed to annotate the following because look at `one_lineify`
         data = {
             'id': (item['name'], DataType.string),
-            'Count': (self.info.pop('count', 1), DataType.byte),
+            'Count': (info_copy.pop('count', 1), DataType.byte),
             'tag': {},
             'Damage': (item['data_value'], DataType.short),
         }
         if item['can_be_damaged']:
-            data['Damage'] = (self.info.pop('damage', 0), DataType.short)
+            data['Damage'] = (info_copy.pop('damage', 0), DataType.short)
         tags = data['tag']
 
-        enchantments: Optional[EnchantmentsType] = self.info.pop('enchantments', None)
+        enchantments: Optional[EnchantmentsType] = info_copy.pop('enchantments', None)
         if enchantments is not None:
             if isinstance(enchantments, str):
                 enchantments = Enchantment(enchantments)
@@ -300,19 +291,19 @@ class Item:
                     'id': (ENCHANTMENT_TO_ID[enchantment if isinstance(enchantment, str) else enchantment.name], DataType.short),
                 } for enchantment in enchantments]
 
-        unbreakable: int = int(self.info.pop('unbreakable', False))
+        unbreakable: int = int(info_copy.pop('unbreakable', False))
         if unbreakable:
             if not item['can_be_damaged']:
                 raise ValueError(f'Item "{self.key}" cannot be unbreakable.')
             tags['Unbreakable'] = (1, DataType.byte)
 
         hide_flags: int = min(sum(
-            value for key, value in HIDE_FLAGS.items() if self.info.pop(key, False)
+            value for key, value in HIDE_FLAGS.items() if info_copy.pop(key, False)
         ), HIDE_FLAGS['hide_all_flags'])
         if hide_flags:
             tags['HideFlags'] = (hide_flags, DataType.integer)
 
-        lore: Optional[str | Iterable[str]] = self.info.pop('lore', None)
+        lore: Optional[str | Iterable[str]] = info_copy.pop('lore', None)
         if lore is not None:
             if not isinstance(lore, str):
                 lore = '\n'.join(lore)
@@ -321,7 +312,7 @@ class Item:
                 display = tags.setdefault('display', {})
                 display['Lore'] = (lore.split('\n'), DataType.string)
 
-        name: Optional[str] = self.info.pop('name', None)
+        name: Optional[str] = info_copy.pop('name', None)
         if name is not None:
             name = self.replace_placeholders(name)
             display = tags.setdefault('display', {})
@@ -330,11 +321,25 @@ class Item:
         if not tags:
             del data['tag']
 
-        if self.info:
-            raise ValueError(f'Invalid keys: {", ".join(self.info.keys())}')
+        if info_copy:
+            raise ValueError(f'Invalid keys: {", ".join(info_copy.keys())}')
 
         return '{"item": "' + self.one_lineify(data) + '"}'
 
     def save(self) -> str:
-        line = self.fetch_line()
-        # TODO
+        item = ITEMS.get(self.key, None)
+        if item is None:
+            raise ValueError(f'Invalid item key: "{self.key}". If you have already saved this in your imports folder, please use solely the string "{self.key}" instead.')
+        line = self.fetch_line(item)
+        cached = SAVED_CACHE.get(line, None)
+        if cached is not None:
+            print(f'Using cached \x1b[38;2;0;255;0m{item["title"]}\x1b[0m as \x1b[38;2;255;0;0m{cached}\x1b[0m.')
+            return cached
+        suffix = hashlib.md5(line.encode()).hexdigest()[:8]
+        name = f'{self.key}_{suffix}'
+        path = HTSL_IMPORTS_FOLDER / f'{name}.json'
+        with path.open('w', encoding='utf-8') as file:
+            file.write(line)
+        SAVED_CACHE[line] = name
+        print(f'Successfully saved \x1b[38;2;0;255;0m{item["title"]}\x1b[0m as \x1b[38;2;255;0;0m{name}\x1b[0m to be used in your script. Written it to\n{path.absolute()}')
+        return name

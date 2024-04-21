@@ -107,7 +107,7 @@ class Writer:
             func()
         self.write_to_files()
         print((
-            '\nAll done! Your .htsl file is written to the following location:'
+            '\n\x1b[38;2;0;255;0mAll done! Your .htsl file is written to the following location:\x1b[0m'
             f'\n{self.htsl_file.absolute()}'
             f'\nExecute it with HTSL by using the following name: \x1b[38;2;255;0;0m{self.file_name}\x1b[0m'
             '\n'
