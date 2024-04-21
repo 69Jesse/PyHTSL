@@ -338,7 +338,7 @@ class Item:
             print(f'Using cached \x1b[38;2;0;255;0m{item["title"]}\x1b[0m as \x1b[38;2;255;0;0m{cached}\x1b[0m.')
             return cached
         suffix = hashlib.md5(line.encode()).hexdigest()[:8]
-        name = f'{self.key}_{suffix}'
+        name = f'_{self.key}_{suffix}'
         path = HTSL_IMPORTS_FOLDER / f'{name}.json'
         with path.open('w', encoding='utf-8') as file:
             file.write(line)
