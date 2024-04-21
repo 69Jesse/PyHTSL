@@ -12,8 +12,8 @@ from .public.region import Region as Region
 from .public.layout import Layout as Layout
 from .public.menu import Menu as Menu
 from .public.function import Function as Function
-from .public.item import Item as Item, ALL_ITEM_KEYS as ALL_ITEM_KEYS
-from .public.enchantment import Enchantment as Enchantment, POSSIBLE_ENCHANTMENTS as POSSIBLE_ENCHANTMENTS
+from .public.item import Item as Item, ALL_POSSIBLE_ITEM_KEYS as ALL_POSSIBLE_ITEM_KEYS
+from .public.enchantment import Enchantment as Enchantment, ALL_POSSIBLE_ENCHANTMENTS as ALL_POSSIBLE_ENCHANTMENTS
 
 from .public.chat import chat as chat
 from .public.apply_inventory_layout import apply_inventory_layout as apply_inventory_layout

@@ -1,5 +1,5 @@
 from ..writer import HERE, HTSL_IMPORTS_FOLDER
-from .enchantment import POSSIBLE_ENCHANTMENTS, Enchantment, ENCHANTMENT_TO_ID
+from .enchantment import ALL_POSSIBLE_ENCHANTMENTS, Enchantment, ENCHANTMENT_TO_ID
 
 import json
 import re
@@ -141,10 +141,10 @@ DAMAGEABLE_ITEM_KEYS = Literal[
 LEATHER_ARMOR_KEYS = Literal[
     'leather_cap', 'leather_tunic', 'leather_pants', 'leather_boots',
 ]
-ALL_ITEM_KEYS = NON_SPECIAL_ITEM_KEYS | DAMAGEABLE_ITEM_KEYS | LEATHER_ARMOR_KEYS
+ALL_POSSIBLE_ITEM_KEYS = NON_SPECIAL_ITEM_KEYS | DAMAGEABLE_ITEM_KEYS | LEATHER_ARMOR_KEYS
 
 
-EnchantmentsType = dict[Enchantment | POSSIBLE_ENCHANTMENTS, int] | Iterable[Enchantment | POSSIBLE_ENCHANTMENTS] | Enchantment | POSSIBLE_ENCHANTMENTS
+EnchantmentsType = dict[Enchantment | ALL_POSSIBLE_ENCHANTMENTS, int] | Iterable[Enchantment | ALL_POSSIBLE_ENCHANTMENTS] | Enchantment | ALL_POSSIBLE_ENCHANTMENTS
 
 
 SAVED_CACHE: dict[str, str] = {}
@@ -213,14 +213,14 @@ class Item:
     @overload
     def __init__(
         self,
-        key: ALL_ITEM_KEYS,
+        key: ALL_POSSIBLE_ITEM_KEYS,
         **info: Any,
     ) -> None:
         ...
 
     def __init__(
         self,
-        key: ALL_ITEM_KEYS,
+        key: ALL_POSSIBLE_ITEM_KEYS,
         **info: Any,
     ) -> None:
         self.key = key
