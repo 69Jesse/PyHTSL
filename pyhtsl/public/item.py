@@ -5,6 +5,7 @@ import json
 import re
 from enum import Enum
 import hashlib
+import difflib
 
 from typing import Literal, TypedDict, overload, Iterable, Optional, Any, Callable
 
@@ -224,6 +225,10 @@ class Item:
     ) -> None:
         self.key = key
         self.info = info
+        self.key_check()
+
+    def as_title(self) -> str:
+        return self.key_check()['title']
 
     def replace_placeholders(self, text: str) -> str:
         return re.sub(r'&([0-9a-fk-or])', r'§\1', text)
@@ -236,29 +241,19 @@ class Item:
                     str, tuple[int | str | list[int] | list[str] | list[dict[str, int]], DataType]
                 ]
             ]
-        ] | tuple[int | str | list[int] | list[str] | dict[str, int | str], DataType],
+        ] | tuple[int | str | list[int] | list[str] | list[dict[str, int]], DataType],
     ) -> str:
         if isinstance(data, tuple):
             left, right = data
             if isinstance(left, (int, str)):
                 return right.value(left)
-            elif isinstance(left, list):
+            else:
                 inside = type(left[0])
                 if inside is dict:
-                    get = lambda x: self.one_lineify((x, right))  # noqa: E731  # type: ignore
-                elif inside is int:
-                    assert right is DataType.integer
-                    get = lambda x: right.value(x)  # noqa: E731
-                elif inside is str:
-                    assert right is DataType.string
-                    get = lambda x: right.value(x)  # noqa: E731
+                    mappings: list[dict[str, int]] = left  # type: ignore
+                    return '[' + ','.join(f'{i}:{{' + ','.join(f'{k}:{right.value(v)}' for k, v in item.items()) + '}' for i, item in enumerate(mappings)) + ']'
                 else:
-                    raise TypeError(f'Invalid type: {inside}')
-                return '[' + ','.join(f'{i}:{get(x)}' for i, x in enumerate(left)) + ']'
-            elif isinstance(left, dict):
-                return '{' + ','.join(f'{k}:{right.value(v)}' for k, v in left.items()) + '}'
-            else:
-                raise TypeError(f'Invalid type: {type(left)}')
+                    return '[' + ','.join(f'{i}:{right.value(x)}' for i, x in enumerate(left)) + ']'
         return '{' + ','.join(f'{k}:{self.one_lineify(v)}' for k, v in data.items()) + '}'  # type: ignore
 
     def fetch_line(self, item: ItemJsonData) -> str:
@@ -281,15 +276,15 @@ class Item:
             if isinstance(enchantments, Enchantment):
                 enchantments = [enchantments]
             if isinstance(enchantments, dict):
-                tags['ench'] = [{
-                    'lvl': (value, DataType.short),
-                    'id': (ENCHANTMENT_TO_ID[key if isinstance(key, str) else key.name], DataType.short),
-                } for key, value in enchantments.items()]
+                tags['ench'] = ([{
+                    'lvl': value,
+                    'id': ENCHANTMENT_TO_ID[key if isinstance(key, str) else key.name],
+                } for key, value in enchantments.items()], DataType.short)
             else:
-                tags['ench'] = [{
-                    'lvl': (1 if isinstance(enchantment, str) else enchantment.level or 1, DataType.short),
-                    'id': (ENCHANTMENT_TO_ID[enchantment if isinstance(enchantment, str) else enchantment.name], DataType.short),
-                } for enchantment in enchantments]
+                tags['ench'] = ([{
+                    'lvl': 1 if isinstance(enchantment, str) else enchantment.level or 1,
+                    'id': ENCHANTMENT_TO_ID[enchantment if isinstance(enchantment, str) else enchantment.name],
+                } for enchantment in enchantments], DataType.short)
 
         unbreakable: int = int(info_copy.pop('unbreakable', False))
         if unbreakable:
@@ -326,10 +321,17 @@ class Item:
 
         return '{"item": "' + self.one_lineify(data) + '"}'
 
-    def save(self) -> str:
+    def key_check(self) -> ItemJsonData:
         item = ITEMS.get(self.key, None)
         if item is None:
-            raise ValueError(f'Invalid item key: "{self.key}". If you have already saved this in your imports folder, please use solely the string "{self.key}" instead.')
+            closest = difflib.get_close_matches(self.key.lower(), ITEMS.keys(), n=1, cutoff=0.0)[0]
+            raise ValueError(
+                f'Invalid item key: \x1b[38;2;255;0;0m{self.key}\x1b[0m. Did you mean \x1b[38;2;0;255;0m{closest}\x1b[0m?\nYou\'ve already saved this in your imports folder? Do not create an Item, use the string "{self.key}" instead.'
+            )
+        return item
+
+    def save(self) -> str:
+        item = self.key_check()
         line = self.fetch_line(item)
         cached = SAVED_CACHE.get(line, None)
         if cached is not None:
