@@ -3,13 +3,13 @@ from typing import Literal, Optional
 
 
 __all__ = (
-    'POSSIBLE_ENCHANTMENT',
+    'POSSIBLE_ENCHANTMENTS',
     'ENCHANTMENT_TO_ID',
     'Enchantment'
 )
 
 
-POSSIBLE_ENCHANTMENT = Literal[
+POSSIBLE_ENCHANTMENTS = Literal[
     'protection',
     'fire_protection',
     'feather_falling',
@@ -38,7 +38,7 @@ POSSIBLE_ENCHANTMENT = Literal[
 ]
 
 
-ENCHANTMENT_TO_ID: dict[POSSIBLE_ENCHANTMENT, int] = {
+ENCHANTMENT_TO_ID: dict[POSSIBLE_ENCHANTMENTS, int] = {
     'protection': 0,
     'fire_protection': 1,
     'feather_falling': 2,
@@ -68,11 +68,11 @@ ENCHANTMENT_TO_ID: dict[POSSIBLE_ENCHANTMENT, int] = {
 
 
 class Enchantment:
-    name: POSSIBLE_ENCHANTMENT
+    name: POSSIBLE_ENCHANTMENTS
     level: Optional[int]
     def __init__(
         self,
-        name: POSSIBLE_ENCHANTMENT,
+        name: POSSIBLE_ENCHANTMENTS,
         level: Optional[int] = None,
     ) -> None:
         self.name = name

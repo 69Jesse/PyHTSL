@@ -1,5 +1,5 @@
 from ..writer import HERE, HTSL_IMPORTS_FOLDER
-from .enchantment import POSSIBLE_ENCHANTMENT, Enchantment, ENCHANTMENT_TO_ID
+from .enchantment import POSSIBLE_ENCHANTMENTS, Enchantment, ENCHANTMENT_TO_ID
 
 import json
 import re
@@ -57,7 +57,7 @@ class DataType(Enum):
     string = DataTypeCallback(lambda x: '\\"' + x.replace('"', '\\"') + '\\"')
 
 
-NON_SPECIAL_ITEM_KEY = Literal[
+NON_SPECIAL_ITEM_KEYS = Literal[
     'stone', 'granite', 'polished_granite', 'diorite', 'polished_diorite', 'andesite', 'polished_andesite', 'grass_block',
     'dirt', 'coarse_dirt', 'podzol', 'cobblestone', 'oak_planks', 'spruce_planks', 'birch_planks', 'jungle_planks',
     'acacia_planks', 'dark_oak_planks', 'oak_sapling', 'spruce_sapling', 'birch_sapling', 'jungle_sapling', 'acacia_sapling', 'dark_oak_sapling',
@@ -130,7 +130,7 @@ NON_SPECIAL_ITEM_KEY = Literal[
     'music_disc_chirp', 'music_disc_far', 'music_disc_mall', 'music_disc_mellohi', 'music_disc_stal', 'music_disc_strad', 'music_disc_ward', 'music_disc_11',
     'music_disc_wait',
 ]
-DAMAGEABLE_ITEM_KEY = Literal[
+DAMAGEABLE_ITEM_KEYS = Literal[
     'iron_shovel', 'iron_pickaxe', 'iron_axe', 'flint_and_steel', 'bow', 'iron_sword', 'wooden_sword', 'wooden_shovel',
     'wooden_pickaxe', 'wooden_axe', 'stone_sword', 'stone_shovel', 'stone_pickaxe', 'stone_axe', 'diamond_sword', 'diamond_shovel',
     'diamond_pickaxe', 'diamond_axe', 'golden_sword', 'golden_shovel', 'golden_pickaxe', 'golden_axe', 'wooden_hoe', 'stone_hoe',
@@ -138,13 +138,13 @@ DAMAGEABLE_ITEM_KEY = Literal[
     'iron_chestplate', 'iron_leggings', 'iron_boots', 'diamond_helmet', 'diamond_chestplate', 'diamond_leggings', 'diamond_boots', 'golden_helmet',
     'golden_chestplate', 'golden_leggings', 'golden_boots', 'fishing_rod', 'shears', 'carrot_on_a_stick',
 ]
-LEATHER_ARMOR_KEY = Literal[
+LEATHER_ARMOR_KEYS = Literal[
     'leather_cap', 'leather_tunic', 'leather_pants', 'leather_boots',
 ]
-ALL_ITEM_KEYS = NON_SPECIAL_ITEM_KEY | DAMAGEABLE_ITEM_KEY | LEATHER_ARMOR_KEY
+ALL_ITEM_KEYS = NON_SPECIAL_ITEM_KEYS | DAMAGEABLE_ITEM_KEYS | LEATHER_ARMOR_KEYS
 
 
-EnchantmentsType = dict[Enchantment | POSSIBLE_ENCHANTMENT, int] | Iterable[Enchantment | POSSIBLE_ENCHANTMENT] | Enchantment | POSSIBLE_ENCHANTMENT
+EnchantmentsType = dict[Enchantment | POSSIBLE_ENCHANTMENTS, int] | Iterable[Enchantment | POSSIBLE_ENCHANTMENTS] | Enchantment | POSSIBLE_ENCHANTMENTS
 
 
 SAVED_CACHE: dict[str, str] = {}
@@ -157,7 +157,7 @@ class Item:
     @overload
     def __init__(
         self,
-        key: NON_SPECIAL_ITEM_KEY,
+        key: NON_SPECIAL_ITEM_KEYS,
         *,
         name: Optional[str] = None,
         lore: Optional[str | Iterable[str]] = None,
@@ -173,7 +173,7 @@ class Item:
     @overload
     def __init__(
         self,
-        key: DAMAGEABLE_ITEM_KEY,
+        key: DAMAGEABLE_ITEM_KEYS,
         *,
         name: Optional[str] = None,
         lore: Optional[str | Iterable[str]] = None,
@@ -192,7 +192,7 @@ class Item:
     @overload
     def __init__(
         self,
-        key: LEATHER_ARMOR_KEY,
+        key: LEATHER_ARMOR_KEYS,
         *,
         name: Optional[str] = None,
         lore: Optional[str | Iterable[str]] = None,
