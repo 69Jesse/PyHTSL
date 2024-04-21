@@ -9,17 +9,23 @@ from typing import Optional, Callable
 
 
 __all__ = (
+    'HERE',
+    'HTSL_IMPORTS_FOLDER',
     'LineType',
     'WRITER',
 )
 
 
+HERE: Path = Path(__file__).parent
+
 DOT_MINECRAFT: Path = Path(os.getenv('APPDATA')) / '.minecraft'  # type: ignore
 if not DOT_MINECRAFT.exists():
     raise FileNotFoundError('Could not find your .minecraft folder')
+
 HTSL_IMPORTS_FOLDER: Path = DOT_MINECRAFT / 'config' / 'ChatTriggers' / 'modules' / 'HTSL' / 'imports'
 if not HTSL_IMPORTS_FOLDER.exists():
     raise FileNotFoundError('Could not find your HTSL imports folder')
+
 PYHTSL_FOLDER: Path = HTSL_IMPORTS_FOLDER / 'pyhtsl'
 if not PYHTSL_FOLDER.exists():
     PYHTSL_FOLDER.mkdir()
