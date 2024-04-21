@@ -8,7 +8,7 @@ setup(
     name='pyhtsl',
     author='Jesse Janssen',
     url='https://github.com/69Jesse/PyHTSL',
-    version='1.0.3',
+    version='1.0.4',
     packages=find_packages(),
     description='Python wrapper for HTSL created to simplify the process of making housings on Hypixel',
     python_requires='>=3.12',
