@@ -12,6 +12,8 @@ from .region import Region as Region
 from .layout import Layout as Layout
 from .menu import Menu as Menu
 from .function import Function as Function
+from .item import Item as Item
+from .enchantment import Enchantment as Enchantment
 
 from .chat import chat as chat
 from .apply_inventory_layout import apply_inventory_layout as apply_inventory_layout
