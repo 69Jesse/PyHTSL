@@ -52,19 +52,98 @@ class LineType(Enum):
 class Fixer:
     stat_limit: int = 10
     conditional_limit: int = 15
+
+    insertions: list[tuple[int, tuple[str, LineType]]]
+    container_name: Optional[str]
+    container_index: int
+    inside_conditional: bool
+    outside_counter: dict[LineType, int]
+    inside_counter: dict[LineType, int]
+
     def new_counter(self) -> dict[LineType, int]:
         return {line_type: 0 for line_type in LineType}
 
     def conditional_enter_count(self, counter: dict[LineType, int]) -> int:
         return counter[LineType.if_and_enter] + counter[LineType.if_or_enter]
 
+    def on_goto_container_line(
+        self,
+        line: str,
+    ) -> None:
+        if self.inside_conditional:
+            raise ValueError('Cannot use goto inside an if or else statement')
+        match = re.search(r'"(.+?)"$', line)
+        if match is None:
+            raise ValueError(f'Invalid goto line: {line}')
+        self.container_name = match.group(1)
+        self.outside_counter = self.new_counter()
+
+    def on_conditional_enter_line(
+        self,
+        index: int,
+        line_type: LineType,
+    ) -> None:
+        if self.inside_conditional:
+            raise ValueError('Cannot nest if statements')
+        self.inside_conditional = True
+        if self.conditional_enter_count(self.outside_counter) <= self.conditional_limit:
+            return
+        self.create_filler_conditional(index=index, line_type=line_type)
+
+    def on_conditional_exit_line(self) -> None:
+        if not self.inside_conditional:
+            raise ValueError('Cannot exit an if statement that was never entered')
+        self.inside_conditional = False
+        self.inside_counter = self.new_counter()
+
+    def on_stat_change_line(
+        self,
+        index: int,
+        line_type: LineType,
+        counter: dict[LineType, int],
+    ) -> None:
+        if counter[line_type] <= self.stat_limit:
+            return
+        if self.inside_conditional:
+            self.insertions.append((index, ('}', LineType.if_exit)))
+            self.inside_counter = self.new_counter()
+            self.inside_conditional = False
+        if self.conditional_enter_count(self.outside_counter) >= self.conditional_limit:
+            self.create_filler_conditional(index=index, line_type=line_type)
+        else:
+            self.create_filler_goto_function(index=index, line_type=line_type)
+
+    def create_filler_conditional(
+        self,
+        index: int,
+        line_type: LineType,
+    ) -> None:
+        self.insertions.append((index, ('if and () {', LineType.if_and_enter)))
+        self.outside_counter[LineType.if_and_enter] += 1
+        self.inside_counter[line_type] += 1
+        self.inside_conditional = True
+
+    def create_filler_goto_function(
+        self,
+        index: int,
+        line_type: LineType,
+    ) -> None:
+        self.container_index += 1
+        if self.container_name is not None:
+            self.insertions.append((index, (f'goto function "{self.container_name} {self.container_index}"', LineType.goto)))
+        else:
+            self.insertions.append((index, (f'// goto function "Unkown Function {self.container_index}"  // uncomment and change name', LineType.comment)))
+        self.outside_counter = self.new_counter()
+        self.outside_counter[line_type] += 1
+        self.container_index = 1
+
     def fix(self, lines: list[tuple[str, LineType]]) -> None:
-        insertions: list[tuple[int, tuple[str, LineType]]] = []
-        container_name: Optional[str] = None
-        container_index: int = 1
-        inside_conditional: bool = False
-        outside_counter: dict[LineType, int] = self.new_counter()
-        inside_counter: dict[LineType, int] = self.new_counter()
+        self.insertions = []
+        self.container_name = None
+        self.container_index = 1
+        self.inside_conditional = False
+        self.outside_counter = self.new_counter()
+        self.inside_counter = self.new_counter()
 
         # \x1b[38;2;0;255;0mNote:\x1b[0m
         # \x1b[38;2;255;0;0mWarning:\x1b[0m
@@ -72,75 +151,36 @@ class Fixer:
 
         for index, (line, line_type) in enumerate(lines):
             if line_type is LineType.goto:
-                if inside_conditional:
-                    raise ValueError('Cannot use goto inside an if or else statement')
-                match = re.search(r'"(.+?)"$', line)
-                if match is None:
-                    raise ValueError(f'Invalid goto line: {line}')
-                container_name = match.group(1)
-                outside_counter = self.new_counter()
+                self.on_goto_container_line(line=line)
                 continue
 
-            counter = inside_counter if inside_conditional else outside_counter
+            counter = self.inside_counter if self.inside_conditional else self.outside_counter
             counter[line_type] += 1
 
             if line_type in (
                 LineType.if_exit,
                 LineType.else_exit,
             ):
-                if not inside_conditional:
-                    raise ValueError('Cannot exit an if statement that was never entered')
-                inside_conditional = False
-                inside_counter = self.new_counter()
+                self.on_conditional_exit_line()
                 continue
-
             if line_type in (
                 LineType.if_and_enter,
                 LineType.if_or_enter,
                 LineType.else_enter,
             ):
-                if inside_conditional:
-                    raise ValueError('Cannot nest if statements')
-                inside_conditional = True
-                if self.conditional_enter_count(outside_counter) <= self.conditional_limit:
-                    continue
-                container_index += 1
-                insertions.append((index, (f'goto function "{container_name} {container_index}"', LineType.goto)))
-                outside_counter = self.new_counter()
-                outside_counter[line_type] += 1
-                container_index = 1
+                self.on_conditional_enter_line(index=index, line_type=line_type)
                 continue
-
             if line_type in (
                 LineType.player_stat_change,
                 LineType.global_stat_change,
                 LineType.team_stat_change,
             ):
-                if counter[line_type] <= self.stat_limit:
-                    continue
-                if inside_conditional:
-                    insertions.append((index, ('}', LineType.if_exit)))
-                    inside_counter = self.new_counter()
-                    inside_conditional = False
-                if self.conditional_enter_count(outside_counter) >= self.conditional_limit:
-                    container_index += 1
-                    if container_name is not None:
-                        insertions.append((index, (f'goto function "{container_name} {container_index}"', LineType.goto)))
-                    else:
-                        insertions.append((index, (f'// goto function "Unkown Function {container_index}"  // uncomment and change name', LineType.comment)))
-                    outside_counter = self.new_counter()
-                    outside_counter[line_type] += 1
-                    container_index = 1
-                else:
-                    insertions.append((index, ('if and () {', LineType.if_and_enter)))
-                    outside_counter[LineType.if_and_enter] += 1
-                    inside_counter[line_type] += 1
-                    inside_conditional = True
+                self.on_stat_change_line(index=index, line_type=line_type, counter=counter)
                 continue
 
-        for index, (line, line_type) in reversed(insertions):
+        for index, (line, line_type) in reversed(self.insertions):
             lines.insert(index, (line, line_type))
-        if len(insertions) > 0 and insertions[-1][1][1] is LineType.if_and_enter:
+        if len(self.insertions) > 0 and self.insertions[-1][1][1] is LineType.if_and_enter:
             lines.append(('}', LineType.if_exit))
 
 
