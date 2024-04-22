@@ -139,7 +139,8 @@ class Fixer:
 
     def fix(self, lines: list[tuple[str, LineType]]) -> None:
         # TODO DIFFERENT APPROACH
-        # mark indixes of where to add
+        # mark indixes of where to add so I can just use
+        # for line, line_type in lines:
         index: int = -1
         while index < len(lines) - 1:
             index += 1
