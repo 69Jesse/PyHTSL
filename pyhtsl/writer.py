@@ -138,6 +138,8 @@ class Fixer:
         return index
 
     def fix(self, lines: list[tuple[str, LineType]]) -> None:
+        # TODO DIFFERENT APPROACH
+        # mark indixes of where to add
         index: int = -1
         while index < len(lines) - 1:
             index += 1
