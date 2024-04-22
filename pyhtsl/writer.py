@@ -51,143 +51,68 @@ class LineType(Enum):
 class Fixer:
     stat_limit: int = 10
     conditional_limit: int = 15
-
-    container_name: Optional[str]
-    container_index: int
-    inside_conditional: bool
-    inside_empty_conditional: bool
-    outside_counter: dict[LineType, int]
-    inside_counter: dict[LineType, int]
-    def __init__(self) -> None:
-        self.container_name = None
-        self.container_index = 1
-        self.inside_conditional = False
-        self.inside_empty_conditional = False
-        self.outside_counter = self.new_counter()
-        self.inside_counter = self.new_counter()
-
     def new_counter(self) -> dict[LineType, int]:
         return {line_type: 0 for line_type in LineType}
 
-    @property
-    def contional_statements_count(self) -> int:
-        return self.outside_counter[LineType.if_and_enter] + self.outside_counter[LineType.if_or_enter]
-
-    def call_next_container(
-        self,
-        lines: list[tuple[str, LineType]],
-        index: int,
-    ) -> int:
-        if self.container_name is None:
-            print(
-                '\x1b[38;2;255;0;0mWarning:\x1b[0m You exceeded the conditional limit, and you are not in an explicit container.'
-                '\n         To prevent this, use the \x1b[38;2;255;0;0m@create_function()\x1b[0m decorator or the \x1b[38;2;255;0;0mgoto()\x1b[0m function.'
-            )
-            return index
-        self.container_index += 1
-        new_container_name = f'{self.container_name} {self.container_index}'
-        lines.insert(index - 1, (f'goto function "{new_container_name}"', LineType.goto))
-        self.outside_counter = self.new_counter()
-        index += 1
-        print(f'\x1b[38;2;0;255;0mNote:\x1b[0m Created a new container named "\x1b[38;2;255;0;0m{new_container_name}\x1b[0m" to prevent too many stat changes.')
-        return index
-
-    def create_empty_conditional(
-        self,
-        lines: list[tuple[str, LineType]],
-        index: int,
-    ) -> int:
-        if not self.inside_empty_conditional:
-            lines.insert(index, ('if and () {', LineType.if_and_enter))
-            self.outside_counter[LineType.if_and_enter] += 1
-            self.inside_empty_conditional = True
-            self.inside_conditional = True
-            self.inside_counter = self.new_counter()
-            line_type = lines[index][1]
-            self.inside_counter[line_type] += 1
-            print('\x1b[38;2;0;255;0mNote:\x1b[0m Added an empty conditional to prevent too many stat changes.')
-        else:
-            lines.insert(index - 1, ('}', LineType.if_exit))
-            self.inside_empty_conditional = False
-            self.inside_conditional = False
-            return self.create_empty_conditional(lines, index)
-        index += 1
-        return index
-
-    def maybe_exit_empty_conditional(
-        self,
-        lines: list[tuple[str, LineType]],
-        index: int,
-        add: int,
-    ) -> int:
-        if self.inside_empty_conditional:
-            lines.insert(index + add, ('}', LineType.if_exit))
-            index += 1
-            self.inside_empty_conditional = False
-            self.inside_conditional = False
-            return index
-        return index
-
-    def check_conditional_limit(
-        self,
-        lines: list[tuple[str, LineType]],
-        index: int,
-    ) -> int:
-        if self.contional_statements_count > self.conditional_limit:
-            index = self.call_next_container(lines, index)
-        return index
+    def conditional_enter_count(self, counter: dict[LineType, int]) -> int:
+        return counter[LineType.if_and_enter] + counter[LineType.if_or_enter]
 
     def fix(self, lines: list[tuple[str, LineType]]) -> None:
-        # TODO DIFFERENT APPROACH
-        # mark indixes of where to add so I can just use
-        # for line, line_type in lines:
-        index: int = -1
-        while index < len(lines) - 1:
-            index += 1
-            line, line_type = lines[index]
+        container_name: Optional[str] = None
+        inside_conditional: bool = False
+        outside_counter: dict[LineType, int] = self.new_counter()
+        inside_counter: dict[LineType, int] = self.new_counter()
+
+        # \x1b[38;2;0;255;0mNote:\x1b[0m
+        # \x1b[38;2;255;0;0mWarning:\x1b[0m
+
+
+        for index, (line, line_type) in enumerate(lines):
             if line_type is LineType.goto:
-                if self.inside_conditional and not self.inside_empty_conditional:
+                if inside_conditional:
                     raise ValueError('Cannot use goto inside an if or else statement')
                 match = re.search(r'"(.+?)"$', line)
                 if match is None:
                     raise ValueError(f'Invalid goto line: {line}')
-                self.maybe_exit_empty_conditional(lines, index, 0)
-                self.container_name = match.group(1)
-                self.outside_counter = self.new_counter()
-                self.container_index = 1
+                container_name = match.group(1)
+                outside_counter = self.new_counter()
                 continue
 
-            counter = self.inside_counter if self.inside_conditional else self.outside_counter
+            counter = inside_counter if inside_conditional else outside_counter
             counter[line_type] += 1
 
-            if line_type in (LineType.if_and_enter, LineType.if_or_enter, LineType.else_enter):
-                if self.inside_conditional:
-                    raise ValueError('Cannot nest if statements')
-                index = self.check_conditional_limit(lines, index)
-                self.inside_conditional = True
-                continue
-
-            if line_type in (LineType.if_exit, LineType.else_exit):
-                if not self.inside_conditional:
-                    print('\n'.join((line for line, _ in lines)))
+            if line_type in (
+                LineType.if_exit,
+                LineType.else_exit,
+            ):
+                if not inside_conditional:
                     raise ValueError('Cannot exit an if statement that was never entered')
-                self.inside_conditional = False
-                self.inside_counter = self.new_counter()
+                inside_conditional = False
+                inside_counter = self.new_counter()
                 continue
 
-            if line_type in (LineType.player_stat_change, LineType.global_stat_change, LineType.team_stat_change):
-                if counter[line_type] > self.stat_limit:
-                    if self.contional_statements_count >= self.conditional_limit:
-                        index = self.maybe_exit_empty_conditional(lines, index, -1)
-                        index = self.call_next_container(lines, index)
-                        index -= 2
-                    else:
-                        index = self.create_empty_conditional(lines, index)
+            if line_type in (
+                LineType.if_and_enter,
+                LineType.if_or_enter,
+                LineType.else_enter,
+            ):
+                if inside_conditional:
+                    raise ValueError('Cannot nest if statements')
+                inside_conditional = True
+                if self.conditional_enter_count(outside_counter) <= self.conditional_limit:
                     continue
+                print('new function')
+                ...
 
-        self.maybe_exit_empty_conditional(lines, index, 1)
-        if self.inside_conditional:
-            raise ValueError('Unclosed if statement')
+            if line_type in (
+                LineType.player_stat_change,
+                LineType.global_stat_change,
+                LineType.team_stat_change,
+            ):
+                if counter[line_type] <= self.stat_limit:
+                    continue
+                print('new empty conditional')
+                ...
 
 
 class Writer:
