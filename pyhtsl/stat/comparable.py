@@ -20,10 +20,12 @@ class ComparableStat(Stat, PlaceholderValue):
         self.full_placeholder = full_placeholder
         self.edge_case_left_side = edge_case_left_side
 
-    def get_prefix(self) -> str:
+    @staticmethod
+    def get_prefix() -> str:
         raise NotImplementedError
 
-    def get_placeholder_word(self) -> str:
+    @staticmethod
+    def get_placeholder_word() -> str:
         raise NotImplementedError
 
     @property
