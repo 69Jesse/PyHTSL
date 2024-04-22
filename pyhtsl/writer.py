@@ -122,6 +122,7 @@ class Fixer:
         self.outside_counter[LineType.if_and_enter] += 1
         self.inside_counter[line_type] += 1
         self.inside_conditional = True
+        print('\x1b[38;2;0;255;0mNote:\x1b[0m Added an empty conditional to prevent too many stat changes.')
 
     def create_filler_goto_function(
         self,
@@ -130,9 +131,16 @@ class Fixer:
     ) -> None:
         self.container_index += 1
         if self.container_name is not None:
-            self.insertions.append((index, (f'goto function "{self.container_name} {self.container_index}"', LineType.goto)))
+            new_container_name = f'{self.container_name} {self.container_index}'
+            self.insertions.append((index, (f'goto function "{new_container_name}"', LineType.goto)))
+            print(f'\x1b[38;2;0;255;0mNote:\x1b[0m Created a new container named "\x1b[38;2;255;0;0m{new_container_name}\x1b[0m" to prevent too many stat changes.')
         else:
             self.insertions.append((index, (f'// goto function "Unkown Function {self.container_index}"  // uncomment and change name', LineType.comment)))
+            print(
+                '\x1b[38;2;255;0;0mWarning:\x1b[0m You exceeded the conditional limit, and you are not in an explicit container.'
+                '\n         To prevent this, use the \x1b[38;2;255;0;0m@create_function()\x1b[0m decorator or the \x1b[38;2;255;0;0mgoto()\x1b[0m function.'
+                '\n         Or uncomment the line I created for you and change the name of the function.'
+            )
         self.outside_counter = self.new_counter()
         self.outside_counter[line_type] += 1
         self.container_index = 1
@@ -144,10 +152,6 @@ class Fixer:
         self.inside_conditional = False
         self.outside_counter = self.new_counter()
         self.inside_counter = self.new_counter()
-
-        # \x1b[38;2;0;255;0mNote:\x1b[0m
-        # \x1b[38;2;255;0;0mWarning:\x1b[0m
-        # TODO add some logs to let user know!!!
 
         for index, (line, line_type) in enumerate(lines):
             if line_type is LineType.goto:
