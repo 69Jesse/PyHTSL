@@ -46,6 +46,7 @@ class LineType(Enum):
     cancel_event = auto()
     miscellaneous = auto()
     goto = auto()
+    comment = auto()
 
 
 class Fixer:
@@ -58,14 +59,16 @@ class Fixer:
         return counter[LineType.if_and_enter] + counter[LineType.if_or_enter]
 
     def fix(self, lines: list[tuple[str, LineType]]) -> None:
+        insertions: list[tuple[int, tuple[str, LineType]]] = []
         container_name: Optional[str] = None
+        container_index: int = 1
         inside_conditional: bool = False
         outside_counter: dict[LineType, int] = self.new_counter()
         inside_counter: dict[LineType, int] = self.new_counter()
 
         # \x1b[38;2;0;255;0mNote:\x1b[0m
         # \x1b[38;2;255;0;0mWarning:\x1b[0m
-
+        # TODO add some logs to let user know!!!
 
         for index, (line, line_type) in enumerate(lines):
             if line_type is LineType.goto:
@@ -101,8 +104,12 @@ class Fixer:
                 inside_conditional = True
                 if self.conditional_enter_count(outside_counter) <= self.conditional_limit:
                     continue
-                print('new function')
-                ...
+                container_index += 1
+                insertions.append((index, (f'goto function "{container_name} {container_index}"', LineType.goto)))
+                outside_counter = self.new_counter()
+                outside_counter[line_type] += 1
+                container_index = 1
+                continue
 
             if line_type in (
                 LineType.player_stat_change,
@@ -111,8 +118,30 @@ class Fixer:
             ):
                 if counter[line_type] <= self.stat_limit:
                     continue
-                print('new empty conditional')
-                ...
+                if inside_conditional:
+                    insertions.append((index, ('}', LineType.if_exit)))
+                    inside_counter = self.new_counter()
+                    inside_conditional = False
+                if self.conditional_enter_count(outside_counter) >= self.conditional_limit:
+                    container_index += 1
+                    if container_name is not None:
+                        insertions.append((index, (f'goto function "{container_name} {container_index}"', LineType.goto)))
+                    else:
+                        insertions.append((index, (f'// goto function "Unkown Function {container_index}"  // uncomment and change name', LineType.comment)))
+                    outside_counter = self.new_counter()
+                    outside_counter[line_type] += 1
+                    container_index = 1
+                else:
+                    insertions.append((index, ('if and () {', LineType.if_and_enter)))
+                    outside_counter[LineType.if_and_enter] += 1
+                    inside_counter[line_type] += 1
+                    inside_conditional = True
+                continue
+
+        for index, (line, line_type) in reversed(insertions):
+            lines.insert(index, (line, line_type))
+        if len(insertions) > 0 and insertions[-1][1][1] is LineType.if_and_enter:
+            lines.append(('}', LineType.if_exit))
 
 
 class Writer:
