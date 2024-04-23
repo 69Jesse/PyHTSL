@@ -77,3 +77,8 @@ class Enchantment:
     ) -> None:
         self.name = name
         self.level = level
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Enchantment):
+            return NotImplemented
+        return self.name == other.name and self.level == other.level

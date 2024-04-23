@@ -236,6 +236,11 @@ class Item:
         self.extras = extras
         self.key_check()
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Item):
+            return False
+        return self.key == other.key and self.extras == other.extras
+
     def as_title(self) -> str:
         return self.key_check()['title']
 

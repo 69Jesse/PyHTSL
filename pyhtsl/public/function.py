@@ -18,3 +18,8 @@ class Function:
     ) -> None:
         self.name = name
         self.parameters = parameters or []
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Function):
+            return NotImplemented
+        return self.name == other.name and self.parameters == other.parameters

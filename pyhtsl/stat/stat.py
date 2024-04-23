@@ -1,7 +1,7 @@
 from .value import StatValue
 from ..condition import PlaceholderValue
 
-from abc import ABC, abstractmethod, ABCMeta
+from abc import ABC, abstractmethod
 
 from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
@@ -22,22 +22,22 @@ STAT_CACHE: dict[type['Stat'], dict[str, 'Stat']] = {}
 
 class StatParameter:
     name: str
-    cls: 'StatMeta'
+    cls: type['Stat']
     def __init__(
         self,
         name: str,
-        cls: 'StatMeta',
+        cls: type['Stat'],
     ) -> None:
         self.name = name
         self.cls = cls
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, StatParameter):
+            return NotImplemented
+        return self.name == other.name and self.cls is other.cls
 
-class StatMeta(ABCMeta):
-    def __getitem__(cls, name: str) -> StatParameter:
-        return StatParameter(name, cls) 
 
-
-class Stat(ABC, metaclass=StatMeta):
+class Stat(ABC):
     name: str
     __value: StatValue
     if TYPE_CHECKING:

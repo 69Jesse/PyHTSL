@@ -26,7 +26,7 @@ def trigger_function(
         for i, (param, expected_param) in enumerate(zip(parameters, function.parameters)):
             if type(param) not in (PlayerStat, GlobalStat, TeamStat, int):
                 raise TypeError(f'Parameter {i} must be either "{PlayerStat.__name__}", "{GlobalStat.__name__}", "{TeamStat.__name__}", or "{int.__name__}", not "{type(param).__name__}".')
-            stat: PlayerStat | GlobalStat | TeamStat = expected_param.cls(name=expected_param.name)
+            stat: PlayerStat | GlobalStat | TeamStat = expected_param.cls(name=expected_param.name)  # type: ignore
             stat.value = param
     WRITER.write(
         f'function "{function.name}" {str(trigger_for_all_players).lower()}',

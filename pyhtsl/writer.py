@@ -36,6 +36,7 @@ class LineType(Enum):
     player_stat_change = auto()
     global_stat_change = auto()
     team_stat_change = auto()
+    misc_stat_change = auto()
     if_and_enter = auto()
     if_or_enter = auto()
     if_exit = auto()
@@ -62,6 +63,22 @@ class Fixer:
     inside_conditional: bool
     outside_counter: dict[LineType, int]
     inside_counter: dict[LineType, int]
+
+    def maybe_change_lines_edge_cases(
+        self,
+        lines: list[tuple[str, LineType]],
+    ) -> None:
+        for index in range(len(lines) - 1, -1, -1):
+            line, line_type = lines[index]
+            if line_type is LineType.misc_stat_change and line.startswith('maxHealth'):
+                try:
+                    next_line, next_line_type = lines[index + 1]
+                    if next_line_type is not LineType.miscellaneous or next_line != 'fullHeal':
+                        raise IndexError
+                    lines[index] = (line + ' true', line_type)
+                    lines.pop(index + 1)
+                except IndexError:
+                    lines[index] = (line + ' false', line_type)
 
     def new_counter(self) -> dict[LineType, int]:
         return {line_type: 0 for line_type in LineType}
@@ -168,6 +185,8 @@ class Fixer:
         self.outside_counter[line_type] += 1
 
     def fix(self, lines: list[tuple[str, LineType]]) -> None:
+        self.maybe_change_lines_edge_cases(lines)        
+
         self.last_line = None
         self.last_line_count = 0
         self.insertions = []
