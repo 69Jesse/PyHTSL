@@ -53,6 +53,9 @@ class Fixer:
     stat_limit: int = 10
     conditional_limit: int = 15
 
+    last_line: Optional[str]
+    last_line_count: int
+
     insertions: list[tuple[int, tuple[str, LineType]]]
     container_name: Optional[str]
     container_index: int
@@ -66,6 +69,16 @@ class Fixer:
     def conditional_enter_count(self, counter: dict[LineType, int]) -> int:
         return counter[LineType.if_and_enter] + counter[LineType.if_or_enter]
 
+    def write_debug_line(self, line: str) -> None:
+        if self.last_line is not None and self.last_line != line:
+            print(f' \x1b[38;2;255;0;0m(x{self.last_line_count})\x1b[0m' * (self.last_line_count > 1))
+        if self.last_line == line:
+            self.last_line_count += 1
+            return
+        self.last_line = line
+        self.last_line_count = 1
+        print(line, end='')
+
     def on_goto_container_line(
         self,
         line: str,
@@ -77,6 +90,7 @@ class Fixer:
             raise ValueError(f'Invalid goto line: {line}')
         self.container_name = match.group(1)
         self.outside_counter = self.new_counter()
+        self.container_index = 1
 
     def on_conditional_enter_line(
         self,
@@ -109,20 +123,23 @@ class Fixer:
             self.inside_counter = self.new_counter()
             self.inside_conditional = False
         if self.conditional_enter_count(self.outside_counter) >= self.conditional_limit:
-            self.create_filler_conditional(index=index, line_type=line_type)
-        else:
             self.create_filler_goto_function(index=index, line_type=line_type)
+        else:
+            self.create_filler_conditional(index=index, line_type=line_type)
 
     def create_filler_conditional(
         self,
         index: int,
         line_type: LineType,
     ) -> None:
-        self.insertions.append((index, ('if and () {', LineType.if_and_enter)))
+        self.insertions.append((index, (
+            'if and () {  // PyHTSL filler conditional',
+            LineType.if_and_enter,
+        )))
         self.outside_counter[LineType.if_and_enter] += 1
         self.inside_counter[line_type] += 1
         self.inside_conditional = True
-        print('\x1b[38;2;0;255;0mNote:\x1b[0m Added an empty conditional to prevent too many stat changes.')
+        self.write_debug_line('\x1b[38;2;0;255;0mNote:\x1b[0m Added a conditional to prevent too many stat changes.')
 
     def create_filler_goto_function(
         self,
@@ -132,20 +149,27 @@ class Fixer:
         self.container_index += 1
         if self.container_name is not None:
             new_container_name = f'{self.container_name} {self.container_index}'
-            self.insertions.append((index, (f'goto function "{new_container_name}"', LineType.goto)))
-            print(f'\x1b[38;2;0;255;0mNote:\x1b[0m Created a new container named "\x1b[38;2;255;0;0m{new_container_name}\x1b[0m" to prevent too many stat changes.')
+            self.insertions.append((index, (
+                f'goto function "{new_container_name}"  // PyHTSL filler goto function',
+                LineType.goto,
+            )))
+            self.write_debug_line(f'\x1b[38;2;0;255;0mNote:\x1b[0m Created a new function named "\x1b[38;2;255;0;0m{new_container_name}\x1b[0m" to prevent too many stat changes.')
         else:
-            self.insertions.append((index, (f'// goto function "Unkown Function {self.container_index}"  // uncomment and change name', LineType.comment)))
-            print(
+            self.insertions.append((index, (
+                f'// goto function "Unkown Function {self.container_index}"  // PyHTSL filler goto function, uncomment and change name',
+                LineType.comment,
+            )))
+            self.write_debug_line(
                 '\x1b[38;2;255;0;0mWarning:\x1b[0m You exceeded the conditional limit, and you are not in an explicit container.'
                 '\n         To prevent this, use the \x1b[38;2;255;0;0m@create_function()\x1b[0m decorator or the \x1b[38;2;255;0;0mgoto()\x1b[0m function.'
                 '\n         Or uncomment the line I created for you and change the name of the function.'
             )
         self.outside_counter = self.new_counter()
         self.outside_counter[line_type] += 1
-        self.container_index = 1
 
     def fix(self, lines: list[tuple[str, LineType]]) -> None:
+        self.last_line = None
+        self.last_line_count = 0
         self.insertions = []
         self.container_name = None
         self.container_index = 1
@@ -186,6 +210,7 @@ class Fixer:
             lines.insert(index, (line, line_type))
         if len(self.insertions) > 0 and self.insertions[-1][1][1] is LineType.if_and_enter:
             lines.append(('}', LineType.if_exit))
+        self.write_debug_line('')
 
 
 class Writer:
