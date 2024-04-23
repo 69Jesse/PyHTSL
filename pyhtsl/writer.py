@@ -102,7 +102,7 @@ class Fixer:
         self.inside_conditional = True
         if self.conditional_enter_count(self.outside_counter) <= self.conditional_limit:
             return
-        self.create_filler_conditional(index=index, line_type=line_type)
+        self.create_filler_goto_function(index=index, line_type=line_type)
 
     def on_conditional_exit_line(self) -> None:
         if not self.inside_conditional:
