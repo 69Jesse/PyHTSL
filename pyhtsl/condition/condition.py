@@ -114,13 +114,13 @@ class PlaceholderValue:
     ) -> Condition:
         return OperatorCondition(left, right, Operator.LessThanOrEqual)
 
-    def __eq__(  # type: ignore
+    def __eq__(
         self,
         other: 'Stat | PlaceholderValue | int',
     ) -> Condition:
         return PlaceholderValue.equals(self, other)
 
-    def __ne__(  # type: ignore
+    def __ne__(
         self,
         other: 'Stat | PlaceholderValue | int',
     ) -> IfStatement:
