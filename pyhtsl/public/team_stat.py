@@ -1,9 +1,8 @@
 from ..writer import LineType
 from ..stat.stat import Stat
+from .team import Team
 
-from typing import TYPE_CHECKING, final
-if TYPE_CHECKING:
-    from .team import Team
+from typing import final
 
 
 __all__ = (
