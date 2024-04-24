@@ -224,6 +224,7 @@ class Fixer:
         index: int,
         line_type: LineType,
     ) -> None:
+        # TODO move all te shit to the end
         assert self.inside_conditional
         assert not self.inside_filler_conditional
         self.old_outside_counter = self.outside_counter
