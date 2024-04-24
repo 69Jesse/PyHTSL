@@ -58,6 +58,9 @@ class Fixer:
     last_line_count: int
 
     insertions: dict[int, list[tuple[str, LineType]]]
+    pops: set[int]
+    move_to_end_left: int
+    move_to_end_ranges: list[tuple[int, int]]
     container_name: Optional[str]
     container_index: int
     inside_conditional: bool
@@ -132,6 +135,7 @@ class Fixer:
             self.inside_filler_goto_inside_conditional = False
             self.pops.add(index)
             self.outside_counter = self.old_outside_counter
+            self.move_to_end_ranges.append((self.move_to_end_left, index))
             return
         if not self.inside_conditional:
             raise ValueError('Cannot exit an if statement that was never entered')
@@ -237,6 +241,8 @@ class Fixer:
                 LineType.if_exit,
             ))
         self.inside_counter = self.new_counter()
+        self.inside_counter[line_type] += 1
+        self.move_to_end_left = index
 
     def fix(self, lines: list[tuple[str, LineType]]) -> None:
         self.maybe_change_lines_edge_cases(lines)        
@@ -245,6 +251,7 @@ class Fixer:
         self.last_line_count = 0
         self.insertions = {}
         self.pops = set()
+        self.move_to_end_ranges = []
         self.container_name = None
         self.container_index = 1
         self.inside_conditional = False
@@ -282,18 +289,31 @@ class Fixer:
                 self.on_stat_change_line(index=index, line_type=line_type, counter=counter)
                 continue
 
+        move_to_end_indexes: set[int] = set()
+        for left, right in self.move_to_end_ranges:
+            for i in range(left, right + 1):
+                move_to_end_indexes.add(i)
+        end: list[tuple[str, LineType]] = []
         for i in range(len(lines) - 1, -1, -1):
-            if i in self.pops:
+            move_to_end = i in move_to_end_indexes
+            if move_to_end:
+                end.insert(0, lines[i])
+            if i in self.pops or move_to_end:
                 lines.pop(i)
             insertions = self.insertions.get(i, None)
             if insertions is None:
                 continue
             for insertion in reversed(insertions):
-                lines.insert(i, insertion)
+                if not move_to_end:
+                    lines.insert(i, insertion)
+                else:
+                    end.insert(0, insertion)
+        lines.extend(end)
 
         if len(self.insertions) > 0 and self.insertions[max(self.insertions.keys())][1] is LineType.if_and_enter:
             lines.append(('}', LineType.if_exit))
         self.write_debug_line('')
+        print(self.move_to_end_ranges)
 
 
 class Writer:
