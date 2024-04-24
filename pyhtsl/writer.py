@@ -114,7 +114,7 @@ class Fixer:
         index: int,
         line_type: LineType,
     ) -> None:
-        if self.inside_conditional:
+        if self.inside_conditional and line_type is not LineType.else_enter:
             raise ValueError('Cannot nest if statements')
         self.inside_conditional = True
         if self.conditional_enter_count(self.outside_counter) <= self.conditional_limit:
@@ -149,6 +149,9 @@ class Fixer:
         index: int,
         line_type: LineType,
     ) -> None:
+        if self.inside_conditional:
+            raise NotImplementedError('Too many stat changes inside of conditional, not implemented yet.')
+            # TODO this is an issue also with goto, idk, keep track of conditionals created here and by user and yeah fuck
         self.insertions.append((index, (
             'if and () {  // PyHTSL filler conditional',
             LineType.if_and_enter,
@@ -163,6 +166,8 @@ class Fixer:
         index: int,
         line_type: LineType,
     ) -> None:
+        if self.inside_conditional:
+            raise NotImplementedError('Too many stat changes inside of conditional, not implemented yet.')
         self.container_index += 1
         if self.container_name is not None:
             new_container_name = f'{self.container_name} {self.container_index}'
@@ -170,7 +175,7 @@ class Fixer:
                 f'goto function "{new_container_name}"  // PyHTSL filler goto function',
                 LineType.goto,
             )))
-            self.write_debug_line(f'\x1b[38;2;0;255;0mNote:\x1b[0m Created a new function named "\x1b[38;2;255;0;0m{new_container_name}\x1b[0m" to prevent too many stat changes.')
+            self.write_debug_line(f'\x1b[38;2;0;255;0m!!! Note:\x1b[0m Created a new function named "\x1b[38;2;255;0;0m{new_container_name}\x1b[0m" to prevent too many stat changes.')
         else:
             self.insertions.append((index, (
                 f'// goto function "Unkown Function {self.container_index}"  // PyHTSL filler goto function, uncomment and change name',
