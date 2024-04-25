@@ -92,7 +92,6 @@ class Fixer:
         return counter[LineType.if_and_enter] + counter[LineType.if_or_enter]
 
     def write_debug_line(self, line: str) -> None:
-        return
         if self.last_line is not None and self.last_line != line:
             print(f' \x1b[38;2;255;0;0m(x{self.last_line_count})\x1b[0m' * (self.last_line_count > 1))
         if self.last_line == line:
@@ -165,7 +164,6 @@ class Fixer:
             self.inside_conditional = False
             self.inside_filler_conditional = False
         if self.inside_conditional:
-            print('aaaaaaaaaaaaaa', self.outside_counter[LineType.player_stat_change])
             return self.create_filler_goto_inside_conditional(index=index, line_type=line_type)
         if self.conditional_enter_count(self.outside_counter) >= self.conditional_limit:
             self.create_filler_goto_function(index=index, line_type=line_type)
@@ -243,14 +241,12 @@ class Fixer:
         index: int,
         line_type: LineType,
     ) -> None:
-        print('yooooooooooooooo')
         assert self.inside_conditional
         assert not self.inside_filler_conditional
         self.old_outside_counter = self.outside_counter
         before_inside_filler = self.inside_filler_goto_inside_conditional
         self.inside_filler_goto_inside_conditional = True
         self.create_filler_goto_function(index=index, line_type=line_type)
-        print('yaaaaaaaaaaaaaaaaa', self.outside_counter[LineType.player_stat_change])
         if not before_inside_filler:
             self.insertions[index].insert(1, (
                 '}',
@@ -285,7 +281,6 @@ class Fixer:
 
             counter = self.inside_counter if self.inside_conditional else self.outside_counter
             counter[line_type] += 1
-            print(line, line_type.name, self.inside_conditional)
 
             if line_type in (
                 LineType.if_exit,
@@ -374,7 +369,7 @@ class Writer:
         self.file_name = os.path.basename(sys.argv[0]).rsplit('.', 1)[0]
 
         args: list[str] = sys.argv[1:]
-        if 'lines' in args:
+        if 'lines' in args and self.lines:
             max_line_length: int = max(len(line) for line, _ in self.lines)
             content = '\n'.join(
                 f'{line.ljust(max_line_length)}  // {line_type}'
