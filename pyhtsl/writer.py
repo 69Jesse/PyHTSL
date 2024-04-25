@@ -380,7 +380,7 @@ class Writer:
 
         self.htsl_file = HTSL_IMPORTS_FOLDER / f'{self.file_name}.htsl'
         self.htsl_file.write_text(
-            f'// Generated with PyHTSL https://github.com/69Jesse/PyHTSL\n{content}'
+            f'// Generated with PyHTSL https://github.com/69Jesse/PyHTSL\n{content}'.removesuffix('\n')
         )
         if 'code' in args:
             os.system(f'code "{self.htsl_file.absolute()}"')
