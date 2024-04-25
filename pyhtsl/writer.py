@@ -48,6 +48,7 @@ class LineType(Enum):
     miscellaneous = auto()
     goto = auto()
     comment = auto()
+    goto_move_to_end = auto()
 
 
 class Fixer:
@@ -59,8 +60,6 @@ class Fixer:
 
     insertions: dict[int, list[tuple[str, LineType]]]
     pops: set[int]
-    move_to_end_left: int
-    move_to_end_ranges: list[tuple[int, int]]
     container_name: Optional[str]
     container_index: int
     inside_conditional: bool
@@ -93,6 +92,7 @@ class Fixer:
         return counter[LineType.if_and_enter] + counter[LineType.if_or_enter]
 
     def write_debug_line(self, line: str) -> None:
+        return
         if self.last_line is not None and self.last_line != line:
             print(f' \x1b[38;2;255;0;0m(x{self.last_line_count})\x1b[0m' * (self.last_line_count > 1))
         if self.last_line == line:
@@ -104,16 +104,22 @@ class Fixer:
 
     def on_goto_container_line(
         self,
+        index: int,
         line: str,
     ) -> None:
-        if self.inside_conditional:
+        if self.inside_conditional and not self.inside_filler_conditional:
             raise ValueError('Cannot use goto inside an if or else statement')
+        if self.inside_filler_conditional:
+            self.insertions.setdefault(index, []).append((
+                '}',
+                LineType.if_exit,
+            ))
         match = re.search(r'"(.+?)"$', line)
         if match is None:
             raise ValueError(f'Invalid goto line: {line}')
         self.container_name = match.group(1)
-        self.outside_counter = self.new_counter()
         self.container_index = 1
+        self.reset_most_attributes()
 
     def on_conditional_enter_line(
         self,
@@ -132,10 +138,10 @@ class Fixer:
         index: int,
     ) -> None:
         if self.inside_filler_goto_inside_conditional:
+            self.inside_conditional = False
+            self.inside_filler_conditional = False
             self.inside_filler_goto_inside_conditional = False
-            self.pops.add(index)
             self.outside_counter = self.old_outside_counter
-            self.move_to_end_ranges.append((self.move_to_end_left, index))
             return
         if not self.inside_conditional:
             raise ValueError('Cannot exit an if statement that was never entered')
@@ -159,6 +165,7 @@ class Fixer:
             self.inside_conditional = False
             self.inside_filler_conditional = False
         if self.inside_conditional:
+            print('aaaaaaaaaaaaaa', self.outside_counter[LineType.player_stat_change])
             return self.create_filler_goto_inside_conditional(index=index, line_type=line_type)
         if self.conditional_enter_count(self.outside_counter) >= self.conditional_limit:
             self.create_filler_goto_function(index=index, line_type=line_type)
@@ -173,10 +180,11 @@ class Fixer:
         if self.inside_conditional:
             return self.create_filler_goto_inside_conditional(index=index, line_type=line_type)
         self.insertions.setdefault(index, []).append((
-            'if and () {  // PyHTSL filler conditional',
+            'if and () {  // PyHTSL filler',
             LineType.if_and_enter,
         ))
         self.outside_counter[LineType.if_and_enter] += 1
+        self.inside_counter = self.new_counter()
         self.inside_counter[line_type] += 1
         self.inside_conditional = True
         self.inside_filler_conditional = True
@@ -195,25 +203,31 @@ class Fixer:
         if self.container_name is not None:
             new_container_name = f'{self.container_name} {self.container_index}'
             self.insertions.setdefault(index, []).append((
-                f'function "{new_container_name}"  // PyHTSL filler goto function',
+                f'function "{new_container_name}"  // PyHTSL filler',
                 LineType.trigger_function,
             ))
-            for i in (0, index):
+            for i, lt in (
+                (0, LineType.goto),
+                (index, LineType.goto_move_to_end if self.inside_filler_goto_inside_conditional else LineType.goto),
+            ):
                 self.insertions.setdefault(i, []).append((
-                    f'goto function "{new_container_name}"  // PyHTSL filler goto function',
-                    LineType.goto,
+                    f'goto function "{new_container_name}"  // PyHTSL filler',
+                    lt,
                 ))
             self.write_debug_line(f'\x1b[38;2;0;255;0mNote:\x1b[0m Created a new function named "\x1b[38;2;255;0;0m{new_container_name}\x1b[0m" to prevent too many stat changes.')
         else:
             new_container_name = 'Unknown Function'
             self.insertions.setdefault(index, []).append((
-                f'// function "{new_container_name} {self.container_index}"       // PyHTSL filler goto function, uncomment and change name',
-                LineType.comment,
+                f'// function "{new_container_name} {self.container_index}"       // PyHTSL filler, uncomment and change name',
+                LineType.trigger_function,
             ))
-            for i in (0, index):
+            for i, lt in (
+                (0, LineType.goto),
+                (index, LineType.goto_move_to_end if self.inside_filler_goto_inside_conditional else LineType.goto),
+            ):
                 self.insertions.setdefault(i, []).append((
-                    f'// goto function "{new_container_name} {self.container_index}"  // PyHTSL filler goto function, uncomment and change name',
-                    LineType.comment,
+                    f'// goto function "{new_container_name} {self.container_index}"  // PyHTSL fille, uncomment and change name',
+                    lt,
                 ))
             self.write_debug_line(
                 '\x1b[38;2;255;0;0mWarning:\x1b[0m You exceeded the conditional limit, and you are not in an explicit container.'
@@ -221,20 +235,22 @@ class Fixer:
                 '\n         Or uncomment the line I created for you and change the name of the function.'
             )
         self.outside_counter = self.new_counter()
-        self.outside_counter[line_type] += 1
+        if not self.inside_filler_goto_inside_conditional:
+            self.outside_counter[line_type] += 1
 
     def create_filler_goto_inside_conditional(
         self,
         index: int,
         line_type: LineType,
     ) -> None:
-        # TODO move all te shit to the end
+        print('yooooooooooooooo')
         assert self.inside_conditional
         assert not self.inside_filler_conditional
         self.old_outside_counter = self.outside_counter
         before_inside_filler = self.inside_filler_goto_inside_conditional
         self.inside_filler_goto_inside_conditional = True
         self.create_filler_goto_function(index=index, line_type=line_type)
+        print('yaaaaaaaaaaaaaaaaa', self.outside_counter[LineType.player_stat_change])
         if not before_inside_filler:
             self.insertions[index].insert(1, (
                 '}',
@@ -242,31 +258,34 @@ class Fixer:
             ))
         self.inside_counter = self.new_counter()
         self.inside_counter[line_type] += 1
-        self.move_to_end_left = index
 
-    def fix(self, lines: list[tuple[str, LineType]]) -> None:
-        self.maybe_change_lines_edge_cases(lines)        
-
-        self.last_line = None
-        self.last_line_count = 0
-        self.insertions = {}
-        self.pops = set()
-        self.move_to_end_ranges = []
-        self.container_name = None
-        self.container_index = 1
+    def reset_most_attributes(self) -> None:
         self.inside_conditional = False
         self.inside_filler_conditional = False
         self.inside_filler_goto_inside_conditional = False
         self.outside_counter = self.new_counter()
         self.inside_counter = self.new_counter()
 
+    def fix(self, lines: list[tuple[str, LineType]]) -> None:
+        """I'm so sorry"""
+        self.maybe_change_lines_edge_cases(lines)        
+
+        self.last_line = None
+        self.last_line_count = 0
+        self.insertions = {}
+        self.pops = set()
+        self.container_name = None
+        self.container_index = 1
+        self.reset_most_attributes()
+
         for index, (line, line_type) in enumerate(lines):
             if line_type is LineType.goto:
-                self.on_goto_container_line(line=line)
+                self.on_goto_container_line(index=index, line=line)
                 continue
 
             counter = self.inside_counter if self.inside_conditional else self.outside_counter
             counter[line_type] += 1
+            print(line, line_type.name, self.inside_conditional)
 
             if line_type in (
                 LineType.if_exit,
@@ -289,31 +308,40 @@ class Fixer:
                 self.on_stat_change_line(index=index, line_type=line_type, counter=counter)
                 continue
 
-        move_to_end_indexes: set[int] = set()
-        for left, right in self.move_to_end_ranges:
-            for i in range(left, right + 1):
-                move_to_end_indexes.add(i)
-        end: list[tuple[str, LineType]] = []
+        self.write_debug_line('')
+
         for i in range(len(lines) - 1, -1, -1):
-            move_to_end = i in move_to_end_indexes
-            if move_to_end:
-                end.insert(0, lines[i])
-            if i in self.pops or move_to_end:
+            if i in self.pops:
                 lines.pop(i)
             insertions = self.insertions.get(i, None)
             if insertions is None:
                 continue
             for insertion in reversed(insertions):
-                if not move_to_end:
-                    lines.insert(i, insertion)
-                else:
-                    end.insert(0, insertion)
-        lines.extend(end)
+                lines.insert(i, insertion)
 
-        if len(self.insertions) > 0 and self.insertions[max(self.insertions.keys())][1] is LineType.if_and_enter:
+        if len(self.insertions) > 0 and self.insertions[max(self.insertions.keys())][-1][1] is LineType.if_and_enter:
             lines.append(('}', LineType.if_exit))
-        self.write_debug_line('')
-        print(self.move_to_end_ranges)
+
+        move_to_end: set[int] = set()
+        pop: set[int] = set()
+        flag: bool = False
+        for index, (line, line_type) in enumerate(lines):
+            if line_type is LineType.goto_move_to_end:
+                flag = True
+            if flag:
+                pop.add(index)
+                if line_type is LineType.if_exit:
+                    flag = False
+                    continue
+                move_to_end.add(index)
+        
+        end: list[tuple[str, LineType]] = []
+        assert move_to_end.issubset(pop)
+        for index in sorted(pop, reverse=True):
+            entry = lines.pop(index)
+            if index in move_to_end:
+                end.insert(0, entry)
+        lines.extend(end)
 
 
 class Writer:
@@ -345,12 +373,21 @@ class Writer:
     def write_to_files(self) -> None:
         self.file_name = os.path.basename(sys.argv[0]).rsplit('.', 1)[0]
 
+        args: list[str] = sys.argv[1:]
+        if 'lines' in args:
+            max_line_length: int = max(len(line) for line, _ in self.lines)
+            content = '\n'.join(
+                f'{line.ljust(max_line_length)}  // {line_type}'
+                for line, line_type in self.lines
+            )
+        else:
+            content = '\n'.join((line for line, _ in self.lines))
+
         self.htsl_file = HTSL_IMPORTS_FOLDER / f'{self.file_name}.htsl'
         self.htsl_file.write_text(
-            '// Generated with PyHTSL https://github.com/69Jesse/PyHTSL\n'
-            + '\n'.join((line for line, _ in self.lines))
+            f'// Generated with PyHTSL https://github.com/69Jesse/PyHTSL\n{content}'
         )
-        if len(sys.argv) > 1 and sys.argv[1] == 'code':
+        if 'code' in args:
             os.system(f'code "{self.htsl_file.absolute()}"')
 
         self.python_save_file = PYHTSL_FOLDER / f'{self.file_name}.py'
