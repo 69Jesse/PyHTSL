@@ -365,7 +365,11 @@ class Writer:
             else:
                 self.lines.append((line, line_type))
 
-    def write_to_files(self) -> None:
+    def write_to_files(self) -> bool:
+        if not self.lines:
+            print('Nothing found to write to your .htsl file. \x1b[38;2;255;0;0mPyHTSL will not do anything.\x1b[0m')
+            return False
+
         self.file_name = os.path.basename(sys.argv[0]).rsplit('.', 1)[0]
 
         args: list[str] = sys.argv[1:]
@@ -381,7 +385,7 @@ class Writer:
         encoding: str = 'utf-8'
         self.htsl_file = HTSL_IMPORTS_FOLDER / f'{self.file_name}.htsl'
         self.htsl_file.write_text(
-            f'// Generated with PyHTSL https://github.com/69Jesse/PyHTSL\n{content}'.removesuffix('\n'),
+            f'// Generated with PyHTSL https://github.com/69Jesse/PyHTSL\n{content}',
             encoding=encoding,
         )
         if 'code' in args:
@@ -392,10 +396,9 @@ class Writer:
         while self.python_save_file.exists():
             index += 1
             self.python_save_file = PYHTSL_FOLDER / f'{self.file_name}_{index}.py'
-        try:
-            self.python_save_file.write_text(Path(sys.argv[0]).read_text(encoding=encoding), encoding=encoding)
-        except UnicodeEncodeError:
-            pass
+        self.python_save_file.write_text(Path(sys.argv[0]).read_text(encoding=encoding), encoding=encoding)
+
+        return True
 
     def exception_hook(
         self,
@@ -412,7 +415,8 @@ class Writer:
         for func in self.registered_functions:
             func()
         Fixer().fix(self.lines)
-        self.write_to_files()
+        if not self.write_to_files():
+            return
         print((
             '\n\x1b[38;2;0;255;0mAll done! Your .htsl file is written to the following location:\x1b[0m'
             f'\n{self.htsl_file.absolute()}'
