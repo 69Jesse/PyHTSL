@@ -378,9 +378,11 @@ class Writer:
         else:
             content = '\n'.join((line for line, _ in self.lines))
 
+        encoding: str = 'utf-8'
         self.htsl_file = HTSL_IMPORTS_FOLDER / f'{self.file_name}.htsl'
         self.htsl_file.write_text(
-            f'// Generated with PyHTSL https://github.com/69Jesse/PyHTSL\n{content}'.removesuffix('\n')
+            f'// Generated with PyHTSL https://github.com/69Jesse/PyHTSL\n{content}'.removesuffix('\n'),
+            encoding=encoding,
         )
         if 'code' in args:
             os.system(f'code "{self.htsl_file.absolute()}"')
@@ -390,7 +392,10 @@ class Writer:
         while self.python_save_file.exists():
             index += 1
             self.python_save_file = PYHTSL_FOLDER / f'{self.file_name}_{index}.py'
-        self.python_save_file.write_text(Path(sys.argv[0]).read_text())
+        try:
+            self.python_save_file.write_text(Path(sys.argv[0]).read_text(encoding=encoding), encoding=encoding)
+        except UnicodeEncodeError:
+            pass
 
     def exception_hook(
         self,
