@@ -79,3 +79,5 @@ from .public.has_item import HasItem as HasItem
 from .public.has_potion_effect import HasPotionEffect as HasPotionEffect
 from .public.required_gamemode import RequiredGamemode as RequiredGamemode
 from .public.required_team import RequiredTeam as RequiredTeam
+
+from .public.delete_items import delete_all_items_from_imports_folder as delete_all_items_from_imports_folder
