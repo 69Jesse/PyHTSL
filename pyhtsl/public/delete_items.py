@@ -15,3 +15,4 @@ def delete_all_items_from_imports_folder() -> None:
         if not path.name.startswith('_'):
             continue
         path.unlink()
+        print(f'Deleted "{path.absolute()}"')
