@@ -331,7 +331,7 @@ class Item:
             del data['tag']
 
         if extras_copy:
-            raise ValueError(f'Invalid keys: {", ".join(extras_copy.keys())}')
+            print(f'Unused keys: {", ".join(extras_copy.keys())}')
 
         return '{"item": "' + self.one_lineify(data) + '"}'
 
