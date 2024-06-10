@@ -8,8 +8,7 @@ from pyhtsl import (
 RANDOM_1_100 = RandomInt(1, 101)
 
 
-rng = PlayerStat('rng')
-rng.value = RANDOM_1_100
+rng = PlayerStat('rng').with_value(RANDOM_1_100)
 
 chat(f'&aRandom number: {rng}')
 rng += 5 + RANDOM_1_100
