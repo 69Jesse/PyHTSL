@@ -67,7 +67,7 @@ class Stat(ABC):
                 STAT_CACHE[cls] = {}
             name = args[0]
             if isinstance(name, str) and name not in STAT_CACHE[cls]:
-                STAT_CACHE[cls][name] = super(Stat, cls).__new__(cls)
+                STAT_CACHE[cls][name] = super(Stat, cls).__new__(cls)  # type: ignore
             return STAT_CACHE[cls][name]  # type: ignore
         return super(Stat, cls).__new__(cls)
 
@@ -113,6 +113,10 @@ class Stat(ABC):
 
     def set(self, value: 'Expression | Stat | int | PlaceholderValue') -> None:
         self.value = value
+
+    def with_value(self, value: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
+        self.value = value
+        return self
 
     def __iadd__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         self.value += other
