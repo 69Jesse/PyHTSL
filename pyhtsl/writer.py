@@ -19,9 +19,14 @@ __all__ = (
 
 HERE: Path = Path(__file__).parent
 
-DOT_MINECRAFT: Path = Path(os.getenv('APPDATA')) / '.minecraft'  # type: ignore
+if os.name == 'nt':
+    DOT_MINECRAFT: Path = Path(os.getenv('APPDATA')) / '.minecraft'  # type: ignore
+elif os.name == 'posix':
+    DOT_MINECRAFT: Path = Path.home() / 'Library' / 'Application Support' / 'minecraft'
+else:
+    raise OSError('Unsupported operating system')
 if not DOT_MINECRAFT.exists():
-    raise FileNotFoundError('Could not find your .minecraft folder')
+    raise FileNotFoundError('Could not find your minecraft folder')
 
 HTSL_IMPORTS_FOLDER: Path = DOT_MINECRAFT / 'config' / 'ChatTriggers' / 'modules' / 'HTSL' / 'imports'
 if not HTSL_IMPORTS_FOLDER.exists():
