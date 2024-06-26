@@ -1,6 +1,7 @@
 from ..condition import TinyCondition
+from .types import POTION_EFFECTS
 
-from typing import final, Literal
+from typing import final
 
 
 __all__ = (
@@ -13,30 +14,7 @@ class HasPotionEffect(TinyCondition):
     effect: str
     def __init__(
         self,
-        effect: Literal[
-            'speed',
-            'slowness',
-            'haste',
-            'mining_fatigue',
-            'strength',
-            'instant_health',
-            'instant_damage',
-            'jump_boost',
-            'nausea',
-            'regeneration',
-            'resistance',
-            'fire_resistance',
-            'water_breathing',
-            'invisibility',
-            'blindness',
-            'night_vision',
-            'hunger',
-            'weakness',
-            'poison',
-            'wither',
-            'health_boost',
-            'absorption',
-        ],
+        effect: POTION_EFFECTS,
     ) -> None:
         self.effect = effect
 

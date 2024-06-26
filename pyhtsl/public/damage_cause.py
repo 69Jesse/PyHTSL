@@ -1,6 +1,7 @@
 from ..condition import TinyCondition
+from .types import DAMAGE_CAUSES
 
-from typing import final, Literal
+from typing import final
 
 
 __all__ = (
@@ -13,19 +14,7 @@ class DamageCause(TinyCondition):
     damage_cause: str
     def __init__(
         self,
-        damage_cause: Literal[
-            'entity Attack',
-            'projectile',
-            'suffocation',
-            'fall',
-            'lava',
-            'fire',
-            'fire_tick',
-            'drowning',
-            'starvation',
-            'poison',
-            'thorns',
-        ],
+        damage_cause: DAMAGE_CAUSES,
     ) -> None:
         self.damage_cause = damage_cause
 

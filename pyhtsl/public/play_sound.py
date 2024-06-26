@@ -1,6 +1,7 @@
 from ..writer import WRITER, LineType
+from .types import LOCATIONS
 
-from typing import Literal, Optional
+from typing import Optional
 
 
 __all__ = (
@@ -13,12 +14,7 @@ def play_sound(
     sound: str,
     volume: float = 0.7,
     pitch: float = 1.0,
-    location: Literal[
-        'house_spawn',
-        'current_location',
-        'invokers_location',
-        'custom_coordinates',
-    ] = 'invokers_location',
+    location: LOCATIONS = 'invokers_location',
     coordinates: Optional[str] = None
 ) -> None:
     line = f'playSound "{sound}" {volume} {pitch} "{location}"'

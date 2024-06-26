@@ -1,5 +1,6 @@
 from ..writer import WRITER, LineType
-from .enchantment import Enchantment, ALL_POSSIBLE_ENCHANTMENTS
+from .types import ALL_POSSIBLE_ENCHANTMENTS
+from .enchantment import Enchantment
 
 from typing import Optional
 
