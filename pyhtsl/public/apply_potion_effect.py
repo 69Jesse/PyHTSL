@@ -1,5 +1,5 @@
 from ..writer import WRITER, LineType
-from .types import POTION_EFFECTS
+from ..types import POTION_EFFECTS
 
 
 __all__ = (

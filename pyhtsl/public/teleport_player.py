@@ -1,5 +1,5 @@
 from ..writer import WRITER, LineType
-from .types import LOCATIONS
+from ..types import LOCATIONS
 
 from typing import Optional
 

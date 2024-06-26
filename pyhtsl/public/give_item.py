@@ -1,5 +1,5 @@
 from ..writer import WRITER, LineType
-from .types import INVENTORY_SLOTS
+from ..types import INVENTORY_SLOTS
 from .item import Item
 
 

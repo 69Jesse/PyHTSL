@@ -1,7 +1,10 @@
+from ..condition import IfStatement
+
 from typing import Literal
 
 
 __all__ = (
+    'IfStatement',
     'POTION_EFFECTS',
     'DAMAGE_CAUSES',
     'ALL_POSSIBLE_ENCHANTMENTS',

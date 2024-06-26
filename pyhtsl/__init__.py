@@ -84,4 +84,4 @@ from .public.delete_items import delete_all_items_from_imports_folder as delete_
 
 from .public.random_int import RandomInt as RandomInt
 
-from .public import types as types
+from . import types as types

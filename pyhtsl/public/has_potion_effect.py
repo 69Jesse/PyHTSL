@@ -1,5 +1,5 @@
 from ..condition import TinyCondition
-from .types import POTION_EFFECTS
+from ..types import POTION_EFFECTS
 
 from typing import final
 

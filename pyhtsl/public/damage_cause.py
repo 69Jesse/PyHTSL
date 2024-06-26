@@ -1,5 +1,5 @@
 from ..condition import TinyCondition
-from .types import DAMAGE_CAUSES
+from ..types import DAMAGE_CAUSES
 
 from typing import final
 
