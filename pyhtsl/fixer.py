@@ -1,8 +1,9 @@
+from abc import ABC, abstractmethod
 import re
 
 from .line_type import LineType
 
-from typing import Generator, Optional
+from typing import Generator, Optional, final
 
 
 __all__ = (
@@ -11,21 +12,6 @@ __all__ = (
 
 
 GOTO_LINE_REGEX = re.compile(r'^goto (.+?) "(.+)"$')
-
-
-class GotoContainer:
-    name: Optional[str]
-    index: int
-    def __init__(
-        self,
-        name: Optional[str],
-        index: int,
-    ) -> None:
-        self.name = name
-        self.index = index
-
-    def as_line(self) -> tuple[str, LineType]:
-        return (f'goto function "{self.name} {self.index}"', LineType.goto)
 
 
 class Part:
@@ -55,22 +41,51 @@ class Counter:
         self.mapping[line_type] -= 1
         return possible
 
+    IF_ENTER_LIMIT: int = 15
+
     def limit_reached(self) -> bool:
         return (
-            (self.mapping.get(LineType.if_and_enter, 0) + self.mapping.get(LineType.if_or_enter, 0)) > 15
-            or self.mapping.get(LineType.player_stat_change, 0) > 10
-            or self.mapping.get(LineType.global_stat_change, 0) > 10
-            or self.mapping.get(LineType.team_stat_change, 0) > 10
-            or self.mapping.get(LineType.misc_stat_change, 0) > 10
+            (self.mapping.get(LineType.if_and_enter, 0) + self.mapping.get(LineType.if_or_enter, 0)) >= self.IF_ENTER_LIMIT
+            or self.mapping.get(LineType.player_stat_change, 0) >= 10
+            or self.mapping.get(LineType.global_stat_change, 0) >= 10
+            or self.mapping.get(LineType.team_stat_change, 0) >= 10
+            or self.mapping.get(LineType.misc_stat_change, 0) >= 10
         )
+
+
+class Addon(ABC):
+    @abstractmethod
+    def apply(self, lines: list[tuple[str, LineType]]) -> None:
+        raise NotImplementedError
+
+
+@final
+class EmptyIfAddon(Addon):
+    pass
+
+
+@final
+class NewFunctionAddon(Addon):
+    name: Optional[str]
+    index: int
+    def __init__(
+        self,
+        name: Optional[str],
+        index: int,
+    ) -> None:
+        self.name = name
+        self.index = index
+
+    def create_goto_line(self) -> tuple[str, LineType]:
+        return (f'goto function "{self.name} {self.index}"', LineType.goto)
 
 
 class Fixer:
     lines: list[tuple[str, LineType]]
-    gotos_added: list[GotoContainer]
+    new_functions_added: list[NewFunctionAddon]
     def __init__(self, lines: list[tuple[str, LineType]]) -> None:
         self.lines = lines
-        self.gotos_added = []
+        self.new_functions_added = []
 
     def fix(self) -> list[tuple[str, LineType]]:
         parts: list[Part] = []
@@ -78,13 +93,11 @@ class Fixer:
             self.process_part(part)
             parts.append(part)
 
-        return self.lines
-
         lines = []
         for part in parts:
             lines.extend(part.lines)
-        for goto in reversed(self.gotos_added):
-            lines.insert(0, goto.as_line())
+        for addon in reversed(self.new_functions_added):
+            lines.insert(0, addon.create_goto_line())
         return lines
 
     def find_container_and_name_from_goto(self, line: str) -> tuple[Optional[str], Optional[str]]:
@@ -113,7 +126,8 @@ class Fixer:
         return rest
 
     def process_part(self, part: Part) -> None:
-        counter = Counter()
+        counter: Counter = Counter()
+        addons: list[Addon] = []
         for i, (line, line_type) in enumerate(part.lines):
             if i != 0 and line_type is LineType.goto:
                 raise RuntimeError('This should never happen')
