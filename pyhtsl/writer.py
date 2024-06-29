@@ -401,7 +401,7 @@ class Writer:
             func()
 
         fixer = Fixer(self.lines)
-        fixer.fix()
+        self.lines = fixer.fix()
 
         if not self.write_to_files():
             return
