@@ -166,6 +166,7 @@ class Fixer:
     def fix(self) -> list[tuple[str, LineType]]:
         parts: list[Part] = []
         for part in self.create_parts():
+            print(f'PART: {part.name} --- ', '\n'.join(map(str, part.lines)), ' --- PART')
             self.fix_lines(part.lines, current_name=part.name)
             parts.append(part)
 
@@ -182,10 +183,15 @@ class Fixer:
             return (None, None)
         return (match.group(1), match.group(2))
 
-    def create_parts(self) -> Generator[Part, None, None]:
+    def create_parts(
+        self,
+        lines: Optional[list[tuple[str, LineType]]] = None,
+    ) -> Generator[Part, None, None]:
+        if lines is None:
+            lines = self.lines
         name: Optional[str] = None
         current_lines: list[tuple[str, LineType]] = []
-        for line, line_type in self.lines:
+        for line, line_type in lines:
             if line_type is LineType.goto:
                 yield Part(name, current_lines)
                 _, name = self.find_container_and_name_from_goto(line)
@@ -210,9 +216,11 @@ class Fixer:
         ):
             print(addon)
             addons.append(addon)
+        print('\n\nLINES IN MIDDLE ---', '\n'.join(map(str, lines)), '--- LINES IN MIDDLE\n\n')
         for addon in reversed(addons):
             addon.add_to_middle(lines)
         for addon in addons:
+            print("ADDON ADDING TO END", addon, '\n\t'.join(map(str, lines)))
             addon.add_to_end(lines)
 
     def remove_rest_from_lines(
@@ -273,7 +281,6 @@ class Fixer:
                     ))):
                         if i == 0:
                             popped = lines.pop(index)
-                            print('POPPED', popped)
                             lines.extend(part)
                             index += len(part) + 1
                             lines.insert(index, popped) 
@@ -283,16 +290,20 @@ class Fixer:
                 continue
 
             rest = self.remove_rest_from_lines(lines, index - 1)
-            print('LINES----', '\n'.join(map(str, lines)), '----LINES')
-            print('REST----', '\n'.join(map(str, rest)), '----REST')
+            # print('LINES----', '\n'.join(map(str, lines)), '----LINES')
+            # print('REST----', '\n'.join(map(str, rest)), '----REST')
             # yield NoChangeAddon(
             #     lines.copy(),
             #     index,
             # )
             # lines.clear()
 
+            # TODO
+
             # print('NEW FUNCTION', _, line_type, index, rest)
             function_index += 1
             self.fix_lines(rest, current_name=current_name, function_index=function_index)
             yield NewFunctionAddon(rest, index, current_name, function_index)
             break
+
+        # lines.extend(add_to_end)
