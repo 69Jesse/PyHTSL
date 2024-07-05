@@ -47,7 +47,7 @@ class Counter:
         self.mapping[line_type] -= 1
         return possible
 
-    IF_ENTER_LIMIT: int = 5
+    IF_ENTER_LIMIT: int = 15
 
     def if_enters(self) -> int:
         return self.mapping.get(LineType.if_and_enter, 0) + self.mapping.get(LineType.if_or_enter, 0)
@@ -61,10 +61,10 @@ class Counter:
     def limit_reached(self) -> bool:
         return (
             self.if_enters() > Counter.IF_ENTER_LIMIT
-            or self.mapping.get(LineType.player_stat_change, 0) > 5
-            or self.mapping.get(LineType.global_stat_change, 0) > 5
-            or self.mapping.get(LineType.team_stat_change, 0) > 5
-            or self.mapping.get(LineType.misc_stat_change, 0) > 5
+            or self.mapping.get(LineType.player_stat_change, 0) > 10
+            or self.mapping.get(LineType.global_stat_change, 0) > 10
+            or self.mapping.get(LineType.team_stat_change, 0) > 10
+            or self.mapping.get(LineType.misc_stat_change, 0) > 10
         )
 
 
@@ -86,16 +86,6 @@ class Addon(ABC):
     @abstractmethod
     def add_to_end(self, append_to: list[tuple[str, LineType]]) -> None:
         raise NotImplementedError
-
-
-# @final
-# class NoChangeAddon(Addon):
-#     def add_to_middle(self, append_to: list[tuple[str, LineType]]) -> None:
-#         for line in reversed(self.lines):
-#             append_to.insert(self.add_to_middle_index, line)
-
-#     def add_to_end(self, append_to: list[tuple[str, LineType]]) -> None:
-#         pass
 
 
 @final
@@ -168,15 +158,11 @@ class Fixer:
     def fix(self) -> list[tuple[str, LineType]]:
         parts: list[Part] = []
         for part in self.create_parts():
-            print(f'PART: {part.name} --- ', '\n'.join(map(str, part.lines)), ' --- PART')
             addons = self.fix_lines(part.lines, current_name=part.name)
-            print(f'PART AFTER: {part.name} --- ', '\n'.join(map(str, part.lines)), ' --- PART')
-
             for addon in addons:
                 if isinstance(addon, NewFunctionAddon):
                     self.new_functions_added.append(addon)
                 addon.add_to_end(part.lines)
-
             parts.append(part)
 
         lines = []
@@ -226,7 +212,7 @@ class Fixer:
         index: int,
     ) -> Generator[list[tuple[str, LineType]], None, None]:
         counter: Counter = Counter()
-        part: list[tuple[str, LineType]] = []
+        section: list[tuple[str, LineType]] = []
         for _ in range(index, len(lines)):
             line, line_type = lines[index]
             if line_type is LineType.if_exit:
@@ -236,14 +222,32 @@ class Fixer:
             assert not line_type.is_if_enter()
             if counter.possible_to_increment(line_type):
                 counter.increment(line_type)
-                part.append((line, line_type))
+                section.append((line, line_type))
                 continue
-            yield part
-            part = [(line, line_type)]
+            yield section
+            section = [(line, line_type)]
             counter.reset()
             counter.increment(line_type)
-        if part:
-            yield part
+        if section:
+            yield section
+
+    def create_and_remove_line_section_that_can_be_inside_if(
+        self,
+        lines: list[tuple[str, LineType]],
+        index: int,
+    ) -> list[tuple[str, LineType]]:
+        counter: Counter = Counter()
+        section: list[tuple[str, LineType]] = []
+        for _ in range(index, len(lines)):
+            line, line_type = lines[index]
+            if line_type.is_if_enter():
+                break
+            if not counter.possible_to_increment(line_type):
+                break
+            lines.pop(index)
+            counter.increment(line_type)
+            section.append((line, line_type))
+        return section
 
     def fix_lines(
         self,
@@ -258,6 +262,7 @@ class Fixer:
 
         while index < len(lines):
             _, line_type = lines[index]
+            print(f'GOING OVER LINE: {_} --- {line_type}')
             index += 1
 
             if counter.possible_to_increment(line_type):
@@ -276,13 +281,26 @@ class Fixer:
                             index += addon.add_to_middle(lines)
                 continue
 
-            rest = self.remove_rest_from_lines(lines, index - 1)
-
-            function_index += 1
-            rest_addons = self.fix_lines(rest, current_name=current_name, function_index=function_index)
-            addon = NewFunctionAddon(rest, index, current_name, function_index)
-            addons.append(addon)
-            index += addon.add_to_middle(lines)
-            addons.extend(rest_addons)
+            if counter.can_add_another_if_enter():
+                counter.add_fake_if_enter()
+                addon = EmptyIfAddon(
+                    lines=self.create_and_remove_line_section_that_can_be_inside_if(lines, index - 1),
+                    add_to_middle_index=index - 1,
+                )
+                addons.append(addon)
+                index += addon.add_to_middle(lines) - 2
+            else:
+                rest = self.remove_rest_from_lines(lines, index - 1)
+                function_index += 1
+                rest_addons = self.fix_lines(rest, current_name=current_name, function_index=function_index)
+                addon = NewFunctionAddon(
+                    lines=rest,
+                    add_to_middle_index=index,
+                    function_name=current_name,
+                    function_index=function_index,
+                )
+                addons.append(addon)
+                index += addon.add_to_middle(lines)
+                addons.extend(rest_addons)
 
         return addons
