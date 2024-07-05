@@ -35,24 +35,33 @@ class Counter:
         self.mapping[line_type] = self.mapping.get(line_type, 0) + 1
         return self.mapping[line_type]
 
-    def possible_to_increment(self, line_type: LineType) -> bool:
+    def possible_to_increment(
+        self,
+        line_type: LineType,
+    ) -> bool:
         self.increment(line_type)
         possible = not self.limit_reached()
         self.mapping[line_type] -= 1
         return possible
 
-    IF_ENTER_LIMIT: int = 15
+    IF_ENTER_LIMIT: int = 5
 
     def if_enters(self) -> int:
         return self.mapping.get(LineType.if_and_enter, 0) + self.mapping.get(LineType.if_or_enter, 0)
 
+    def can_add_another_if_enter(self) -> bool:
+        return self.if_enters() < Counter.IF_ENTER_LIMIT
+
+    def add_fake_if_enter(self) -> None:
+        self.mapping[LineType.if_and_enter] = self.mapping.get(LineType.if_and_enter, 0) + 1
+
     def limit_reached(self) -> bool:
         return (
-            self.if_enters() > self.IF_ENTER_LIMIT
-            or self.mapping.get(LineType.player_stat_change, 0) > 10
-            or self.mapping.get(LineType.global_stat_change, 0) > 10
-            or self.mapping.get(LineType.team_stat_change, 0) > 10
-            or self.mapping.get(LineType.misc_stat_change, 0) > 10
+            self.if_enters() > Counter.IF_ENTER_LIMIT
+            or self.mapping.get(LineType.player_stat_change, 0) > 5
+            or self.mapping.get(LineType.global_stat_change, 0) > 5
+            or self.mapping.get(LineType.team_stat_change, 0) > 5
+            or self.mapping.get(LineType.misc_stat_change, 0) > 5
         )
 
 
@@ -65,6 +74,7 @@ class Addon(ABC):
         add_to_middle_index: int,
     ) -> None:
         self.lines = lines
+        self.add_to_middle_index = add_to_middle_index
 
     @abstractmethod
     def add_to_middle(self, append_to: list[tuple[str, LineType]]) -> None:
@@ -183,47 +193,88 @@ class Fixer:
         self,
         lines: list[tuple[str, LineType]],
         index: int,
-        until: Optional[LineType] = None,
     ) -> list[tuple[str, LineType]]:
         rest: list[tuple[str, LineType]] = []
         for _ in range(index, len(lines)):
-            if until is not None:
-                _, line_type = lines[index]
-                if line_type is until:
-                    return rest
             rest.append(lines.pop(index))
-        print(rest)
         return rest
 
-    def frick(self, lines: list[tuple[str, LineType]]) -> None:
-        print('-----')
-        for line, line_type in lines:
-            print((line, line_type))
-        print('-----')
+    def create_possible_parts_inside_if(
+        self,
+        lines: list[tuple[str, LineType]],
+        index: int,
+    ) -> Generator[list[tuple[str, LineType]], None, None]:
+        counter: Counter = Counter()
+        part: list[tuple[str, LineType]] = []
+        for _ in range(index, len(lines)):
+            line, line_type = lines[index]
+            if line_type is LineType.if_exit:
+                return
+            lines.pop(index)
+
+            assert not line_type.is_if_enter()
+            if counter.possible_to_increment(line_type):
+                counter.increment(line_type)
+                part.append((line, line_type))
+                continue
+            yield part
+            part = [(line, line_type)]
+            counter = Counter()
+            counter.increment(line_type)
+        if part:
+            yield part
 
     def get_addons_from_lines(
         self,
         lines: list[tuple[str, LineType]],
         *,
         current_name: Optional[str],
+        function_index: int,
     ) -> Generator[Addon, None, None]:
-        function_index: int = 0
         counter: Counter = Counter()
-        addon_lines: list[tuple[str, LineType]] = []
-        add_to_middle_index: int = 0
         index: int = 0
-        first_time: bool = True
 
         while index < len(lines):
-            line, line_type = lines[index]
-
-            # TODO
-
-            addon_lines.append((line, line_type))
+            _, line_type = lines[index]
             index += 1
 
+            if counter.possible_to_increment(line_type):
+                if line_type.is_if_enter():
+                    for part in self.create_possible_parts_inside_if(
+                        lines,
+                        index + 1,
+                    ):
+                        print(part)
+                        if counter.can_add_another_if_enter():
+                            yield EmptyIfAddon(part, index)
+                            counter.add_fake_if_enter()
+                        else:
+                            yield NewFunctionAddon(part, index, current_name, function_index)
+                            function_index += 1
+                    continue
+
+                counter.increment(line_type)
+                continue
+
+            yield NoChangeAddon(
+                lines[index - 1:],
+                index,
+            )
+
+            rest = self.remove_rest_from_lines(lines, index)
+            yield NewFunctionAddon(rest, index, current_name, function_index)
+            function_index += 1
+
     def process_part(self, part: Part) -> None:
-        addons: list[Addon] = list(self.get_addons_from_lines(part.lines, current_name=part.name))
+        addons: list[Addon] = []
+        for addon in self.get_addons_from_lines(
+            part.lines,
+            current_name=part.name,
+            function_index=2,
+        ):
+            print(addon)
+            addons.append(addon)
+
         for addon in reversed(addons):
             addon.add_to_middle(part.lines)
         for addon in addons:
