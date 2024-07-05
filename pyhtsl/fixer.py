@@ -58,6 +58,12 @@ class Counter:
     def add_fake_if_enter(self) -> None:
         self.mapping[LineType.if_and_enter] = self.mapping.get(LineType.if_and_enter, 0) + 1
 
+    def add_fake_function_trigger(self) -> None:
+        self.mapping[LineType.trigger_function] = self.mapping.get(LineType.trigger_function, 0) + 1
+
+    def remove_fake_function_trigger(self) -> None:
+        self.mapping[LineType.trigger_function] -= 1
+
     def limit_reached(self) -> bool:
         return (
             self.if_enters() > Counter.IF_ENTER_LIMIT
@@ -65,6 +71,7 @@ class Counter:
             or self.mapping.get(LineType.global_stat_change, 0) > 10
             or self.mapping.get(LineType.team_stat_change, 0) > 10
             or self.mapping.get(LineType.misc_stat_change, 0) > 10
+            or self.mapping.get(LineType.trigger_function, 0) > 10
         )
 
 
@@ -118,16 +125,16 @@ class NewFunctionAddon(Addon):
         self.raw_function_name = function_name
         self.function_index = function_index
 
-    def function_name(self) -> str:
-        return f'{self.raw_function_name if self.raw_function_name is not None else "Rename Me"} {self.function_index}'
+    def has_unknown_name(self) -> bool:
+        return self.raw_function_name is None
 
-    def maybe_commented(self) -> str:
-        return '// ' if self.raw_function_name is None else ''
+    def function_name(self) -> str:
+        return f'{self.raw_function_name if not self.has_unknown_name() else "!!! Rename Me"} {self.function_index}'
 
     def add_to_middle(self, append_to: list[tuple[str, LineType]]) -> int:
         append_to.insert(self.add_to_middle_index, (
             (
-                f'{self.maybe_commented()}function "{self.function_name()}" false'
+                f'function "{self.function_name()}" false'
                 '  // PyHTSL filler'
             ),
             LineType.trigger_function,
@@ -137,7 +144,7 @@ class NewFunctionAddon(Addon):
     def create_goto_line(self) -> tuple[str, LineType]:
         return (
             (
-                f'{self.maybe_commented()}goto function "{self.function_name()}"'
+                f'goto function "{self.function_name()}"'
                 '  // PyHTSL filler'
             ),
             LineType.goto,
@@ -215,7 +222,7 @@ class Fixer:
         section: list[tuple[str, LineType]] = []
         for _ in range(index, len(lines)):
             line, line_type = lines[index]
-            if line_type is LineType.if_exit:
+            if line_type is LineType.if_exit or line_type is LineType.else_exit:
                 break
             lines.pop(index)
 
@@ -257,17 +264,22 @@ class Fixer:
         function_index: int = 1,
     ) -> list[Addon]:
         counter: Counter = Counter()
+
+        # To account for the filler function call if nessessary
+        # This can result in some weird behavior but should not be a problem
+        # See [SECOND PART] where this is reverted to not cause any issues
+        counter.add_fake_function_trigger()
+
         index: int = 0
         addons: list[Addon] = []
 
         while index < len(lines):
             _, line_type = lines[index]
-            print(f'GOING OVER LINE: {_} --- {line_type}')
             index += 1
 
             if counter.possible_to_increment(line_type):
                 counter.increment(line_type)
-                if line_type.is_if_enter():
+                if line_type.is_if_enter() or line_type is LineType.else_enter:
                     line_sections = list(self.create_and_remove_line_sections_inside_if(lines, index))
                     for i, section in enumerate(line_sections):
                         if i == 0:
@@ -281,6 +293,12 @@ class Fixer:
                             index += addon.add_to_middle(lines)
                 continue
 
+            # [SECOND PART]
+            if line_type is LineType.trigger_function and index == len(lines):
+                counter.remove_fake_function_trigger()
+                index -= 1
+                continue
+
             if counter.can_add_another_if_enter():
                 counter.add_fake_if_enter()
                 addon = EmptyIfAddon(
@@ -290,6 +308,7 @@ class Fixer:
                 addons.append(addon)
                 index += addon.add_to_middle(lines) - 2
             else:
+                counter.add_fake_function_trigger()
                 rest = self.remove_rest_from_lines(lines, index - 1)
                 function_index += 1
                 rest_addons = self.fix_lines(rest, current_name=current_name, function_index=function_index)
