@@ -80,7 +80,7 @@ class Addon(ABC):
         self.add_to_middle_index = add_to_middle_index
 
     @abstractmethod
-    def add_to_middle(self, append_to: list[tuple[str, LineType]]) -> None:
+    def add_to_middle(self, append_to: list[tuple[str, LineType]]) -> int:
         raise NotImplementedError
 
     @abstractmethod
@@ -88,25 +88,26 @@ class Addon(ABC):
         raise NotImplementedError
 
 
-@final
-class NoChangeAddon(Addon):
-    def add_to_middle(self, append_to: list[tuple[str, LineType]]) -> None:
-        for line in reversed(self.lines):
-            append_to.insert(self.add_to_middle_index, line)
+# @final
+# class NoChangeAddon(Addon):
+#     def add_to_middle(self, append_to: list[tuple[str, LineType]]) -> None:
+#         for line in reversed(self.lines):
+#             append_to.insert(self.add_to_middle_index, line)
 
-    def add_to_end(self, append_to: list[tuple[str, LineType]]) -> None:
-        pass
+#     def add_to_end(self, append_to: list[tuple[str, LineType]]) -> None:
+#         pass
 
 
 @final
 class EmptyIfAddon(Addon):
-    def add_to_middle(self, append_to: list[tuple[str, LineType]]) -> None:
+    def add_to_middle(self, append_to: list[tuple[str, LineType]]) -> int:
         for line in reversed((
             ('if and () {', LineType.if_and_enter),
             *self.lines,
             ('}', LineType.if_exit),
         )):
             append_to.insert(self.add_to_middle_index, line)
+        return len(self.lines) + 2
 
     def add_to_end(self, append_to: list[tuple[str, LineType]]) -> None:
         pass
@@ -133,7 +134,7 @@ class NewFunctionAddon(Addon):
     def maybe_commented(self) -> str:
         return '// ' if self.raw_function_name is None else ''
 
-    def add_to_middle(self, append_to: list[tuple[str, LineType]]) -> None:
+    def add_to_middle(self, append_to: list[tuple[str, LineType]]) -> int:
         append_to.insert(self.add_to_middle_index, (
             (
                 f'{self.maybe_commented()}function "{self.function_name()}" false'
@@ -141,6 +142,7 @@ class NewFunctionAddon(Addon):
             ),
             LineType.trigger_function,
         ))
+        return 1
 
     def create_goto_line(self) -> tuple[str, LineType]:
         return (
@@ -167,7 +169,14 @@ class Fixer:
         parts: list[Part] = []
         for part in self.create_parts():
             print(f'PART: {part.name} --- ', '\n'.join(map(str, part.lines)), ' --- PART')
-            self.fix_lines(part.lines, current_name=part.name)
+            addons = self.fix_lines(part.lines, current_name=part.name)
+            print(f'PART AFTER: {part.name} --- ', '\n'.join(map(str, part.lines)), ' --- PART')
+
+            for addon in addons:
+                if isinstance(addon, NewFunctionAddon):
+                    self.new_functions_added.append(addon)
+                addon.add_to_end(part.lines)
+
             parts.append(part)
 
         lines = []
@@ -201,28 +210,6 @@ class Fixer:
         if current_lines:
             yield Part(name, current_lines)
 
-    def fix_lines(
-        self,
-        lines: list[tuple[str, LineType]],
-        *,
-        current_name: Optional[str] = None,
-        function_index: int = 1,
-    ) -> None:
-        addons: list[Addon] = []
-        for addon in self.get_addons_from_lines(
-            lines,
-            current_name=current_name,
-            function_index=function_index,
-        ):
-            print(addon)
-            addons.append(addon)
-        print('\n\nLINES IN MIDDLE ---', '\n'.join(map(str, lines)), '--- LINES IN MIDDLE\n\n')
-        for addon in reversed(addons):
-            addon.add_to_middle(lines)
-        for addon in addons:
-            print("ADDON ADDING TO END", addon, '\n\t'.join(map(str, lines)))
-            addon.add_to_end(lines)
-
     def remove_rest_from_lines(
         self,
         lines: list[tuple[str, LineType]],
@@ -233,7 +220,7 @@ class Fixer:
             rest.append(lines.pop(index))
         return rest
 
-    def create_and_remove_possible_parts_inside_if(
+    def create_and_remove_line_sections_inside_if(
         self,
         lines: list[tuple[str, LineType]],
         index: int,
@@ -258,15 +245,16 @@ class Fixer:
         if part:
             yield part
 
-    def get_addons_from_lines(
+    def fix_lines(
         self,
         lines: list[tuple[str, LineType]],
         *,
         current_name: Optional[str],
-        function_index: int,
-    ) -> Generator[Addon, None, None]:
+        function_index: int = 1,
+    ) -> list[Addon]:
         counter: Counter = Counter()
         index: int = 0
+        addons: list[Addon] = []
 
         while index < len(lines):
             _, line_type = lines[index]
@@ -275,35 +263,26 @@ class Fixer:
             if counter.possible_to_increment(line_type):
                 counter.increment(line_type)
                 if line_type.is_if_enter():
-                    for i, part in enumerate(list(self.create_and_remove_possible_parts_inside_if(
-                        lines,
-                        index,
-                    ))):
+                    line_sections = list(self.create_and_remove_line_sections_inside_if(lines, index))
+                    for i, section in enumerate(line_sections):
                         if i == 0:
-                            popped = lines.pop(index)
-                            lines.extend(part)
-                            index += len(part) + 1
-                            lines.insert(index, popped) 
+                            for _ in range(len(section)):
+                                lines.insert(index, section.pop(0))
+                                index += 1
                         else:
                             function_index += 1
-                            yield NewFunctionAddon(part, index - 1, current_name, function_index)
+                            addon = NewFunctionAddon(section, index, current_name, function_index)
+                            addons.append(addon)
+                            index += addon.add_to_middle(lines)
                 continue
 
             rest = self.remove_rest_from_lines(lines, index - 1)
-            # print('LINES----', '\n'.join(map(str, lines)), '----LINES')
-            # print('REST----', '\n'.join(map(str, rest)), '----REST')
-            # yield NoChangeAddon(
-            #     lines.copy(),
-            #     index,
-            # )
-            # lines.clear()
 
-            # TODO
-
-            # print('NEW FUNCTION', _, line_type, index, rest)
             function_index += 1
-            self.fix_lines(rest, current_name=current_name, function_index=function_index)
-            yield NewFunctionAddon(rest, index, current_name, function_index)
-            break
+            rest_addons = self.fix_lines(rest, current_name=current_name, function_index=function_index)
+            addon = NewFunctionAddon(rest, index, current_name, function_index)
+            addons.append(addon)
+            index += addon.add_to_middle(lines)
+            addons.extend(rest_addons)
 
-        # lines.extend(add_to_end)
+        return addons
