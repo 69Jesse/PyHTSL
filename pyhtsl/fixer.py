@@ -159,12 +159,12 @@ class NewFunctionAddon(Addon):
         self.raw_function_name = function_name
         self.function_index = function_index
         if not self.has_unknown_name():
-            LOGGER.log('\x1b[38;2;0;255;0mNote:\x1b[0m Created a new function named "\x1b[38;2;255;0;0m{new_container_name}\x1b[0m" to prevent too many stat changes.')
+            LOGGER.log(f'\x1b[38;2;0;255;0mNote:\x1b[0m Created a new function named "\x1b[38;2;255;0;0m{self.function_name()}\x1b[0m" to prevent too many stat changes.')
         else:
             LOGGER.log(
                 '\x1b[38;2;255;0;0mWarning:\x1b[0m You exceeded the conditional limit, and you are not in an explicit container.'
                 '\n         To prevent this, use the \x1b[38;2;255;0;0m@create_function()\x1b[0m decorator or the \x1b[38;2;255;0;0mgoto()\x1b[0m function.'
-                '\n         Or uncomment the line I created for you and change the name of the function.'
+                f'\n         I created the function with the name "\x1b[38;2;255;0;0m{self.function_name()}\x1b[0m" to prevent any issues.'
             )
 
     def has_unknown_name(self) -> bool:
