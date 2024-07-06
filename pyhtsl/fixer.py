@@ -320,16 +320,21 @@ class Fixer:
                 counter.increment(line_type)
                 if line_type.is_if_enter() or line_type is LineType.else_enter:
                     line_sections = list(self.create_and_remove_line_sections_inside_if(lines, index))
+                    previous_section: list[tuple[str, LineType]] = []
                     for i, section in enumerate(line_sections):
                         if i == 0:
                             for _ in range(len(section)):
                                 lines.insert(index, section.pop(0))
                                 index += 1
+                            previous_section = lines
                         else:
                             function_index += 1
-                            addon = NewFunctionAddon(section, index, current_name, function_index)
+                            addon = NewFunctionAddon(section, index if previous_section is lines else len(previous_section), current_name, function_index)
                             addons.append(addon)
-                            index += addon.add_to_middle(lines)
+                            index_diff = addon.add_to_middle(previous_section)
+                            if previous_section is lines:
+                                index += index_diff
+                            previous_section = section
                 continue
 
             # [SECOND PART]
