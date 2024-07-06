@@ -15,4 +15,7 @@ def delete_all_items_from_imports_folder() -> None:
         if not path.name.startswith('_'):
             continue
         path.unlink()
-        print(f'\x1b[38;2;255;0;0mDeleted the .json file at the following location:\x1b[0m\n{path.absolute()}')
+        print(
+            'Found and \033[38;2;255;0;0mdeleted\033[0m the following \033[38;2;255;0;0m.json file\033[0m:'
+            f'\n  \033[38;2;255;0;0m-\033[0m {path.absolute()}'
+        )
