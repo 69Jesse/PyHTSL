@@ -94,9 +94,9 @@ class Counter:
             or self.mapping.get(LineType.misc_stat_change, 0) > 10
 
             # 9 instead of 10 to account for the filler function call if nessessary
-            # This can result in some weird behavior but should not be a problem
-            # See [SECOND PART] where this is reverted to not cause any issues
-            # TODO fix it fully, have no clue how to do that tho...
+            # This results in some tiny inefficiencies in some cases.
+            # See [9 INSTEAD OF 10] for a fix in one case. Maybe TODO:
+            # fix it fully, but right now I have no clue how to do that.
             or self.mapping.get(LineType.trigger_function, 0) > 9
         )
 
@@ -337,7 +337,7 @@ class Fixer:
                             previous_section = section
                 continue
 
-            # [SECOND PART]
+            # [9 INSTEAD OF 10]
             if line_type is LineType.trigger_function and index == len(lines):
                 counter.remove_fake_function_trigger()
                 index -= 1
