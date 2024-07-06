@@ -14,6 +14,27 @@ __all__ = (
 GOTO_LINE_REGEX = re.compile(r'^goto (.+?) "(.+)"$')
 
 
+class AntiSpamLogger:
+    last_logged: Optional[str]
+    amount_logged: int
+    def __init__(self) -> None:
+        self.last_logged = None
+        self.amount_logged = 0
+
+    def log(self, message: str) -> None:
+        if self.last_logged is not None and self.last_logged != message:
+            print(f' \x1b[38;2;255;0;0m(x{self.amount_logged})\x1b[0m' * (self.amount_logged > 1))
+        if self.last_logged == message:
+            self.amount_logged += 1
+            return
+        self.last_logged = message
+        self.amount_logged = 1
+        print(message, end='')
+
+
+LOGGER = AntiSpamLogger()
+
+
 class Part:
     name: Optional[str]
     lines: list[tuple[str, LineType]]
@@ -71,7 +92,12 @@ class Counter:
             or self.mapping.get(LineType.global_stat_change, 0) > 10
             or self.mapping.get(LineType.team_stat_change, 0) > 10
             or self.mapping.get(LineType.misc_stat_change, 0) > 10
-            or self.mapping.get(LineType.trigger_function, 0) > 10
+
+            # 9 instead of 10 to account for the filler function call if nessessary
+            # This can result in some weird behavior but should not be a problem
+            # See [SECOND PART] where this is reverted to not cause any issues
+            # TODO fix it fully, have no clue how to do that tho...
+            or self.mapping.get(LineType.trigger_function, 0) > 9
         )
 
 
@@ -97,6 +123,14 @@ class Addon(ABC):
 
 @final
 class EmptyIfAddon(Addon):
+    def __init__(
+        self,
+        lines: list[tuple[str, LineType]],
+        add_to_middle_index: int,
+    ) -> None:
+        super().__init__(lines, add_to_middle_index)
+        LOGGER.log()
+
     def add_to_middle(self, append_to: list[tuple[str, LineType]]) -> int:
         for line in reversed((
             ('if and () {', LineType.if_and_enter),
@@ -264,11 +298,6 @@ class Fixer:
         function_index: int = 1,
     ) -> list[Addon]:
         counter: Counter = Counter()
-
-        # To account for the filler function call if nessessary
-        # This can result in some weird behavior but should not be a problem
-        # See [SECOND PART] where this is reverted to not cause any issues
-        counter.add_fake_function_trigger()
 
         index: int = 0
         addons: list[Addon] = []
