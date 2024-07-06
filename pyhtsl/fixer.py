@@ -129,7 +129,7 @@ class EmptyIfAddon(Addon):
         add_to_middle_index: int,
     ) -> None:
         super().__init__(lines, add_to_middle_index)
-        LOGGER.log()
+        LOGGER.log('\x1b[38;2;0;255;0mNote:\x1b[0m Added a conditional to prevent too many stat changes.')
 
     def add_to_middle(self, append_to: list[tuple[str, LineType]]) -> int:
         for line in reversed((
@@ -158,6 +158,14 @@ class NewFunctionAddon(Addon):
         super().__init__(lines, add_to_middle_index)
         self.raw_function_name = function_name
         self.function_index = function_index
+        if not self.has_unknown_name():
+            LOGGER.log('\x1b[38;2;0;255;0mNote:\x1b[0m Created a new function named "\x1b[38;2;255;0;0m{new_container_name}\x1b[0m" to prevent too many stat changes.')
+        else:
+            LOGGER.log(
+                '\x1b[38;2;255;0;0mWarning:\x1b[0m You exceeded the conditional limit, and you are not in an explicit container.'
+                '\n         To prevent this, use the \x1b[38;2;255;0;0m@create_function()\x1b[0m decorator or the \x1b[38;2;255;0;0mgoto()\x1b[0m function.'
+                '\n         Or uncomment the line I created for you and change the name of the function.'
+            )
 
     def has_unknown_name(self) -> bool:
         return self.raw_function_name is None
@@ -211,6 +219,8 @@ class Fixer:
             lines.extend(part.lines)
         for addon in reversed(self.new_functions_added):
             lines.insert(0, addon.create_goto_line())
+
+        LOGGER.log('')
         return lines
 
     def find_container_and_name_from_goto(self, line: str) -> tuple[Optional[str], Optional[str]]:
