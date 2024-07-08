@@ -2,7 +2,7 @@ from ..writer import LineType
 from ..stat.stat import Stat
 from .team import Team
 
-from typing import final
+from typing import final, Optional
 
 
 __all__ = (
@@ -12,10 +12,10 @@ __all__ = (
 
 @final
 class TeamStat(Stat):
-    team: 'Team'
-    def __init__(self, name: str, team: 'Team | str') -> None:
+    team: Optional['Team']
+    def __init__(self, name: str, team: Optional['Team | str'] = None) -> None:
         super().__init__(name)
-        self.team = team if isinstance(team, Team) else Team(team)
+        self.team = team if isinstance(team, Team) else Team(team) if team is not None else None
 
     @staticmethod
     def get_prefix() -> str:
@@ -30,4 +30,4 @@ class TeamStat(Stat):
         return LineType.team_stat_change
 
     def get_htsl_formatted(self) -> str:
-        return f'{super().get_htsl_formatted()} {self.team.name}'
+        return f'{super().get_htsl_formatted()} {self.team.name if self.team is not None else 'None'}'
