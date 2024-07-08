@@ -1,5 +1,5 @@
 from ..writer import WRITER, LineType
-from ..types import ALL_POSSIBLE_ENCHANTMENTS
+from ..types import ALL_ENCHANTMENTS
 from .enchantment import Enchantment
 
 from typing import Optional
@@ -11,7 +11,7 @@ __all__ = (
 
 
 def enchant_held_item(
-    enchantment: ALL_POSSIBLE_ENCHANTMENTS | Enchantment,
+    enchantment: ALL_ENCHANTMENTS | Enchantment,
     level: Optional[int] = None,
 ) -> None:
     if isinstance(enchantment, Enchantment):

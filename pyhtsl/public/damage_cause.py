@@ -1,5 +1,5 @@
 from ..condition import TinyCondition
-from ..types import DAMAGE_CAUSES
+from ..types import ALL_DAMAGE_CAUSES
 
 from typing import final
 
@@ -14,7 +14,7 @@ class DamageCause(TinyCondition):
     damage_cause: str
     def __init__(
         self,
-        damage_cause: DAMAGE_CAUSES,
+        damage_cause: ALL_DAMAGE_CAUSES,
     ) -> None:
         self.damage_cause = damage_cause
 

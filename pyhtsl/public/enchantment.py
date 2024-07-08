@@ -1,4 +1,4 @@
-from ..types import ALL_POSSIBLE_ENCHANTMENTS
+from ..types import ALL_ENCHANTMENTS
 
 from typing import Optional
 
@@ -9,11 +9,11 @@ __all__ = (
 
 
 class Enchantment:
-    name: ALL_POSSIBLE_ENCHANTMENTS
+    name: ALL_ENCHANTMENTS
     level: Optional[int]
     def __init__(
         self,
-        name: ALL_POSSIBLE_ENCHANTMENTS,
+        name: ALL_ENCHANTMENTS,
         level: Optional[int] = None,
     ) -> None:
         self.name = name

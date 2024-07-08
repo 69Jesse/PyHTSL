@@ -5,20 +5,24 @@ from typing import Literal
 
 __all__ = (
     'IfStatement',
-    'POTION_EFFECTS',
-    'DAMAGE_CAUSES',
-    'ALL_POSSIBLE_ENCHANTMENTS',
+    'ALL_POTION_EFFECTS',
+    'ALL_DAMAGE_CAUSES',
+    'ALL_ENCHANTMENTS',
     'ENCHANTMENT_TO_ID',
     'INVENTORY_SLOTS',
     'NON_SPECIAL_ITEM_KEYS',
     'DAMAGEABLE_ITEM_KEYS',
     'LEATHER_ARMOR_KEYS',
-    'ALL_POSSIBLE_ITEM_KEYS',
-    'LOCATIONS',
+    'ALL_ITEM_KEYS',
+    'ALL_LOCATIONS',
+    'ALL_SOUNDS_PRETTY',
+    'ALL_SOUNDS_RAW',
+    'ALL_SOUNDS_PRETTY_TO_RAW',
+    'ALL_LOCATIONS',
 )
 
 
-POTION_EFFECTS = Literal[
+ALL_POTION_EFFECTS = Literal[
     'speed',
     'slowness',
     'haste',
@@ -44,7 +48,7 @@ POTION_EFFECTS = Literal[
 ]
 
 
-DAMAGE_CAUSES = Literal[
+ALL_DAMAGE_CAUSES = Literal[
     'entity_attack',
     'projectile',
     'suffocation',
@@ -59,7 +63,7 @@ DAMAGE_CAUSES = Literal[
 ]
 
 
-ALL_POSSIBLE_ENCHANTMENTS = Literal[
+ALL_ENCHANTMENTS = Literal[
     'protection',
     'fire_protection',
     'feather_falling',
@@ -88,7 +92,7 @@ ALL_POSSIBLE_ENCHANTMENTS = Literal[
 ]
 
 
-ENCHANTMENT_TO_ID: dict[ALL_POSSIBLE_ENCHANTMENTS, int] = {
+ENCHANTMENT_TO_ID: dict[ALL_ENCHANTMENTS, int] = {
     'protection': 0,
     'fire_protection': 1,
     'feather_falling': 2,
@@ -253,12 +257,119 @@ LEATHER_ARMOR_KEYS = Literal[
 ]
 
 
-ALL_POSSIBLE_ITEM_KEYS = NON_SPECIAL_ITEM_KEYS | DAMAGEABLE_ITEM_KEYS | LEATHER_ARMOR_KEYS
+ALL_ITEM_KEYS = NON_SPECIAL_ITEM_KEYS | DAMAGEABLE_ITEM_KEYS | LEATHER_ARMOR_KEYS
 
 
-LOCATIONS = Literal[
+ALL_LOCATIONS = Literal[
     'house_spawn',
     'current_location',
     'invokers_location',
     'custom_coordinates',
 ]
+
+
+ALL_SOUNDS_PRETTY = Literal[
+    'Ambience Cave', 'Ambience Rain', 'Ambience Thunder', 'Anvil Break', 'Anvil Land', 'Anvil Use', 'Arrow Hit', 'Burp',
+    'Chest Close', 'Chest Open', 'Click', 'Door Close', 'Door Open', 'Drink', 'Eat', 'Explode',
+    'Fall Big', 'Fall Small', 'Fizz', 'Fuse', 'Glass', 'Hurt Flesh', 'Item Break', 'Item Pickup',
+    'Lava Pop', 'Level Up', 'Note Bass', 'Note Piano', 'Note Bass Drum', 'Note Sticks', 'Note Bass Guitar', 'Note Snare Drum',
+    'Note Pling', 'Orb Pickup', 'Shoot Arrow', 'Splash', 'Swim', 'Wood Click', 'Bat Death', 'Bat Hurt',
+    'Bat Idle', 'Bat Loop', 'Bat Takeoff', 'Blaze Breath', 'Blaze Death', 'Blaze Hit', 'Cat Hiss', 'Cat Hit',
+    'Cat Meow', 'Cat Purr', 'Cat Purreow', 'Chicken Idle', 'Chicken Hurt', 'Chicken Egg Pop', 'Chicken Walk', 'Cow Idle',
+    'Cow Hurt', 'Cow Walk', 'Creeper Hiss', 'Creeper Death', 'Enderdragon Death', 'Enderdragon Growl', 'Enderdragon Hit', 'Enderdragon Wings',
+    'Enderman Death', 'Enderman Hit', 'Enderman Idle', 'Enderman Teleport', 'Enderman Scream', 'Enderman Stare', 'Ghast Scream', 'Ghast Scream2',
+    'Ghast Charge', 'Ghast Death', 'Ghast Fireball', 'Ghast Moan', 'Guardian Hit', 'Guardian Idle', 'Guardian Death', 'Guardian Elder Hit',
+    'Guardian Elder Idle', 'Guardian Elder Death', 'Guardian Land Hit', 'Guardian Land Idle', 'Guardian Land Death', 'Guardian Curse', 'Guardian Attack', 'Guardian Flop',
+    'Irongolem Death', 'Irongolem Hit', 'Irongolem Throw', 'Irongolem Walk', 'Magmacube Walk', 'Magmacube Walk2', 'Magmacube Jump', 'Pig Idle',
+    'Pig Death', 'Pig Walk', 'Rabbit Ambient', 'Rabbit Death', 'Rabbit Hurt', 'Rabbit Jump', 'Sheep Idle', 'Sheep Shear',
+    'Sheep Walk', 'Silverfish Hit', 'Silverfish Kill', 'Silverfish Idle', 'Silverfish Walk', 'Skeleton Idle', 'Skeleton Death', 'Skeleton Hurt',
+    'Skeleton Walk', 'Slime Attack', 'Slime Walk', 'Slime Walk2', 'Spider Idle', 'Spider Death', 'Spider Walk', 'Wither Death',
+    'Wither Hurt', 'Wither Idle', 'Wither Shoot', 'Wither Spawn', 'Wolf Bark', 'Wolf Death', 'Wolf Growl', 'Wolf Howl',
+    'Wolf Hurt', 'Wolf Pant', 'Wolf Shake', 'Wolf Walk', 'Wolf Whine', 'Zombie Metal', 'Zombie Wood', 'Zombie Woodbreak',
+    'Zombie Idle', 'Zombie Death', 'Zombie Hurt', 'Zombie Infect', 'Zombie Unfect', 'Zombie Remedy', 'Zombie Walk', 'Zombie Pig Idle',
+    'Zombie Pig Angry', 'Zombie Pig Death', 'Zombie Pig Hurt', 'Firework Blast', 'Firework Blast2', 'Firework Large Blast', 'Firework Large Blast2', 'Firework Twinkle',
+    'Firework Twinkle2', 'Firework Launch', 'Successful Hit', 'Horse Angry', 'Horse Armor', 'Horse Breathe', 'Horse Death', 'Horse Gallop',
+    'Horse Hit', 'Horse Idle', 'Horse Jump', 'Horse Land', 'Horse Saddle', 'Horse Soft', 'Horse Wood', 'Donkey Angry',
+    'Donkey Death', 'Donkey Hit', 'Donkey Idle', 'Horse Skeleton Death', 'Horse Skeleton Hit', 'Horse Skeleton Idle', 'Horse Zombie Death', 'Horse Zombie Hit',
+    'Horse Zombie Idle', 'Villager Death', 'Villager Haggle', 'Villager Hit', 'Villager Idle', 'Villager No', 'Villager Yes',
+]
+
+
+ALL_SOUNDS_RAW = Literal[
+    'ambient.cave.cave', 'ambient.weather.rain', 'ambient.weather.thunder', 'random.anvil_break', 'random.anvil_land', 'random.anvil_use', 'random.bowhit', 'random.burp',
+    'random.chestclosed', 'random.chestopen', 'random.click', 'random.door_close', 'random.door_open', 'random.drink', 'random.eat', 'random.explode',
+    'game.player.hurt.fall.big', 'game.player.hurt.fall.small', 'random.fizz', 'game.tnt.primed', 'dig.glass', 'game.player.hurt', 'random.break', 'random.pop',
+    'liquid.lavapop', 'random.levelup', 'note.bass', 'note.harp', 'note.bd', 'note.hat', 'note.bassattack', 'note.snare',
+    'note.pling', 'random.orb', 'random.bow', 'game.player.swim.splash', 'game.player.swim', 'random.wood_click', 'mob.bat.death', 'mob.bat.hurt',
+    'mob.bat.idle', 'mob.bat.loop', 'mob.bat.takeoff', 'mob.blaze.breathe', 'mob.blaze.death', 'mob.blaze.hit', 'mob.cat.hiss', 'mob.cat.hitt',
+    'mob.cat.meow', 'mob.cat.purr', 'mob.cat.purreow', 'mob.chicken.say', 'mob.chicken.hurt', 'mob.chicken.plop', 'mob.chicken.step', 'mob.cow.say',
+    'mob.cow.hurt', 'mob.cow.step', 'mob.creeper.say', 'mob.creeper.death', 'mob.enderdragon.end', 'mob.enderdragon.growl', 'mob.enderdragon.hit', 'mob.enderdragon.wings',
+    'mob.endermen.death', 'mob.endermen.hit', 'mob.endermen.idle', 'mob.endermen.portal', 'mob.endermen.scream', 'mob.endermen.stare', 'mob.ghast.scream', 'mob.ghast.affectionate_scream',
+    'mob.ghast.charge', 'mob.ghast.death', 'mob.ghast.fireball', 'mob.ghast.moan', 'mob.guardian.hit', 'mob.guardian.idle', 'mob.guardian.death', 'mob.guardian.elder.hit',
+    'mob.guardian.elder.idle', 'mob.guardian.elder.death', 'mob.guardian.land.hit', 'mob.guardian.land.idle', 'mob.guardian.land.death', 'mob.guardian.curse', 'mob.guardian.attack', 'mob.guardian.flop',
+    'mob.irongolem.death', 'mob.irongolem.hit', 'mob.irongolem.throw', 'mob.irongolem.walk', 'mob.magmacube.small', 'mob.magmacube.big', 'mob.magmacube.jump', 'mob.pig.say',
+    'mob.pig.death', 'mob.pig.step', 'mob.rabbit.idle', 'mob.rabbit.death', 'mob.rabbit.hurt', 'mob.rabbit.hop', 'mob.sheep.say', 'mob.sheep.shear',
+    'mob.sheep.step', 'mob.silverfish.hit', 'mob.silverfish.kill', 'mob.silverfish.say', 'mob.silverfish.step', 'mob.skeleton.say', 'mob.skeleton.death', 'mob.skeleton.hurt',
+    'mob.skeleton.step', 'mob.slime.attack', 'mob.slime.small', 'mob.slime.big', 'mob.spider.say', 'mob.spider.death', 'mob.spider.step', 'mob.wither.death',
+    'mob.wither.hurt', 'mob.wither.idle', 'mob.wither.shoot', 'mob.wither.spawn', 'mob.wolf.bark', 'mob.wolf.death', 'mob.wolf.growl', 'mob.wolf.howl',
+    'mob.wolf.hurt', 'mob.wolf.panting', 'mob.wolf.shake', 'mob.wolf.step', 'mob.wolf.whine', 'mob.zombie.metal', 'mob.zombie.wood', 'mob.zombie.woodbreak',
+    'mob.zombie.say', 'mob.zombie.death', 'mob.zombie.hurt', 'mob.zombie.infect', 'mob.zombie.unfect', 'mob.zombie.remedy', 'mob.zombie.step', 'mob.zombiepig.zpig',
+    'mob.zombiepig.zpigangry', 'mob.zombiepig.zpigdeath', 'mob.zombiepig.zpighurt', 'fireworks.blast', 'fireworks.blast_far', 'fireworks.largeBlast', 'fireworks.largeBlast_far', 'fireworks.twinkle',
+    'fireworks.twinkle_far', 'fireworks.launch', 'random.successful_hit', 'mob.horse.angry', 'mob.horse.armor', 'mob.horse.breathe', 'mob.horse.death', 'mob.horse.gallop',
+    'mob.horse.hit', 'mob.horse.idle', 'mob.horse.jump', 'mob.horse.land', 'mob.horse.leather', 'mob.horse.soft', 'mob.horse.wood', 'mob.horse.donkey.angry',
+    'mob.horse.donkey.death', 'mob.horse.donkey.hit', 'mob.horse.donkey.idle', 'mob.horse.skeleton.death', 'mob.horse.skeleton.hit', 'mob.horse.skeleton.idle', 'mob.horse.zombie.death', 'mob.horse.zombie.hit',
+    'mob.horse.zombie.idle', 'mob.villager.death', 'mob.villager.haggle', 'mob.villager.hit', 'mob.villager.idle', 'mob.villager.no', 'mob.villager.yes',
+]
+
+
+ALL_SOUNDS_PRETTY_TO_RAW = {
+    'Ambience Cave': 'ambient.cave.cave', 'Ambience Rain': 'ambient.weather.rain', 'Ambience Thunder': 'ambient.weather.thunder', 'Anvil Break': 'random.anvil_break',
+    'Anvil Land': 'random.anvil_land', 'Anvil Use': 'random.anvil_use', 'Arrow Hit': 'random.bowhit', 'Burp': 'random.burp',
+    'Chest Close': 'random.chestclosed', 'Chest Open': 'random.chestopen', 'Click': 'random.click', 'Door Close': 'random.door_close',
+    'Door Open': 'random.door_open', 'Drink': 'random.drink', 'Eat': 'random.eat', 'Explode': 'random.explode',
+    'Fall Big': 'game.player.hurt.fall.big', 'Fall Small': 'game.player.hurt.fall.small', 'Fizz': 'random.fizz', 'Fuse': 'game.tnt.primed',
+    'Glass': 'dig.glass', 'Hurt Flesh': 'game.player.hurt', 'Item Break': 'random.break', 'Item Pickup': 'random.pop',
+    'Lava Pop': 'liquid.lavapop', 'Level Up': 'random.levelup', 'Note Bass': 'note.bass', 'Note Piano': 'note.harp',
+    'Note Bass Drum': 'note.bd', 'Note Sticks': 'note.hat', 'Note Bass Guitar': 'note.bassattack', 'Note Snare Drum': 'note.snare',
+    'Note Pling': 'note.pling', 'Orb Pickup': 'random.orb', 'Shoot Arrow': 'random.bow', 'Splash': 'game.player.swim.splash',
+    'Swim': 'game.player.swim', 'Wood Click': 'random.wood_click', 'Bat Death': 'mob.bat.death', 'Bat Hurt': 'mob.bat.hurt',
+    'Bat Idle': 'mob.bat.idle', 'Bat Loop': 'mob.bat.loop', 'Bat Takeoff': 'mob.bat.takeoff', 'Blaze Breath': 'mob.blaze.breathe',
+    'Blaze Death': 'mob.blaze.death', 'Blaze Hit': 'mob.blaze.hit', 'Cat Hiss': 'mob.cat.hiss', 'Cat Hit': 'mob.cat.hitt',
+    'Cat Meow': 'mob.cat.meow', 'Cat Purr': 'mob.cat.purr', 'Cat Purreow': 'mob.cat.purreow', 'Chicken Idle': 'mob.chicken.say',
+    'Chicken Hurt': 'mob.chicken.hurt', 'Chicken Egg Pop': 'mob.chicken.plop', 'Chicken Walk': 'mob.chicken.step', 'Cow Idle': 'mob.cow.say',
+    'Cow Hurt': 'mob.cow.hurt', 'Cow Walk': 'mob.cow.step', 'Creeper Hiss': 'mob.creeper.say', 'Creeper Death': 'mob.creeper.death',
+    'Enderdragon Death': 'mob.enderdragon.end', 'Enderdragon Growl': 'mob.enderdragon.growl', 'Enderdragon Hit': 'mob.enderdragon.hit', 'Enderdragon Wings': 'mob.enderdragon.wings',
+    'Enderman Death': 'mob.endermen.death', 'Enderman Hit': 'mob.endermen.hit', 'Enderman Idle': 'mob.endermen.idle', 'Enderman Teleport': 'mob.endermen.portal',
+    'Enderman Scream': 'mob.endermen.scream', 'Enderman Stare': 'mob.endermen.stare', 'Ghast Scream': 'mob.ghast.scream', 'Ghast Scream2': 'mob.ghast.affectionate_scream',
+    'Ghast Charge': 'mob.ghast.charge', 'Ghast Death': 'mob.ghast.death', 'Ghast Fireball': 'mob.ghast.fireball', 'Ghast Moan': 'mob.ghast.moan',
+    'Guardian Hit': 'mob.guardian.hit', 'Guardian Idle': 'mob.guardian.idle', 'Guardian Death': 'mob.guardian.death', 'Guardian Elder Hit': 'mob.guardian.elder.hit',
+    'Guardian Elder Idle': 'mob.guardian.elder.idle', 'Guardian Elder Death': 'mob.guardian.elder.death', 'Guardian Land Hit': 'mob.guardian.land.hit', 'Guardian Land Idle': 'mob.guardian.land.idle',
+    'Guardian Land Death': 'mob.guardian.land.death', 'Guardian Curse': 'mob.guardian.curse', 'Guardian Attack': 'mob.guardian.attack', 'Guardian Flop': 'mob.guardian.flop',
+    'Irongolem Death': 'mob.irongolem.death', 'Irongolem Hit': 'mob.irongolem.hit', 'Irongolem Throw': 'mob.irongolem.throw', 'Irongolem Walk': 'mob.irongolem.walk',
+    'Magmacube Walk': 'mob.magmacube.small', 'Magmacube Walk2': 'mob.magmacube.big', 'Magmacube Jump': 'mob.magmacube.jump', 'Pig Idle': 'mob.pig.say',
+    'Pig Death': 'mob.pig.death', 'Pig Walk': 'mob.pig.step', 'Rabbit Ambient': 'mob.rabbit.idle', 'Rabbit Death': 'mob.rabbit.death',
+    'Rabbit Hurt': 'mob.rabbit.hurt', 'Rabbit Jump': 'mob.rabbit.hop', 'Sheep Idle': 'mob.sheep.say', 'Sheep Shear': 'mob.sheep.shear',
+    'Sheep Walk': 'mob.sheep.step', 'Silverfish Hit': 'mob.silverfish.hit', 'Silverfish Kill': 'mob.silverfish.kill', 'Silverfish Idle': 'mob.silverfish.say',
+    'Silverfish Walk': 'mob.silverfish.step', 'Skeleton Idle': 'mob.skeleton.say', 'Skeleton Death': 'mob.skeleton.death', 'Skeleton Hurt': 'mob.skeleton.hurt',
+    'Skeleton Walk': 'mob.skeleton.step', 'Slime Attack': 'mob.slime.attack', 'Slime Walk': 'mob.slime.small', 'Slime Walk2': 'mob.slime.big',
+    'Spider Idle': 'mob.spider.say', 'Spider Death': 'mob.spider.death', 'Spider Walk': 'mob.spider.step', 'Wither Death': 'mob.wither.death',
+    'Wither Hurt': 'mob.wither.hurt', 'Wither Idle': 'mob.wither.idle', 'Wither Shoot': 'mob.wither.shoot', 'Wither Spawn': 'mob.wither.spawn',
+    'Wolf Bark': 'mob.wolf.bark', 'Wolf Death': 'mob.wolf.death', 'Wolf Growl': 'mob.wolf.growl', 'Wolf Howl': 'mob.wolf.howl',
+    'Wolf Hurt': 'mob.wolf.hurt', 'Wolf Pant': 'mob.wolf.panting', 'Wolf Shake': 'mob.wolf.shake', 'Wolf Walk': 'mob.wolf.step',
+    'Wolf Whine': 'mob.wolf.whine', 'Zombie Metal': 'mob.zombie.metal', 'Zombie Wood': 'mob.zombie.wood', 'Zombie Woodbreak': 'mob.zombie.woodbreak',
+    'Zombie Idle': 'mob.zombie.say', 'Zombie Death': 'mob.zombie.death', 'Zombie Hurt': 'mob.zombie.hurt', 'Zombie Infect': 'mob.zombie.infect',
+    'Zombie Unfect': 'mob.zombie.unfect', 'Zombie Remedy': 'mob.zombie.remedy', 'Zombie Walk': 'mob.zombie.step', 'Zombie Pig Idle': 'mob.zombiepig.zpig',
+    'Zombie Pig Angry': 'mob.zombiepig.zpigangry', 'Zombie Pig Death': 'mob.zombiepig.zpigdeath', 'Zombie Pig Hurt': 'mob.zombiepig.zpighurt', 'Firework Blast': 'fireworks.blast',
+    'Firework Blast2': 'fireworks.blast_far', 'Firework Large Blast': 'fireworks.largeBlast', 'Firework Large Blast2': 'fireworks.largeBlast_far', 'Firework Twinkle': 'fireworks.twinkle',
+    'Firework Twinkle2': 'fireworks.twinkle_far', 'Firework Launch': 'fireworks.launch', 'Successful Hit': 'random.successful_hit', 'Horse Angry': 'mob.horse.angry',
+    'Horse Armor': 'mob.horse.armor', 'Horse Breathe': 'mob.horse.breathe', 'Horse Death': 'mob.horse.death', 'Horse Gallop': 'mob.horse.gallop',
+    'Horse Hit': 'mob.horse.hit', 'Horse Idle': 'mob.horse.idle', 'Horse Jump': 'mob.horse.jump', 'Horse Land': 'mob.horse.land',
+    'Horse Saddle': 'mob.horse.leather', 'Horse Soft': 'mob.horse.soft', 'Horse Wood': 'mob.horse.wood', 'Donkey Angry': 'mob.horse.donkey.angry',
+    'Donkey Death': 'mob.horse.donkey.death', 'Donkey Hit': 'mob.horse.donkey.hit', 'Donkey Idle': 'mob.horse.donkey.idle', 'Horse Skeleton Death': 'mob.horse.skeleton.death',
+    'Horse Skeleton Hit': 'mob.horse.skeleton.hit', 'Horse Skeleton Idle': 'mob.horse.skeleton.idle', 'Horse Zombie Death': 'mob.horse.zombie.death', 'Horse Zombie Hit': 'mob.horse.zombie.hit',
+    'Horse Zombie Idle': 'mob.horse.zombie.idle', 'Villager Death': 'mob.villager.death', 'Villager Haggle': 'mob.villager.haggle', 'Villager Hit': 'mob.villager.hit',
+    'Villager Idle': 'mob.villager.idle', 'Villager No': 'mob.villager.no', 'Villager Yes': 'mob.villager.yes',
+}
+
+
+ALL_SOUNDS = ALL_SOUNDS_PRETTY | ALL_SOUNDS_RAW

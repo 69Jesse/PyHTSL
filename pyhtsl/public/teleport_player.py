@@ -1,5 +1,5 @@
 from ..writer import WRITER, LineType
-from ..types import LOCATIONS
+from ..types import ALL_LOCATIONS
 
 from typing import Optional
 
@@ -10,7 +10,7 @@ __all__ = (
 
 # TODO proper overload
 def teleport_player(
-    location: LOCATIONS = 'invokers_location',
+    location: ALL_LOCATIONS = 'invokers_location',
     coordinates: Optional[str] = None
 ) -> None:
     line = f'tp "{location}"'

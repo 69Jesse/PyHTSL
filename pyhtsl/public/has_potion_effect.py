@@ -1,5 +1,5 @@
 from ..condition import TinyCondition
-from ..types import POTION_EFFECTS
+from ..types import ALL_POTION_EFFECTS
 
 from typing import final
 
@@ -14,7 +14,7 @@ class HasPotionEffect(TinyCondition):
     effect: str
     def __init__(
         self,
-        effect: POTION_EFFECTS,
+        effect: ALL_POTION_EFFECTS,
     ) -> None:
         self.effect = effect
 

@@ -1,5 +1,5 @@
 from ..writer import HERE, HTSL_IMPORTS_FOLDER
-from ..types import NON_SPECIAL_ITEM_KEYS, DAMAGEABLE_ITEM_KEYS, LEATHER_ARMOR_KEYS, ALL_POSSIBLE_ITEM_KEYS, ALL_POSSIBLE_ENCHANTMENTS, ENCHANTMENT_TO_ID
+from ..types import NON_SPECIAL_ITEM_KEYS, DAMAGEABLE_ITEM_KEYS, LEATHER_ARMOR_KEYS, ALL_ITEM_KEYS, ALL_ENCHANTMENTS, ENCHANTMENT_TO_ID
 from .enchantment import Enchantment
 
 import json
@@ -58,7 +58,7 @@ class DataType(Enum):
     string = DataTypeCallback(lambda x: '\\"' + x.replace('"', '\\"') + '\\"')
 
 
-EnchantmentsType = dict[Enchantment | ALL_POSSIBLE_ENCHANTMENTS, int] | Iterable[Enchantment | ALL_POSSIBLE_ENCHANTMENTS] | Enchantment | ALL_POSSIBLE_ENCHANTMENTS
+EnchantmentsType = dict[Enchantment | ALL_ENCHANTMENTS, int] | Iterable[Enchantment | ALL_ENCHANTMENTS] | Enchantment | ALL_ENCHANTMENTS
 
 
 SAVED_CACHE: dict[str, str] = {}
@@ -127,7 +127,7 @@ class Item:
     @overload
     def __init__(
         self,
-        key: ALL_POSSIBLE_ITEM_KEYS,
+        key: ALL_ITEM_KEYS,
         *,
         name: Optional[str] = None,
         lore: Optional[str | Iterable[str]] = None,
@@ -143,7 +143,7 @@ class Item:
 
     def __init__(
         self,
-        key: ALL_POSSIBLE_ITEM_KEYS,
+        key: ALL_ITEM_KEYS,
         **extras: Any,
     ) -> None:
         self.key = key

@@ -1,5 +1,5 @@
 from ..writer import WRITER, LineType
-from ..types import POTION_EFFECTS
+from ..types import ALL_POTION_EFFECTS
 
 
 __all__ = (
@@ -8,7 +8,7 @@ __all__ = (
 
 
 def apply_potion_effect(
-    potion: POTION_EFFECTS,
+    potion: ALL_POTION_EFFECTS,
     duration: int = 60,
     level: int = 1,
     override_existing_effects: bool = False,

@@ -1,5 +1,5 @@
 from ..writer import WRITER, LineType
-from ..types import LOCATIONS
+from ..types import ALL_SOUNDS, ALL_SOUNDS_PRETTY_TO_RAW, ALL_LOCATIONS
 
 from typing import Optional
 
@@ -11,12 +11,13 @@ __all__ = (
 
 # TODO proper overload
 def play_sound(
-    sound: str,
+    sound: ALL_SOUNDS,
     volume: float = 0.7,
     pitch: float = 1.0,
-    location: LOCATIONS = 'invokers_location',
+    location: ALL_LOCATIONS = 'invokers_location',
     coordinates: Optional[str] = None
 ) -> None:
+    sound = ALL_SOUNDS_PRETTY_TO_RAW.get(sound, sound)  # pyright: ignore[reportAssignmentType]
     line = f'playSound "{sound}" {volume} {pitch} "{location}"'
     if location == 'custom_coordinates':
         if coordinates is None:
