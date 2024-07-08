@@ -257,7 +257,7 @@ class Item:
             del data['tag']
 
         if extras_copy:
-            print(f'\x1b[38;2;255;0;0mUnused keys whilst saving "{self.key}": {', '.join(extras_copy.keys())}\x1b[0m')
+            print(f'\x1b[38;2;255;0;0mIgnoring unused keys whilst saving "{self.key}": {', '.join(extras_copy.keys())}\x1b[0m')
 
         return '{"item": "' + self.one_lineify(data) + '"}'
 
