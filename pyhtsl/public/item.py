@@ -241,11 +241,23 @@ class Item:
             display = tags.setdefault('display', {})
             display['Name'] = (name, DataType.string)
 
+        color: Optional[int | str | tuple[int, int, int]] = extras_copy.pop('color', None)
+        if color is not None:
+            if not isinstance(color, (int, str, tuple)):
+                raise ValueError(f'Invalid color type: {type(color)}')
+            if isinstance(color, str):
+                color = int(color, 16)
+            elif isinstance(color, tuple):
+                color = color[0] << 16 | color[1] << 8 | color[2]
+            tags['display'] = {
+                'color': (color, DataType.integer),
+            }
+
         if not tags:
             del data['tag']
 
         if extras_copy:
-            print(f'Unused keys: {", ".join(extras_copy.keys())}')
+            print(f'\x1b[38;2;255;0;0mUnused keys whilst saving "{self.key}": {', '.join(extras_copy.keys())}\x1b[0m')
 
         return '{"item": "' + self.one_lineify(data) + '"}'
 
