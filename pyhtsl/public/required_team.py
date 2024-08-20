@@ -19,4 +19,4 @@ class RequiredTeam(TinyCondition):
         self.team = team if isinstance(team, Team) else Team(team)
 
     def __str__(self) -> str:
-        return f'isTeam "{self.team.name}"'
+        return f'hasTeam "{self.team.name}"'

@@ -1,3 +1,10 @@
+from ..condition import PlaceholderValue
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .team_stat import TeamStat
+    from .team_players import TeamPlayers
+
 
 __all__ = (
     'Team',
@@ -13,3 +20,10 @@ class Team:
         if not isinstance(other, Team):
             return NotImplemented
         return self.name == other.name
+
+    if TYPE_CHECKING:
+        def stat(self, key: str) -> TeamStat:
+            return TeamStat(key, self)
+
+        def players(self) -> PlaceholderValue:
+            return TeamPlayers(self)

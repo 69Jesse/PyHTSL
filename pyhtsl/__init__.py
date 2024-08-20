@@ -2,6 +2,8 @@ from .public.player_stat import PlayerStat as PlayerStat
 from .public.global_stat import GlobalStat as GlobalStat
 from .public.team_stat import TeamStat as TeamStat
 
+from .public.team_players import TeamPlayers as TeamPlayers
+
 from .public.if_and import IfAnd as IfAnd
 from .public.if_or import IfOr as IfOr
 from .public._else import Else as Else
