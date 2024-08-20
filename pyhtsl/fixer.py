@@ -11,25 +11,24 @@ __all__ = (
 )
 
 
-GOTO_LINE_REGEX = re.compile(r'^goto (.+?) "(.+)"$')
+GOTO_LINE_REGEX = re.compile(r'^goto (.+?) "(.+)"')
 
 
 class AntiSpamLogger:
-    last_logged: Optional[str]
-    amount_logged: int
+    messages: list[tuple[str, int]]
     def __init__(self) -> None:
-        self.last_logged = None
-        self.amount_logged = 0
+        self.messages = []
 
     def log(self, message: str) -> None:
-        if self.last_logged is not None and self.last_logged != message:
-            print(f' \x1b[38;2;255;0;0m(x{self.amount_logged})\x1b[0m' * (self.amount_logged > 1))
-        if self.last_logged == message:
-            self.amount_logged += 1
-            return
-        self.last_logged = message
-        self.amount_logged = 1
-        print(message, end='')
+        if self.messages and self.messages[-1][0] == message:
+            self.messages[-1] = (message, self.messages[-1][1] + 1)
+        else:
+            self.messages.append((message, 1))
+
+    def publish(self) -> None:
+        for message, amount in self.messages:
+            print(message + f' \x1b[38;2;255;0;0m(x{amount})\x1b[0m' * (amount > 1))
+        print()
 
 
 LOGGER = AntiSpamLogger()
@@ -144,6 +143,9 @@ class EmptyIfAddon(Addon):
         pass
 
 
+FILLER_COMMENT_SUFFIX: str = '  // PyHTSL filler'
+
+
 @final
 class NewFunctionAddon(Addon):
     raw_function_name: Optional[str]
@@ -175,20 +177,14 @@ class NewFunctionAddon(Addon):
 
     def add_to_middle(self, append_to: list[tuple[str, LineType]]) -> int:
         append_to.insert(self.add_to_middle_index, (
-            (
-                f'function "{self.function_name()}" false'
-                '  // PyHTSL filler'
-            ),
+            f'function "{self.function_name()}" false' + FILLER_COMMENT_SUFFIX,
             LineType.trigger_function,
         ))
         return 1
 
     def create_goto_line(self) -> tuple[str, LineType]:
         return (
-            (
-                f'goto function "{self.function_name()}"'
-                '  // PyHTSL filler'
-            ),
+            f'goto function "{self.function_name()}"' + FILLER_COMMENT_SUFFIX,
             LineType.goto,
         )
 
@@ -220,10 +216,12 @@ class Fixer:
         for addon in reversed(self.new_functions_added):
             lines.insert(0, addon.create_goto_line())
 
-        LOGGER.log('')
+        self.fix_goto_order(lines)
+
+        LOGGER.publish()
         return lines
 
-    def find_container_and_name_from_goto(self, line: str) -> tuple[Optional[str], Optional[str]]:
+    def find_container_and_name_from_goto(self, line: str) -> tuple[str, str] | tuple[None, None]:
         match = GOTO_LINE_REGEX.match(line)
         if match is None:
             return (None, None)
@@ -367,3 +365,68 @@ class Fixer:
                 addons.extend(rest_addons)
 
         return addons
+
+    def find_goto_line_child_index(self, parent_line: str, child_line: str) -> Optional[int]:
+        prefix = parent_line.removesuffix('"') + ' '
+        suffix = '"' + FILLER_COMMENT_SUFFIX
+        if not child_line.startswith(prefix):
+            return None
+        if not child_line.endswith(suffix):
+            return None
+
+        try:
+            return int(child_line[len(prefix):-len(suffix)].strip())
+        except ValueError:
+            return None
+
+    def fix_goto_order(self, lines: list[tuple[str, LineType]]) -> None:
+        gotos: list[tuple[tuple[str, LineType], tuple[str, str]]] = []
+        while True:
+            line = lines[0]
+            if line[1] is not LineType.goto:
+                break
+            pair = self.find_container_and_name_from_goto(line[0])
+            if pair[0] is None:
+                break
+            gotos.append((line, pair))
+            lines.pop(0)
+        if not gotos:
+            return
+        lines.insert(0, gotos.pop(-1)[0])
+
+        visited_indexes: set[int] = set()
+        parents_with_children: dict[
+            tuple[tuple[str, LineType], tuple[str, str]],
+            list[tuple[tuple[str, LineType], int]]
+        ] = {}
+        for i, (line, pair) in enumerate(gotos):
+            if i in visited_indexes:
+                continue
+            is_child_of_any = False
+            for maybe_parent_line, _ in gotos:
+                if self.find_goto_line_child_index(
+                    maybe_parent_line[0],
+                    line[0],
+                ) is not None:
+                    is_child_of_any = True
+                    break
+            if is_child_of_any:
+                continue
+
+            children = parents_with_children.setdefault((line, pair), [])
+            for j, (maybe_child_line, _) in enumerate(gotos):
+                if i == j:
+                    continue
+                index = self.find_goto_line_child_index(
+                    line[0],
+                    maybe_child_line[0],
+                )
+                if index is not None:
+                    children.append((maybe_child_line, index))
+                    visited_indexes.add(j)
+
+        for parent, children in reversed(parents_with_children.items()):
+            children.sort(key=lambda x: x[1])
+            for line, _ in reversed(children):
+                lines.insert(0, line)
+            lines.insert(0, parent[0])
