@@ -18,7 +18,7 @@ def play_sound(
     location: ALL_LOCATIONS = 'invokers_location',
 ) -> None:
     sound = ALL_SOUNDS_PRETTY_TO_RAW.get(sound, sound)  # pyright: ignore[reportAssignmentType]
-    line = f'playSound "{sound}" {volume} {pitch} "{location}"'
+    line = f'sound "{sound}" {volume} {pitch} "{location}"'
     if location == 'custom_coordinates':
         if coordinates is None:
             raise ValueError('coordinates must be provided when location is custom_coordinates')
