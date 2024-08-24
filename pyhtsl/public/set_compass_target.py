@@ -11,7 +11,7 @@ __all__ = (
 
 # TODO proper overload
 def set_compass_target(
-    coordinates: Optional[tuple[int, int, int] | str] = None,
+    coordinates: Optional[tuple[float, float, float] | str] = None,
     location: ALL_LOCATIONS = 'invokers_location',
 ) -> None:
     line = f'compassTarget "{location}"'

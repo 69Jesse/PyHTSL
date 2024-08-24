@@ -11,8 +11,8 @@ __all__ = (
 # TODO proper overload
 def teleport_player(
     coordinates: Optional[
-        tuple[int, int, int]  # (x, y, z)
-        | tuple[int, int, int, int, int]  # (x, y, z, yaw, pitch)
+        tuple[float, float, float]  # (x, y, z)
+        | tuple[float, float, float, float, float]  # (x, y, z, yaw, pitch)
         | str  # custom string
     ],
     location: ALL_LOCATIONS = 'custom_coordinates',

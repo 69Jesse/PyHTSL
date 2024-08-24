@@ -14,7 +14,7 @@ def play_sound(
     sound: ALL_SOUNDS,
     volume: float = 0.7,
     pitch: float = 1.0,
-    coordinates: Optional[tuple[int, int, int] | str] = None,
+    coordinates: Optional[tuple[float, float, float] | str] = None,
     location: ALL_LOCATIONS = 'invokers_location',
 ) -> None:
     sound = ALL_SOUNDS_PRETTY_TO_RAW.get(sound, sound)  # pyright: ignore[reportAssignmentType]
