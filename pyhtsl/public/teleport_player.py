@@ -14,7 +14,7 @@ def teleport_player(
         tuple[int, int, int]  # (x, y, z)
         | tuple[int, int, int, int, int]  # (x, y, z, yaw, pitch)
         | str  # custom string
-    ] = None,
+    ],
     location: ALL_LOCATIONS = 'custom_coordinates',
 ) -> None:
     line = f'tp "{location}"'
