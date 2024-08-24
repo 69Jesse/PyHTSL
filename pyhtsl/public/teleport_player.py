@@ -10,7 +10,11 @@ __all__ = (
 
 # TODO proper overload
 def teleport_player(
-    coordinates: Optional[tuple[int, int, int] | str] = None,
+    coordinates: Optional[
+        tuple[int, int, int]  # (x, y, z)
+        | tuple[int, int, int, int, int]  # (x, y, z, yaw, pitch)
+        | str  # custom string
+    ] = None,
     location: ALL_LOCATIONS = 'custom_coordinates',
 ) -> None:
     line = f'tp "{location}"'
