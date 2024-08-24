@@ -10,13 +10,15 @@ __all__ = (
 
 # TODO proper overload
 def teleport_player(
-    location: ALL_LOCATIONS = 'invokers_location',
-    coordinates: Optional[str] = None
+    coordinates: Optional[tuple[int, int, int] | str] = None,
+    location: ALL_LOCATIONS = 'custom_coordinates',
 ) -> None:
     line = f'tp "{location}"'
     if location == 'custom_coordinates':
         if coordinates is None:
             raise ValueError('coordinates must be provided when location is custom_coordinates')
+        if isinstance(coordinates, tuple):
+            coordinates = ' '.join(map(str, coordinates))
         line += f' "{coordinates}"'
     WRITER.write(
         line,
