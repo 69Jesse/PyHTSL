@@ -1,4 +1,7 @@
-from ..condition import IfStatement
+from ..condition import (
+    Condition,
+    IfStatement,
+)
 
 from typing import Literal
 
