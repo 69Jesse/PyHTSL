@@ -30,7 +30,7 @@ class TeamStat(Stat):
         return LineType.team_stat_change
 
     def get_htsl_formatted(self) -> str:
-        return f'{super().get_htsl_formatted()} {self.team.name if self.team is not None else 'None'}'
+        return f'{super().get_htsl_formatted()} "{self.team.name if self.team is not None else 'None'}"'
 
 
 Team.stat = lambda self, key: TeamStat(key, self)

@@ -85,7 +85,7 @@ class Stat(ABC):
         return f'%stat.{self.get_placeholder_word()}/{self.name}%'
 
     def get_htsl_formatted(self) -> str:
-        return f'{self.get_prefix()} {self.name}'
+        return f'{self.get_prefix()} "{self.name}"'
 
     @property
     @abstractmethod
