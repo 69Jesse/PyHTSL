@@ -20,6 +20,6 @@ def give_item(
     else:
         name = item
     WRITER.write(
-        f'giveItem "{name}" {str(allow_multiple).lower()} {inventory_slot} {str(replace_existing_item).lower()}',
+        f'giveItem "{name}" {str(allow_multiple).lower()} "{inventory_slot}" {str(replace_existing_item).lower()}',
         LineType.miscellaneous,
     )
