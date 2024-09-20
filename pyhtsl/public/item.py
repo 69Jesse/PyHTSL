@@ -249,9 +249,8 @@ class Item:
                 color = int(color.removeprefix('#'), 16)
             elif isinstance(color, tuple):
                 color = color[0] << 16 | color[1] << 8 | color[2]
-            tags['display'] = {
-                'color': (color, DataType.integer),
-            }
+            display = tags.setdefault('display', {})
+            display['color'] = (color, DataType.integer)
 
         if not tags:
             del data['tag']
