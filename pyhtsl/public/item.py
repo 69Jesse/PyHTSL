@@ -114,7 +114,7 @@ class Item:
         enchantments: Optional[EnchantmentsType] = None,
         unbreakable: bool = False,
         damage: int = 0,
-        color: int | str | tuple[int, int, int] = 0,
+        color: Optional[int | str | tuple[int, int, int]] = None,
         hide_all_flags: bool = False,
         hide_enchantments_flag: bool = False,
         hide_modifiers_flag: bool = False,
@@ -246,7 +246,7 @@ class Item:
             if not isinstance(color, (int, str, tuple)):
                 raise ValueError(f'Invalid color type: {type(color)}')
             if isinstance(color, str):
-                color = int(color, 16)
+                color = int(color.removeprefix('#'), 16)
             elif isinstance(color, tuple):
                 color = color[0] << 16 | color[1] << 8 | color[2]
             tags['display'] = {
@@ -266,7 +266,7 @@ class Item:
         if item is None:
             closest = difflib.get_close_matches(self.key.lower(), ITEMS.keys(), n=1, cutoff=0.0)[0]
             raise ValueError(
-                f'Invalid item key: \x1b[38;2;255;0;0m{self.key}\x1b[0m. Did you mean \x1b[38;2;0;255;0m{closest}\x1b[0m?\nYou\'ve already saved this in your imports folder? Do not create an Item, use the string "{self.key}" instead.'
+                f'Invalid item key: \x1b[38;2;255;0;0m{self.key}\x1b[0m. Did you mean \x1b[38;2;0;255;0m{closest}\x1b[0m?\nHave you already saved this in your imports folder? Do not create an Item, use the string "{self.key}" instead.'
             )
         return item
 
