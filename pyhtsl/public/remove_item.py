@@ -1,4 +1,5 @@
 from ..writer import WRITER, LineType
+from .item import Item
 
 
 __all__ = (
@@ -7,9 +8,13 @@ __all__ = (
 
 
 def remove_item(
-    item: str,
+    item: Item | str,
 ) -> None:
+    if isinstance(item, Item):
+        name = item.save()
+    else:
+        name = item
     WRITER.write(
-        f'removeItem "{item}"',
+        f'removeItem "{name}"',
         LineType.miscellaneous,
     )
