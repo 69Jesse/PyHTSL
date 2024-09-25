@@ -1679,129 +1679,129 @@
         "data_value": 0,
         "can_be_damaged": false
     },
-    "white_terracotta": {
-        "key": "white_terracotta",
-        "title": "White Terracotta",
+    "white_stained_clay": {
+        "key": "white_stained_clay",
+        "title": "White Stained Clay",
         "name": "minecraft:stained_hardened_clay",
         "id": 159,
         "data_value": 0,
         "can_be_damaged": false
     },
-    "orange_terracotta": {
-        "key": "orange_terracotta",
-        "title": "Orange Terracotta",
+    "orange_stained_clay": {
+        "key": "orange_stained_clay",
+        "title": "Orange Stained Clay",
         "name": "minecraft:stained_hardened_clay",
         "id": 159,
         "data_value": 1,
         "can_be_damaged": false
     },
-    "magenta_terracotta": {
-        "key": "magenta_terracotta",
-        "title": "Magenta Terracotta",
+    "magenta_stained_clay": {
+        "key": "magenta_stained_clay",
+        "title": "Magenta Stained Clay",
         "name": "minecraft:stained_hardened_clay",
         "id": 159,
         "data_value": 2,
         "can_be_damaged": false
     },
-    "light_blue_terracotta": {
-        "key": "light_blue_terracotta",
-        "title": "Light Blue Terracotta",
+    "light_blue_stained_clay": {
+        "key": "light_blue_stained_clay",
+        "title": "Light Blue Stained Clay",
         "name": "minecraft:stained_hardened_clay",
         "id": 159,
         "data_value": 3,
         "can_be_damaged": false
     },
-    "yellow_terracotta": {
-        "key": "yellow_terracotta",
-        "title": "Yellow Terracotta",
+    "yellow_stained_clay": {
+        "key": "yellow_stained_clay",
+        "title": "Yellow Stained Clay",
         "name": "minecraft:stained_hardened_clay",
         "id": 159,
         "data_value": 4,
         "can_be_damaged": false
     },
-    "lime_terracotta": {
-        "key": "lime_terracotta",
-        "title": "Lime Terracotta",
+    "lime_stained_clay": {
+        "key": "lime_stained_clay",
+        "title": "Lime Stained Clay",
         "name": "minecraft:stained_hardened_clay",
         "id": 159,
         "data_value": 5,
         "can_be_damaged": false
     },
-    "pink_terracotta": {
-        "key": "pink_terracotta",
-        "title": "Pink Terracotta",
+    "pink_stained_clay": {
+        "key": "pink_stained_clay",
+        "title": "Pink Stained Clay",
         "name": "minecraft:stained_hardened_clay",
         "id": 159,
         "data_value": 6,
         "can_be_damaged": false
     },
-    "gray_terracotta": {
-        "key": "gray_terracotta",
-        "title": "Gray Terracotta",
+    "gray_stained_clay": {
+        "key": "gray_stained_clay",
+        "title": "Gray Stained Clay",
         "name": "minecraft:stained_hardened_clay",
         "id": 159,
         "data_value": 7,
         "can_be_damaged": false
     },
-    "light_gray_terracotta": {
-        "key": "light_gray_terracotta",
-        "title": "Light Gray Terracotta",
+    "light_gray_stained_clay": {
+        "key": "light_gray_stained_clay",
+        "title": "Light Gray Stained Clay",
         "name": "minecraft:stained_hardened_clay",
         "id": 159,
         "data_value": 8,
         "can_be_damaged": false
     },
-    "cyan_terracotta": {
-        "key": "cyan_terracotta",
-        "title": "Cyan Terracotta",
+    "cyan_stained_clay": {
+        "key": "cyan_stained_clay",
+        "title": "Cyan Stained Clay",
         "name": "minecraft:stained_hardened_clay",
         "id": 159,
         "data_value": 9,
         "can_be_damaged": false
     },
-    "purple_terracotta": {
-        "key": "purple_terracotta",
-        "title": "Purple Terracotta",
+    "purple_stained_clay": {
+        "key": "purple_stained_clay",
+        "title": "Purple Stained Clay",
         "name": "minecraft:stained_hardened_clay",
         "id": 159,
         "data_value": 10,
         "can_be_damaged": false
     },
-    "blue_terracotta": {
-        "key": "blue_terracotta",
-        "title": "Blue Terracotta",
+    "blue_stained_clay": {
+        "key": "blue_stained_clay",
+        "title": "Blue Stained Clay",
         "name": "minecraft:stained_hardened_clay",
         "id": 159,
         "data_value": 11,
         "can_be_damaged": false
     },
-    "brown_terracotta": {
-        "key": "brown_terracotta",
-        "title": "Brown Terracotta",
+    "brown_stained_clay": {
+        "key": "brown_stained_clay",
+        "title": "Brown Stained Clay",
         "name": "minecraft:stained_hardened_clay",
         "id": 159,
         "data_value": 12,
         "can_be_damaged": false
     },
-    "green_terracotta": {
-        "key": "green_terracotta",
-        "title": "Green Terracotta",
+    "green_stained_clay": {
+        "key": "green_stained_clay",
+        "title": "Green Stained Clay",
         "name": "minecraft:stained_hardened_clay",
         "id": 159,
         "data_value": 13,
         "can_be_damaged": false
     },
-    "red_terracotta": {
-        "key": "red_terracotta",
-        "title": "Red Terracotta",
+    "red_stained_clay": {
+        "key": "red_stained_clay",
+        "title": "Red Stained Clay",
         "name": "minecraft:stained_hardened_clay",
         "id": 159,
         "data_value": 14,
         "can_be_damaged": false
     },
-    "black_terracotta": {
-        "key": "black_terracotta",
-        "title": "Black Terracotta",
+    "black_stained_clay": {
+        "key": "black_stained_clay",
+        "title": "Black Stained Clay",
         "name": "minecraft:stained_hardened_clay",
         "id": 159,
         "data_value": 15,
@@ -2175,9 +2175,9 @@
         "data_value": 15,
         "can_be_damaged": false
     },
-    "terracotta": {
-        "key": "terracotta",
-        "title": "Terracotta",
+    "stained_clay": {
+        "key": "stained_clay",
+        "title": "Stained Clay",
         "name": "minecraft:hardened_clay",
         "id": 172,
         "data_value": 0,
