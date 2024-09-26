@@ -13,7 +13,7 @@ __all__ = (
 @final
 class TeamStat(Stat):
     team: Optional['Team']
-    def __init__(self, name: str, team: Optional['Team | str'] = None) -> None:
+    def __init__(self, name: str, team: Optional['Team | str'] = None, /) -> None:
         super().__init__(name)
         self.team = team if isinstance(team, Team) else Team(team) if team is not None else None
 
@@ -24,6 +24,9 @@ class TeamStat(Stat):
     @staticmethod
     def get_placeholder_word() -> str:
         return 'team'
+
+    def get_placeholder(self) -> str:
+        return f'%stat.{self.get_placeholder_word()}/{self.name}' + (f' {self.team.name}' if self.team is not None else '') + '%'
 
     @property
     def line_type(self) -> LineType:
