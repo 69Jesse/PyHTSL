@@ -66,7 +66,9 @@ class Stat(ABC):
         """Caching stats based on its name so I can just compare id() and always have it be correct."""
         if cls is Stat:
             raise TypeError('Cannot instantiate Stat class')
-        assert len(args) > 0
+
+        if len(args) == 0:
+            return super(Stat, cls).__new__(cls)
 
         cached = STAT_CACHE.setdefault(cls, {})
         name = args[0]
