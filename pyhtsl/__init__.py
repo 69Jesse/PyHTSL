@@ -42,6 +42,7 @@ from .public.house_players import HousePlayers as HousePlayers
 from .public.house_visiting_rules import HouseVisitingRules as HouseVisitingRules
 from .public.if_and import IfAnd as IfAnd
 from .public.if_or import IfOr as IfOr
+from .public.is_item import IsItem as IsItem
 from .public.item import Item as Item
 from .public.kill_player import kill_player as kill_player
 from .public.layout import Layout as Layout
