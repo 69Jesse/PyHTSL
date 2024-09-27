@@ -42,7 +42,10 @@ from .public.house_players import HousePlayers as HousePlayers
 from .public.house_visiting_rules import HouseVisitingRules as HouseVisitingRules
 from .public.if_and import IfAnd as IfAnd
 from .public.if_or import IfOr as IfOr
+from .public.is_doing_parkour import IsDoingParkour as IsDoingParkour
+from .public.is_flying import IsFlying as IsFlying
 from .public.is_item import IsItem as IsItem
+from .public.is_sneaking import IsSneaking as IsSneaking
 from .public.item import Item as Item
 from .public.kill_player import kill_player as kill_player
 from .public.layout import Layout as Layout
