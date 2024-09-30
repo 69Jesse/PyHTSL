@@ -201,6 +201,9 @@ class Fixer:
         self.new_functions_added = []
 
     def fix(self) -> list[tuple[str, LineType]]:
+        if not self.lines:
+            return []
+
         parts: list[Part] = []
         for part in self.create_parts():
             addons = self.fix_lines(part.lines, current_name=part.name)
