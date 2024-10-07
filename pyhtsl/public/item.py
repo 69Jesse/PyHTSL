@@ -74,6 +74,7 @@ class Item:
         lore: Optional[str] = None,
         count: int = 1,
         enchantments: Optional[list[Enchantment]] = None,
+        interaction_data_key: Optional[str] = None,
         hide_all_flags: bool = False,
         hide_enchantments_flag: bool = False,
         hide_modifiers_flag: bool = False,
@@ -90,6 +91,7 @@ class Item:
         lore: Optional[str] = None,
         count: int = 1,
         enchantments: Optional[list[Enchantment]] = None,
+        interaction_data_key: Optional[str] = None,
         unbreakable: bool = False,
         damage: int = 0,
         hide_all_flags: bool = False,
@@ -109,6 +111,7 @@ class Item:
         lore: Optional[str] = None,
         count: int = 1,
         enchantments: Optional[list[Enchantment]] = None,
+        interaction_data_key: Optional[str] = None,
         unbreakable: bool = False,
         damage: int = 0,
         color: Optional[int | str | tuple[int, int, int]] = None,
@@ -130,6 +133,7 @@ class Item:
         lore: Optional[str] = None,
         count: int = 1,
         enchantments: Optional[list[Enchantment]] = None,
+        interaction_data_key: Optional[str] = None,
         hide_all_flags: bool = False,
         hide_enchantments_flag: bool = False,
         hide_modifiers_flag: bool = False,
@@ -235,6 +239,12 @@ class Item:
                 color = color[0] << 16 | color[1] << 8 | color[2]
             display = tags.setdefault('display', {})
             display['color'] = (color, DataType.integer)
+
+        interaction_data_key: Optional[str] = extras_copy.pop('interaction_data_key', None)
+        if interaction_data_key is not None:
+            data['tag']['ExtraAttributes'] = {
+                'interact_data': (interaction_data_key, DataType.string),
+            }
 
         if not tags:
             del data['tag']
