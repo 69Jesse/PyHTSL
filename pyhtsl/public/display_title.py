@@ -14,6 +14,6 @@ def display_title(
     fadeout: int = 1,
 ) -> None:
     WRITER.write(
-        f'title "{title}" "{subtitle}" {fadein} {stay} {fadeout}',
+        f'title "{title or '&r'}" "{subtitle or '&r'}" {fadein} {stay} {fadeout}',
         LineType.miscellaneous,
     )

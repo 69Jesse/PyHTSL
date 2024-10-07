@@ -10,6 +10,6 @@ def display_action_bar(
     text: str,
 ) -> None:
     WRITER.write(
-        f'actionBar "{text}"',
+        f'actionBar "{text or '&r'}"',
         LineType.miscellaneous,
     )
