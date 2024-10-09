@@ -1,5 +1,5 @@
 from ..writer import HERE, HTSL_IMPORTS_FOLDER
-from ..types import NON_SPECIAL_ITEM_KEYS, DAMAGEABLE_ITEM_KEYS, LEATHER_ARMOR_KEYS, ALL_ITEM_KEYS, ALL_ENCHANTMENTS, ENCHANTMENT_TO_ID
+from ..types import NON_SPECIAL_ITEM_KEYS, DAMAGEABLE_ITEM_KEYS, LEATHER_ARMOR_KEYS, COOKIE_ITEM_KEY, ALL_ITEM_KEYS, ALL_ENCHANTMENTS, ENCHANTMENT_TO_ID
 from .enchantment import Enchantment
 
 import json
@@ -8,7 +8,7 @@ from enum import Enum
 import hashlib
 import difflib
 
-from typing import TypedDict, overload, Iterable, Optional, Any, Callable
+from typing import TypedDict, overload, Optional, Any, Callable
 
 
 __all__ = (
@@ -121,6 +121,24 @@ class Item:
         hide_unbreakable_flag: bool = False,
         hide_additional_flag: bool = False,
         hide_dye_flag: bool = False,
+    ) -> None:
+        ...
+
+    @overload
+    def __init__(
+        self,
+        key: COOKIE_ITEM_KEY,
+        *,
+        name: Optional[str] = None,
+        lore: Optional[str] = None,
+        count: int = 1,
+        enchantments: Optional[list[Enchantment]] = None,
+        interaction_data_key: Optional[str] = None,
+        hide_all_flags: bool = False,
+        hide_enchantments_flag: bool = False,
+        hide_modifiers_flag: bool = False,
+        hide_additional_flag: bool = False,
+        is_cookie_item: bool = False,
     ) -> None:
         ...
 
@@ -240,11 +258,18 @@ class Item:
             display = tags.setdefault('display', {})
             display['color'] = (color, DataType.integer)
 
+        extra_attributes = {}
+
         interaction_data_key: Optional[str] = extras_copy.pop('interaction_data_key', None)
         if interaction_data_key is not None:
-            data['tag']['ExtraAttributes'] = {
-                'interact_data': (interaction_data_key, DataType.string),
-            }
+            extra_attributes['interact_data'] = (interaction_data_key, DataType.string)
+
+        is_cookie_item: bool = extras_copy.pop('is_cookie_item', False)
+        if is_cookie_item:
+            extra_attributes['COOKIE_ITEM'] = (1, DataType.byte)
+
+        if extra_attributes:
+            tags['ExtraAttributes'] = extra_attributes
 
         if not tags:
             del data['tag']

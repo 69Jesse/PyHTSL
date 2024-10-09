@@ -308,7 +308,7 @@ NON_SPECIAL_ITEM_KEYS = Literal[
     'raw_salmon', 'clownfish', 'pufferfish', 'cooked_fish', 'cooked_salmon', 'ink_sac', 'red_dye', 'green_dye',
     'cocoa_beans', 'lapis_lazuli', 'purple_dye', 'cyan_dye', 'light_gray_dye', 'gray_dye', 'pink_dye', 'lime_dye',
     'yellow_dye', 'light_blue_dye', 'magenta_dye', 'orange_dye', 'bone_meal', 'bone', 'sugar', 'cake',
-    'red_bed', 'redstone_repeater', 'cookie', 'filled_map', 'melon_slice', 'pumpkin_seeds', 'melon_seeds', 'raw_beef',
+    'red_bed', 'redstone_repeater', 'filled_map', 'melon_slice', 'pumpkin_seeds', 'melon_seeds', 'raw_beef',
     'steak', 'raw_chicken', 'cooked_chicken', 'rotten_flesh', 'ender_pearl', 'blaze_rod', 'ghast_tear', 'gold_nugget',
     'nether_wart', 'water_bottle', 'potion_of_regeneration', 'potion_of_swiftness', 'potion_of_poison', 'potion_of_strength', 'potion_of_leaping', 'potion_of_regeneration_2',
     'potion_of_swiftness_2', 'potion_of_fire_resistance', 'potion_of_poison_2', 'potion_of_healing', 'potion_of_night_vision', 'potion_of_weakness', 'potion_of_strength_2', 'potion_of_slowness',
@@ -351,7 +351,10 @@ LEATHER_ARMOR_KEYS = Literal[
 ]
 
 
-ALL_ITEM_KEYS = NON_SPECIAL_ITEM_KEYS | DAMAGEABLE_ITEM_KEYS | LEATHER_ARMOR_KEYS
+COOKIE_ITEM_KEY = Literal['cookie']
+
+
+ALL_ITEM_KEYS = NON_SPECIAL_ITEM_KEYS | DAMAGEABLE_ITEM_KEYS | LEATHER_ARMOR_KEYS | COOKIE_ITEM_KEY
 
 
 ALL_LOCATIONS = Literal[
