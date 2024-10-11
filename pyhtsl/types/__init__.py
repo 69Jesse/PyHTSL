@@ -2,6 +2,7 @@ from ..condition import (
     Condition,
     IfStatement,
 )
+from ..expression import Expression
 
 from typing import Literal
 
@@ -9,6 +10,7 @@ from typing import Literal
 __all__ = (
     'Condition',
     'IfStatement',
+    'Expression',
     'ALL_POTION_EFFECTS',
     'ALL_DAMAGE_CAUSES',
     'ALL_ENCHANTMENTS',
@@ -128,6 +130,7 @@ ENCHANTMENT_TO_ID: dict[ALL_ENCHANTMENTS, int] = {
 
 INVENTORY_SLOTS = Literal[
     'first_slot', 'First Slot',
+    'First Available Slot',
     'hand_slot', 'Hand Slot',
     'hotbar_slot_1', 'Hotbar Slot 1',
     'hotbar_slot_2', 'Hotbar Slot 2',
@@ -174,8 +177,9 @@ INVENTORY_SLOTS = Literal[
 
 # HTSL only seems to accept the pretty names for inventory slots
 _INVENTORY_SLOTS_PRETTY_NAME_MAPPING: dict[INVENTORY_SLOTS, INVENTORY_SLOTS] = {
-    'first_slot': 'First Slot',
-    'First Slot': 'First Slot',
+    'first_slot': 'First Available Slot',
+    'First Slot': 'First Available Slot',
+    'First Available Slot': 'First Available Slot',
     'hand_slot': 'Hand Slot',
     'Hand Slot': 'Hand Slot',
     'hotbar_slot_1': 'Hotbar Slot 1',
