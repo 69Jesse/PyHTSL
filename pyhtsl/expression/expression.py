@@ -249,7 +249,17 @@ class Expression:
         EXPR_HANDLER.push()
         return str(self.fetch_stat_or_int(self.left))
 
-    __repr__ = __str__
+    def __repr__(self) -> str:
+        """Do NOT call this method when it is not used inside of a f-string! It will break things.
+        
+        The reason that this pushes is that you can make something like this work:
+        ```py
+        stat = PlayerStat('stat')
+        chat(f'&aYour stat is &6{stat + 1}g')
+        ```
+        """
+        EXPR_HANDLER.push()
+        return repr(self.fetch_stat_or_int(self.left))
 
     def __eq__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Condition':
         return self._placeholder_value_cls.equals(self, other)
