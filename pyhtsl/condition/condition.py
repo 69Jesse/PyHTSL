@@ -70,15 +70,15 @@ class PlaceholderValue:
 
     @staticmethod
     def equals(
-        left: 'Stat | PlaceholderValue',
-        right: 'Stat | PlaceholderValue | int',
+        left: 'Stat | PlaceholderValue | Expression',
+        right: 'Stat | PlaceholderValue | Expression | int',
     ) -> Condition:
         return OperatorCondition(left, right, Operator.Equal)
 
     @staticmethod
     def not_equal(
-        left: 'Stat | PlaceholderValue',
-        right: 'Stat | PlaceholderValue | int',
+        left: 'Stat | PlaceholderValue | Expression',
+        right: 'Stat | PlaceholderValue | Expression | int',
     ) -> IfStatement:
         """Not equal does not exist on housing, so we do a little magic"""
         return IfStatement([
@@ -88,65 +88,65 @@ class PlaceholderValue:
 
     @staticmethod
     def greater_than(
-        left: 'Stat | PlaceholderValue',
-        right: 'Stat | PlaceholderValue | int',
+        left: 'Stat | PlaceholderValue | Expression',
+        right: 'Stat | PlaceholderValue | Expression | int',
     ) -> Condition:
         return OperatorCondition(left, right, Operator.GreaterThan)
 
     @staticmethod
     def less_than(
-        left: 'Stat | PlaceholderValue',
-        right: 'Stat | PlaceholderValue | int',
+        left: 'Stat | PlaceholderValue | Expression',
+        right: 'Stat | PlaceholderValue | Expression | int',
     ) -> Condition:
         return OperatorCondition(left, right, Operator.LessThan)
 
     @staticmethod
     def greater_than_or_equal(
-        left: 'Stat | PlaceholderValue',
-        right: 'Stat | PlaceholderValue | int',
+        left: 'Stat | PlaceholderValue | Expression',
+        right: 'Stat | PlaceholderValue | Expression | int',
     ) -> Condition:
         return OperatorCondition(left, right, Operator.GreaterThanOrEqual)
 
     @staticmethod
     def less_than_or_equal(
-        left: 'Stat | PlaceholderValue',
-        right: 'Stat | PlaceholderValue | int',
+        left: 'Stat | PlaceholderValue | Expression',
+        right: 'Stat | PlaceholderValue | Expression | int',
     ) -> Condition:
         return OperatorCondition(left, right, Operator.LessThanOrEqual)
 
     def __eq__(
         self,
-        other: 'Stat | PlaceholderValue | int',
+        other: 'Stat | PlaceholderValue | Expression | int',
     ) -> Condition:
         return PlaceholderValue.equals(self, other)
 
     def __ne__(
         self,
-        other: 'Stat | PlaceholderValue | int',
+        other: 'Stat | PlaceholderValue | Expression | int',
     ) -> IfStatement:
         return PlaceholderValue.not_equal(self, other)
 
     def __gt__(
         self,
-        other: 'Stat | PlaceholderValue | int',
+        other: 'Stat | PlaceholderValue | Expression | int',
     ) -> Condition:
         return PlaceholderValue.greater_than(self, other)
 
     def __lt__(
         self,
-        other: 'Stat | PlaceholderValue | int',
+        other: 'Stat | PlaceholderValue | Expression | int',
     ) -> Condition:
         return PlaceholderValue.less_than(self, other)
 
     def __ge__(
         self,
-        other: 'Stat | PlaceholderValue | int',
+        other: 'Stat | PlaceholderValue | Expression | int',
     ) -> Condition:
         return PlaceholderValue.greater_than_or_equal(self, other)
 
     def __le__(
         self,
-        other: 'Stat | PlaceholderValue | int',
+        other: 'Stat | PlaceholderValue | Expression | int',
     ) -> Condition:
         return PlaceholderValue.less_than_or_equal(self, other)
 
@@ -157,15 +157,18 @@ class PlaceholderValue:
         return f'placeholder "{self.name}"'
 
 
+Expression._placeholder_value_cls = PlaceholderValue
+
+
 @final
 class OperatorCondition(Condition):
-    left: 'Stat | PlaceholderValue'
-    right: 'Stat | PlaceholderValue | int'
+    left: 'Stat | PlaceholderValue | Expression'
+    right: 'Stat | PlaceholderValue | Expression | int'
     operator: Operator
     def __init__(
         self,
-        left: 'Stat | PlaceholderValue',
-        right: 'Stat | PlaceholderValue | int',
+        left: 'Stat | PlaceholderValue | Expression',
+        right: 'Stat | PlaceholderValue | Expression | int',
         operator: Operator,
     ) -> None:
         self.left = left

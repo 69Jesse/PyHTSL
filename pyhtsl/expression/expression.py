@@ -7,7 +7,8 @@ from typing import TYPE_CHECKING, Optional, overload
 if TYPE_CHECKING:
     from typing import Self
     from ..stat import Stat
-    from ..condition import PlaceholderValue
+    from ..condition import PlaceholderValue, Condition, IfStatement
+    PlaceholderValueCls = type['PlaceholderValue']
 
 
 __all__ = (
@@ -16,6 +17,8 @@ __all__ = (
 
 
 class Expression:
+    _placeholder_value_cls: 'PlaceholderValueCls'
+
     left: 'Expression | Stat | PlaceholderValue'
     right: 'Expression | Stat | int | PlaceholderValue'
     type: ExpressionType
@@ -245,3 +248,23 @@ class Expression:
         """
         EXPR_HANDLER.push()
         return str(self.fetch_stat_or_int(self.left))
+
+    __repr__ = __str__
+
+    def __eq__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Condition':
+        return self._placeholder_value_cls.equals(self, other)
+
+    def __ne__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'IfStatement':
+        return self._placeholder_value_cls.not_equal(self, other)
+
+    def __gt__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Condition':
+        return self._placeholder_value_cls.greater_than(self, other)
+
+    def __lt__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Condition':
+        return self._placeholder_value_cls.less_than(self, other)
+
+    def __ge__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Condition':
+        return self._placeholder_value_cls.greater_than_or_equal(self, other)
+
+    def __le__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Condition':
+        return self._placeholder_value_cls.less_than_or_equal(self, other)
