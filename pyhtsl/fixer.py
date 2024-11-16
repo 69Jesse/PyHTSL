@@ -325,12 +325,23 @@ class Fixer:
     ) -> list[Addon]:
         counter: Counter = Counter()
 
+        is_inside_random: bool = False
+
         index: int = 0
         addons: list[Addon] = []
 
         while index < len(lines):
             _, line_type = lines[index]
             index += 1
+
+            if line_type is LineType.random_enter:
+                is_inside_random = True
+                continue
+            if line_type is LineType.random_exit:
+                is_inside_random = False
+                continue
+            if is_inside_random:
+                continue
 
             if counter.possible_to_increment(line_type):
                 counter.increment(line_type)
