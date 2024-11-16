@@ -71,6 +71,7 @@ from .public.player_protocol import PlayerProtocol as PlayerProtocol
 from .public.player_sneaking import PlayerSneaking as PlayerSneaking
 from .public.player_stat import PlayerStat as PlayerStat
 from .public.player_version import PlayerVersion as PlayerVersion
+from .public.random import Random as Random
 from .public.random_int import RandomInt as RandomInt
 from .public.region import Region as Region
 from .public.remove_item import remove_item as remove_item
