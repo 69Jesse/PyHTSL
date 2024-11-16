@@ -278,7 +278,11 @@ class Fixer:
         section: list[tuple[str, LineType]] = []
         for _ in range(index, len(lines)):
             line, line_type = lines[index]
-            if line_type is LineType.if_exit or line_type is LineType.else_exit:
+            if (
+                line_type is LineType.if_exit
+                or line_type is LineType.else_exit
+                or line_type is LineType.else_enter  # Have to reset counter here
+            ):
                 break
             lines.pop(index)
 
