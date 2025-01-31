@@ -14,6 +14,7 @@ __all__ = (
 
 
 TEMP_STATS_NUMBER_START: int = 1
+LinesType = list[tuple['Stat', ExpressionType, 'Stat | int | PlaceholderValue']]
 
 
 @final
@@ -27,19 +28,8 @@ class ExpressionHandler:
     def is_empty(self) -> bool:
         return not self.__expressions
 
-    def rename_temporary_stats(self) -> None:
-        temporary_stats: list['TemporaryStat'] = []
-        for expression in self.__expressions:
-            stat = expression.fetch_stat_or_int(expression.left)
-            if isinstance(stat, self.temporary_stat_cls) and not any(
-                id(stat) == id(temp_stat) for temp_stat in temporary_stats
-            ):
-                temporary_stats.append(stat)
-        for i, stat in enumerate(temporary_stats, start=TEMP_STATS_NUMBER_START):
-            stat.number = i
-
-    def create_lines(self) -> list[tuple['Stat', ExpressionType, 'Stat | int | PlaceholderValue']]:
-        lines: list[tuple['Stat', ExpressionType, 'Stat | int | PlaceholderValue']] = []
+    def create_lines(self) -> LinesType:
+        lines: LinesType = []
         for expression in self.__expressions:
             left = expression.fetch_stat_or_int(expression.left)
             if TYPE_CHECKING:
@@ -48,7 +38,10 @@ class ExpressionHandler:
             lines.append((left, expression.type, right))
         return lines
 
-    def optimize_lines(self, lines: list[tuple['Stat', ExpressionType, 'Stat | int | PlaceholderValue']]) -> None:
+    def optimize_lines(
+        self,
+        lines: LinesType,
+    ) -> None:
         skipping_temporary_stats: set['TemporaryStat'] = set()
         for i in range(len(lines)):
             left, type, right = lines[i]
@@ -103,7 +96,10 @@ class ExpressionHandler:
             else:
                 skipping_temporary_stats.add(left)
 
-    def take_out_useless(self, lines: list[tuple['Stat', ExpressionType, 'Stat | int | PlaceholderValue']]) -> None:
+    def take_out_useless(
+        self,
+        lines: LinesType,
+    ) -> None:
         for i in range(len(lines) - 1, -1, -1):
             left, expr_type, right = lines[i]
             if (
@@ -126,7 +122,25 @@ class ExpressionHandler:
             ):
                 lines.pop(i)
 
-    def write_lines(self, lines: list[tuple['Stat', ExpressionType, 'Stat | int | PlaceholderValue']]) -> None:
+    def rename_temporary_stats(
+        self,
+        lines: LinesType,
+    ) -> None:
+        temporary_stats: list['TemporaryStat'] = []
+        stat_id_set: set[int] = set()
+        for stat, _, _ in lines:
+            if id(stat) in stat_id_set:
+                continue
+            if isinstance(stat, self.temporary_stat_cls):
+                temporary_stats.append(stat)
+            stat_id_set.add(id(stat))
+        for i, stat in enumerate(temporary_stats, start=TEMP_STATS_NUMBER_START):
+            stat.number = i
+
+    def write_lines(
+        self,
+        lines: LinesType,
+    ) -> None:
         for left, type, right in lines:
             WRITER.write(
                 f'{left.operational_expression_left_side()} {type.value} "{str(right)}"',
@@ -136,10 +150,10 @@ class ExpressionHandler:
     def push(self) -> None:
         if self.is_empty():
             return
-        self.rename_temporary_stats()
         lines = self.create_lines()
         self.optimize_lines(lines)
         self.take_out_useless(lines)
+        self.rename_temporary_stats(lines)
         self.write_lines(lines)
         self.__expressions.clear()
 

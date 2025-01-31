@@ -15,7 +15,7 @@ class TemporaryStat(Stat):
     number: int
     def __init__(self) -> None:
         super().__init__(None, set_name=False)  # type: ignore
-        self.number = 0
+        self.number = id(self) + 1_000_000
 
     @property
     def name(self) -> str:
