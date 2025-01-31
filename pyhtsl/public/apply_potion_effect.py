@@ -12,8 +12,9 @@ def apply_potion_effect(
     duration: int = 60,
     level: int = 1,
     override_existing_effects: bool = False,
+    show_potion_icon: bool = False,
 ) -> None:
     WRITER.write(
-        f'applyPotion "{potion}" {duration} {level} {str(override_existing_effects).lower()}',
+        f'applyPotion "{potion}" {duration} {level} {str(override_existing_effects).lower()} {str(show_potion_icon).lower()}',
         LineType.miscellaneous,
     )

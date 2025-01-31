@@ -1,16 +1,17 @@
 from ..writer import WRITER, LineType
 from ..types import ALL_LOCATIONS
+from .item import Item
 
 from typing import Optional
 
 
 __all__ = (
-    'teleport_player',
+    'drop_item',
 )
 
-# TODO proper overload
-# TODO probably actually create Location class that has the coordinates and type
-def teleport_player(
+
+def drop_item(
+    item: Item | str,
     coordinates: Optional[
         tuple[float, float, float]  # (x, y, z)
         | tuple[str, str, str]  # (~x, ~y, ~z)
@@ -19,9 +20,16 @@ def teleport_player(
         | str  # custom string
     ],
     location: ALL_LOCATIONS = 'custom_coordinates',
-    prevent_teleport_inside_block: bool = False,
+    drop_naturally: bool = False,
+    disable_item_merging: bool = False,
+    prioritize_player: bool = False,
+    fallback_to_inventory: bool = False,
 ) -> None:
-    line = f'tp "{location}"'
+    if isinstance(item, Item):
+        name = item.save()
+    else:
+        name = item
+    line = f'dropItem "{name}"'
     if location == 'custom_coordinates':
         if coordinates is None:
             raise ValueError('coordinates must be provided when location is custom_coordinates')
@@ -30,7 +38,7 @@ def teleport_player(
         line += f' "{coordinates}"'
     else:
         line += ' "~ ~ ~"'
-    line += f' {str(prevent_teleport_inside_block).lower()}'
+    line += f' {str(drop_naturally).lower()} {str(disable_item_merging).lower()} {str(prioritize_player).lower()} {str(fallback_to_inventory).lower()}'
     WRITER.write(
         line,
         LineType.miscellaneous,

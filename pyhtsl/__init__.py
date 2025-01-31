@@ -94,3 +94,6 @@ from .public.team_tag import TeamTag as TeamTag
 from .public.teleport_player import teleport_player as teleport_player
 from .public.trigger_function import trigger_function as trigger_function
 from .public.within_region import WithinRegion as WithinRegion
+from .public.change_velocity import change_velocity as change_velocity
+from .public.launch_to_target import launch_to_target as launch_to_target
+from .public.drop_item import drop_item as drop_item

@@ -1,16 +1,17 @@
 from ..writer import WRITER, LineType
 from ..types import ALL_LOCATIONS
+from ..stat.stat import Stat
 
 from typing import Optional
 
 
 __all__ = (
-    'teleport_player',
+    'launch_to_target',
 )
 
-# TODO proper overload
+
 # TODO probably actually create Location class that has the coordinates and type
-def teleport_player(
+def launch_to_target(
     coordinates: Optional[
         tuple[float, float, float]  # (x, y, z)
         | tuple[str, str, str]  # (~x, ~y, ~z)
@@ -19,9 +20,9 @@ def teleport_player(
         | str  # custom string
     ],
     location: ALL_LOCATIONS = 'custom_coordinates',
-    prevent_teleport_inside_block: bool = False,
+    strength: Stat | int = 2,
 ) -> None:
-    line = f'tp "{location}"'
+    line = f'launchTarget "{location}"'
     if location == 'custom_coordinates':
         if coordinates is None:
             raise ValueError('coordinates must be provided when location is custom_coordinates')
@@ -30,7 +31,7 @@ def teleport_player(
         line += f' "{coordinates}"'
     else:
         line += ' "~ ~ ~"'
-    line += f' {str(prevent_teleport_inside_block).lower()}'
+    line += f' {strength}'
     WRITER.write(
         line,
         LineType.miscellaneous,

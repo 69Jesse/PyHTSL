@@ -1,6 +1,6 @@
 from ..writer import WRITER, LineType
 
-from typing import Optional, TYPE_CHECKING
+from typing import Optional
 from types import TracebackType
 
 
