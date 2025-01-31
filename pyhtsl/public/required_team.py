@@ -18,5 +18,5 @@ class RequiredTeam(TinyCondition):
     ) -> None:
         self.team = team if not isinstance(team, str) else Team(team)
 
-    def __str__(self) -> str:
+    def create_line(self) -> str:
         return f'hasTeam "{self.team.name if self.team is not None else "None"}"'

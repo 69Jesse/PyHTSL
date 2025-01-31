@@ -15,7 +15,9 @@ class RandomInt(PlaceholderValue):
         lower_bound: int,
         exclusive_upper_bound: int,
     ) -> None:
-        super().__init__(f'%random.int/{lower_bound} {exclusive_upper_bound}%')
+        self.__lower_bound = lower_bound
+        self.__exclusive_upper_bound = exclusive_upper_bound
+        super().__init__(self.__create_name())
 
     def __create_name(self) -> str:
         return f'%random.int/{self.lower_bound} {self.exclusive_upper_bound}%'

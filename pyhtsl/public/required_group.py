@@ -21,5 +21,5 @@ class RequiredGroup(TinyCondition):
         self.group = group if isinstance(group, Group) else Group(group)
         self.include_higher_groups = include_higher_groups
 
-    def __str__(self) -> str:
+    def create_line(self) -> str:
         return f'hasGroup "{self.group.name}" {str(self.include_higher_groups).lower()}'

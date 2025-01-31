@@ -18,5 +18,5 @@ class DamageCause(TinyCondition):
     ) -> None:
         self.damage_cause = damage_cause
 
-    def __str__(self) -> str:
+    def create_line(self) -> str:
         return f'damageCause "{self.damage_cause}"'

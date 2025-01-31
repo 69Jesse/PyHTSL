@@ -19,7 +19,7 @@ class HasItem(TinyCondition):
         self,
         item: Item | str,
         what_to_check: Literal['item_type', 'metadata'] = 'metadata',
-        where_to_check: Literal['hand', 'armor', 'hotbar', 'inventory', 'anywhere'] = 'anywhere',
+        where_to_check: Literal['hand', 'armor', 'hotbar', 'inventory', 'cursor', 'crafting_grid', 'anywhere'] = 'anywhere',
         required_amount: Literal['any_amount', 'equal_or_greater_amount'] = 'any_amount',
     ) -> None:
         self.item = item
@@ -27,7 +27,7 @@ class HasItem(TinyCondition):
         self.where_to_check = where_to_check
         self.required_amount = required_amount
 
-    def __str__(self) -> str:
+    def create_line(self) -> str:
         if isinstance(self.item, Item):
             name = self.item.save()
         else:

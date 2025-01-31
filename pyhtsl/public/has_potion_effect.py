@@ -18,5 +18,5 @@ class HasPotionEffect(TinyCondition):
     ) -> None:
         self.effect = effect
 
-    def __str__(self) -> str:
+    def create_line(self) -> str:
         return f'hasPotion "{self.effect}"'

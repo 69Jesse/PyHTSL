@@ -13,5 +13,5 @@ class WithinRegion(TinyCondition):
     ) -> None:
         self.region = region if isinstance(region, Region) else Region(region)
 
-    def __str__(self) -> str:
+    def create_line(self) -> str:
         return f'inRegion "{self.region}"'

@@ -62,7 +62,7 @@ def create_function(
             goto(container='function', name=name, add_to_front=True)  # type: ignore
             if create if create is not None else (func.__module__ == '__main__'):
                 goto(container='function', name=name)
-                func(*(param.cls(name=param.name) for param in parameters))
+                func(*(param.cls(name=param.name) for param in parameters))  # type: ignore
         WRITER.registered_functions.append(wrapper)
         return Function(name=name, parameters=parameters)
     return decorator

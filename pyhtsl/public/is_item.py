@@ -27,7 +27,7 @@ class IsItem(TinyCondition):
         self.where_to_check = where_to_check
         self.required_amount = required_amount
 
-    def __str__(self) -> str:
+    def create_line(self) -> str:
         if isinstance(self.item, Item):
             name = self.item.save()
         else:

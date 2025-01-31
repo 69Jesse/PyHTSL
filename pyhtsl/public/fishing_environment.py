@@ -17,5 +17,5 @@ class FishingEnvironment(TinyCondition):
     ) -> None:
         self.environment = environment
 
-    def __str__(self) -> str:
+    def create_line(self) -> str:
         return f'fishingEnv "{self.environment}"'
