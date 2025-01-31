@@ -17,5 +17,5 @@ class RawCondition(Condition):
     ) -> None:
         self.name = name
 
-    def __str__(self) -> str:
+    def create_line(self) -> str:
         return self.name

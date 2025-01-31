@@ -68,6 +68,9 @@ class StatValue:
     def __floordiv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
         return Expression.floordiv(self.stat, other)
 
+    def __pow__(self, other: int) -> Expression | int:
+        return Expression.pow(self.stat, other)
+
     def __neg__(self) -> Expression:
         return Expression.neg(self.stat)
 

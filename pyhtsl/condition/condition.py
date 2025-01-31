@@ -18,11 +18,19 @@ __all__ = (
 
 
 class Condition(ABC):
+    inverted: bool = False
     __slots__ = ()
 
     @abstractmethod
-    def __str__(self) -> str:
+    def create_line(self) -> str:
         raise NotImplementedError
+
+    def __invert__(self) -> 'Condition':
+        self.inverted = not self.inverted
+        return self
+
+    def __str__(self) -> str:
+        return ('!' * self.inverted) + self.create_line()
 
 
 class Operator(Enum):
@@ -175,5 +183,5 @@ class OperatorCondition(Condition):
         self.right = right
         self.operator = operator
 
-    def __str__(self) -> str:
+    def create_line(self) -> str:
         return f'{repr(self.left)} {self.operator.value} "{str(self.right)}"'

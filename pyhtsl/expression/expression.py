@@ -187,6 +187,24 @@ class Expression:
         return Expression.truediv(left, right)
 
     @staticmethod
+    def pow(
+        left: 'Expression | Stat | PlaceholderValue',
+        right: int,
+    ) -> 'Expression | int':
+        if right < 0:
+            raise ValueError('Power must be greater than or equal to 0')
+        if right == 0:
+            return 1
+        temp_stat = EXPR_HANDLER.temporary_stat_cls()
+        expr = Expression(temp_stat, left, ExpressionType.Set)
+        EXPR_HANDLER.add(expr)
+        # TODO optimize this
+        for _ in range(right - 1):
+            expr = Expression(temp_stat, left, ExpressionType.Multiply)
+            EXPR_HANDLER.add(expr)
+        return expr
+
+    @staticmethod
     def neg(value: 'Expression | Stat | PlaceholderValue') -> 'Expression':
         return Expression.mul(value, -1)
 

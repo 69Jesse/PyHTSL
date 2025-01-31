@@ -20,5 +20,5 @@ class BlockType(TinyCondition):
         self.block_name = block_name
         self.match_type_only = match_type_only
 
-    def __str__(self) -> str:
+    def create_line(self) -> str:
         return f'blockType "{self.block_name}" {str(self.match_type_only).lower()}'
