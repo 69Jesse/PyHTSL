@@ -188,37 +188,90 @@ class Expression:
         return Expression.truediv(left, right)
 
     @staticmethod
+    def _pow_multiply_strat(
+        left: 'Expression | Stat | PlaceholderValue',
+        right: int,
+    ) -> 'Expression | int':
+        if right == 0:
+            return 1
+        temp_stat = EXPR_HANDLER.temporary_stat_cls()
+        expr = Expression(temp_stat, left, ExpressionType.Set)
+        EXPR_HANDLER.add(expr)
+        log2 = int(math.log2(right))
+        for _ in range(log2):
+            expr = Expression(temp_stat, temp_stat, ExpressionType.Multiply)
+            EXPR_HANDLER.add(expr)
+        remaining = right - 2 ** log2
+        if remaining == 0:
+            return expr
+        expr = Expression(temp_stat, Expression.pow(left, remaining), ExpressionType.Multiply)
+        EXPR_HANDLER.add(expr)
+        return expr
+
+    @staticmethod
+    def _pow_divide_strat(
+        left: 'Expression | Stat | PlaceholderValue',
+        right: int,
+    ) -> 'Expression | int':
+        if right == 0:
+            return 1
+        temp_stat = EXPR_HANDLER.temporary_stat_cls()
+        expr = Expression(temp_stat, left, ExpressionType.Set)
+        EXPR_HANDLER.add(expr)
+        log2 = int(math.log2(right))
+        for _ in range(log2 + 1):
+            expr = Expression(temp_stat, temp_stat, ExpressionType.Multiply)
+            EXPR_HANDLER.add(expr)
+        remaining = 2 ** (log2 + 1) - right
+        assert remaining > 0
+        if remaining == 1:
+            expr = Expression(temp_stat, left, ExpressionType.Divide)
+            EXPR_HANDLER.add(expr)
+            return expr
+        if remaining == 2:
+            expr = Expression(temp_stat, left, ExpressionType.Divide)
+            EXPR_HANDLER.add(expr)
+            expr = Expression(temp_stat, left, ExpressionType.Divide)
+            EXPR_HANDLER.add(expr)
+            return expr
+        if remaining & (remaining - 1) == 0:
+            expr = Expression(temp_stat, Expression._pow_multiply_strat(left, remaining), ExpressionType.Divide)
+            EXPR_HANDLER.add(expr)
+            return expr
+        expr = Expression(temp_stat, Expression.pow(left, remaining), ExpressionType.Divide)
+        EXPR_HANDLER.add(expr)
+        return expr
+
+    @staticmethod
     def pow(
         left: 'Expression | Stat | PlaceholderValue',
         right: int,
     ) -> 'Expression | int':
         if right < 0:
             raise ValueError('Power must be greater than or equal to 0')
-        if right == 0:
-            return 1
 
-        first_temp_stat: Optional['TemporaryStat'] = None
-        remaining = right
-        while True:
-            temp_stat = EXPR_HANDLER.temporary_stat_cls()
-            expr = Expression(temp_stat, left, ExpressionType.Set)
-            EXPR_HANDLER.add(expr)
-            log2 = int(math.log2(remaining))
-            for _ in range(log2):
-                expr = Expression(temp_stat, temp_stat, ExpressionType.Multiply)
-                EXPR_HANDLER.add(expr)
-            remaining -= 2 ** log2
-            if first_temp_stat is not None:
-                expr = Expression(first_temp_stat, temp_stat, ExpressionType.Multiply)
-                EXPR_HANDLER.add(expr)
-            if first_temp_stat is None:
-                first_temp_stat = temp_stat
-            if remaining == 0:
-                return expr
-            if remaining == 1:
-                expr = Expression(first_temp_stat, left, ExpressionType.Multiply)
-                EXPR_HANDLER.add(expr)
-                return expr
+        before_length = len(EXPR_HANDLER._expressions)
+        multiply_strat_expr = Expression._pow_multiply_strat(left, right)
+        multiply_strat_after_length = len(EXPR_HANDLER._expressions)
+        if multiply_strat_after_length - before_length <= 1:
+            return multiply_strat_expr
+
+        multiply_expressions: list['Expression'] = []
+        for _ in range(multiply_strat_after_length - before_length):
+            multiply_expressions.append(EXPR_HANDLER._expressions.pop(before_length))
+
+        assert len(EXPR_HANDLER._expressions) == before_length
+        divide_strat_expr = Expression._pow_divide_strat(left, right)
+        divide_strat_after_length = len(EXPR_HANDLER._expressions)
+
+        if divide_strat_after_length < multiply_strat_after_length:
+            return divide_strat_expr
+
+        for _ in range(divide_strat_after_length - before_length):
+            EXPR_HANDLER._expressions.pop()
+        assert len(EXPR_HANDLER._expressions) == before_length
+        EXPR_HANDLER._expressions.extend(multiply_expressions)
+        return multiply_strat_expr
 
     @staticmethod
     def neg(value: 'Expression | Stat | PlaceholderValue') -> 'Expression':

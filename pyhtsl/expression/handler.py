@@ -19,18 +19,18 @@ LinesType = list[tuple['Stat', ExpressionType, 'Stat | int | PlaceholderValue']]
 
 @final
 class ExpressionHandler:
-    __expressions: list['Expression'] = []
+    _expressions: list['Expression'] = []
     temporary_stat_cls: ClassVar[type['TemporaryStat']]
 
     def add(self, expression: 'Expression') -> None:
-        self.__expressions.append(expression)
+        self._expressions.append(expression)
 
     def is_empty(self) -> bool:
-        return not self.__expressions
+        return not self._expressions
 
     def create_lines(self) -> LinesType:
         lines: LinesType = []
-        for expression in self.__expressions:
+        for expression in self._expressions:
             left = expression.fetch_stat_or_int(expression.left)
             if TYPE_CHECKING:
                 assert isinstance(left, Stat)
@@ -155,7 +155,7 @@ class ExpressionHandler:
         self.take_out_useless(lines)
         self.rename_temporary_stats(lines)
         self.write_lines(lines)
-        self.__expressions.clear()
+        self._expressions.clear()
 
 
 EXPR_HANDLER = ExpressionHandler()
