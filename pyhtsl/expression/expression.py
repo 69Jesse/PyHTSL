@@ -204,6 +204,10 @@ class Expression:
         remaining = right - 2 ** log2
         if remaining == 0:
             return expr
+        if remaining == 1:
+            expr = Expression(temp_stat, left, ExpressionType.Multiply)
+            EXPR_HANDLER.add(expr)
+            return expr
         expr = Expression(temp_stat, Expression.pow(left, remaining), ExpressionType.Multiply)
         EXPR_HANDLER.add(expr)
         return expr
