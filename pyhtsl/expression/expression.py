@@ -1,4 +1,5 @@
 import os
+import math
 
 from .handler import EXPR_HANDLER
 from .expression_type import ExpressionType
@@ -6,7 +7,7 @@ from .expression_type import ExpressionType
 from typing import TYPE_CHECKING, Optional, overload
 if TYPE_CHECKING:
     from typing import Self
-    from ..stat import Stat
+    from ..stat import Stat, TemporaryStat
     from ..condition import PlaceholderValue, Condition, IfStatement
     PlaceholderValueCls = type['PlaceholderValue']
 
@@ -195,14 +196,29 @@ class Expression:
             raise ValueError('Power must be greater than or equal to 0')
         if right == 0:
             return 1
-        temp_stat = EXPR_HANDLER.temporary_stat_cls()
-        expr = Expression(temp_stat, left, ExpressionType.Set)
-        EXPR_HANDLER.add(expr)
-        # TODO optimize this
-        for _ in range(right - 1):
-            expr = Expression(temp_stat, left, ExpressionType.Multiply)
+
+        first_temp_stat: Optional['TemporaryStat'] = None
+        remaining = right
+        while True:
+            temp_stat = EXPR_HANDLER.temporary_stat_cls()
+            expr = Expression(temp_stat, left, ExpressionType.Set)
             EXPR_HANDLER.add(expr)
-        return expr
+            log2 = int(math.log2(remaining))
+            for _ in range(log2):
+                expr = Expression(temp_stat, temp_stat, ExpressionType.Multiply)
+                EXPR_HANDLER.add(expr)
+            remaining -= 2 ** log2
+            if first_temp_stat is not None:
+                expr = Expression(first_temp_stat, temp_stat, ExpressionType.Multiply)
+                EXPR_HANDLER.add(expr)
+            if first_temp_stat is None:
+                first_temp_stat = temp_stat
+            if remaining == 0:
+                return expr
+            if remaining == 1:
+                expr = Expression(first_temp_stat, left, ExpressionType.Multiply)
+                EXPR_HANDLER.add(expr)
+                return expr
 
     @staticmethod
     def neg(value: 'Expression | Stat | PlaceholderValue') -> 'Expression':
