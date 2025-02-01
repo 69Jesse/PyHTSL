@@ -285,6 +285,29 @@ class Expression:
         return multiply_strat_expr
 
     @staticmethod
+    def imod(
+        left: 'Expression | Stat',
+        right: 'Expression | Stat | int | PlaceholderValue',
+    ) -> None:
+        Expression.set(left, Expression.mod(left, right))
+
+    @staticmethod
+    def mod(
+        left: 'Expression | Stat | PlaceholderValue',
+        right: 'Expression | Stat | int | PlaceholderValue',
+    ) -> 'Expression':
+        temp_stat = EXPR_HANDLER.temporary_stat_cls()
+        expr = Expression(temp_stat, left, ExpressionType.Set)
+        EXPR_HANDLER.add(expr)
+        expr = Expression(temp_stat, right, ExpressionType.Divide)
+        EXPR_HANDLER.add(expr)
+        expr = Expression(temp_stat, right, ExpressionType.Multiply)
+        EXPR_HANDLER.add(expr)
+        expr = Expression(temp_stat, left, ExpressionType.Decrement)
+        EXPR_HANDLER.add(expr)
+        return expr
+
+    @staticmethod
     def neg(value: 'Expression | Stat | PlaceholderValue') -> 'Expression':
         return Expression.mul(value, -1)
 
@@ -338,6 +361,13 @@ class Expression:
 
     def __pow__(self, other: int) -> 'Expression | int':
         return Expression.pow(self, other)
+
+    def __imod__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
+        Expression.imod(self, other)
+        return self
+
+    def __mod__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
+        return Expression.mod(self, other)
 
     def __neg__(self) -> 'Expression':
         return Expression.neg(self)

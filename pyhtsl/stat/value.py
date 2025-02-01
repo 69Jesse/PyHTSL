@@ -75,6 +75,13 @@ class StatValue:
     def __pow__(self, other: int) -> Expression | int:
         return Expression.pow(self.stat, other)
 
+    def __imod__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
+        Expression.imod(self.stat, other)
+        return self
+
+    def __mod__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
+        return Expression.mod(self.stat, other)
+
     def __neg__(self) -> Expression:
         return Expression.neg(self.stat)
 

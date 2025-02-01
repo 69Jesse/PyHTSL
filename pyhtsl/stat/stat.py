@@ -183,6 +183,13 @@ class Stat(ABC):
     def __pow__(self, other: int) -> 'Expression | int':
         return self.value ** other
 
+    def __imod__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
+        self.value %= other
+        return self
+
+    def __mod__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
+        return self.value % other
+
     def __neg__(self) -> 'Expression':
         return -self.value
 
