@@ -42,7 +42,6 @@ class ExpressionHandler:
         self,
         lines: LinesType,
     ) -> None:
-        skipping_temporary_stats: set['TemporaryStat'] = set()
         for i in range(len(lines)):
             left, type, right = lines[i]
 
@@ -60,41 +59,6 @@ class ExpressionHandler:
                         new_right = left
                     lines[j] = (new_left, new_type, new_right)
                 continue
-
-            if isinstance(right, self.temporary_stat_cls) and type is ExpressionType.Set:
-                # l-tempstat = r-tempstat -> all next l-tempstat to r-tempstat
-                lines[i] = (right, type, right)
-                for j in range(i + 1, len(lines)):
-                    new_left, new_type, new_right = lines[j]
-                    if isinstance(new_left, self.temporary_stat_cls) and new_left.number == left.number:
-                        new_left = right
-                    if isinstance(new_right, self.temporary_stat_cls) and new_right.number == left.number:
-                        new_right = right
-                    lines[j] = (new_left, new_type, new_right)
-                continue
-
-            # check for possible lower number to avoid using unnecessary temporary stats
-            if left in skipping_temporary_stats:
-                continue
-            for number in range(TEMP_STATS_NUMBER_START, left.number):
-                for j in range(i, len(lines)):
-                    new_left, new_type, new_right = lines[j]
-                    if (
-                        isinstance(new_left, self.temporary_stat_cls)
-                        and new_left.number == number
-                        and new_type is not ExpressionType.Set
-                    ):
-                        break
-                    if (
-                        isinstance(new_right, self.temporary_stat_cls)
-                        and new_right.number == number
-                    ):
-                        break
-                else:
-                    left.number = number
-                    break
-            else:
-                skipping_temporary_stats.add(left)
 
     def take_out_useless(
         self,
