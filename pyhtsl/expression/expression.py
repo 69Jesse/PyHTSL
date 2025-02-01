@@ -188,6 +188,13 @@ class Expression:
         return Expression.truediv(left, right)
 
     @staticmethod
+    def ipow(
+        left: 'Expression | Stat',
+        right: int,
+    ) -> None:
+        return Expression.set(left, Expression.pow(left, right))
+
+    @staticmethod
     def _pow_multiply_strat(
         left: 'Expression | Stat | PlaceholderValue',
         right: int,
@@ -324,6 +331,13 @@ class Expression:
 
     def __floordiv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return Expression.truediv(self, other)
+
+    def __ipow__(self, other: int) -> 'Self':
+        Expression.ipow(self, other)
+        return self
+
+    def __pow__(self, other: int) -> 'Expression | int':
+        return Expression.pow(self, other)
 
     def __neg__(self) -> 'Expression':
         return Expression.neg(self)

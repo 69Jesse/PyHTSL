@@ -176,6 +176,10 @@ class Stat(ABC):
     def __floordiv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return self.value // other
 
+    def __ipow__(self, other: int) -> 'Self':
+        self.value **= other
+        return self
+
     def __pow__(self, other: int) -> 'Expression | int':
         return self.value ** other
 
