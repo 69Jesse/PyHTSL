@@ -273,7 +273,7 @@ class Expression:
 
     def __str__(self) -> str:
         """Do NOT call this method when it is not used inside of a f-string! It will break things.
-        
+
         The reason that this pushes is that you can make something like this work:
         ```py
         stat = PlayerStat('stat')
@@ -285,7 +285,7 @@ class Expression:
 
     def __repr__(self) -> str:
         """Do NOT call this method when it is not used inside of a f-string! It will break things.
-        
+
         The reason that this pushes is that you can make something like this work:
         ```py
         stat = PlayerStat('stat')
