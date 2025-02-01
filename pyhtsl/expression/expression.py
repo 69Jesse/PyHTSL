@@ -296,14 +296,17 @@ class Expression:
         left: 'Expression | Stat | PlaceholderValue',
         right: 'Expression | Stat | int | PlaceholderValue',
     ) -> 'Expression':
-        temp_stat = EXPR_HANDLER.temporary_stat_cls()
-        expr = Expression(temp_stat, left, ExpressionType.Set)
+        temp_stat_1 = EXPR_HANDLER.temporary_stat_cls()
+        expr = Expression(temp_stat_1, left, ExpressionType.Set)
         EXPR_HANDLER.add(expr)
-        expr = Expression(temp_stat, right, ExpressionType.Divide)
+        temp_stat_2 = EXPR_HANDLER.temporary_stat_cls()
+        expr = Expression(temp_stat_2, left, ExpressionType.Set)
         EXPR_HANDLER.add(expr)
-        expr = Expression(temp_stat, right, ExpressionType.Multiply)
+        expr = Expression(temp_stat_2, right, ExpressionType.Divide)
         EXPR_HANDLER.add(expr)
-        expr = Expression(temp_stat, left, ExpressionType.Decrement)
+        expr = Expression(temp_stat_2, right, ExpressionType.Multiply)
+        EXPR_HANDLER.add(expr)
+        expr = Expression(temp_stat_1, temp_stat_2, ExpressionType.Decrement)
         EXPR_HANDLER.add(expr)
         return expr
 
