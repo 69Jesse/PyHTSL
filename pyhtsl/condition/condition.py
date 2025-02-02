@@ -52,20 +52,11 @@ class PlaceholderValue:
     def __add__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
         return Expression.add(self, other)
 
-    def __radd__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
-        return Expression.radd(self, other)
-
     def __sub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
         return Expression.sub(self, other)
 
-    def __rsub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
-        return Expression.rsub(self, other)
-
     def __mul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
         return Expression.mul(self, other)
-
-    def __rmul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
-        return Expression.rmul(self, other)
 
     def __truediv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
         return Expression.truediv(self, other)

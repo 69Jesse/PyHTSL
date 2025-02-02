@@ -28,18 +28,12 @@ class StatValue:
     def __add__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
         return Expression.add(self.stat, other)
 
-    def __radd__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
-        return Expression.radd(self.stat, other)
-
     def __isub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         Expression.isub(self.stat, other)
         return self
 
     def __sub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
         return Expression.sub(self.stat, other)
-
-    def __rsub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
-        return Expression.rsub(self.stat, other)
 
     def set(self, value: 'Expression | Stat | int | PlaceholderValue') -> None:
         return Expression.set(self.stat, value)
@@ -50,9 +44,6 @@ class StatValue:
 
     def __mul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
         return Expression.mul(self.stat, other)
-
-    def __rmul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
-        return Expression.rmul(self.stat, other)
 
     def __itruediv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         Expression.itruediv(self.stat, other)

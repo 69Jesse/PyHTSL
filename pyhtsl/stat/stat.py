@@ -139,9 +139,6 @@ class Stat(ABC):
     def __add__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return self.value + other
 
-    def __radd__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
-        return other + self.value
-
     def __isub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         self.value -= other
         return self
@@ -149,18 +146,12 @@ class Stat(ABC):
     def __sub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return self.value - other
 
-    def __rsub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
-        return other - self.value
-
     def __imul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         self.value *= other
         return self
 
     def __mul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return self.value * other
-
-    def __rmul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
-        return other * self.value
 
     def __itruediv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         self.value /= other
