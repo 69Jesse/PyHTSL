@@ -57,8 +57,47 @@ class ExpressionHandler:
                     # We have:
                     # `stat = tempstat`
                     # this means that
-                    #     - we can replace all previous tempstat to stat
+                    #     - we can replace all previous tempstat with stat
                     #     - but ONLY IF tempstat is not used after this line
+
+                    used_after = False
+                    for j in range(i + 1, len(lines)):
+                        new_left, new_type, new_right = lines[j]
+                        if isinstance(new_left, self.temporary_stat_cls) and new_left.number == right.number:
+                            used_after = True
+                            break
+                        if isinstance(new_right, self.temporary_stat_cls) and new_right.number == right.number:
+                            used_after = True
+                            break
+                    if used_after:
+                        continue
+
+                    for j in range(i, -1, -1):
+                        new_left, new_type, new_right = lines[j]
+                        changing = False
+                        if isinstance(new_left, self.temporary_stat_cls) and new_left.number == right.number:
+                            new_left = left
+                            changing = True
+                        if isinstance(new_right, self.temporary_stat_cls) and new_right.number == right.number:
+                            new_right = left
+                            changing = True
+                        if changing:
+                            lines[j] = (new_left, new_type, new_right)
+                            has_changed = True
+
+                    continue
+
+                else:
+                    if not isinstance(right, self.temporary_stat_cls):
+                        continue
+                    if type is not ExpressionType.Set:
+                        continue
+
+                    # We have:
+                    # `tempstat1 = tempstat2`
+                    # this means that
+                    #     - we can replace all previous tempstat2 with tempstat1
+                    #     - but ONLY IF tempstat2 is not used after this line
 
                     used_after = False
                     for j in range(i + 1, len(lines)):
