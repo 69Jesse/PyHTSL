@@ -219,7 +219,10 @@ class Fixer:
         for addon in reversed(self.new_functions_added):
             lines.insert(0, addon.create_goto_line())
 
-        self.fix_goto_order(lines)
+        try:
+            self.fix_goto_order(lines)
+        except IndexError:
+            return []
 
         for i in range(len(lines) - 1, -1, -1):
             line = lines[i]
