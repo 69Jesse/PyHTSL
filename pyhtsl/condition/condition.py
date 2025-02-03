@@ -52,17 +52,32 @@ class PlaceholderValue:
     def __add__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
         return Expression.add(self, other)
 
+    def __radd__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
+        return Expression.radd(other, self)
+
     def __sub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
         return Expression.sub(self, other)
+
+    def __rsub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
+        return Expression.rsub(other, self)
 
     def __mul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
         return Expression.mul(self, other)
 
+    def __rmul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
+        return Expression.rmul(other, self)
+
     def __truediv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
         return Expression.truediv(self, other)
 
+    def __rtruediv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
+        return Expression.rtruediv(other, self)
+
     def __floordiv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
         return Expression.floordiv(self, other)
+
+    def __rfloordiv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
+        return Expression.rfloordiv(other, self)
 
     def __neg__(self) -> Expression:
         return Expression.neg(self)

@@ -75,6 +75,13 @@ class Expression:
         return expr
 
     @staticmethod
+    def radd(
+        left: 'Expression | Stat | int | PlaceholderValue',
+        right: 'Expression | Stat | PlaceholderValue',
+    ) -> 'Expression':
+        return Expression.add(right, left)
+
+    @staticmethod
     def isub(
         left: 'Expression | Stat',
         right: 'Expression | Stat | int | PlaceholderValue',
@@ -93,6 +100,19 @@ class Expression:
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat, right, ExpressionType.Decrement)
         EXPR_HANDLER.add(expr)
+        return expr
+
+    @staticmethod
+    def rsub(
+        left: 'Expression | Stat | int | PlaceholderValue',
+        right: 'Expression | Stat | PlaceholderValue',
+    ) -> 'Expression':
+        temp_stat = EXPR_HANDLER.temporary_stat_cls()
+        expr = Expression(temp_stat, left, ExpressionType.Set)
+        EXPR_HANDLER.add(expr)
+        EXPR_HANDLER.add(
+            Expression(temp_stat, right, ExpressionType.Decrement),
+        )
         return expr
 
     @staticmethod
@@ -126,6 +146,13 @@ class Expression:
         return expr
 
     @staticmethod
+    def rmul(
+        left: 'Expression | Stat | int | PlaceholderValue',
+        right: 'Expression | Stat | PlaceholderValue',
+    ) -> 'Expression':
+        return Expression.mul(right, left)
+
+    @staticmethod
     def itruediv(
         left: 'Expression | Stat',
         right: 'Expression | Stat | int | PlaceholderValue',
@@ -147,6 +174,19 @@ class Expression:
         return expr
 
     @staticmethod
+    def rtruediv(
+        left: 'Expression | Stat | int | PlaceholderValue',
+        right: 'Expression | Stat | PlaceholderValue',
+    ) -> 'Expression':
+        temp_stat = EXPR_HANDLER.temporary_stat_cls()
+        expr = Expression(temp_stat, left, ExpressionType.Set)
+        EXPR_HANDLER.add(expr)
+        EXPR_HANDLER.add(
+            Expression(temp_stat, right, ExpressionType.Divide),
+        )
+        return expr
+
+    @staticmethod
     def ifloordiv(
         left: 'Expression | Stat',
         right: 'Expression | Stat | int | PlaceholderValue',
@@ -159,6 +199,13 @@ class Expression:
         right: 'Expression | Stat | int | PlaceholderValue',
     ) -> 'Expression':
         return Expression.truediv(left, right)
+
+    @staticmethod
+    def rfloordiv(
+        left: 'Expression | Stat | int | PlaceholderValue',
+        right: 'Expression | Stat | PlaceholderValue',
+    ) -> 'Expression':
+        return Expression.rtruediv(left, right)
 
     @staticmethod
     def ipow(
@@ -294,12 +341,18 @@ class Expression:
     def __add__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return Expression.add(self, other)
 
+    def __radd__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
+        return Expression.radd(other, self)
+
     def __isub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         Expression.isub(self, other)
         return self
 
     def __sub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return Expression.sub(self, other)
+
+    def __rsub__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
+        return Expression.rsub(other, self)
 
     def __imul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         Expression.imul(self, other)
@@ -308,6 +361,9 @@ class Expression:
     def __mul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return Expression.mul(self, other)
 
+    def __rmul__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
+        return Expression.rmul(other, self)
+
     def __itruediv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         Expression.itruediv(self, other)
         return self
@@ -315,12 +371,18 @@ class Expression:
     def __truediv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return Expression.truediv(self, other)
 
+    def __rtruediv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
+        return Expression.rtruediv(other, self)
+
     def __ifloordiv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         Expression.ifloordiv(self, other)
         return self
 
     def __floordiv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
-        return Expression.truediv(self, other)
+        return Expression.floordiv(self, other)
+
+    def __rfloordiv__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
+        return Expression.rfloordiv(other, self)
 
     def __ipow__(self, other: int) -> 'Self':
         Expression.ipow(self, other)
