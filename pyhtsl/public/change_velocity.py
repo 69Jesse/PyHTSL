@@ -13,6 +13,6 @@ def change_velocity(
     z: Stat | int,
 ) -> None:
     WRITER.write(
-        f'changeVelocity {x} {y} {z}',
+        f'changeVelocity "{x}" "{y}" "{z}"',
         LineType.miscellaneous,
     )
