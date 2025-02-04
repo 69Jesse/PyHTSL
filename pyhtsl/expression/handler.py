@@ -61,11 +61,10 @@ class ExpressionHandler:
                     #     - but ONLY IF
                     #         * there is no `tempstat = ...` before this line
                     #         * tempstat is not used after this line
-                    print('WTFFFF')
+
                     assigned_before = False
                     for j in range(i - 1, -1, -1):
                         other_left, other_type, other_right = lines[j]
-                        print('OTHER', other_left, other_type, other_right)
                         if isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number and other_type is ExpressionType.Set:
                             assigned_before = True
                             break
@@ -202,9 +201,7 @@ class ExpressionHandler:
         if self.is_empty():
             return
         lines = self.create_lines()
-        print('BEFORE', lines)
         self.optimize_lines(lines)
-        print('AFTER', lines)
         self.take_out_useless(lines)
         self.rename_temporary_stats(lines)
         self.write_lines(lines)
