@@ -42,6 +42,10 @@ class ExpressionHandler:
         self,
         lines: LinesType,
     ) -> None:
+        for i in range(len(lines) - 1):
+            left, _, _ = lines[i]
+            assert isinstance(left, self.temporary_stat_cls)
+
         has_changed = True
         while has_changed:
             has_changed = False
@@ -60,20 +64,17 @@ class ExpressionHandler:
                     #     - we can replace all previous tempstat with stat
                     #     - but ONLY IF
                     #         * stat is not used before this line in relation with tempstat
+                    #             the exception being `tempstat = stat`
                     #         * tempstat is not used after this line
 
                     used_before = False
                     for j in range(i - 1, -1, -1):
                         other_left, other_type, other_right = lines[j]
-                        if (
-                            type(other_left) is type(left) and other_left.name == left.name
-                            and isinstance(other_right, self.temporary_stat_cls) and other_right.number == right.number
-                        ):
-                            used_before = True
-                            break
+                        assert type(other_left) is not type(left)
                         if (
                             isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number
                             and type(other_right) is type(left) and other_right.name == left.name  # type: ignore
+                            and other_type is not ExpressionType.Set
                         ):
                             used_before = True
                             break
@@ -119,6 +120,7 @@ class ExpressionHandler:
                     #     - we can replace all previous tempstat2 with tempstat1
                     #     - but ONLY IF
                     #         * tempstat1 is not used before this line in relation with tempstat2
+                    #             the exception being `tempstat2 = tempstat1`
                     #         * tempstat2 is not used after this line
 
                     used_before = False
@@ -133,6 +135,7 @@ class ExpressionHandler:
                         if (
                             isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number
                             and isinstance(other_right, self.temporary_stat_cls) and other_right.number == left.number
+                            and other_type is not ExpressionType.Set
                         ):
                             used_before = True
                             break
