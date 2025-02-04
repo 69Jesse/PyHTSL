@@ -46,12 +46,12 @@ class ExpressionHandler:
         while has_changed:
             has_changed = False
             for i in range(len(lines)):
-                left, type, right = lines[i]
+                left, expr_type, right = lines[i]
 
                 if not isinstance(left, self.temporary_stat_cls):
                     if not isinstance(right, self.temporary_stat_cls):
                         continue
-                    if type is not ExpressionType.Set:
+                    if expr_type is not ExpressionType.Set:
                         continue
 
                     # We have:
@@ -59,16 +59,25 @@ class ExpressionHandler:
                     # this means that
                     #     - we can replace all previous tempstat with stat
                     #     - but ONLY IF
-                    #         * there is no `tempstat = ...` before this line
+                    #         * stat is not used before this line in relation with tempstat
                     #         * tempstat is not used after this line
 
-                    assigned_before = False
+                    used_before = False
                     for j in range(i - 1, -1, -1):
                         other_left, other_type, other_right = lines[j]
-                        if isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number and other_type is ExpressionType.Set:
-                            assigned_before = True
+                        if (
+                            type(other_left) is type(left) and other_left.name == left.name
+                            and isinstance(other_right, self.temporary_stat_cls) and other_right.number == right.number
+                        ):
+                            used_before = True
                             break
-                    if assigned_before:
+                        if (
+                            isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number
+                            and type(other_right) is type(left) and other_right.name == left.name  # type: ignore
+                        ):
+                            used_before = True
+                            break
+                    if used_before:
                         continue
 
                     used_after = False
@@ -101,7 +110,7 @@ class ExpressionHandler:
                 else:
                     if not isinstance(right, self.temporary_stat_cls):
                         continue
-                    if type is not ExpressionType.Set:
+                    if expr_type is not ExpressionType.Set:
                         continue
 
                     # We have:
@@ -109,17 +118,24 @@ class ExpressionHandler:
                     # this means that
                     #     - we can replace all previous tempstat2 with tempstat1
                     #     - but ONLY IF
-                    #         * there is no `tempstat2 = ...` before this line
+                    #         * tempstat1 is not used before this line in relation with tempstat2
                     #         * tempstat2 is not used after this line
 
-                    assigned_before = False
+                    used_before = False
                     for j in range(i - 1, -1, -1):
                         other_left, other_type, other_right = lines[j]
-                        if isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number and other_type is ExpressionType.Set:
-                            assigned_before = True
+                        if (
+                            isinstance(other_left, self.temporary_stat_cls) and other_left.number == left.number
+                            and isinstance(other_right, self.temporary_stat_cls) and other_right.number == right.number
+                        ):
+                            used_before = True
                             break
-                    if assigned_before:
-                        continue
+                        if (
+                            isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number
+                            and isinstance(other_right, self.temporary_stat_cls) and other_right.number == left.number
+                        ):
+                            used_before = True
+                            break
 
                     used_after = False
                     for j in range(i + 1, len(lines)):
