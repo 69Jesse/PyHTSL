@@ -58,31 +58,43 @@ class ExpressionHandler:
                     # `stat = tempstat`
                     # this means that
                     #     - we can replace all previous tempstat with stat
-                    #     - but ONLY IF tempstat is not used after this line
+                    #     - but ONLY IF
+                    #         * there is no `tempstat = ...` before this line
+                    #         * tempstat is not used after this line
+                    print('WTFFFF')
+                    assigned_before = False
+                    for j in range(i - 1, -1, -1):
+                        other_left, other_type, other_right = lines[j]
+                        print('OTHER', other_left, other_type, other_right)
+                        if isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number and other_type is ExpressionType.Set:
+                            assigned_before = True
+                            break
+                    if assigned_before:
+                        continue
 
                     used_after = False
                     for j in range(i + 1, len(lines)):
-                        new_left, new_type, new_right = lines[j]
-                        if isinstance(new_left, self.temporary_stat_cls) and new_left.number == right.number:
+                        other_left, other_type, other_right = lines[j]
+                        if isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number:
                             used_after = True
                             break
-                        if isinstance(new_right, self.temporary_stat_cls) and new_right.number == right.number:
+                        if isinstance(other_right, self.temporary_stat_cls) and other_right.number == right.number:
                             used_after = True
                             break
                     if used_after:
                         continue
 
                     for j in range(i, -1, -1):
-                        new_left, new_type, new_right = lines[j]
+                        other_left, other_type, other_right = lines[j]
                         changing = False
-                        if isinstance(new_left, self.temporary_stat_cls) and new_left.number == right.number:
-                            new_left = left
+                        if isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number:
+                            other_left = left
                             changing = True
-                        if isinstance(new_right, self.temporary_stat_cls) and new_right.number == right.number:
-                            new_right = left
+                        if isinstance(other_right, self.temporary_stat_cls) and other_right.number == right.number:
+                            other_right = left
                             changing = True
                         if changing:
-                            lines[j] = (new_left, new_type, new_right)
+                            lines[j] = (other_left, other_type, other_right)
                             has_changed = True
 
                     continue
@@ -97,31 +109,42 @@ class ExpressionHandler:
                     # `tempstat1 = tempstat2`
                     # this means that
                     #     - we can replace all previous tempstat2 with tempstat1
-                    #     - but ONLY IF tempstat2 is not used after this line
+                    #     - but ONLY IF
+                    #         * there is no `tempstat2 = ...` before this line
+                    #         * tempstat2 is not used after this line
+
+                    assigned_before = False
+                    for j in range(i - 1, -1, -1):
+                        other_left, other_type, other_right = lines[j]
+                        if isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number and other_type is ExpressionType.Set:
+                            assigned_before = True
+                            break
+                    if assigned_before:
+                        continue
 
                     used_after = False
                     for j in range(i + 1, len(lines)):
-                        new_left, new_type, new_right = lines[j]
-                        if isinstance(new_left, self.temporary_stat_cls) and new_left.number == right.number:
+                        other_left, other_type, other_right = lines[j]
+                        if isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number:
                             used_after = True
                             break
-                        if isinstance(new_right, self.temporary_stat_cls) and new_right.number == right.number:
+                        if isinstance(other_right, self.temporary_stat_cls) and other_right.number == right.number:
                             used_after = True
                             break
                     if used_after:
                         continue
 
                     for j in range(i, -1, -1):
-                        new_left, new_type, new_right = lines[j]
+                        other_left, other_type, other_right = lines[j]
                         changing = False
-                        if isinstance(new_left, self.temporary_stat_cls) and new_left.number == right.number:
-                            new_left = left
+                        if isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number:
+                            other_left = left
                             changing = True
-                        if isinstance(new_right, self.temporary_stat_cls) and new_right.number == right.number:
-                            new_right = left
+                        if isinstance(other_right, self.temporary_stat_cls) and other_right.number == right.number:
+                            other_right = left
                             changing = True
                         if changing:
-                            lines[j] = (new_left, new_type, new_right)
+                            lines[j] = (other_left, other_type, other_right)
                             has_changed = True
 
     def take_out_useless(
@@ -179,7 +202,9 @@ class ExpressionHandler:
         if self.is_empty():
             return
         lines = self.create_lines()
+        print('BEFORE', lines)
         self.optimize_lines(lines)
+        print('AFTER', lines)
         self.take_out_useless(lines)
         self.rename_temporary_stats(lines)
         self.write_lines(lines)
