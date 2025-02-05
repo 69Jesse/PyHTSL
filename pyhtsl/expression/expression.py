@@ -319,6 +319,34 @@ class Expression:
         temp_stat_1 = EXPR_HANDLER.temporary_stat_cls()
         expr = Expression(temp_stat_1, left, ExpressionType.Set)
         EXPR_HANDLER.add(expr)
+        expr = Expression(temp_stat_1, right, ExpressionType.Increment)
+        EXPR_HANDLER.add(expr)
+        temp_stat_2 = EXPR_HANDLER.temporary_stat_cls()
+        expr = Expression(temp_stat_2, left, ExpressionType.Set)
+        EXPR_HANDLER.add(expr)
+        expr = Expression(temp_stat_2, right, ExpressionType.Divide)
+        EXPR_HANDLER.add(expr)
+        expr = Expression(temp_stat_2, right, ExpressionType.Multiply)
+        EXPR_HANDLER.add(expr)
+        expr = Expression(temp_stat_1, temp_stat_2, ExpressionType.Decrement)
+        EXPR_HANDLER.add(expr)
+        return Expression.unsafemod(expr, right)
+
+    @staticmethod
+    def safemod(
+        left: 'Expression | Stat | PlaceholderValue',
+        right: 'Expression | Stat | int | PlaceholderValue',
+    ) -> 'Expression':
+        return Expression.mod(left, right)
+
+    @staticmethod
+    def unsafemod(
+        left: 'Expression | Stat | PlaceholderValue',
+        right: 'Expression | Stat | int | PlaceholderValue',
+    ) -> 'Expression':
+        temp_stat_1 = EXPR_HANDLER.temporary_stat_cls()
+        expr = Expression(temp_stat_1, left, ExpressionType.Set)
+        EXPR_HANDLER.add(expr)
         temp_stat_2 = EXPR_HANDLER.temporary_stat_cls()
         expr = Expression(temp_stat_2, left, ExpressionType.Set)
         EXPR_HANDLER.add(expr)

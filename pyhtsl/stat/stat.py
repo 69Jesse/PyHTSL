@@ -196,6 +196,12 @@ class Stat(ABC):
     def __mod__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
         return self.value % other
 
+    def safemod(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
+        return self.value.safemod(other)
+
+    def unsafemod(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Expression':
+        return self.value.unsafemod(other)
+
     def __neg__(self) -> 'Expression':
         return -self.value
 

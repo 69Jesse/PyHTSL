@@ -88,6 +88,12 @@ class StatValue:
     def __mod__(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
         return Expression.mod(self.stat, other)
 
+    def safemod(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
+        return Expression.safemod(self.stat, other)
+
+    def unsafemod(self, other: 'Expression | Stat | int | PlaceholderValue') -> Expression:
+        return Expression.unsafemod(self.stat, other)
+
     def __neg__(self) -> Expression:
         return Expression.neg(self.stat)
 
