@@ -44,6 +44,7 @@ def create_function(
     name: str,
     *,
     create: Optional[bool] = None,
+    run_right_now: bool = False,
 ) -> Callable[[F], Function]:
     def decorator(func: F) -> Function:
         parameters: list[StatParameter] = []
@@ -63,6 +64,11 @@ def create_function(
             if create if create is not None else (func.__module__ == '__main__'):
                 goto(container='function', name=name)
                 func(*(param.cls(name=param.name) for param in parameters))  # type: ignore
-        WRITER.registered_functions.append(wrapper)
+
+        if run_right_now:
+            wrapper()
+        else:
+            WRITER.registered_functions.append(wrapper)
+
         return Function(name=name, parameters=parameters)
     return decorator
