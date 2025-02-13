@@ -262,7 +262,10 @@ class Item:
 
         interaction_data_key: Optional[str] = extras_copy.pop('interaction_data_key', None)
         if interaction_data_key is not None:
-            extra_attributes['interact_data'] = (interaction_data_key, DataType.string)
+            extra_attributes['interact_data'] = {
+                'data': (interaction_data_key, DataType.string),
+                'version': (2, DataType.integer),
+            }
 
         is_cookie_item: bool = extras_copy.pop('is_cookie_item', False)
         if is_cookie_item:
