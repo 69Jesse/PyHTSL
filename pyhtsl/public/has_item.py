@@ -32,4 +32,8 @@ class HasItem(TinyCondition):
             name = self.item.save()
         else:
             name = self.item
-        return f'hasItem "{name}" {self.what_to_check} {self.where_to_check} {self.required_amount}'
+        required_amount = {
+            'any_amount': 'Any Amount',
+            'equal_or_greater_amount': 'Equal or Greater Amount',
+        }[self.required_amount]
+        return f'hasItem "{name}" {self.what_to_check} {self.where_to_check} "{required_amount}"'
