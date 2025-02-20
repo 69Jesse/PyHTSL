@@ -14,7 +14,7 @@ def give_item(
     inventory_slot: INVENTORY_SLOTS = 'first_slot',
     replace_existing_item: bool = False,
 ) -> None:
-    inventory_slot = _INVENTORY_SLOTS_PRETTY_NAME_MAPPING[inventory_slot]
+    inventory_slot = _INVENTORY_SLOTS_PRETTY_NAME_MAPPING.get(inventory_slot, inventory_slot)
     if isinstance(item, Item):
         name = item.save()
     else:
