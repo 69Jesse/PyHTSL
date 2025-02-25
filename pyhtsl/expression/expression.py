@@ -362,6 +362,47 @@ class Expression:
     def neg(value: 'Expression | Stat | PlaceholderValue') -> 'Expression':
         return Expression.mul(value, -1)
 
+    @staticmethod
+    def sign(
+        value: 'Expression | Stat | PlaceholderValue',
+        *,
+        greater_than_2_62: bool = False,
+        multiplied_by: int = 1,
+    ) -> 'Expression':
+        temp_stat = EXPR_HANDLER.temporary_stat_cls()
+        expr = Expression(temp_stat, value, ExpressionType.Set)
+        EXPR_HANDLER.add(expr)
+        if greater_than_2_62:
+            expr = Expression(temp_stat, 2, ExpressionType.Divide)
+            EXPR_HANDLER.add(expr)
+        expr = Expression(temp_stat, 2 ** 62, ExpressionType.Increment)
+        EXPR_HANDLER.add(expr)
+        expr = Expression(temp_stat, 2 ** 62, ExpressionType.Divide)
+        EXPR_HANDLER.add(expr)
+        expr = Expression(temp_stat, 2 * multiplied_by, ExpressionType.Multiply)
+        EXPR_HANDLER.add(expr)
+        expr = Expression(temp_stat, 1 * multiplied_by, ExpressionType.Decrement)
+        EXPR_HANDLER.add(expr)
+        return expr
+
+    @staticmethod
+    def abs(
+        value: 'Expression | Stat | PlaceholderValue',
+        *,
+        greater_than_2_62: bool = False,
+        sign: 'Expression | None' = None,
+    ) -> 'Expression':
+        temp_stat = EXPR_HANDLER.temporary_stat_cls()
+        expr = Expression(temp_stat, value, ExpressionType.Set)
+        EXPR_HANDLER.add(expr)
+        expr = Expression(
+            temp_stat,
+            sign if sign is not None else Expression.sign(value, greater_than_2_62=greater_than_2_62),
+            ExpressionType.Multiply,
+        )
+        EXPR_HANDLER.add(expr)
+        return expr
+
     def __iadd__(self, other: 'Expression | Stat | int | PlaceholderValue') -> 'Self':
         Expression.iadd(self, other)
         return self
@@ -428,6 +469,9 @@ class Expression:
 
     def __neg__(self) -> 'Expression':
         return Expression.neg(self)
+
+    def __abs__(self) -> 'Expression':
+        return Expression.abs(self)
 
     def __str__(self) -> str:
         """Do NOT call this method when it is not used inside of a f-string! It will break things.

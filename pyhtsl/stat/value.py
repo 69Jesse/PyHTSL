@@ -97,5 +97,11 @@ class StatValue:
     def __neg__(self) -> Expression:
         return Expression.neg(self.stat)
 
+    def sign(self) -> Expression:
+        return Expression.sign(self.stat)
+
+    def __abs__(self) -> Expression:
+        return Expression.abs(self.stat)
+
     def __eq__(self, other: 'Stat | PlaceholderValue | int') -> Condition:
         return OperatorCondition(self.stat, other, Operator.Equal)

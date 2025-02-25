@@ -82,6 +82,12 @@ class PlaceholderValue:
     def __neg__(self) -> Expression:
         return Expression.neg(self)
 
+    def __abs__(self) -> Expression:
+        return Expression.abs(self)
+
+    def sign(self) -> Expression:
+        return Expression.sign(self)
+
     @staticmethod
     def equals(
         left: 'Stat | PlaceholderValue | Expression',

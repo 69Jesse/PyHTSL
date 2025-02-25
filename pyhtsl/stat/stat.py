@@ -205,6 +205,12 @@ class Stat(ABC):
     def __neg__(self) -> 'Expression':
         return -self.value
 
+    def sign(self) -> 'Expression':
+        return self.value.sign()
+
+    def __abs__(self) -> 'Expression':
+        return abs(self.value)
+
     def __eq__(
         self,
         other: 'Stat | PlaceholderValue | int',
