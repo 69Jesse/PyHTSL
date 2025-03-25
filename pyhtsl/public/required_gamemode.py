@@ -18,4 +18,4 @@ class RequiredGamemode(TinyCondition):
         self.gamemode = gamemode
 
     def create_line(self) -> str:
-        return f'isGamemode "{self.gamemode}"'
+        return f'gamemode "{self.gamemode}"'
