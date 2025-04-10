@@ -28,7 +28,7 @@ def set_minecraft_folder(minecraft_folder: Path | str) -> None:
     if not minecraft_folder.exists():
         raise FileNotFoundError('The provided Minecraft folder does not exist.')
     content = CACHED_MINECRAFT_FOLDER_PATH.read_text() if CACHED_MINECRAFT_FOLDER_PATH.exists() else None
-    new_content = minecraft_folder.as_posix()
+    new_content = minecraft_folder.resolve().as_posix()
     if content is not None and content == new_content:
         return
     CACHED_MINECRAFT_FOLDER_PATH.write_text(new_content)
@@ -46,9 +46,11 @@ def get_minecraft_folder() -> Path:
     elif os.name == 'posix':
         maybe_path = Path.home() / 'Library' / 'Application Support' / 'minecraft'
 
-    if maybe_path is not None and maybe_path.exists():
-        set_minecraft_folder(maybe_path)
-        return maybe_path
+    if maybe_path is not None:
+        maybe_path = maybe_path.resolve()
+        if maybe_path.exists():
+            set_minecraft_folder(maybe_path)
+            return maybe_path
 
     print('\x1b[38;2;255;0;0mCould not find your Minecraft folder.\x1b[0m')
     while True:
@@ -56,7 +58,7 @@ def get_minecraft_folder() -> Path:
         if not raw_path:
             print('\x1b[38;2;255;0;0mPlease provide a valid path.\x1b[0m')
             continue
-        maybe_path = Path(raw_path)
+        maybe_path = Path(raw_path).resolve()
         try:
             set_minecraft_folder(maybe_path)
             return maybe_path
