@@ -21,6 +21,9 @@ class Team:
             return NotImplemented
         return self.name == other.name
 
+    def __hash__(self) -> int:
+        return hash(self.name)
+
     if TYPE_CHECKING:
         def stat(self, key: str) -> TeamStat:
             return TeamStat(key, self)

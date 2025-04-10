@@ -13,3 +13,6 @@ class Region:
         if not isinstance(other, Region):
             return NotImplemented
         return self.name == other.name
+
+    def __hash__(self) -> int:
+        return hash(self.name)

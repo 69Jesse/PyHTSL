@@ -17,23 +17,58 @@ __all__ = (
 
 
 HERE: Path = Path(__file__).parent
+CACHED_MINECRAFT_FOLDER_PATH: Path = HERE / 'cached_minecraft_folder.txt'
 
-if os.name == 'nt':
-    DOT_MINECRAFT: Path = Path(os.getenv('APPDATA')) / '.minecraft'  # type: ignore
-elif os.name == 'posix':
-    DOT_MINECRAFT: Path = Path.home() / 'Library' / 'Application Support' / 'minecraft'
-else:
-    raise OSError('Unsupported operating system')
-if not DOT_MINECRAFT.exists():
-    raise FileNotFoundError('Could not find your minecraft folder')
 
-HTSL_IMPORTS_FOLDER: Path = DOT_MINECRAFT / 'config' / 'ChatTriggers' / 'modules' / 'HTSL' / 'imports'
+def set_minecraft_folder(minecraft_folder: Path | str) -> None:
+    if isinstance(minecraft_folder, str):
+        minecraft_folder = Path(minecraft_folder)
+    if not minecraft_folder.is_dir():
+        raise NotADirectoryError('The provided Minecraft folder is not a directory.')
+    if not minecraft_folder.exists():
+        raise FileNotFoundError('The provided Minecraft folder does not exist.')
+    content = CACHED_MINECRAFT_FOLDER_PATH.read_text() if CACHED_MINECRAFT_FOLDER_PATH.exists() else None
+    new_content = minecraft_folder.as_posix()
+    if content is not None and content == new_content:
+        return
+    CACHED_MINECRAFT_FOLDER_PATH.write_text(new_content)
+    print(f'Saved your Minecraft folder for future use at\n{CACHED_MINECRAFT_FOLDER_PATH}')
+
+
+def get_minecraft_folder() -> Path:
+    maybe_path: Path | None = None
+    if CACHED_MINECRAFT_FOLDER_PATH.exists():
+        maybe_path = Path(CACHED_MINECRAFT_FOLDER_PATH.read_text())
+    elif os.name == 'nt':
+        maybe_path = Path(os.getenv('APPDATA')) / '.minecraft'  # type: ignore
+    elif os.name == 'posix':
+        maybe_path = Path.home() / 'Library' / 'Application Support' / 'minecraft'
+
+    if maybe_path is not None and maybe_path.exists():
+        set_minecraft_folder(maybe_path)
+        return maybe_path
+
+    print('Could not find your Minecraft folder.')
+    while True:
+        raw_path = input('Please enter the path to your Minecraft folder (relative or absolute): ').strip()
+        if not raw_path:
+            print('Please provide a valid path.')
+            continue
+        maybe_path = Path(raw_path)
+        try:
+            set_minecraft_folder(maybe_path)
+            return maybe_path
+        except (FileNotFoundError, NotADirectoryError) as e:
+            print(f'Error: {e}')
+            continue
+
+
+MINECRAFT_FOLDER: Path = get_minecraft_folder()
+assert MINECRAFT_FOLDER.exists()
+
+HTSL_IMPORTS_FOLDER: Path = MINECRAFT_FOLDER / 'config' / 'ChatTriggers' / 'modules' / 'HTSL' / 'imports'
 if not HTSL_IMPORTS_FOLDER.exists():
-    raise FileNotFoundError('Could not find your HTSL imports folder')
-
-PYHTSL_FOLDER: Path = HTSL_IMPORTS_FOLDER / 'pyhtsl'
-if not PYHTSL_FOLDER.exists():
-    PYHTSL_FOLDER.mkdir()
+    raise FileNotFoundError(f'Could not find your HTSL imports folder at\n{HTSL_IMPORTS_FOLDER}')
 
 
 class Writer:
@@ -87,13 +122,6 @@ class Writer:
         )
         if 'code' in args:
             os.system(f'code "{self.htsl_file.absolute()}"')
-
-        self.python_save_file = PYHTSL_FOLDER / f'{self.file_name}.py'
-        index: int = 1
-        while self.python_save_file.exists():
-            index += 1
-            self.python_save_file = PYHTSL_FOLDER / f'{self.file_name}_{index}.py'
-        self.python_save_file.write_text(Path(sys.argv[0]).read_text(encoding=encoding), encoding=encoding)
 
         return True
 
