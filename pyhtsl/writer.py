@@ -32,7 +32,7 @@ def set_minecraft_folder(minecraft_folder: Path | str) -> None:
     if content is not None and content == new_content:
         return
     CACHED_MINECRAFT_FOLDER_PATH.write_text(new_content)
-    print(f'Saved your Minecraft folder \x1b[38;2;0;255;0m{minecraft_folder.as_posix()}\x1b[0m for future use at\n\x1b[38;2;0;255;{CACHED_MINECRAFT_FOLDER_PATH}\x1b[0m')
+    print(f'Saved your Minecraft folder \x1b[38;2;0;255;0m{minecraft_folder.as_posix()}\x1b[0m for future use at\n\x1b[38;2;0;255;0m{CACHED_MINECRAFT_FOLDER_PATH}\x1b[0m')
 
 
 def get_minecraft_folder() -> Path:
