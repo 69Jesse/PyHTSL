@@ -32,7 +32,7 @@ def set_minecraft_folder(minecraft_folder: Path | str) -> None:
     if content is not None and content == new_content:
         return
     CACHED_MINECRAFT_FOLDER_PATH.write_text(new_content)
-    print(f'Saved your Minecraft folder for future use at\n{CACHED_MINECRAFT_FOLDER_PATH}')
+    print(f'Saved your Minecraft folder \x1b[38;2;0;255;0m{minecraft_folder.as_posix()}\x1b[0m for future use at\n\x1b[38;2;0;255;{CACHED_MINECRAFT_FOLDER_PATH}\x1b[0m')
 
 
 def get_minecraft_folder() -> Path:
@@ -48,18 +48,18 @@ def get_minecraft_folder() -> Path:
         set_minecraft_folder(maybe_path)
         return maybe_path
 
-    print('Could not find your Minecraft folder.')
+    print('\x1b[38;2;255;0;0mCould not find your Minecraft folder.\x1b[0m')
     while True:
-        raw_path = input('Please enter the path to your Minecraft folder (relative or absolute): ').strip()
+        raw_path = input('Please enter the path to your \x1b[38;2;0;255;0mMinecraft folder\x1b[0m (relative or absolute): ').strip()
         if not raw_path:
-            print('Please provide a valid path.')
+            print('\x1b[38;2;255;0;0mPlease provide a valid path.\x1b[0m')
             continue
         maybe_path = Path(raw_path)
         try:
             set_minecraft_folder(maybe_path)
             return maybe_path
         except (FileNotFoundError, NotADirectoryError) as e:
-            print(f'Error: {e}')
+            print(f'\x1b[38;2;255;0;0m{e.__class__.__name__}: {e}\x1b[0m')
             continue
 
 
