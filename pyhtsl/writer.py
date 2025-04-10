@@ -38,7 +38,9 @@ def set_minecraft_folder(minecraft_folder: Path | str) -> None:
 def get_minecraft_folder() -> Path:
     maybe_path: Path | None = None
     if CACHED_MINECRAFT_FOLDER_PATH.exists():
-        maybe_path = Path(CACHED_MINECRAFT_FOLDER_PATH.read_text())
+        raw_path = CACHED_MINECRAFT_FOLDER_PATH.read_text().strip()
+        if raw_path:
+            maybe_path = Path(raw_path)
     elif os.name == 'nt':
         maybe_path = Path(os.getenv('APPDATA')) / '.minecraft'  # type: ignore
     elif os.name == 'posix':
