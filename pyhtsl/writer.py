@@ -13,64 +13,62 @@ __all__ = (
     'HERE',
     'HTSL_IMPORTS_FOLDER',
     'WRITER',
+    'set_htsl_imports_folder',
 )
 
 
 HERE: Path = Path(__file__).parent
-CACHED_MINECRAFT_FOLDER_PATH: Path = HERE / 'cached_minecraft_folder.txt'
+CACHED_HTSL_IMPORTS_FOLDER_PATH: Path = HERE / 'cached_htsl_imports_folder.txt'
 
 
-def set_minecraft_folder(minecraft_folder: Path | str) -> None:
-    if isinstance(minecraft_folder, str):
-        minecraft_folder = Path(minecraft_folder)
-    if not minecraft_folder.is_dir():
-        raise NotADirectoryError('The provided Minecraft folder is not a directory.')
-    if not minecraft_folder.exists():
-        raise FileNotFoundError('The provided Minecraft folder does not exist.')
-    content = CACHED_MINECRAFT_FOLDER_PATH.read_text() if CACHED_MINECRAFT_FOLDER_PATH.exists() else None
-    new_content = minecraft_folder.resolve().as_posix()
+def set_htsl_imports_folder(htsl_folder: Path | str) -> None:
+    if isinstance(htsl_folder, str):
+        htsl_folder = Path(htsl_folder)
+    if not htsl_folder.is_dir():
+        raise NotADirectoryError('The provided HTSL imports folder is not a directory.')
+    if not htsl_folder.exists():
+        raise FileNotFoundError('The provided HTSL imports folder does not exist.')
+    content = CACHED_HTSL_IMPORTS_FOLDER_PATH.read_text() if CACHED_HTSL_IMPORTS_FOLDER_PATH.exists() else None
+    new_content = htsl_folder.resolve().as_posix()
     if content is not None and content == new_content:
         return
-    CACHED_MINECRAFT_FOLDER_PATH.write_text(new_content)
-    print(f'Saved your Minecraft folder \x1b[38;2;0;255;0m{minecraft_folder.as_posix()}\x1b[0m for future use at\n\x1b[38;2;0;255;0m{CACHED_MINECRAFT_FOLDER_PATH}\x1b[0m')
+    CACHED_HTSL_IMPORTS_FOLDER_PATH.write_text(new_content)
+    print(f'Saved your HTSL imports folder \x1b[38;2;0;255;0m{htsl_folder.as_posix()}\x1b[0m for future use at\n\x1b[38;2;0;255;0m{CACHED_HTSL_IMPORTS_FOLDER_PATH}\x1b[0m')
 
 
-def get_minecraft_folder() -> Path:
+def get_htsl_import_folder() -> Path:
     maybe_path: Path | None = None
-    if CACHED_MINECRAFT_FOLDER_PATH.exists():
-        raw_path = CACHED_MINECRAFT_FOLDER_PATH.read_text().strip()
+    if CACHED_HTSL_IMPORTS_FOLDER_PATH.exists():
+        raw_path = CACHED_HTSL_IMPORTS_FOLDER_PATH.read_text().strip()
         if raw_path:
             maybe_path = Path(raw_path)
     elif os.name == 'nt':
-        maybe_path = Path(os.getenv('APPDATA')) / '.minecraft'  # type: ignore
+        maybe_path = Path(os.getenv('APPDATA')) / '.minecraft' / 'config' / 'ChatTriggers' / 'modules' / 'HTSL' / 'imports'  # type: ignore
     elif os.name == 'posix':
-        maybe_path = Path.home() / 'Library' / 'Application Support' / 'minecraft'
+        maybe_path = Path.home() / 'Library' / 'Application Support' / 'minecraft' / 'config' / 'ChatTriggers' / 'modules' / 'HTSL' / 'imports'
 
     if maybe_path is not None:
         maybe_path = maybe_path.resolve()
         if maybe_path.exists():
-            set_minecraft_folder(maybe_path)
+            set_htsl_imports_folder(maybe_path)
             return maybe_path
 
-    print('\x1b[38;2;255;0;0mCould not find your Minecraft folder.\x1b[0m')
+    print('\x1b[38;2;255;0;0mCould not find your HTSL imports folder.\x1b[0m')
     while True:
-        raw_path = input('Please enter the path to your \x1b[38;2;0;255;0mMinecraft folder\x1b[0m (relative or absolute): ').strip()
+        raw_path = input('Please enter the path to your \x1b[38;2;0;255;0mHTSL imports folder\x1b[0m (relative or absolute): ').strip()
         if not raw_path:
             print('\x1b[38;2;255;0;0mPlease provide a valid path.\x1b[0m')
             continue
         maybe_path = Path(raw_path).resolve()
         try:
-            set_minecraft_folder(maybe_path)
+            set_htsl_imports_folder(maybe_path)
             return maybe_path
         except (FileNotFoundError, NotADirectoryError) as e:
             print(f'\x1b[38;2;255;0;0m{e.__class__.__name__}: {e}\x1b[0m')
             continue
 
 
-MINECRAFT_FOLDER: Path = get_minecraft_folder()
-assert MINECRAFT_FOLDER.exists()
-
-HTSL_IMPORTS_FOLDER: Path = MINECRAFT_FOLDER / 'config' / 'ChatTriggers' / 'modules' / 'HTSL' / 'imports'
+HTSL_IMPORTS_FOLDER: Path = get_htsl_import_folder()
 if not HTSL_IMPORTS_FOLDER.exists():
     raise FileNotFoundError(f'Could not find your HTSL imports folder at\n{HTSL_IMPORTS_FOLDER}')
 
