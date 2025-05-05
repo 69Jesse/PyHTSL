@@ -1,4 +1,4 @@
-from ..condition import PlaceholderValue
+from ..placeholders import PlaceholderCheckable
 
 
 __all__ = (
@@ -6,4 +6,9 @@ __all__ = (
 )
 
 
-PlayerProtocol = PlaceholderValue('%player.protocol%')
+PlayerProtocol = PlaceholderCheckable(
+    assignment_right_side='%player.protocol%',
+    comparison_left_side='placeholder "%player.protocol%"',
+    comparison_right_side='%player.protocol%',
+    in_string='%player.protocol%',
+)

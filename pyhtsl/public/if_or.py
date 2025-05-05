@@ -1,4 +1,5 @@
-from ..condition import BaseCondition, ConditionalMode, IfStatement
+from ..condition.base_condition import BaseCondition
+from ..condition.conditional_statements import ConditionalMode, IfStatement
 
 
 __all__ = (

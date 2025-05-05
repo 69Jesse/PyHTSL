@@ -1,4 +1,4 @@
-from ..condition import PlaceholderValue
+from ..placeholders import PlaceholderCheckable
 
 
 __all__ = (
@@ -6,4 +6,9 @@ __all__ = (
 )
 
 
-GroupPriority = PlaceholderValue('%player.group.priority%')
+GroupPriority = PlaceholderCheckable(
+    assignment_right_side='%player.group.priority%',
+    comparison_left_side='placeholder "%player.group.priority%"',
+    comparison_right_side='%player.group.priority%',
+    in_string='%player.group.priority%',
+)

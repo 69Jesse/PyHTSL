@@ -12,31 +12,39 @@ __all__ = (
 
 
 @final
-class PlaceholderCheckable(Checkable):
-    right_side: str
-    string: str
+class PlaceholderCheckable(Editable):
+    assignment_right_side: str
+    comparison_left_side: str
+    comparison_right_side: str
+    inside_of_string: str
     def __init__(
         self,
-        right_side: str,
-        string: str | None = None,
+        *,
+        assignment_right_side: str,
+        comparison_left_side: str,
+        comparison_right_side: str,
+        in_string: str,
     ) -> None:
-        self.right_side = right_side
-        self.string = string if string is not None else right_side
+        self.assignment_right_side = assignment_right_side
+        self.comparison_left_side = comparison_left_side
+        self.comparison_right_side = comparison_right_side
+        self.inside_of_string = in_string
 
-    def _left_side_keyword(self) -> str:
-        raise RuntimeError('Should not be used')
+    def _in_assignment_left_side(self) -> str:
+        # return "foooooo"
+        raise RuntimeError(f'Cannot use {self.__class__.__name__} as left side of assignment.')
 
-    def _as_left_side(self) -> str:
-        raise RuntimeError('Should not be used')
+    def _in_assignment_right_side(self) -> str:
+        return self.assignment_right_side
 
-    def _right_side_keyword(self) -> str:
-        raise RuntimeError('Should not be used')
+    def _in_comparison_left_side(self) -> str:
+        return self.comparison_left_side
 
-    def _as_right_side(self) -> str:
-        return self.right_side
+    def _in_comparison_right_side(self) -> str:
+        return self.comparison_right_side
 
     def _as_string(self) -> str:
-        return self.string
+        return self.inside_of_string
 
     def _equals(self, other: Checkable | HousingType) -> bool:
         return self is other
@@ -44,33 +52,40 @@ class PlaceholderCheckable(Checkable):
 
 @final
 class PlaceholderEditable(Editable):
-    left_side: str
-    right_side: str
-    string: str
+    assignment_left_side: str
+    assignment_right_side: str
+    comparison_left_side: str
+    comparison_right_side: str
+    inside_of_string: str
     def __init__(
         self,
-        left_side: str,
-        right_side: str,
-        string: str | None = None,
+        *,
+        assignment_left_side: str,
+        assignment_right_side: str,
+        comparison_left_side: str,
+        comparison_right_side: str,
+        in_string: str,
     ) -> None:
-        self.left_side = left_side
-        self.right_side = right_side
-        self.string = string if string is not None else left_side
+        self.assignment_left_side = assignment_left_side
+        self.assignment_right_side = assignment_right_side
+        self.comparison_left_side = comparison_left_side
+        self.comparison_right_side = comparison_right_side
+        self.inside_of_string = in_string
 
-    def _left_side_keyword(self) -> str:
-        raise RuntimeError('Should not be used')
+    def _in_assignment_left_side(self) -> str:
+        return self.assignment_left_side
 
-    def _as_left_side(self) -> str:
-        return self.left_side
+    def _in_assignment_right_side(self) -> str:
+        return self.assignment_right_side
 
-    def _right_side_keyword(self) -> str:
-        raise RuntimeError('Should not be used')
+    def _in_comparison_left_side(self) -> str:
+        return self.comparison_left_side
 
-    def _as_right_side(self) -> str:
-        return self.right_side
+    def _in_comparison_right_side(self) -> str:
+        return self.comparison_right_side
 
     def _as_string(self) -> str:
-        return self.string
+        return self.inside_of_string
 
     def _equals(self, other: Checkable | HousingType) -> bool:
         return self is other

@@ -1,4 +1,4 @@
-from ..stats import StatParameter
+from ..stats.stat_parameter import StatParameter
 
 from typing import Optional
 

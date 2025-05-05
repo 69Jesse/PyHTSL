@@ -4,7 +4,7 @@ from ..checkable import Checkable
 from ..editable import Editable
 from .housing_type import HousingType
 from enum import Enum
-from .handler import EXPR_HANDLER
+from .handler import ExpressionHandler, EXPR_HANDLER
 
 from typing import Optional, final, overload
 
@@ -24,6 +24,9 @@ class ExpressionOperator(Enum):
 
     def __repr__(self) -> str:
         return self.value
+
+
+ExpressionHandler._import_expression_operator(ExpressionOperator)
 
 
 @final
@@ -65,11 +68,17 @@ class Expression(Checkable):
             value = value.left
         return value
 
-    def _as_left_side(self) -> str:
-        return self._all_the_way_left(self)._as_left_side()
+    def _in_assignment_left_side(self) -> str:
+        return self._all_the_way_left(self)._in_assignment_left_side()
 
-    def _as_right_side(self) -> str:
-        return self._all_the_way_left(self)._as_right_side()
+    def _in_assignment_right_side(self) -> str:
+        return self._all_the_way_left(self)._in_assignment_right_side()
+
+    def _in_comparison_left_side(self) -> str:
+        return self._in_assignment_left_side()
+
+    def _in_comparison_right_side(self) -> str:
+        return self._in_assignment_right_side()
 
     def _as_string(self) -> str:
         """Pushing here so we can do something like

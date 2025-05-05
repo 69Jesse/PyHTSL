@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import re
 
-from .line_type import LineType
+from .writer import LineType
 
 from typing import Generator, Optional, final
 

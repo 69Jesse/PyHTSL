@@ -73,9 +73,6 @@ class BaseStat(Editable):
         """
         raise NotImplementedError
 
-    def _as_left_side(self) -> str:
-        return f'{self._left_side_keyword()} {self.name}'
-
     @staticmethod
     @abstractmethod
     def _right_side_keyword() -> str:
@@ -85,11 +82,20 @@ class BaseStat(Editable):
         """
         raise NotImplementedError
 
-    def _as_right_side(self) -> str:
+    def _in_assignment_left_side(self) -> str:
+        return f'{self._left_side_keyword()} {self.name}'
+
+    def _in_assignment_right_side(self) -> str:
         return f'%var.{self._right_side_keyword()}/{self.name}%'
 
+    def _in_comparison_left_side(self) -> str:
+        return self._in_assignment_left_side()
+
+    def _in_comparison_right_side(self) -> str:
+        return self._in_assignment_right_side()
+
     def _as_string(self) -> str:
-        return self._as_right_side()
+        return self._in_assignment_right_side()
 
     def _equals(self, other: Checkable | HousingType) -> bool:
         return self is other

@@ -1,6 +1,6 @@
 import math
 
-from .expression.handler import EXPR_HANDLER
+from .expression.handler import ExpressionHandler, EXPR_HANDLER
 from .condition.base_condition import BaseCondition
 from .condition.double_sided_condition import DoubleSidedConditionOperator, DoubleSidedCondition
 from .expression.housing_type import NumericHousingType, HousingType, _housing_type_as_right_side
@@ -10,7 +10,6 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Self
 if TYPE_CHECKING:
     from .expression.assignment_expression import Expression, ExpressionOperator
-    from .stats.base_stat import BaseStat
     from .stats.temporary_stat import TemporaryStat
 
 
@@ -29,19 +28,13 @@ class Checkable(ABC):
         globals()[expression_operator_cls.__name__] = expression_operator_cls
 
     @staticmethod
-    def _import_stat(
-        stat_cls: type['BaseStat'],
-    ) -> None:
-        globals()[stat_cls.__name__] = stat_cls
-
-    @staticmethod
     def _import_temporary_stat(
-        temporary_stat_cls: type['BaseStat'],
+        temporary_stat_cls: type['TemporaryStat'],
     ) -> None:
         globals()[temporary_stat_cls.__name__] = temporary_stat_cls
 
     @abstractmethod
-    def _as_left_side(self) -> str:
+    def _in_assignment_left_side(self) -> str:
         """
         var foo = %var.player/bar%
         ^^^^^^^
@@ -49,10 +42,26 @@ class Checkable(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def _as_right_side(self) -> str:
+    def _in_assignment_right_side(self) -> str:
         """
         var foo = %var.player/bar%
                   ^^^^^^^^^^^^^^^^
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def _in_comparison_left_side(self) -> str:
+        """
+        if and (var "foo" > "%var.player/bar%") {
+                ^^^^^^^^^
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def _in_comparison_right_side(self) -> str:
+        """
+        if and (var "foo" > "%var.player/bar%") {
+                            ^^^^^^^^^^^^^^^^^^
         """
         raise NotImplementedError
 
@@ -69,11 +78,19 @@ class Checkable(ABC):
         raise NotImplementedError
 
     @staticmethod
-    def _to_right_side(
+    def _to_assignment_right_side(
         value: 'Checkable | HousingType',
     ) -> str:
         if isinstance(value, Checkable):
-            return value._as_right_side()
+            return value._in_assignment_right_side()
+        return _housing_type_as_right_side(value)
+
+    @staticmethod
+    def _to_comparison_right_side(
+        value: 'Checkable | HousingType',
+    ) -> str:
+        if isinstance(value, Checkable):
+            return value._in_comparison_right_side()
         return _housing_type_as_right_side(value)
 
     def __str__(self) -> str:
@@ -478,27 +495,6 @@ class Checkable(ABC):
     def value(self) -> Self:
         return self
 
-    # TODO fix that shit??
-    # def __str__(self) -> str:
-    #     """Do NOT call this method when it is not used inside of a f-string! It will break things.
 
-    #     The reason that this pushes is that you can make something like this work:
-    #     ```py
-    #     stat = PlayerStat('stat')
-    #     chat(f'&aYour stat is &6{stat + 1}g')
-    #     ```
-    #     """
-    #     EXPR_HANDLER.push()
-    #     return str(self.fetch_stat_or_int(self.left))
-
-    # def __repr__(self) -> str:
-    #     """Do NOT call this method when it is not used inside of a f-string! It will break things.
-
-    #     The reason that this pushes is that you can make something like this work:
-    #     ```py
-    #     stat = PlayerStat('stat')
-    #     chat(f'&aYour stat is &6{stat + 1}g')
-    #     ```
-    #     """
-    #     EXPR_HANDLER.push()
-    #     return repr(self.fetch_stat_or_int(self.left))
+ExpressionHandler._import_checkable(Checkable)
+DoubleSidedCondition._import_checkable(Checkable)

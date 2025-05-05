@@ -18,6 +18,10 @@ class TemporaryStat(BaseStat):
         super().__init__(None, set_name=False)  # type: ignore
         self.number = id(self) + 1_000_000
 
+    @property
+    def name(self) -> str:
+        return f'temp{self.number}'
+
     @staticmethod
     def _left_side_keyword() -> str:
         return PlayerStat._left_side_keyword()

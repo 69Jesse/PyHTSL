@@ -1,4 +1,4 @@
-from ..condition import PlaceholderValue
+from ..placeholders import PlaceholderCheckable
 
 
 __all__ = (
@@ -6,4 +6,9 @@ __all__ = (
 )
 
 
-PlayerGamemode = PlaceholderValue('%player.gamemode%')
+PlayerGamemode = PlaceholderCheckable(
+    assignment_right_side='%player.gamemode%',
+    comparison_left_side='placeholder "%player.gamemode%"',
+    comparison_right_side='%player.gamemode%',
+    in_string='%player.gamemode%',
+)

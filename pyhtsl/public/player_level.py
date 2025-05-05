@@ -1,4 +1,4 @@
-from ..condition import PlaceholderValue
+from ..placeholders import PlaceholderCheckable
 
 
 __all__ = (
@@ -6,4 +6,9 @@ __all__ = (
 )
 
 
-PlayerLevel = PlaceholderValue('%player.level%')
+PlayerLevel = PlaceholderCheckable(
+    assignment_right_side='%player.level%',
+    comparison_left_side='placeholder "%player.level%"',
+    comparison_right_side='%player.level%',
+    in_string='%player.level%',
+)

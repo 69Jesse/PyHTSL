@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import atexit
 import sys
-from enum import Enum, auto
+from .line_type import LineType
 from .fixer import Fixer
 
 from types import TracebackType
@@ -70,30 +70,6 @@ def get_htsl_import_folder() -> Path:
 HTSL_IMPORTS_FOLDER: Path = get_htsl_import_folder()
 if not HTSL_IMPORTS_FOLDER.exists():
     raise FileNotFoundError(f'Could not find your HTSL imports folder at\n{HTSL_IMPORTS_FOLDER}')
-
-
-class LineType(Enum):
-    player_stat_change = auto()
-    global_stat_change = auto()
-    team_stat_change = auto()
-    misc_stat_change = auto()
-    if_and_enter = auto()
-    if_or_enter = auto()
-    if_exit = auto()
-    else_enter = auto()
-    else_exit = auto()
-    trigger_function = auto()
-    exit_function = auto()
-    cancel_event = auto()
-    miscellaneous = auto()
-    goto = auto()
-    comment = auto()
-    goto_move_to_end = auto()
-    random_enter = auto()
-    random_exit = auto()
-
-    def is_if_enter(self) -> bool:
-        return self is LineType.if_and_enter or self is LineType.if_or_enter
 
 
 class Writer:

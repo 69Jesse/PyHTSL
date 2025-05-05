@@ -2,11 +2,11 @@ from ..writer import WRITER, LineType
 
 from typing import TYPE_CHECKING, final, TypeAlias
 if TYPE_CHECKING:
+    from ..stats.temporary_stat import TemporaryStat
     from ..checkable import Checkable
     from .housing_type import HousingType
     from ..editable import Editable
     from .assignment_expression import Expression, ExpressionOperator
-    from ..stats.temporary_stat import TemporaryStat
 
 
 __all__ = (
@@ -20,13 +20,25 @@ Lines: TypeAlias = list[tuple['Editable', 'ExpressionOperator', 'Checkable | Hou
 
 @final
 class ExpressionHandler:
-    _expressions: list['Expression'] = []
+    @staticmethod
+    def _import_checkable(
+        checkable_cls: type['Checkable'],
+    ) -> None:
+        globals()[checkable_cls.__name__] = checkable_cls
 
     @staticmethod
     def _import_temporary_stat(
         temporary_stat_cls: type['TemporaryStat'],
     ) -> None:
         globals()[temporary_stat_cls.__name__] = temporary_stat_cls
+
+    @staticmethod
+    def _import_expression_operator(
+        expression_operator_cls: type['ExpressionOperator'],
+    ) -> None:
+        globals()[expression_operator_cls.__name__] = expression_operator_cls
+
+    _expressions: list['Expression'] = []
 
     def add(self, expression: 'Expression') -> None:
         self._expressions.append(expression)
@@ -214,7 +226,7 @@ class ExpressionHandler:
     ) -> None:
         for left, operator, right in lines:
             WRITER.write(
-                f'{left._as_left_side()} {operator.value} {str(right)}',
+                f'{left._in_assignment_left_side()} {operator.value} {Checkable._to_assignment_right_side(right)}',
                 LineType.player_stat_change,
             )
 

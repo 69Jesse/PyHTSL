@@ -1,4 +1,4 @@
-from ..stats import EdgeCaseEditable
+from ..placeholders import PlaceholderEditable
 
 
 __all__ = (
@@ -6,4 +6,10 @@ __all__ = (
 )
 
 
-PlayerHealth = EdgeCaseEditable('health', '%player.health%', 'changeHealth')
+PlayerHealth = PlaceholderEditable(
+    assignment_left_side='health',
+    assignment_right_side='%player.health%',
+    comparison_left_side='placeholder "%player.health%"',
+    comparison_right_side='%player.health%',
+    in_string='%player.health%',
+)

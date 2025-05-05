@@ -1,6 +1,7 @@
 from .stats.player_stat import PlayerStat as PlayerStat
 from .stats.global_stat import GlobalStat as GlobalStat
 from .stats.team_stat import TeamStat as TeamStat
+from .stats.temporary_stat import TemporaryStat as TemporaryStat
 
 from .public._else import Else as Else
 from .public.apply_inventory_layout import apply_inventory_layout as apply_inventory_layout
@@ -74,7 +75,8 @@ from .public.player_protocol import PlayerProtocol as PlayerProtocol
 from .public.player_sneaking import PlayerSneaking as PlayerSneaking
 from .public.player_version import PlayerVersion as PlayerVersion
 from .public.random import Random as Random
-from .public.random_int import RandomInt as RandomInt
+from .public.random_whole import RandomWhole as RandomWhole
+from .public.random_decimal import RandomDecimal as RandomDecimal
 from .public.region import Region as Region
 from .public.remove_item import remove_item as remove_item
 from .public.required_gamemode import RequiredGamemode as RequiredGamemode

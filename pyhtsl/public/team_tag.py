@@ -6,4 +6,9 @@ __all__ = (
 )
 
 
-TeamTag = PlaceholderCheckable('%player.team.tag%')
+TeamTag = PlaceholderCheckable(
+    assignment_right_side='%player.team.tag%',
+    comparison_left_side='placeholder "%player.team.tag%"',
+    comparison_right_side='%player.team.tag%',
+    in_string='%player.team.tag%',
+)

@@ -13,9 +13,16 @@ def TeamPlayers(
     team: Optional[Team | str],
 ) -> PlaceholderCheckable:
     if team is None:
-        return PlaceholderCheckable('%player.team.players%')
-    team = team if isinstance(team, Team) else Team(team)
-    return PlaceholderCheckable(f'%player.team.players/{team.name}%')
+        key = '%player.team.players%'
+    else:
+        team = team if isinstance(team, Team) else Team(team)
+        key = f'%player.team.players/{team.name}%'
+    return PlaceholderCheckable(
+        assignment_right_side=key,
+        comparison_left_side=f'placeholder "{key}"',
+        comparison_right_side=key,
+        in_string=key,
+    )
 
 
 Team._import_team_players(TeamPlayers)

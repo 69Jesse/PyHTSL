@@ -1,8 +1,6 @@
-from ..condition import (
-    BaseCondition,
-    IfStatement,
-)
-from ..expression import Expression
+from ..condition.base_condition import BaseCondition
+from ..condition.conditional_statements import IfStatement
+from ..expression.assignment_expression import Expression
 
 from typing import Literal
 

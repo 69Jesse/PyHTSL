@@ -1,4 +1,4 @@
-from ..condition import PlaceholderValue
+from ..placeholders import PlaceholderCheckable
 
 
 __all__ = (
@@ -6,4 +6,9 @@ __all__ = (
 )
 
 
-HouseGuests = PlaceholderValue('%house.guests%')
+HouseGuests = PlaceholderCheckable(
+    assignment_right_side='%house.guests%',
+    comparison_left_side='placeholder "%house.guests%"',
+    comparison_right_side='%house.guests%',
+    in_string='%house.guests%',
+)

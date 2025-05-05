@@ -24,6 +24,12 @@ class DoubleSidedConditionOperator(Enum):
 
 @final
 class DoubleSidedCondition(BaseCondition):
+    @staticmethod
+    def _import_checkable(
+        checkable_cls: type['Checkable'],
+    ) -> None:
+        globals()[checkable_cls.__name__] = checkable_cls
+
     left: 'Checkable'
     right: 'Checkable | HousingType'
     operator: DoubleSidedConditionOperator
@@ -38,4 +44,4 @@ class DoubleSidedCondition(BaseCondition):
         self.operator = operator
 
     def create_line(self) -> str:
-        return f'{self.left._as_left_side()} {self.operator.value} {Checkable._to_right_side(self.right)}'
+        return f'{self.left._in_comparison_left_side()} {self.operator.value} {Checkable._to_comparison_right_side(self.right)}'

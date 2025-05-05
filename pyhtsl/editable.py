@@ -1,5 +1,4 @@
 from .expression.handler import EXPR_HANDLER
-from .expression.assignment_expression import Expression
 from .checkable import Checkable
 from .expression.housing_type import NumericHousingType, HousingType
 
@@ -123,3 +122,10 @@ class Editable(Checkable):
     @value.setter
     def value(self, value: 'Checkable | HousingType') -> None:
         return Editable.set(self, value)
+
+    def with_value(
+        self,
+        value: 'Checkable | HousingType',
+    ) -> Self:
+        self.value = value
+        return self

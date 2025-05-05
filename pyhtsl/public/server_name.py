@@ -1,4 +1,4 @@
-from ..condition import PlaceholderValue
+from ..placeholders import PlaceholderCheckable
 
 
 __all__ = (
@@ -6,4 +6,9 @@ __all__ = (
 )
 
 
-ServerName = PlaceholderValue('%server.name%')
+ServerName = PlaceholderCheckable(
+    assignment_right_side='%server.name%',
+    comparison_left_side='placeholder "%server.name%"',
+    comparison_right_side='%server.name%',
+    in_string='%server.name%',
+)

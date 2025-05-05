@@ -1,4 +1,5 @@
 from ..writer import WRITER, LineType
+from ..expression.handler import EXPR_HANDLER
 
 from enum import Enum
 
@@ -25,13 +26,14 @@ class IfStatement:
     mode: ConditionalMode
     def __init__(
         self,
-        conditions: 'list[BaseCondition]',
+        conditions: list['BaseCondition'],
         mode: ConditionalMode = ConditionalMode.AND,
     ) -> None:
         self.conditions = conditions if isinstance(conditions, list) else [conditions]
         self.mode = mode
 
     def __enter__(self) -> None:
+        EXPR_HANDLER.push()
         WRITER.write(
             f'if {self.mode.name.lower()} (' + ', '.join(map(str, self.conditions)) + ') {',
             self.mode.value,
