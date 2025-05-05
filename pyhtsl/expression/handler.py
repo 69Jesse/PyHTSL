@@ -227,7 +227,7 @@ class ExpressionHandler:
         for left, operator, right in lines:
             WRITER.write(
                 f'{left._in_assignment_left_side()} {operator.value} {Checkable._to_assignment_right_side(right)}',
-                LineType.player_stat_change,
+                LineType.variable_change,
             )
 
     def push(self) -> None:
