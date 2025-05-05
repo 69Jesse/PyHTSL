@@ -1,4 +1,4 @@
-from ..condition import TinyCondition
+from ..condition.base_condition import BaseCondition
 from .team import Team
 
 from typing import Optional, final
@@ -10,7 +10,7 @@ __all__ = (
 
 
 @final
-class RequiredTeam(TinyCondition):
+class RequiredTeam(BaseCondition):
     team: Optional[Team]
     def __init__(
         self,

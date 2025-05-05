@@ -1,8 +1,8 @@
 from ..writer import WRITER, LineType
 from .function import Function
-from .player_stat import PlayerStat
-from .global_stat import GlobalStat
-from .team_stat import TeamStat
+from ..stats.player_stat import PlayerStat
+from ..stats.global_stat import GlobalStat
+from ..stats.team_stat import TeamStat
 
 from typing import Optional, Iterable
 

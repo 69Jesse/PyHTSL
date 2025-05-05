@@ -1,6 +1,6 @@
 from ..writer import WRITER, LineType
 from ..types import ALL_LOCATIONS
-from ..stat.stat import Stat
+from ..stats.base_stat import BaseStat
 
 from typing import Optional
 
@@ -20,7 +20,7 @@ def launch_to_target(
         | str  # custom string
     ],
     location: ALL_LOCATIONS = 'custom_coordinates',
-    strength: Stat | int = 2,
+    strength: BaseStat | int = 2,
 ) -> None:
     line = f'launchTarget "{location}"'
     if location == 'custom_coordinates':

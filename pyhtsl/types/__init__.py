@@ -1,14 +1,12 @@
-from ..condition import (
-    Condition,
-    IfStatement,
-)
-from ..expression import Expression
+from ..condition.base_condition import BaseCondition
+from ..condition.conditional_statements import IfStatement
+from ..expression.assignment_expression import Expression
 
 from typing import Literal
 
 
 __all__ = (
-    'Condition',
+    'BaseCondition',
     'IfStatement',
     'Expression',
     'ALL_POTION_EFFECTS',

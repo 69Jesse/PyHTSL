@@ -1,4 +1,4 @@
-from ..condition import RawCondition
+from ..condition.named_condition import NamedCondition
 
 
 __all__ = (
@@ -6,4 +6,4 @@ __all__ = (
 )
 
 
-IsFlying = RawCondition('isFlying')
+IsFlying = NamedCondition('isFlying')

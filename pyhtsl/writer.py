@@ -10,10 +10,9 @@ from typing import Optional, Callable
 
 
 __all__ = (
-    'HERE',
-    'HTSL_IMPORTS_FOLDER',
-    'WRITER',
     'set_htsl_imports_folder',
+    'LineType',
+    'WRITER',
 )
 
 

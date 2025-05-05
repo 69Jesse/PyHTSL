@@ -1,4 +1,4 @@
-from ..condition import TinyCondition
+from ..condition.base_condition import BaseCondition
 from .item import Item
 
 from typing import final, Literal
@@ -10,7 +10,7 @@ __all__ = (
 
 
 @final
-class HasItem(TinyCondition):
+class HasItem(BaseCondition):
     item: Item | str
     what_to_check: str
     where_to_check: str

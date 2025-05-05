@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import re
 
-from .line_type import LineType
+from .writer import LineType
 
 from typing import Generator, Optional, final
 
@@ -87,10 +87,7 @@ class Counter:
     def limit_reached(self) -> bool:
         return (
             self.if_enters() > Counter.IF_ENTER_LIMIT
-            or self.mapping.get(LineType.player_stat_change, 0) > 10
-            or self.mapping.get(LineType.global_stat_change, 0) > 10
-            or self.mapping.get(LineType.team_stat_change, 0) > 10
-            or self.mapping.get(LineType.misc_stat_change, 0) > 10
+            or self.mapping.get(LineType.variable_change, 0) > 25
 
             # 9 instead of 10 to account for the filler function call if nessessary
             # This results in some tiny inefficiencies in some cases.

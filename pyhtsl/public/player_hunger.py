@@ -1,4 +1,4 @@
-from ..stat import ComparableStat
+from ..placeholders import PlaceholderEditable
 
 
 __all__ = (
@@ -6,4 +6,10 @@ __all__ = (
 )
 
 
-PlayerHunger = ComparableStat('hunger', '%player.hunger%')
+PlayerHunger = PlaceholderEditable(
+    assignment_left_side='hunger',
+    assignment_right_side='%player.hunger%',
+    comparison_left_side='placeholder "%player.hunger%"',
+    comparison_right_side='%player.hunger%',
+    in_string='%player.hunger%',
+)

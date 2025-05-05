@@ -1,4 +1,4 @@
-from ..condition import TinyCondition
+from ..condition.base_condition import BaseCondition
 from .item import Item
 
 from typing import final
@@ -10,7 +10,7 @@ __all__ = (
 
 
 @final
-class BlockType(TinyCondition):
+class BlockType(BaseCondition):
     block: Item | str
     match_type_only: bool
     def __init__(

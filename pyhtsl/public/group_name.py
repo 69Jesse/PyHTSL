@@ -1,4 +1,4 @@
-from ..condition import PlaceholderValue
+from ..placeholders import PlaceholderCheckable
 
 
 __all__ = (
@@ -6,4 +6,9 @@ __all__ = (
 )
 
 
-GroupName = PlaceholderValue('%player.group.name%')
+GroupName = PlaceholderCheckable(
+    assignment_right_side='%player.group.name%',
+    comparison_left_side='placeholder "%player.group.name%"',
+    comparison_right_side='%player.group.name%',
+    in_string='%player.group.name%',
+)

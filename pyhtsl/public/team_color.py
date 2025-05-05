@@ -1,4 +1,4 @@
-from ..condition import PlaceholderValue
+from ..placeholders import PlaceholderCheckable
 
 
 __all__ = (
@@ -6,4 +6,9 @@ __all__ = (
 )
 
 
-TeamColor = PlaceholderValue('%player.team.color%')
+TeamColor = PlaceholderCheckable(
+    assignment_right_side='%player.team.color%',
+    comparison_left_side='placeholder "%player.team.color%"',
+    comparison_right_side='%player.team.color%',
+    in_string='%player.team.color%',
+)

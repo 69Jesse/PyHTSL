@@ -1,11 +1,11 @@
-from ..condition import TinyCondition
+from ..condition.base_condition import BaseCondition
 from .region import Region
 
 from typing import final
 
 
 @final
-class WithinRegion(TinyCondition):
+class WithinRegion(BaseCondition):
     region: Region
     def __init__(
         self,

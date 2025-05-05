@@ -1,4 +1,4 @@
-from ..stat import ComparableStat
+from ..placeholders import PlaceholderEditable
 
 
 __all__ = (
@@ -6,4 +6,10 @@ __all__ = (
 )
 
 
-PlayerMaxHealth = ComparableStat('maxHealth', '%player.maxhealth%')
+PlayerMaxHealth = PlaceholderEditable(
+    assignment_left_side='maxHealth',
+    assignment_right_side='%player.maxhealth%',
+    comparison_left_side='placeholder "%player.maxhealth%"',
+    comparison_right_side='%player.maxhealth%',
+    in_string='%player.maxhealth%',
+)

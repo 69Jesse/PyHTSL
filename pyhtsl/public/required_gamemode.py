@@ -1,4 +1,4 @@
-from ..condition import TinyCondition
+from ..condition.base_condition import BaseCondition
 
 from typing import final, Literal
 
@@ -9,7 +9,7 @@ __all__ = (
 
 
 @final
-class RequiredGamemode(TinyCondition):
+class RequiredGamemode(BaseCondition):
     gamemode: str
     def __init__(
         self,
@@ -18,4 +18,4 @@ class RequiredGamemode(TinyCondition):
         self.gamemode = gamemode
 
     def create_line(self) -> str:
-        return f'gamemode "{self.gamemode}"'
+        return f'gamemode {self.gamemode}'

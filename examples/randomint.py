@@ -1,11 +1,11 @@
 from pyhtsl import (
     PlayerStat,
-    RandomInt,
+    RandomWhole,
     chat,
 )
 
 
-RANDOM_1_100 = RandomInt(1, 101)
+RANDOM_1_100 = RandomWhole(1, 101)
 
 
 rng = PlayerStat('rng').with_value(RANDOM_1_100)

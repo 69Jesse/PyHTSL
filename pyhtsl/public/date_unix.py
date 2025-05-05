@@ -1,4 +1,4 @@
-from ..condition import PlaceholderValue
+from ..placeholders import PlaceholderCheckable
 
 
 __all__ = (
@@ -6,4 +6,9 @@ __all__ = (
 )
 
 
-DateUnix = PlaceholderValue('%date.unix%')
+DateUnix = PlaceholderCheckable(
+    assignment_right_side='%date.unix%',
+    comparison_left_side='placeholder "%date.unix%"',
+    comparison_right_side='%date.unix%',
+    in_string='%date.unix%',
+)

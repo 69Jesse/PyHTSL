@@ -1,4 +1,4 @@
-from ..condition import PlaceholderValue
+from ..placeholders import PlaceholderCheckable
 
 
 __all__ = (
@@ -6,4 +6,9 @@ __all__ = (
 )
 
 
-PlayerLocationZ = PlaceholderValue('%player.location.z%')
+PlayerLocationZ = PlaceholderCheckable(
+    assignment_right_side='%player.location.z%',
+    comparison_left_side='placeholder "%player.location.z%"',
+    comparison_right_side='%player.location.z%',
+    in_string='%player.location.z%',
+)

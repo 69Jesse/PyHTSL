@@ -1,15 +1,15 @@
-from .condition import Condition
+from .base_condition import BaseCondition
 
 from typing import final
 
 
 __all__ = (
-    'RawCondition',
+    'NamedCondition',
 )
 
 
 @final
-class RawCondition(Condition):
+class NamedCondition(BaseCondition):
     name: str
     def __init__(
         self,

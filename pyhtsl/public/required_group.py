@@ -1,4 +1,4 @@
-from ..condition import TinyCondition
+from ..condition.base_condition import BaseCondition
 from .group import Group
 
 from typing import final
@@ -10,7 +10,7 @@ __all__ = (
 
 
 @final
-class RequiredGroup(TinyCondition):
+class RequiredGroup(BaseCondition):
     group: Group
     include_higher_groups: bool
     def __init__(
