@@ -1,8 +1,8 @@
-from ..condition import PlaceholderValue
+from ..placeholders import PlaceholderCheckable
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from .team_stat import TeamStat
+    from ..stats.team_stat import TeamStat
     from .team_players import TeamPlayers
 
 
@@ -12,6 +12,14 @@ __all__ = (
 
 
 class Team:
+    @staticmethod
+    def _import_team_stat(team_stat: type['TeamStat']) -> None:
+        globals()[team_stat.__name__] = team_stat
+
+    @staticmethod
+    def _import_team_players(team_players: ...) -> None:
+        globals()[team_players.__name__] = team_players
+
     name: str
     def __init__(self, name: str) -> None:
         self.name = name
@@ -24,9 +32,8 @@ class Team:
     def __hash__(self) -> int:
         return hash(self.name)
 
-    if TYPE_CHECKING:
-        def stat(self, key: str) -> TeamStat:
-            return TeamStat(key, self)
+    def stat(self, key: str) -> 'TeamStat':
+        return TeamStat(key, self)
 
-        def players(self) -> PlaceholderValue:
-            return TeamPlayers(self)
+    def players(self) -> PlaceholderCheckable:
+        return TeamPlayers(self)

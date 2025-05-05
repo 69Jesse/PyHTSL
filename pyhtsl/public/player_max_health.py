@@ -1,4 +1,4 @@
-from ..stat import ComparableStat
+from ..stats import EdgeCaseEditable
 
 
 __all__ = (
@@ -6,4 +6,4 @@ __all__ = (
 )
 
 
-PlayerMaxHealth = ComparableStat('maxHealth', '%player.maxhealth%')
+PlayerMaxHealth = EdgeCaseEditable('maxHealth', '%player.maxhealth%')

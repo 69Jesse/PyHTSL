@@ -1,11 +1,12 @@
-from .expression_type import ExpressionOperator
-from ..writer import WRITER
+from ..writer import WRITER, LineType
 
-from typing import TYPE_CHECKING, final, ClassVar
+from typing import TYPE_CHECKING, final, TypeAlias
 if TYPE_CHECKING:
-    from .expression import Expression
-    from ..stat import Stat, TemporaryStat
-    from ..condition import PlaceholderValue
+    from ..checkable import Checkable
+    from .housing_type import HousingType
+    from ..editable import Editable
+    from .assignment_expression import Expression, ExpressionOperator
+    from ..stats.temporary_stat import TemporaryStat
 
 
 __all__ = (
@@ -14,13 +15,18 @@ __all__ = (
 
 
 TEMP_STATS_NUMBER_START: int = 1
-LinesType = list[tuple['Stat', ExpressionOperator, 'Stat | int | PlaceholderValue']]
+Lines: TypeAlias = list[tuple['Editable', 'ExpressionOperator', 'Checkable | HousingType']]
 
 
 @final
 class ExpressionHandler:
     _expressions: list['Expression'] = []
-    temporary_stat_cls: ClassVar[type['TemporaryStat']]
+
+    @staticmethod
+    def _import_temporary_stat(
+        temporary_stat_cls: type['TemporaryStat'],
+    ) -> None:
+        globals()[temporary_stat_cls.__name__] = temporary_stat_cls
 
     def add(self, expression: 'Expression') -> None:
         self._expressions.append(expression)
@@ -28,34 +34,32 @@ class ExpressionHandler:
     def is_empty(self) -> bool:
         return not self._expressions
 
-    def create_lines(self) -> LinesType:
-        lines: LinesType = []
+    def create_lines(self) -> Lines:
+        lines: Lines = []
         for expression in self._expressions:
-            left = expression.all_the_way_left(expression.left)
-            if TYPE_CHECKING:
-                assert isinstance(left, Stat)
-            right = expression.all_the_way_left(expression.right)
+            left = expression._all_the_way_left(expression.left)
+            right = expression._all_the_way_left(expression.right)
             lines.append((left, expression.operator, right))
         return lines
 
     def optimize_lines(
         self,
-        lines: LinesType,
+        lines: Lines,
     ) -> None:
         for i in range(len(lines) - 1):
             left, _, _ = lines[i]
-            assert isinstance(left, self.temporary_stat_cls)
+            assert isinstance(left, TemporaryStat)
 
         has_changed = True
         while has_changed:
             has_changed = False
             for i in range(len(lines)):
-                left, expr_type, right = lines[i]
+                left, operator, right = lines[i]
 
-                if not isinstance(left, self.temporary_stat_cls):
-                    if not isinstance(right, self.temporary_stat_cls):
+                if not isinstance(left, TemporaryStat):
+                    if not isinstance(right, TemporaryStat):
                         continue
-                    if expr_type is not ExpressionOperator.Set:
+                    if operator is not ExpressionOperator.Set:
                         continue
 
                     # We have:
@@ -69,12 +73,12 @@ class ExpressionHandler:
 
                     used_before = False
                     for j in range(i - 1, -1, -1):
-                        other_left, other_type, other_right = lines[j]
+                        other_left, other_operator, other_right = lines[j]
                         assert type(other_left) is not type(left)
                         if (
-                            isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number
+                            isinstance(other_left, TemporaryStat) and other_left.number == right.number
                             and type(other_right) is type(left) and other_right.name == left.name  # type: ignore
-                            and other_type is not ExpressionOperator.Set
+                            and other_operator is not ExpressionOperator.Set
                         ):
                             used_before = True
                             break
@@ -83,35 +87,35 @@ class ExpressionHandler:
 
                     used_after = False
                     for j in range(i + 1, len(lines)):
-                        other_left, other_type, other_right = lines[j]
-                        if isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number:
+                        other_left, other_operator, other_right = lines[j]
+                        if isinstance(other_left, TemporaryStat) and other_left.number == right.number:
                             used_after = True
                             break
-                        if isinstance(other_right, self.temporary_stat_cls) and other_right.number == right.number:
+                        if isinstance(other_right, TemporaryStat) and other_right.number == right.number:
                             used_after = True
                             break
                     if used_after:
                         continue
 
                     for j in range(i, -1, -1):
-                        other_left, other_type, other_right = lines[j]
+                        other_left, other_operator, other_right = lines[j]
                         changing = False
-                        if isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number:
+                        if isinstance(other_left, TemporaryStat) and other_left.number == right.number:
                             other_left = left
                             changing = True
-                        if isinstance(other_right, self.temporary_stat_cls) and other_right.number == right.number:
+                        if isinstance(other_right, TemporaryStat) and other_right.number == right.number:
                             other_right = left
                             changing = True
                         if changing:
-                            lines[j] = (other_left, other_type, other_right)
+                            lines[j] = (other_left, other_operator, other_right)
                             has_changed = True
 
                     continue
 
                 else:
-                    if not isinstance(right, self.temporary_stat_cls):
+                    if not isinstance(right, TemporaryStat):
                         continue
-                    if expr_type is not ExpressionOperator.Set:
+                    if operator is not ExpressionOperator.Set:
                         continue
 
                     # We have:
@@ -125,67 +129,65 @@ class ExpressionHandler:
 
                     used_before = False
                     for j in range(i - 1, -1, -1):
-                        other_left, other_type, other_right = lines[j]
+                        other_left, other_operator, other_right = lines[j]
                         if (
-                            isinstance(other_left, self.temporary_stat_cls) and other_left.number == left.number
-                            and isinstance(other_right, self.temporary_stat_cls) and other_right.number == right.number
+                            isinstance(other_left, TemporaryStat) and other_left.number == left.number
+                            and isinstance(other_right, TemporaryStat) and other_right.number == right.number
                         ):
                             used_before = True
                             break
                         if (
-                            isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number
-                            and isinstance(other_right, self.temporary_stat_cls) and other_right.number == left.number
-                            and other_type is not ExpressionOperator.Set
+                            isinstance(other_left, TemporaryStat) and other_left.number == right.number
+                            and isinstance(other_right, TemporaryStat) and other_right.number == left.number
+                            and other_operator is not ExpressionOperator.Set
                         ):
                             used_before = True
                             break
 
                     used_after = False
                     for j in range(i + 1, len(lines)):
-                        other_left, other_type, other_right = lines[j]
-                        if isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number:
+                        other_left, other_operator, other_right = lines[j]
+                        if isinstance(other_left, TemporaryStat) and other_left.number == right.number:
                             used_after = True
                             break
-                        if isinstance(other_right, self.temporary_stat_cls) and other_right.number == right.number:
+                        if isinstance(other_right, TemporaryStat) and other_right.number == right.number:
                             used_after = True
                             break
                     if used_after:
                         continue
 
                     for j in range(i, -1, -1):
-                        other_left, other_type, other_right = lines[j]
+                        other_left, other_operator, other_right = lines[j]
                         changing = False
-                        if isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number:
+                        if isinstance(other_left, TemporaryStat) and other_left.number == right.number:
                             other_left = left
                             changing = True
-                        if isinstance(other_right, self.temporary_stat_cls) and other_right.number == right.number:
+                        if isinstance(other_right, TemporaryStat) and other_right.number == right.number:
                             other_right = left
                             changing = True
                         if changing:
-                            lines[j] = (other_left, other_type, other_right)
+                            lines[j] = (other_left, other_operator, other_right)
                             has_changed = True
 
     def take_out_useless(
         self,
-        lines: LinesType,
+        lines: Lines,
     ) -> None:
         for i in range(len(lines) - 1, -1, -1):
-            left, expr_type, right = lines[i]
+            left, operator, right = lines[i]
             if (
-                expr_type is ExpressionOperator.Set
-                and not isinstance(right, int)
-                and left.name == right.name
-                and type(left) is type(right)
+                left._equals(right)
+                and operator is ExpressionOperator.Set
             ):
                 lines.pop(i)
             elif (
-                (expr_type is ExpressionOperator.Increment or expr_type is ExpressionOperator.Decrement)
+                (operator is ExpressionOperator.Increment or operator is ExpressionOperator.Decrement)
                 and isinstance(right, int)
                 and right == 0
             ):
                 lines.pop(i)
             elif (
-                (expr_type is ExpressionOperator.Multiply or expr_type is ExpressionOperator.Divide)
+                (operator is ExpressionOperator.Multiply or operator is ExpressionOperator.Divide)
                 and isinstance(right, int)
                 and right == 1
             ):
@@ -193,14 +195,14 @@ class ExpressionHandler:
 
     def rename_temporary_stats(
         self,
-        lines: LinesType,
+        lines: Lines,
     ) -> None:
         temporary_stats: list['TemporaryStat'] = []
         stat_id_set: set[int] = set()
         for stat, _, _ in lines:
             if id(stat) in stat_id_set:
                 continue
-            if isinstance(stat, self.temporary_stat_cls):
+            if isinstance(stat, TemporaryStat):
                 temporary_stats.append(stat)
             stat_id_set.add(id(stat))
         for i, stat in enumerate(temporary_stats, start=TEMP_STATS_NUMBER_START):
@@ -208,12 +210,12 @@ class ExpressionHandler:
 
     def write_lines(
         self,
-        lines: LinesType,
+        lines: Lines,
     ) -> None:
-        for left, type, right in lines:
+        for left, operator, right in lines:
             WRITER.write(
-                f'{left.operational_expression_left_side()} {type.value} "{str(right)}"',
-                left.line_type,
+                f'{left._as_left_side()} {operator.value} {str(right)}',
+                LineType.player_stat_change,
             )
 
     def push(self) -> None:

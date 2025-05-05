@@ -1,5 +1,5 @@
 from ..writer import WRITER, LineType
-from ..stat.stat import Stat
+from ..stats.base_stat import BaseStat
 
 
 __all__ = (
@@ -8,11 +8,11 @@ __all__ = (
 
 
 def change_velocity(
-    x: Stat | int,
-    y: Stat | int,
-    z: Stat | int,
+    x: BaseStat | int,
+    y: BaseStat | int,
+    z: BaseStat | int,
 ) -> None:
     WRITER.write(
-        f'changeVelocity "{x}" "{y}" "{z}"',
+        f'changeVelocity {x} {y} {z}',
         LineType.miscellaneous,
     )

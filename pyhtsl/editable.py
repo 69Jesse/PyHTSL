@@ -1,10 +1,11 @@
-from .handler import EXPR_HANDLER
-from .expression_type import ExpressionOperator
-from .expression import Expression
+from .expression.handler import EXPR_HANDLER
+from .expression.assignment_expression import Expression
 from .checkable import Checkable
-from .housing_type import NumericHousingType, HousingType
+from .expression.housing_type import NumericHousingType, HousingType
 
-from typing import Self
+from typing import TYPE_CHECKING, Self
+if TYPE_CHECKING:
+    from .expression.assignment_expression import Expression, ExpressionOperator
 
 
 __all__ = (
@@ -13,6 +14,14 @@ __all__ = (
 
 
 class Editable(Checkable):
+    @staticmethod
+    def _import_expression(
+        expression_cls: type['Expression'],
+        expression_operator_cls: type['ExpressionOperator'],
+    ) -> None:
+        globals()[expression_cls.__name__] = expression_cls
+        globals()[expression_operator_cls.__name__] = expression_operator_cls
+
     @staticmethod
     def iadd(
         left: 'Editable',

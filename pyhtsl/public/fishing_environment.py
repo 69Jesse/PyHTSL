@@ -1,4 +1,4 @@
-from ..condition import TinyCondition
+from ..condition.base_condition import BaseCondition
 
 from typing import final, Literal
 
@@ -9,7 +9,7 @@ __all__ = (
 
 
 @final
-class FishingEnvironment(TinyCondition):
+class FishingEnvironment(BaseCondition):
     environment: str
     def __init__(
         self,

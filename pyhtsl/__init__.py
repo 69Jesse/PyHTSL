@@ -1,3 +1,7 @@
+from .stats.player_stat import PlayerStat as PlayerStat
+from .stats.global_stat import GlobalStat as GlobalStat
+from .stats.team_stat import TeamStat as TeamStat
+
 from .public._else import Else as Else
 from .public.apply_inventory_layout import apply_inventory_layout as apply_inventory_layout
 from .public.apply_potion_effect import apply_potion_effect as apply_potion_effect
@@ -26,7 +30,6 @@ from .public.full_heal import full_heal as full_heal
 from .public.function import Function as Function
 from .public.give_experience_levels import give_experience_levels as give_experience_levels
 from .public.give_item import give_item as give_item
-from .public.global_stat import GlobalStat as GlobalStat
 from .public.go_to_house_spawn import go_to_house_spawn as go_to_house_spawn
 from .public.goto import goto as goto
 from .public.group import Group as Group
@@ -69,7 +72,6 @@ from .public.player_name import PlayerName as PlayerName
 from .public.player_ping import PlayerPing as PlayerPing
 from .public.player_protocol import PlayerProtocol as PlayerProtocol
 from .public.player_sneaking import PlayerSneaking as PlayerSneaking
-from .public.player_stat import PlayerStat as PlayerStat
 from .public.player_version import PlayerVersion as PlayerVersion
 from .public.random import Random as Random
 from .public.random_int import RandomInt as RandomInt
@@ -89,7 +91,6 @@ from .public.team import Team as Team
 from .public.team_color import TeamColor as TeamColor
 from .public.team_name import TeamName as TeamName
 from .public.team_players import TeamPlayers as TeamPlayers
-from .public.team_stat import TeamStat as TeamStat
 from .public.team_tag import TeamTag as TeamTag
 from .public.teleport_player import teleport_player as teleport_player
 from .public.trigger_function import trigger_function as trigger_function
@@ -97,4 +98,5 @@ from .public.within_region import WithinRegion as WithinRegion
 from .public.change_velocity import change_velocity as change_velocity
 from .public.launch_to_target import launch_to_target as launch_to_target
 from .public.drop_item import drop_item as drop_item
+
 from .writer import set_htsl_imports_folder as set_htsl_imports_folder

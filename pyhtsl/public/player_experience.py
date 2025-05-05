@@ -1,4 +1,4 @@
-from ..condition import PlaceholderValue
+from ..placeholders import PlaceholderCheckable
 
 
 __all__ = (
@@ -6,4 +6,4 @@ __all__ = (
 )
 
 
-PlayerExperience = PlaceholderValue('%player.experience%')
+PlayerExperience = PlaceholderCheckable('%player.experience%')

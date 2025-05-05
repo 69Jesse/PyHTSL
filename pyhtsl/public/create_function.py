@@ -1,10 +1,10 @@
 from ..writer import WRITER
 from .goto import goto
 from .function import Function
-from ..stat import StatParameter
-from .player_stat import PlayerStat
-from .global_stat import GlobalStat
-from .team_stat import TeamStat
+from ..stats.stat_parameter import StatParameter
+from ..stats.player_stat import PlayerStat
+from ..stats.global_stat import GlobalStat
+from ..stats.team_stat import TeamStat
 
 import inspect
 

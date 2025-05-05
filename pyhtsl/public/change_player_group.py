@@ -13,6 +13,6 @@ def change_player_group(
 ) -> None:
     group = group if isinstance(group, Group) else Group(group)
     WRITER.write(
-        f'changePlayerGroup "{group.name}" {str(demotion_protection).lower()}',
+        f'changePlayerGroup {group.name} {str(demotion_protection).lower()}',
         LineType.miscellaneous,
     )

@@ -1,14 +1,17 @@
 import math
 
-from .handler import EXPR_HANDLER
-from .expression_type import ExpressionOperator
-from ..condition import BaseCondition, ConditionOperator, DoubleSidedCondition
-from .housing_type import NumericHousingType, HousingType
-from .expression import Expression
+from .expression.handler import EXPR_HANDLER
+from .condition.base_condition import BaseCondition
+from .condition.double_sided_condition import DoubleSidedConditionOperator, DoubleSidedCondition
+from .expression.housing_type import NumericHousingType, HousingType, _housing_type_as_right_side
 
 from abc import ABC, abstractmethod
 
-from typing import Self
+from typing import TYPE_CHECKING, Self
+if TYPE_CHECKING:
+    from .expression.assignment_expression import Expression, ExpressionOperator
+    from .stats.base_stat import BaseStat
+    from .stats.temporary_stat import TemporaryStat
 
 
 __all__ = (
@@ -17,28 +20,80 @@ __all__ = (
 
 
 class Checkable(ABC):
+    @staticmethod
+    def _import_expression(
+        expression_cls: type['Expression'],
+        expression_operator_cls: type['ExpressionOperator'],
+    ) -> None:
+        globals()[expression_cls.__name__] = expression_cls
+        globals()[expression_operator_cls.__name__] = expression_operator_cls
+
+    @staticmethod
+    def _import_stat(
+        stat_cls: type['BaseStat'],
+    ) -> None:
+        globals()[stat_cls.__name__] = stat_cls
+
+    @staticmethod
+    def _import_temporary_stat(
+        temporary_stat_cls: type['BaseStat'],
+    ) -> None:
+        globals()[temporary_stat_cls.__name__] = temporary_stat_cls
+
     @abstractmethod
-    def as_left_side(self) -> str:
+    def _as_left_side(self) -> str:
         """
-        var foo = "%var.player/bar%"
+        var foo = %var.player/bar%
         ^^^^^^^
         """
         raise NotImplementedError
 
     @abstractmethod
-    def as_right_side(self) -> str:
+    def _as_right_side(self) -> str:
         """
-        var foo = "%var.player/bar%"
-                  ^^^^^^^^^^^^^^^^^^
+        var foo = %var.player/bar%
+                  ^^^^^^^^^^^^^^^^
         """
         raise NotImplementedError
+
+    @abstractmethod
+    def _as_string(self) -> str:
+        """
+        chat "hello %player.name%"
+                    ^^^^^^^^^^^^^
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def _equals(self, other: 'Checkable | HousingType') -> bool:
+        raise NotImplementedError
+
+    @staticmethod
+    def _to_right_side(
+        value: 'Checkable | HousingType',
+    ) -> str:
+        if isinstance(value, Checkable):
+            return value._as_right_side()
+        return _housing_type_as_right_side(value)
+
+    def __str__(self) -> str:
+        return self._as_string()
+
+    def as_long(self) -> str:
+        return f'{self._as_string()}L'
+
+    def as_double(self) -> str:
+        return f'{self._as_string()}D'
+
+    def as_string(self) -> str:
+        return f'"{self._as_string()}"'
 
     @staticmethod
     def add(
         left: 'Checkable',
         right: 'Checkable | NumericHousingType',
     ) -> 'Expression':
-        temp_stat = EXPR_HANDLER.temporary_stat_cls()
+        temp_stat = TemporaryStat()
         expr = Expression(temp_stat, left, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat, right, ExpressionOperator.Increment)
@@ -63,7 +118,7 @@ class Checkable(ABC):
         left: 'Checkable',
         right: 'Checkable | NumericHousingType',
     ) -> 'Expression':
-        temp_stat = EXPR_HANDLER.temporary_stat_cls()
+        temp_stat = TemporaryStat()
         expr = Expression(temp_stat, left, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat, right, ExpressionOperator.Decrement)
@@ -78,7 +133,7 @@ class Checkable(ABC):
         left: 'Checkable | NumericHousingType',
         right: 'Checkable',
     ) -> 'Expression':
-        temp_stat = EXPR_HANDLER.temporary_stat_cls()
+        temp_stat = TemporaryStat()
         expr = Expression(temp_stat, left, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.add(
@@ -94,7 +149,7 @@ class Checkable(ABC):
         left: 'Checkable',
         right: 'Checkable | NumericHousingType',
     ) -> 'Expression':
-        temp_stat = EXPR_HANDLER.temporary_stat_cls()
+        temp_stat = TemporaryStat()
         expr = Expression(temp_stat, left, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat, right, ExpressionOperator.Multiply)
@@ -119,7 +174,7 @@ class Checkable(ABC):
         left: 'Checkable',
         right: 'Checkable | NumericHousingType',
     ) -> 'Expression':
-        temp_stat = EXPR_HANDLER.temporary_stat_cls()
+        temp_stat = TemporaryStat()
         expr = Expression(temp_stat, left, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat, right, ExpressionOperator.Divide)
@@ -134,7 +189,7 @@ class Checkable(ABC):
         left: 'Checkable | NumericHousingType',
         right: 'Checkable',
     ) -> 'Expression':
-        temp_stat = EXPR_HANDLER.temporary_stat_cls()
+        temp_stat = TemporaryStat()
         expr = Expression(temp_stat, left, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.add(
@@ -172,7 +227,7 @@ class Checkable(ABC):
     ) -> 'Expression | int':
         if right == 0:
             return 1
-        temp_stat = EXPR_HANDLER.temporary_stat_cls()
+        temp_stat = TemporaryStat()
         expr = Expression(temp_stat, left, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         log2 = int(math.log2(right))
@@ -197,7 +252,7 @@ class Checkable(ABC):
     ) -> 'Expression | int':
         if right == 0:
             return 1
-        temp_stat = EXPR_HANDLER.temporary_stat_cls()
+        temp_stat = TemporaryStat()
         expr = Expression(temp_stat, left, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         log2 = int(math.log2(right))
@@ -263,10 +318,10 @@ class Checkable(ABC):
         left: 'Checkable | NumericHousingType',
         right: 'Checkable | NumericHousingType',
     ) -> 'Expression':
-        temp_stat_1 = EXPR_HANDLER.temporary_stat_cls()
+        temp_stat_1 = TemporaryStat()
         expr = Expression(temp_stat_1, left, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
-        temp_stat_2 = EXPR_HANDLER.temporary_stat_cls()
+        temp_stat_2 = TemporaryStat()
         expr = Expression(temp_stat_2, left, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat_2, right, ExpressionOperator.Divide)
@@ -282,12 +337,12 @@ class Checkable(ABC):
         left: 'Checkable | NumericHousingType',
         right: 'Checkable | NumericHousingType',
     ) -> 'Expression':
-        temp_stat_1 = EXPR_HANDLER.temporary_stat_cls()
+        temp_stat_1 = TemporaryStat()
         expr = Expression(temp_stat_1, left, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat_1, right, ExpressionOperator.Increment)
         EXPR_HANDLER.add(expr)
-        temp_stat_2 = EXPR_HANDLER.temporary_stat_cls()
+        temp_stat_2 = TemporaryStat()
         expr = Expression(temp_stat_2, left, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat_2, right, ExpressionOperator.Divide)
@@ -322,7 +377,7 @@ class Checkable(ABC):
         greater_than_2_62: bool = False,
         multiplied_by: int = 1,
     ) -> 'Expression':
-        temp_stat = EXPR_HANDLER.temporary_stat_cls()
+        temp_stat = TemporaryStat()
         expr = Expression(temp_stat, value, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         if greater_than_2_62:
@@ -345,7 +400,7 @@ class Checkable(ABC):
         greater_than_2_62: bool = False,
         sign: 'Expression | int | None' = None,
     ) -> 'Expression':
-        temp_stat = EXPR_HANDLER.temporary_stat_cls()
+        temp_stat = TemporaryStat()
         expr = Expression(temp_stat, value, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = Expression(
@@ -364,7 +419,7 @@ class Checkable(ABC):
         left: 'Checkable',
         right: 'Checkable | HousingType',
     ) -> BaseCondition:
-        return DoubleSidedCondition(left, right, ConditionOperator.Equal)
+        return DoubleSidedCondition(left, right, DoubleSidedConditionOperator.Equal)
 
     def __eq__(self, other: 'Checkable | HousingType') -> BaseCondition:
         return Checkable.equals(self, other)
@@ -384,7 +439,7 @@ class Checkable(ABC):
         left: 'Checkable',
         right: 'Checkable | HousingType',
     ) -> BaseCondition:
-        return DoubleSidedCondition(left, right, ConditionOperator.GreaterThan)
+        return DoubleSidedCondition(left, right, DoubleSidedConditionOperator.GreaterThan)
 
     def __gt__(self, other: 'Checkable | HousingType') -> BaseCondition:
         return Checkable.greater_than(self, other)
@@ -394,7 +449,7 @@ class Checkable(ABC):
         left: 'Checkable',
         right: 'Checkable | HousingType',
     ) -> BaseCondition:
-        return DoubleSidedCondition(left, right, ConditionOperator.LessThan)
+        return DoubleSidedCondition(left, right, DoubleSidedConditionOperator.LessThan)
 
     def __lt__(self, other: 'Checkable | HousingType') -> BaseCondition:
         return Checkable.less_than(self, other)
@@ -404,7 +459,7 @@ class Checkable(ABC):
         left: 'Checkable',
         right: 'Checkable | HousingType',
     ) -> BaseCondition:
-        return DoubleSidedCondition(left, right, ConditionOperator.GreaterThanOrEqual)
+        return DoubleSidedCondition(left, right, DoubleSidedConditionOperator.GreaterThanOrEqual)
 
     def __ge__(self, other: 'Checkable | HousingType') -> BaseCondition:
         return Checkable.greater_than_or_equal(self, other)
@@ -414,7 +469,7 @@ class Checkable(ABC):
         left: 'Checkable',
         right: 'Checkable | HousingType',
     ) -> BaseCondition:
-        return DoubleSidedCondition(left, right, ConditionOperator.LessThanOrEqual)
+        return DoubleSidedCondition(left, right, DoubleSidedConditionOperator.LessThanOrEqual)
 
     def __le__(self, other: 'Checkable | HousingType') -> BaseCondition:
         return Checkable.less_than_or_equal(self, other)

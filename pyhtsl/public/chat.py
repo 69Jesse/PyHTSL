@@ -10,6 +10,6 @@ def chat(
     line: str,
 ) -> None:
     WRITER.write(
-        f'chat "{line}"',
+        f'chat "{line.replace('""', '\\"')}"',
         LineType.miscellaneous,
     )

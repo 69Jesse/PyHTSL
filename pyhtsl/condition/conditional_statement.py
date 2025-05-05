@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Optional, TYPE_CHECKING
 from types import TracebackType
 if TYPE_CHECKING:
-    from .condition import BaseCondition
+    from .base_condition import BaseCondition
 
 
 __all__ = (
@@ -25,25 +25,11 @@ class IfStatement:
     mode: ConditionalMode
     def __init__(
         self,
-        condition: 'BaseCondition | list[BaseCondition]',
+        conditions: 'list[BaseCondition]',
         mode: ConditionalMode = ConditionalMode.AND,
     ) -> None:
-        self.conditions = condition if isinstance(condition, list) else [condition]
+        self.conditions = conditions if isinstance(conditions, list) else [conditions]
         self.mode = mode
-
-    @staticmethod
-    def get_new_conditions(
-        left: 'BaseCondition | IfStatement',
-        right: 'BaseCondition | IfStatement',
-    ) -> list['BaseCondition']:
-        left_is_if, right_is_if = isinstance(left, IfStatement), isinstance(right, IfStatement)
-        if left_is_if and right_is_if:
-            return left.conditions + right.conditions  # type: ignore
-        if left_is_if:
-            return left.conditions + [right]  # type: ignore
-        if right_is_if:
-            return [left] + right.conditions  # type: ignore
-        return [left, right]  # type: ignore
 
     def __enter__(self) -> None:
         WRITER.write(

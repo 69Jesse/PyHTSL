@@ -1,4 +1,4 @@
-from ..condition import TinyCondition
+from ..condition.base_condition import BaseCondition
 from ..types import ALL_POTION_EFFECTS
 
 from typing import final
@@ -10,7 +10,7 @@ __all__ = (
 
 
 @final
-class HasPotionEffect(TinyCondition):
+class HasPotionEffect(BaseCondition):
     effect: str
     def __init__(
         self,
