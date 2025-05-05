@@ -1,4 +1,4 @@
-from .condition import Condition
+from .condition import BaseCondition
 
 
 __all__ = (
@@ -6,5 +6,5 @@ __all__ = (
 )
 
 
-class TinyCondition(Condition):
+class TinyCondition(BaseCondition):
     __slots__ = ()

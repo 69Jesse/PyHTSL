@@ -1,5 +1,5 @@
 from ..condition import (
-    Condition,
+    BaseCondition,
     IfStatement,
 )
 from ..expression import Expression
@@ -8,7 +8,7 @@ from typing import Literal
 
 
 __all__ = (
-    'Condition',
+    'BaseCondition',
     'IfStatement',
     'Expression',
     'ALL_POTION_EFFECTS',

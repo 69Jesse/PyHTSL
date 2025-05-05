@@ -1,4 +1,4 @@
-from ..condition import Condition, ConditionalMode, IfStatement
+from ..condition import BaseCondition, ConditionalMode, IfStatement
 
 
 __all__ = (
@@ -7,9 +7,9 @@ __all__ = (
 
 
 def IfOr(
-    *conditions: 'Condition | IfStatement',
+    *conditions: 'BaseCondition | IfStatement',
 ) -> IfStatement:
-    new_conditions: list[Condition] = []
+    new_conditions: list[BaseCondition] = []
     for condition in conditions:
         if isinstance(condition, IfStatement):
             if condition.mode is not ConditionalMode.OR:

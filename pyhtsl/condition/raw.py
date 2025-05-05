@@ -1,4 +1,4 @@
-from .condition import Condition
+from .condition import BaseCondition
 
 from typing import final
 
@@ -9,7 +9,7 @@ __all__ = (
 
 
 @final
-class RawCondition(Condition):
+class RawCondition(BaseCondition):
     name: str
     def __init__(
         self,

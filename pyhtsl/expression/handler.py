@@ -1,4 +1,4 @@
-from .expression_type import ExpressionType
+from .expression_type import ExpressionOperator
 from ..writer import WRITER
 
 from typing import TYPE_CHECKING, final, ClassVar
@@ -14,7 +14,7 @@ __all__ = (
 
 
 TEMP_STATS_NUMBER_START: int = 1
-LinesType = list[tuple['Stat', ExpressionType, 'Stat | int | PlaceholderValue']]
+LinesType = list[tuple['Stat', ExpressionOperator, 'Stat | int | PlaceholderValue']]
 
 
 @final
@@ -31,11 +31,11 @@ class ExpressionHandler:
     def create_lines(self) -> LinesType:
         lines: LinesType = []
         for expression in self._expressions:
-            left = expression.fetch_stat_or_int(expression.left)
+            left = expression.all_the_way_left(expression.left)
             if TYPE_CHECKING:
                 assert isinstance(left, Stat)
-            right = expression.fetch_stat_or_int(expression.right)
-            lines.append((left, expression.type, right))
+            right = expression.all_the_way_left(expression.right)
+            lines.append((left, expression.operator, right))
         return lines
 
     def optimize_lines(
@@ -55,7 +55,7 @@ class ExpressionHandler:
                 if not isinstance(left, self.temporary_stat_cls):
                     if not isinstance(right, self.temporary_stat_cls):
                         continue
-                    if expr_type is not ExpressionType.Set:
+                    if expr_type is not ExpressionOperator.Set:
                         continue
 
                     # We have:
@@ -74,7 +74,7 @@ class ExpressionHandler:
                         if (
                             isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number
                             and type(other_right) is type(left) and other_right.name == left.name  # type: ignore
-                            and other_type is not ExpressionType.Set
+                            and other_type is not ExpressionOperator.Set
                         ):
                             used_before = True
                             break
@@ -111,7 +111,7 @@ class ExpressionHandler:
                 else:
                     if not isinstance(right, self.temporary_stat_cls):
                         continue
-                    if expr_type is not ExpressionType.Set:
+                    if expr_type is not ExpressionOperator.Set:
                         continue
 
                     # We have:
@@ -135,7 +135,7 @@ class ExpressionHandler:
                         if (
                             isinstance(other_left, self.temporary_stat_cls) and other_left.number == right.number
                             and isinstance(other_right, self.temporary_stat_cls) and other_right.number == left.number
-                            and other_type is not ExpressionType.Set
+                            and other_type is not ExpressionOperator.Set
                         ):
                             used_before = True
                             break
@@ -172,20 +172,20 @@ class ExpressionHandler:
         for i in range(len(lines) - 1, -1, -1):
             left, expr_type, right = lines[i]
             if (
-                expr_type is ExpressionType.Set
+                expr_type is ExpressionOperator.Set
                 and not isinstance(right, int)
                 and left.name == right.name
                 and type(left) is type(right)
             ):
                 lines.pop(i)
             elif (
-                (expr_type is ExpressionType.Increment or expr_type is ExpressionType.Decrement)
+                (expr_type is ExpressionOperator.Increment or expr_type is ExpressionOperator.Decrement)
                 and isinstance(right, int)
                 and right == 0
             ):
                 lines.pop(i)
             elif (
-                (expr_type is ExpressionType.Multiply or expr_type is ExpressionType.Divide)
+                (expr_type is ExpressionOperator.Multiply or expr_type is ExpressionOperator.Divide)
                 and isinstance(right, int)
                 and right == 1
             ):
