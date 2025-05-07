@@ -105,207 +105,125 @@ class Checkable(ABC):
     def as_string(self) -> str:
         return f'"{self._as_string()}"'
 
-    @staticmethod
-    def add(
-        left: 'Checkable',
-        right: 'Checkable | NumericHousingType',
-    ) -> 'Expression':
+    def __add__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
         temp_stat = TemporaryStat()
-        expr = Expression(temp_stat, left, ExpressionOperator.Set)
+        expr = Expression(temp_stat, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
-        expr = Expression(temp_stat, right, ExpressionOperator.Increment)
+        expr = Expression(temp_stat, other, ExpressionOperator.Increment)
         EXPR_HANDLER.add(expr)
         return expr
-
-    def __add__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
-        return Checkable.add(self, other)
-
-    @staticmethod
-    def radd(
-        left: 'Checkable | NumericHousingType',
-        right: 'Checkable',
-    ) -> 'Expression':
-        return Checkable.add(right, left)
 
     def __radd__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
-        return Checkable.radd(other, self)
-
-    @staticmethod
-    def sub(
-        left: 'Checkable',
-        right: 'Checkable | NumericHousingType',
-    ) -> 'Expression':
-        temp_stat = TemporaryStat()
-        expr = Expression(temp_stat, left, ExpressionOperator.Set)
-        EXPR_HANDLER.add(expr)
-        expr = Expression(temp_stat, right, ExpressionOperator.Decrement)
-        EXPR_HANDLER.add(expr)
-        return expr
+        return self.__add__(other)
 
     def __sub__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
-        return Checkable.add(self, other)
-
-    @staticmethod
-    def rsub(
-        left: 'Checkable | NumericHousingType',
-        right: 'Checkable',
-    ) -> 'Expression':
         temp_stat = TemporaryStat()
-        expr = Expression(temp_stat, left, ExpressionOperator.Set)
+        expr = Expression(temp_stat, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
-        EXPR_HANDLER.add(
-            Expression(temp_stat, right, ExpressionOperator.Decrement),
-        )
+        expr = Expression(temp_stat, other, ExpressionOperator.Decrement)
+        EXPR_HANDLER.add(expr)
         return expr
 
     def __rsub__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
-        return Checkable.rsub(other, self)
-
-    @staticmethod
-    def mul(
-        left: 'Checkable',
-        right: 'Checkable | NumericHousingType',
-    ) -> 'Expression':
         temp_stat = TemporaryStat()
-        expr = Expression(temp_stat, left, ExpressionOperator.Set)
-        EXPR_HANDLER.add(expr)
-        expr = Expression(temp_stat, right, ExpressionOperator.Multiply)
-        EXPR_HANDLER.add(expr)
-        return expr
-
-    def __mul__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
-        return Checkable.mul(self, other)
-
-    @staticmethod
-    def rmul(
-        left: 'Checkable | NumericHousingType',
-        right: 'Checkable',
-    ) -> 'Expression':
-        return Checkable.mul(right, left)
-
-    def __rmul__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
-        return Checkable.rmul(other, self)
-
-    @staticmethod
-    def truediv(
-        left: 'Checkable',
-        right: 'Checkable | NumericHousingType',
-    ) -> 'Expression':
-        temp_stat = TemporaryStat()
-        expr = Expression(temp_stat, left, ExpressionOperator.Set)
-        EXPR_HANDLER.add(expr)
-        expr = Expression(temp_stat, right, ExpressionOperator.Divide)
-        EXPR_HANDLER.add(expr)
-        return expr
-
-    def __truediv__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
-        return Checkable.truediv(self, other)
-
-    @staticmethod
-    def rtruediv(
-        left: 'Checkable | NumericHousingType',
-        right: 'Checkable',
-    ) -> 'Expression':
-        temp_stat = TemporaryStat()
-        expr = Expression(temp_stat, left, ExpressionOperator.Set)
+        expr = Expression(temp_stat, other, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.add(
-            Expression(temp_stat, right, ExpressionOperator.Divide),
+            Expression(temp_stat, self, ExpressionOperator.Decrement),
         )
         return expr
 
-    def __rtruediv__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
-        return Checkable.rtruediv(other, self)
+    def __mul__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
+        temp_stat = TemporaryStat()
+        expr = Expression(temp_stat, self, ExpressionOperator.Set)
+        EXPR_HANDLER.add(expr)
+        expr = Expression(temp_stat, other, ExpressionOperator.Multiply)
+        EXPR_HANDLER.add(expr)
+        return expr
 
-    @staticmethod
-    def floordiv(
-        left: 'Checkable',
-        right: 'Checkable | NumericHousingType',
-    ) -> 'Expression':
-        return Checkable.truediv(left, right)
+    def __rmul__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
+        return self.__mul__(other)
+
+    def __truediv__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
+        temp_stat = TemporaryStat()
+        expr = Expression(temp_stat, self, ExpressionOperator.Set)
+        EXPR_HANDLER.add(expr)
+        expr = Expression(temp_stat, other, ExpressionOperator.Divide)
+        EXPR_HANDLER.add(expr)
+        return expr
+
+    def __rtruediv__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
+        temp_stat = TemporaryStat()
+        expr = Expression(temp_stat, other, ExpressionOperator.Set)
+        EXPR_HANDLER.add(expr)
+        EXPR_HANDLER.add(
+            Expression(temp_stat, self, ExpressionOperator.Divide),
+        )
+        return expr
 
     def __floordiv__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
-        return Checkable.floordiv(self, other)
-
-    @staticmethod
-    def rfloordiv(
-        left: 'Checkable | NumericHousingType',
-        right: 'Checkable',
-    ) -> 'Expression':
-        return Checkable.rtruediv(left, right)
+        return self.__truediv__(other)
 
     def __rfloordiv__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
-        return Checkable.rfloordiv(other, self)
+        return self.__truediv__(other)
 
-    @staticmethod
-    def _pow_multiply_strat(
-        left: 'Checkable | NumericHousingType',
-        right: int,
-    ) -> 'Expression | int':
-        if right == 0:
+    def _pow_multiply_strat(self, other: int) -> 'Expression | int':
+        if other == 0:
             return 1
         temp_stat = TemporaryStat()
-        expr = Expression(temp_stat, left, ExpressionOperator.Set)
+        expr = Expression(temp_stat, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
-        log2 = int(math.log2(right))
+        log2 = int(math.log2(other))
         for _ in range(log2):
             expr = Expression(temp_stat, temp_stat, ExpressionOperator.Multiply)
             EXPR_HANDLER.add(expr)
-        remaining = right - 2 ** log2
+        remaining = other - 2 ** log2
         if remaining == 0:
             return expr
         if remaining == 1:
-            expr = Expression(temp_stat, left, ExpressionOperator.Multiply)
+            expr = Expression(temp_stat, self, ExpressionOperator.Multiply)
             EXPR_HANDLER.add(expr)
             return expr
-        expr = Expression(temp_stat, Checkable.pow(left, remaining), ExpressionOperator.Multiply)
+        expr = Expression(temp_stat, self.__pow__(remaining), ExpressionOperator.Multiply)
         EXPR_HANDLER.add(expr)
         return expr
 
-    @staticmethod
-    def _pow_divide_strat(
-        left: 'Checkable | NumericHousingType',
-        right: int,
-    ) -> 'Expression | int':
-        if right == 0:
+    def _pow_divide_strat(self, other: int) -> 'Expression | int':
+        if other == 0:
             return 1
         temp_stat = TemporaryStat()
-        expr = Expression(temp_stat, left, ExpressionOperator.Set)
+        expr = Expression(temp_stat, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
-        log2 = int(math.log2(right))
+        log2 = int(math.log2(other))
         for _ in range(log2 + 1):
             expr = Expression(temp_stat, temp_stat, ExpressionOperator.Multiply)
             EXPR_HANDLER.add(expr)
-        remaining = 2 ** (log2 + 1) - right
+        remaining = 2 ** (log2 + 1) - other
         assert remaining > 0
         if remaining == 1:
-            expr = Expression(temp_stat, left, ExpressionOperator.Divide)
+            expr = Expression(temp_stat, self, ExpressionOperator.Divide)
             EXPR_HANDLER.add(expr)
             return expr
         if remaining == 2:
-            expr = Expression(temp_stat, left, ExpressionOperator.Divide)
+            expr = Expression(temp_stat, self, ExpressionOperator.Divide)
             EXPR_HANDLER.add(expr)
-            expr = Expression(temp_stat, left, ExpressionOperator.Divide)
+            expr = Expression(temp_stat, self, ExpressionOperator.Divide)
             EXPR_HANDLER.add(expr)
             return expr
         if remaining & (remaining - 1) == 0:
-            expr = Expression(temp_stat, Checkable._pow_multiply_strat(left, remaining), ExpressionOperator.Divide)
+            expr = Expression(temp_stat, Checkable._pow_multiply_strat(self, remaining), ExpressionOperator.Divide)
             EXPR_HANDLER.add(expr)
             return expr
-        expr = Expression(temp_stat, Checkable.pow(left, remaining), ExpressionOperator.Divide)
+        expr = Expression(temp_stat, self.__pow__(remaining), ExpressionOperator.Divide)
         EXPR_HANDLER.add(expr)
         return expr
 
-    @staticmethod
-    def pow(
-        left: 'Checkable | NumericHousingType',
-        right: int,
-    ) -> 'Expression | int':
-        if right < 0:
+    def __pow__(self, other: int) -> 'Expression | int':
+        if other < 0:
             raise ValueError('Power must be greater than or equal to 0')
 
         before_length = len(EXPR_HANDLER._expressions)
-        multiply_strat_expr = Checkable._pow_multiply_strat(left, right)
+        multiply_strat_expr = Checkable._pow_multiply_strat(self, other)
         multiply_strat_after_length = len(EXPR_HANDLER._expressions)
         if multiply_strat_after_length - before_length <= 1:
             return multiply_strat_expr
@@ -315,7 +233,7 @@ class Checkable(ABC):
             multiply_expressions.append(EXPR_HANDLER._expressions.pop(before_length))
 
         assert len(EXPR_HANDLER._expressions) == before_length
-        divide_strat_expr = Checkable._pow_divide_strat(left, right)
+        divide_strat_expr = Checkable._pow_divide_strat(self, other)
         divide_strat_after_length = len(EXPR_HANDLER._expressions)
 
         if divide_strat_after_length < multiply_strat_after_length:
@@ -327,75 +245,52 @@ class Checkable(ABC):
         EXPR_HANDLER._expressions.extend(multiply_expressions)
         return multiply_strat_expr
 
-    def __pow__(self, other: int) -> 'Expression | int':
-        return Checkable.pow(self, other)
-
-    @staticmethod
-    def unsafemod(
-        left: 'Checkable | NumericHousingType',
-        right: 'Checkable | NumericHousingType',
-    ) -> 'Expression':
+    def unsafemod(self, other: 'Checkable | NumericHousingType') -> 'Expression':
         temp_stat_1 = TemporaryStat()
-        expr = Expression(temp_stat_1, left, ExpressionOperator.Set)
+        expr = Expression(temp_stat_1, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         temp_stat_2 = TemporaryStat()
-        expr = Expression(temp_stat_2, left, ExpressionOperator.Set)
+        expr = Expression(temp_stat_2, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
-        expr = Expression(temp_stat_2, right, ExpressionOperator.Divide)
+        expr = Expression(temp_stat_2, other, ExpressionOperator.Divide)
         EXPR_HANDLER.add(expr)
-        expr = Expression(temp_stat_2, right, ExpressionOperator.Multiply)
+        expr = Expression(temp_stat_2, other, ExpressionOperator.Multiply)
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat_1, temp_stat_2, ExpressionOperator.Decrement)
         EXPR_HANDLER.add(expr)
         return expr
 
-    @staticmethod
-    def safemod(
-        left: 'Checkable | NumericHousingType',
-        right: 'Checkable | NumericHousingType',
-    ) -> 'Expression':
+    def safemod(self, other: 'Checkable | NumericHousingType') -> 'Expression':
         temp_stat_1 = TemporaryStat()
-        expr = Expression(temp_stat_1, left, ExpressionOperator.Set)
+        expr = Expression(temp_stat_1, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
-        expr = Expression(temp_stat_1, right, ExpressionOperator.Increment)
+        expr = Expression(temp_stat_1, other, ExpressionOperator.Increment)
         EXPR_HANDLER.add(expr)
         temp_stat_2 = TemporaryStat()
-        expr = Expression(temp_stat_2, left, ExpressionOperator.Set)
+        expr = Expression(temp_stat_2, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
-        expr = Expression(temp_stat_2, right, ExpressionOperator.Divide)
+        expr = Expression(temp_stat_2, other, ExpressionOperator.Divide)
         EXPR_HANDLER.add(expr)
-        expr = Expression(temp_stat_2, right, ExpressionOperator.Multiply)
+        expr = Expression(temp_stat_2, other, ExpressionOperator.Multiply)
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat_1, temp_stat_2, ExpressionOperator.Decrement)
         EXPR_HANDLER.add(expr)
-        return Expression.unsafemod(expr, right)
-
-    @staticmethod
-    def mod(
-        left: 'Checkable | NumericHousingType',
-        right: 'Checkable | NumericHousingType',
-    ) -> 'Expression':
-        return Checkable.safemod(left, right)
+        return Expression.unsafemod(expr, other)
 
     def __mod__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
-        return Checkable.mod(self, other)
-
-    @staticmethod
-    def neg(value: 'Checkable') -> 'Expression':
-        return Checkable.mul(value, -1)
+        return self.safemod(other)
 
     def __neg__(self) -> 'Expression':
-        return Checkable.neg(self)
+        return self.__mul__(-1)
 
-    @staticmethod
     def sign(
-        value: 'Checkable',
+        self,
         *,
         greater_than_2_62: bool = False,
         multiplied_by: int = 1,
     ) -> 'Expression':
         temp_stat = TemporaryStat()
-        expr = Expression(temp_stat, value, ExpressionOperator.Set)
+        expr = Expression(temp_stat, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         if greater_than_2_62:
             expr = Expression(temp_stat, 2, ExpressionOperator.Divide)
@@ -410,86 +305,43 @@ class Checkable(ABC):
         EXPR_HANDLER.add(expr)
         return expr
 
-    @staticmethod
     def abs(
-        value: 'Checkable',
+        self,
         *,
         greater_than_2_62: bool = False,
         sign: 'Expression | int | None' = None,
     ) -> 'Expression':
         temp_stat = TemporaryStat()
-        expr = Expression(temp_stat, value, ExpressionOperator.Set)
+        expr = Expression(temp_stat, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = Expression(
             temp_stat,
-            sign if sign is not None else Checkable.sign(value, greater_than_2_62=greater_than_2_62),
+            sign if sign is not None else Checkable.sign(self, greater_than_2_62=greater_than_2_62),
             ExpressionOperator.Multiply,
         )
         EXPR_HANDLER.add(expr)
         return expr
 
     def __abs__(self) -> 'Expression':
-        return Checkable.abs(self)
-
-    @staticmethod
-    def equals(
-        left: 'Checkable',
-        right: 'Checkable | HousingType',
-    ) -> BaseCondition:
-        return DoubleSidedCondition(left, right, DoubleSidedConditionOperator.Equal)
+        return self.abs()
 
     def __eq__(self, other: 'Checkable | HousingType') -> BaseCondition:
-        return Checkable.equals(self, other)
-
-    @staticmethod
-    def not_equal(
-        left: 'Checkable',
-        right: 'Checkable | HousingType',
-    ) -> BaseCondition:
-        return ~Checkable.equals(left, right)
+        return DoubleSidedCondition(self, other, DoubleSidedConditionOperator.Equal)
 
     def __ne__(self, other: 'Checkable | HousingType') -> BaseCondition:
-        return Checkable.not_equal(self, other)
-
-    @staticmethod
-    def greater_than(
-        left: 'Checkable',
-        right: 'Checkable | HousingType',
-    ) -> BaseCondition:
-        return DoubleSidedCondition(left, right, DoubleSidedConditionOperator.GreaterThan)
+        return ~self.__eq__(other)
 
     def __gt__(self, other: 'Checkable | HousingType') -> BaseCondition:
-        return Checkable.greater_than(self, other)
-
-    @staticmethod
-    def less_than(
-        left: 'Checkable',
-        right: 'Checkable | HousingType',
-    ) -> BaseCondition:
-        return DoubleSidedCondition(left, right, DoubleSidedConditionOperator.LessThan)
+        return DoubleSidedCondition(self, other, DoubleSidedConditionOperator.GreaterThan)
 
     def __lt__(self, other: 'Checkable | HousingType') -> BaseCondition:
-        return Checkable.less_than(self, other)
-
-    @staticmethod
-    def greater_than_or_equal(
-        left: 'Checkable',
-        right: 'Checkable | HousingType',
-    ) -> BaseCondition:
-        return DoubleSidedCondition(left, right, DoubleSidedConditionOperator.GreaterThanOrEqual)
+        return DoubleSidedCondition(self, other, DoubleSidedConditionOperator.LessThan)
 
     def __ge__(self, other: 'Checkable | HousingType') -> BaseCondition:
-        return Checkable.greater_than_or_equal(self, other)
-
-    @staticmethod
-    def less_than_or_equal(
-        left: 'Checkable',
-        right: 'Checkable | HousingType',
-    ) -> BaseCondition:
-        return DoubleSidedCondition(left, right, DoubleSidedConditionOperator.LessThanOrEqual)
+        return DoubleSidedCondition(self, other, DoubleSidedConditionOperator.GreaterThanOrEqual)
 
     def __le__(self, other: 'Checkable | HousingType') -> BaseCondition:
-        return Checkable.less_than_or_equal(self, other)
+        return DoubleSidedCondition(self, other, DoubleSidedConditionOperator.LessThanOrEqual)
 
     @property
     def value(self) -> Self:

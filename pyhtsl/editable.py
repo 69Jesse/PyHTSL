@@ -21,97 +21,43 @@ class Editable(Checkable):
         globals()[expression_cls.__name__] = expression_cls
         globals()[expression_operator_cls.__name__] = expression_operator_cls
 
-    @staticmethod
-    def iadd(
-        left: 'Editable',
-        right: 'Checkable | NumericHousingType',
-    ) -> None:
-        expr = Expression(left, right, ExpressionOperator.Increment)
-        EXPR_HANDLER.add(expr)
-        EXPR_HANDLER.push()
-
     def __iadd__(self, other: 'Checkable | NumericHousingType') -> 'Self':
-        Editable.iadd(self, other)
-        return self
-
-    @staticmethod
-    def isub(
-        left: 'Editable',
-        right: 'Checkable | NumericHousingType',
-    ) -> None:
-        expr = Expression(left, right, ExpressionOperator.Decrement)
+        expr = Expression(self, other, ExpressionOperator.Increment)
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
+        return self
 
     def __isub__(self, other: 'Checkable | NumericHousingType') -> 'Self':
-        Editable.isub(self, other)
-        return self
-
-    @staticmethod
-    def imul(
-        left: 'Editable',
-        right: 'Checkable | NumericHousingType',
-    ) -> None:
-        expr = Expression(left, right, ExpressionOperator.Multiply)
+        expr = Expression(self, other, ExpressionOperator.Decrement)
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
+        return self
 
     def __imul__(self, other: 'Checkable | NumericHousingType') -> 'Self':
-        Editable.imul(self, other)
-        return self
-
-    @staticmethod
-    def itruediv(
-        left: 'Editable',
-        right: 'Checkable | NumericHousingType',
-    ) -> None:
-        expr = Expression(left, right, ExpressionOperator.Divide)
+        expr = Expression(self, other, ExpressionOperator.Multiply)
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
+        return self
 
     def __itruediv__(self, other: 'Checkable | NumericHousingType') -> 'Self':
-        Editable.itruediv(self, other)
+        expr = Expression(self, other, ExpressionOperator.Divide)
+        EXPR_HANDLER.add(expr)
+        EXPR_HANDLER.push()
         return self
-
-    @staticmethod
-    def ifloordiv(
-        left: 'Editable',
-        right: 'Checkable | NumericHousingType',
-    ) -> None:
-        return Editable.itruediv(left, right)
 
     def __ifloordiv__(self, other: 'Checkable | NumericHousingType') -> 'Self':
-        Editable.ifloordiv(self, other)
-        return self
-
-    @staticmethod
-    def ipow(
-        left: 'Editable',
-        right: int,
-    ) -> None:
-        return Editable.set(left, Checkable.pow(left, right))
+        return self.__itruediv__(other)
 
     def __ipow__(self, other: int) -> 'Self':
-        Editable.ipow(self, other)
+        self.set(self.__pow__(other))
         return self
-
-    @staticmethod
-    def imod(
-        left: 'Editable',
-        right: 'Checkable | NumericHousingType',
-    ) -> None:
-        Editable.set(left, Checkable.mod(left, right))
 
     def __imod__(self, other: 'Checkable | NumericHousingType') -> 'Self':
-        Editable.imod(self, other)
+        self.set(self.__mod__(other))
         return self
 
-    @staticmethod
-    def set(
-        left: 'Editable',
-        right: 'Checkable | HousingType',
-    ) -> None:
-        expr = Expression(left, right, ExpressionOperator.Set)
+    def set(self, right: 'Checkable | HousingType') -> None:
+        expr = Expression(self, right, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
 
@@ -121,11 +67,11 @@ class Editable(Checkable):
 
     @value.setter
     def value(self, value: 'Checkable | HousingType') -> None:
-        return Editable.set(self, value)
+        return self.set(value)
 
     def with_value(
         self,
         value: 'Checkable | HousingType',
     ) -> Self:
-        self.value = value
+        self.set(value)
         return self
