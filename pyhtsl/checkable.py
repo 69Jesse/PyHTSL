@@ -245,7 +245,7 @@ class Checkable(ABC):
         EXPR_HANDLER._expressions.extend(multiply_expressions)
         return multiply_strat_expr
 
-    def unsafemod(self, other: 'Checkable | NumericHousingType') -> 'Expression':
+    def unsafemod(self, other: 'Checkable | int') -> 'Expression':
         temp_stat_1 = TemporaryStat()
         expr = Expression(temp_stat_1, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
@@ -260,7 +260,7 @@ class Checkable(ABC):
         EXPR_HANDLER.add(expr)
         return expr
 
-    def safemod(self, other: 'Checkable | NumericHousingType') -> 'Expression':
+    def safemod(self, other: 'Checkable | int') -> 'Expression':
         temp_stat_1 = TemporaryStat()
         expr = Expression(temp_stat_1, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
@@ -277,7 +277,7 @@ class Checkable(ABC):
         EXPR_HANDLER.add(expr)
         return Expression.unsafemod(expr, other)
 
-    def __mod__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
+    def __mod__(self, other: 'Checkable | int') -> 'Expression':
         return self.safemod(other)
 
     def __neg__(self) -> 'Expression':
