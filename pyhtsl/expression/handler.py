@@ -194,14 +194,12 @@ class ExpressionHandler:
                 lines.pop(i)
             elif (
                 (operator is ExpressionOperator.Increment or operator is ExpressionOperator.Decrement)
-                and isinstance(right, int)
-                and right == 0
+                and ((isinstance(right, int) and right == 0) or (isinstance(right, float) and right == 0.0))
             ):
                 lines.pop(i)
             elif (
                 (operator is ExpressionOperator.Multiply or operator is ExpressionOperator.Divide)
-                and isinstance(right, int)
-                and right == 1
+                and ((isinstance(right, int) and right == 1) or (isinstance(right, float) and right == 1.0))
             ):
                 lines.pop(i)
 
