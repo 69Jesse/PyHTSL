@@ -425,27 +425,26 @@ class Checkable(ABC):
         return self.abs()
 
     def __eq__(self, other: 'Checkable | HousingType') -> BaseCondition:
-        self._assert_type_compatible(other)
-        return DoubleSidedCondition(self, other, DoubleSidedConditionOperator.Equal)
+        return DoubleSidedCondition(self, self._other_as_type_compatible(other), DoubleSidedConditionOperator.Equal)
 
     def __ne__(self, other: 'Checkable | HousingType') -> BaseCondition:
         return ~self.__eq__(other)
 
     def __gt__(self, other: 'Checkable | HousingType') -> BaseCondition:
         self._assert_type_compatible(other)
-        return DoubleSidedCondition(self, other, DoubleSidedConditionOperator.GreaterThan)
+        return DoubleSidedCondition(self, self._other_as_type_compatible(other), DoubleSidedConditionOperator.GreaterThan)
 
     def __lt__(self, other: 'Checkable | HousingType') -> BaseCondition:
         self._assert_type_compatible(other)
-        return DoubleSidedCondition(self, other, DoubleSidedConditionOperator.LessThan)
+        return DoubleSidedCondition(self, self._other_as_type_compatible(other), DoubleSidedConditionOperator.LessThan)
 
     def __ge__(self, other: 'Checkable | HousingType') -> BaseCondition:
         self._assert_type_compatible(other)
-        return DoubleSidedCondition(self, other, DoubleSidedConditionOperator.GreaterThanOrEqual)
+        return DoubleSidedCondition(self, self._other_as_type_compatible(other), DoubleSidedConditionOperator.GreaterThanOrEqual)
 
     def __le__(self, other: 'Checkable | HousingType') -> BaseCondition:
         self._assert_type_compatible(other)
-        return DoubleSidedCondition(self, other, DoubleSidedConditionOperator.LessThanOrEqual)
+        return DoubleSidedCondition(self, self._other_as_type_compatible(other), DoubleSidedConditionOperator.LessThanOrEqual)
 
     @property
     def value(self) -> Self:
