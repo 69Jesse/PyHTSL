@@ -22,25 +22,25 @@ class Editable(Checkable):
         globals()[expression_operator_cls.__name__] = expression_operator_cls
 
     def __iadd__(self, other: 'Checkable | NumericHousingType') -> 'Self':
-        expr = Expression(self, other, ExpressionOperator.Increment)
+        expr = Expression(self, self._other_as_type_compatible(other), ExpressionOperator.Increment)
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
         return self
 
     def __isub__(self, other: 'Checkable | NumericHousingType') -> 'Self':
-        expr = Expression(self, other, ExpressionOperator.Decrement)
+        expr = Expression(self, self._other_as_type_compatible(other), ExpressionOperator.Decrement)
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
         return self
 
     def __imul__(self, other: 'Checkable | NumericHousingType') -> 'Self':
-        expr = Expression(self, other, ExpressionOperator.Multiply)
+        expr = Expression(self, self._other_as_type_compatible(other), ExpressionOperator.Multiply)
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
         return self
 
     def __itruediv__(self, other: 'Checkable | NumericHousingType') -> 'Self':
-        expr = Expression(self, other, ExpressionOperator.Divide)
+        expr = Expression(self, self._other_as_type_compatible(other), ExpressionOperator.Divide)
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
         return self
@@ -49,15 +49,15 @@ class Editable(Checkable):
         return self.__itruediv__(other)
 
     def __ipow__(self, other: int) -> 'Self':
-        self.set(self.__pow__(other))
+        self.set(self.__pow__(self._other_as_type_compatible(other)))  # type: ignore
         return self
 
-    def __imod__(self, other: 'Checkable | NumericHousingType') -> 'Self':
-        self.set(self.__mod__(other))
+    def __imod__(self, other: 'Checkable | int') -> 'Self':
+        self.set(self.__mod__(self._other_as_type_compatible(other)))  # type: ignore
         return self
 
     def set(self, right: 'Checkable | HousingType') -> None:
-        expr = Expression(self, right, ExpressionOperator.Set)
+        expr = Expression(self, self._other_as_type_compatible(right), ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
 

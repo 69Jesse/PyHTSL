@@ -1,4 +1,5 @@
 import math
+from enum import Enum
 
 from .expression.handler import ExpressionHandler, EXPR_HANDLER
 from .condition.base_condition import BaseCondition
@@ -18,7 +19,40 @@ __all__ = (
 )
 
 
+class InternalType(Enum):
+    ANY = 0
+    LONG = 1
+    DOUBLE = 2
+    STRING = 3
+
+
+def _formatted_as_long(value: 'Checkable | NumericHousingType') -> 'Checkable | NumericHousingType':
+    if isinstance(value, Checkable):
+        return value  # TODO when typecasts are implemented
+    if isinstance(value, NumericHousingType):
+        return int(value)
+    raise TypeError(f'Cannot format {repr(value)} as long.')
+
+
+def _formatted_as_double(value: 'Checkable | NumericHousingType') -> 'Checkable | NumericHousingType':
+    if isinstance(value, Checkable):
+        return value  # TODO when typecasts are implemented
+    if isinstance(value, NumericHousingType):
+        return float(value)
+    raise TypeError(f'Cannot format {repr(value)} as double.')
+
+
+def _formatted_as_string(value: 'Checkable | HousingType') -> 'Checkable | HousingType':
+    if isinstance(value, Checkable):
+        return value  # TODO when typecasts are implemented
+    if isinstance(value, HousingType):
+        return str(value)
+    raise TypeError(f'Cannot format {repr(value)} as string.')
+
+
 class Checkable(ABC):
+    internal_type: InternalType = InternalType.ANY
+
     @staticmethod
     def _import_expression(
         expression_cls: type['Expression'],
@@ -96,16 +130,73 @@ class Checkable(ABC):
     def __str__(self) -> str:
         return self._as_string()
 
-    def as_long(self) -> str:
-        return f'{self._as_string()}L'
+    def _other_as_type_compatible(self, other: 'Checkable | HousingType') -> 'Checkable | HousingType':
+        if self.internal_type is InternalType.ANY:
+            return other
+        if isinstance(other, Checkable):
+            if self.internal_type is InternalType.LONG and (other.internal_type is InternalType.ANY or other.internal_type is InternalType.LONG):
+                return _formatted_as_long(other)
+            if self.internal_type is InternalType.DOUBLE and (other.internal_type is InternalType.ANY or other.internal_type is InternalType.DOUBLE):
+                return _formatted_as_double(other)
+            if self.internal_type is InternalType.STRING and (other.internal_type is InternalType.ANY or other.internal_type is InternalType.STRING):
+                return _formatted_as_string(other)
+        if isinstance(other, NumericHousingType):
+            if self.internal_type is InternalType.LONG:
+                return _formatted_as_long(other)
+            if self.internal_type is InternalType.DOUBLE:
+                return _formatted_as_double(other)
+            if self.internal_type is InternalType.STRING:
+                return _formatted_as_string(other)
+        if self.internal_type is InternalType.STRING:
+            return _formatted_as_string(other)
+        raise TypeError(
+            f'{repr(self)} with internal type {self.internal_type} '
+            + f'is incompatible with {repr(other)}'
+            + (f' with internal type {other.internal_type}' if isinstance(other, Checkable) else '')
+        )
 
-    def as_double(self) -> str:
-        return f'{self._as_string()}D'
+    def is_type_compatible(self, other: 'Checkable | HousingType') -> bool:
+        try:
+            self._other_as_type_compatible(other)
+        except TypeError:
+            return False
+        return True
 
-    def as_string(self) -> str:
-        return f'"{self._as_string()}"'
+    def _assert_type_compatible(self, other: 'Checkable | HousingType') -> None:
+        self._other_as_type_compatible(other)
+        if isinstance(other, Checkable):
+            other._other_as_type_compatible(self)
+
+    def as_long(self) -> Self:
+        """
+        Sets the internal type to LONG, then returns itself.
+        """
+        self.internal_type = InternalType.LONG
+        return self
+
+    def as_double(self) -> Self:
+        """
+        Sets the internal type to DOUBLE, then returns itself.
+        """
+        self.internal_type = InternalType.DOUBLE
+        return self
+
+    def as_string(self) -> Self:
+        """
+        Sets the internal type to STRING, then returns itself.
+        """
+        self.internal_type = InternalType.STRING
+        return self
+
+    def as_any(self) -> Self:
+        """
+        Sets the internal type to ANY, then returns itself.
+        """
+        self.internal_type = InternalType.ANY
+        return self
 
     def __add__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
+        self._assert_type_compatible(other)
         temp_stat = TemporaryStat()
         expr = Expression(temp_stat, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
@@ -117,6 +208,7 @@ class Checkable(ABC):
         return self.__add__(other)
 
     def __sub__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
+        self._assert_type_compatible(other)
         temp_stat = TemporaryStat()
         expr = Expression(temp_stat, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
@@ -125,6 +217,7 @@ class Checkable(ABC):
         return expr
 
     def __rsub__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
+        self._assert_type_compatible(other)
         temp_stat = TemporaryStat()
         expr = Expression(temp_stat, other, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
@@ -134,6 +227,7 @@ class Checkable(ABC):
         return expr
 
     def __mul__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
+        self._assert_type_compatible(other)
         temp_stat = TemporaryStat()
         expr = Expression(temp_stat, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
@@ -145,6 +239,7 @@ class Checkable(ABC):
         return self.__mul__(other)
 
     def __truediv__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
+        self._assert_type_compatible(other)
         temp_stat = TemporaryStat()
         expr = Expression(temp_stat, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
@@ -153,6 +248,7 @@ class Checkable(ABC):
         return expr
 
     def __rtruediv__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
+        self._assert_type_compatible(other)
         temp_stat = TemporaryStat()
         expr = Expression(temp_stat, other, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
@@ -219,6 +315,7 @@ class Checkable(ABC):
         return expr
 
     def __pow__(self, other: int) -> 'Expression | int':
+        self._assert_type_compatible(other)
         if other < 0:
             raise ValueError('Power must be greater than or equal to 0')
 
@@ -246,6 +343,7 @@ class Checkable(ABC):
         return multiply_strat_expr
 
     def unsafemod(self, other: 'Checkable | int') -> 'Expression':
+        self._assert_type_compatible(other)
         temp_stat_1 = TemporaryStat()
         expr = Expression(temp_stat_1, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
@@ -261,6 +359,7 @@ class Checkable(ABC):
         return expr
 
     def safemod(self, other: 'Checkable | int') -> 'Expression':
+        self._assert_type_compatible(other)
         temp_stat_1 = TemporaryStat()
         expr = Expression(temp_stat_1, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
@@ -326,21 +425,26 @@ class Checkable(ABC):
         return self.abs()
 
     def __eq__(self, other: 'Checkable | HousingType') -> BaseCondition:
+        self._assert_type_compatible(other)
         return DoubleSidedCondition(self, other, DoubleSidedConditionOperator.Equal)
 
     def __ne__(self, other: 'Checkable | HousingType') -> BaseCondition:
         return ~self.__eq__(other)
 
     def __gt__(self, other: 'Checkable | HousingType') -> BaseCondition:
+        self._assert_type_compatible(other)
         return DoubleSidedCondition(self, other, DoubleSidedConditionOperator.GreaterThan)
 
     def __lt__(self, other: 'Checkable | HousingType') -> BaseCondition:
+        self._assert_type_compatible(other)
         return DoubleSidedCondition(self, other, DoubleSidedConditionOperator.LessThan)
 
     def __ge__(self, other: 'Checkable | HousingType') -> BaseCondition:
+        self._assert_type_compatible(other)
         return DoubleSidedCondition(self, other, DoubleSidedConditionOperator.GreaterThanOrEqual)
 
     def __le__(self, other: 'Checkable | HousingType') -> BaseCondition:
+        self._assert_type_compatible(other)
         return DoubleSidedCondition(self, other, DoubleSidedConditionOperator.LessThanOrEqual)
 
     @property
