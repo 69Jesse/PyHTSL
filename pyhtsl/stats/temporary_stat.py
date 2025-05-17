@@ -1,4 +1,5 @@
 from ..expression.handler import ExpressionHandler
+from ..expression.housing_type import HousingType
 from .player_stat import PlayerStat
 from .base_stat import BaseStat
 from ..checkable import Checkable
@@ -29,6 +30,16 @@ class TemporaryStat(BaseStat):
     @staticmethod
     def _right_side_keyword() -> str:
         return PlayerStat._right_side_keyword()
+
+    def _equals(self, other: Checkable | HousingType) -> bool:
+        if isinstance(other, TemporaryStat):
+            return self.number == other.number
+        return False
+
+    def copied(self) -> 'TemporaryStat':
+        copy = TemporaryStat()
+        copy.number = self.number
+        return copy
 
 
 ExpressionHandler._import_temporary_stat(TemporaryStat)

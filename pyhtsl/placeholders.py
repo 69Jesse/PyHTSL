@@ -31,7 +31,6 @@ class PlaceholderCheckable(Editable):
         self.inside_of_string = in_string
 
     def _in_assignment_left_side(self) -> str:
-        # return "foooooo"
         raise RuntimeError(f'Cannot use {self.__class__.__name__} as left side of assignment.')
 
     def _in_assignment_right_side(self) -> str:
@@ -48,6 +47,14 @@ class PlaceholderCheckable(Editable):
 
     def _equals(self, other: Checkable | HousingType) -> bool:
         return self is other
+
+    def copied(self) -> 'PlaceholderCheckable':
+        return PlaceholderCheckable(
+            assignment_right_side=self.assignment_right_side,
+            comparison_left_side=self.comparison_left_side,
+            comparison_right_side=self.comparison_right_side,
+            in_string=self.inside_of_string,
+        )
 
 
 @final
@@ -89,3 +96,15 @@ class PlaceholderEditable(Editable):
 
     def _equals(self, other: Checkable | HousingType) -> bool:
         return self is other
+
+    def copied(self) -> 'PlaceholderEditable':
+        return PlaceholderEditable(
+            assignment_left_side=self.assignment_left_side,
+            assignment_right_side=self.assignment_right_side,
+            comparison_left_side=self.comparison_left_side,
+            comparison_right_side=self.comparison_right_side,
+            in_string=self.inside_of_string,
+        )
+
+
+Checkable._import_placeholders(PlaceholderCheckable, PlaceholderEditable)

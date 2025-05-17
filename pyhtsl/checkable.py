@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Self
 if TYPE_CHECKING:
     from .expression.assignment_expression import Expression, ExpressionOperator
     from .stats.temporary_stat import TemporaryStat
+    from .placeholders import PlaceholderCheckable, PlaceholderEditable
 
 
 __all__ = (
@@ -67,6 +68,14 @@ class Checkable(ABC):
     ) -> None:
         globals()[temporary_stat_cls.__name__] = temporary_stat_cls
 
+    @staticmethod
+    def _import_placeholders(
+        placeholder_checkable_cls: type['PlaceholderCheckable'],
+        placeholder_editable_cls: type['PlaceholderEditable'],
+    ) -> None:
+        globals()[placeholder_checkable_cls.__name__] = placeholder_checkable_cls
+        globals()[placeholder_editable_cls.__name__] = placeholder_editable_cls
+
     @abstractmethod
     def _in_assignment_left_side(self) -> str:
         """
@@ -115,6 +124,17 @@ class Checkable(ABC):
     def _to_assignment_right_side(
         value: 'Checkable | HousingType',
     ) -> str:
+        # TODO fix when typecasts are implemented
+        if isinstance(value, (PlaceholderCheckable, PlaceholderEditable)):
+            result = value._in_assignment_right_side()
+            if value.internal_type is InternalType.LONG:
+                result = f'{result}L'
+            elif value.internal_type is InternalType.DOUBLE:
+                result = f'{result}D'
+            elif value.internal_type is InternalType.STRING:
+                result = f'"{result}"'
+            return result
+
         if isinstance(value, Checkable):
             return value._in_assignment_right_side()
         return _housing_type_as_right_side(value)
@@ -167,33 +187,44 @@ class Checkable(ABC):
         if isinstance(other, Checkable):
             other._other_as_type_compatible(self)
 
+    @abstractmethod
+    def copied(self) -> Self:
+        """
+        Returns a copy of the current object.
+        """
+        raise NotImplementedError
+
     def as_long(self) -> Self:
         """
-        Sets the internal type to LONG, then returns itself.
+        Creates a copy of the current object, with the internal type set to LONG.
         """
-        self.internal_type = InternalType.LONG
-        return self
+        copy = self.copied()
+        copy.internal_type = InternalType.LONG
+        return copy
 
     def as_double(self) -> Self:
         """
-        Sets the internal type to DOUBLE, then returns itself.
+        Creates a copy of the current object, with the internal type set to DOUBLE.
         """
-        self.internal_type = InternalType.DOUBLE
-        return self
+        copy = self.copied()
+        copy.internal_type = InternalType.DOUBLE
+        return copy
 
     def as_string(self) -> Self:
         """
-        Sets the internal type to STRING, then returns itself.
+        Creates a copy of the current object, with the internal type set to STRING.
         """
-        self.internal_type = InternalType.STRING
-        return self
+        copy = self.copied()
+        copy.internal_type = InternalType.STRING
+        return copy
 
     def as_any(self) -> Self:
         """
-        Sets the internal type to ANY, then returns itself.
+        Creates a copy of the current object, with the internal type set to ANY.
         """
-        self.internal_type = InternalType.ANY
-        return self
+        copy = self.copied()
+        copy.internal_type = InternalType.ANY
+        return copy
 
     def __add__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
         self._assert_type_compatible(other)

@@ -6,7 +6,7 @@ from .housing_type import HousingType
 from enum import Enum
 from .handler import ExpressionHandler, EXPR_HANDLER
 
-from typing import Optional, final, overload
+from typing import Optional, final, overload, Self
 
 
 __all__ = (
@@ -98,6 +98,14 @@ class Expression(Checkable):
                 return False
             return self.right == other.right
         return self.right._equals(other.right)
+
+    def copied(self) -> 'Expression':
+        return Expression(
+            self.left.copied(),
+            self.right.copied() if isinstance(self.right, Checkable) else self.right,
+            self.operator,
+            self.id,
+        )
 
 
 Checkable._import_expression(Expression, ExpressionOperator)

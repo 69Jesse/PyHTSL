@@ -1,21 +1,13 @@
 from abc import abstractmethod
 
-from ..checkable import Checkable
-from ..expression.housing_type import HousingType
 from ..editable import Editable
 
-from typing import TYPE_CHECKING, Any, Optional, Self
+from typing import TYPE_CHECKING
 
 
 __all__ = (
     'BaseStat',
 )
-
-
-STAT_CACHE: dict[
-    type['BaseStat'],
-    dict[tuple[str, Optional[str]], 'BaseStat'],  # {(name, team or None): Stat}
-] = {}
 
 
 class BaseStat(Editable):
@@ -34,35 +26,8 @@ class BaseStat(Editable):
             if set_name:
                 self.name = name
 
-    def __new__(
-        cls,
-        *args: Any,
-        **kwargs: Any,
-    ) -> 'Self':
-        """Caching stats based on its name so I can just compare id() and always have it be correct."""
-        if cls is BaseStat:
-            raise TypeError('Cannot instantiate Stat class')
-
-        if len(args) == 0:
-            return super(BaseStat, cls).__new__(cls)
-
-        cached = STAT_CACHE.setdefault(cls, {})
-        name = args[0]
-        assert isinstance(name, str)
-
-        if len(args) > 1:
-            maybe_team = args[1]
-            maybe_team = maybe_team if isinstance(maybe_team, str) else str(getattr(maybe_team, 'name')) if hasattr(maybe_team, 'name') else None
-        else:
-            maybe_team = None
-
-        key = (name, maybe_team)
-        if key not in cached:
-            cached[key] = super(BaseStat, cls).__new__(cls)
-        return cached[key]  # type: ignore
-
     def __hash__(self) -> int:
-        return hash(id(self))
+        return hash((self.__class__, self.name))
 
     @staticmethod
     @abstractmethod
@@ -96,6 +61,3 @@ class BaseStat(Editable):
 
     def _as_string(self) -> str:
         return self._in_assignment_right_side()
-
-    def _equals(self, other: Checkable | HousingType) -> bool:
-        return self is other

@@ -1,3 +1,5 @@
+from ..checkable import Checkable
+from ..expression.housing_type import HousingType
 from .stat import Stat
 
 from typing import final
@@ -17,3 +19,11 @@ class PlayerStat(Stat):
     @staticmethod
     def _right_side_keyword() -> str:
         return 'player'
+
+    def _equals(self, other: Checkable | HousingType) -> bool:
+        if isinstance(other, PlayerStat):
+            return self.name == other.name
+        return False
+
+    def copied(self) -> 'PlayerStat':
+        return PlayerStat(self.name)

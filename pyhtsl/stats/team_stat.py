@@ -1,4 +1,6 @@
 from .stat import Stat
+from ..checkable import Checkable
+from ..expression.housing_type import HousingType
 from ..public.team import Team
 
 from typing import final, Optional
@@ -23,6 +25,14 @@ class TeamStat(Stat):
     @staticmethod
     def _right_side_keyword() -> str:
         return 'team'
+
+    def _equals(self, other: Checkable | HousingType) -> bool:
+        if isinstance(other, TeamStat):
+            return self.name == other.name and self.team == other.team
+        return False
+
+    def copied(self) -> 'TeamStat':
+        return TeamStat(self.name, self.team)
 
 
 Team._import_team_stat(TeamStat)
