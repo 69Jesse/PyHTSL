@@ -27,7 +27,7 @@ class InternalType(Enum):
     STRING = 3
 
 
-def _formatted_as_long(value: 'Checkable | NumericHousingType') -> 'Checkable | NumericHousingType':
+def _transformed_to_long(value: 'Checkable | NumericHousingType') -> 'Checkable | NumericHousingType':
     if isinstance(value, Checkable):
         return value  # TODO when typecasts are implemented
     if isinstance(value, NumericHousingType):
@@ -35,7 +35,7 @@ def _formatted_as_long(value: 'Checkable | NumericHousingType') -> 'Checkable | 
     raise TypeError(f'Cannot format {repr(value)} as long.')
 
 
-def _formatted_as_double(value: 'Checkable | NumericHousingType') -> 'Checkable | NumericHousingType':
+def _transformed_to_double(value: 'Checkable | NumericHousingType') -> 'Checkable | NumericHousingType':
     if isinstance(value, Checkable):
         return value  # TODO when typecasts are implemented
     if isinstance(value, NumericHousingType):
@@ -43,7 +43,7 @@ def _formatted_as_double(value: 'Checkable | NumericHousingType') -> 'Checkable 
     raise TypeError(f'Cannot format {repr(value)} as double.')
 
 
-def _formatted_as_string(value: 'Checkable | HousingType') -> 'Checkable | HousingType':
+def _transformed_to_string(value: 'Checkable | HousingType') -> 'Checkable | HousingType':
     if isinstance(value, Checkable):
         return value  # TODO when typecasts are implemented
     if isinstance(value, HousingType):
@@ -155,20 +155,20 @@ class Checkable(ABC):
             return other
         if isinstance(other, Checkable):
             if self.internal_type is InternalType.LONG and (other.internal_type is InternalType.ANY or other.internal_type is InternalType.LONG):
-                return _formatted_as_long(other)
+                return _transformed_to_long(other)
             if self.internal_type is InternalType.DOUBLE and (other.internal_type is InternalType.ANY or other.internal_type is InternalType.DOUBLE):
-                return _formatted_as_double(other)
+                return _transformed_to_double(other)
             if self.internal_type is InternalType.STRING and (other.internal_type is InternalType.ANY or other.internal_type is InternalType.STRING):
-                return _formatted_as_string(other)
+                return _transformed_to_string(other)
         if isinstance(other, NumericHousingType):
             if self.internal_type is InternalType.LONG:
-                return _formatted_as_long(other)
+                return _transformed_to_long(other)
             if self.internal_type is InternalType.DOUBLE:
-                return _formatted_as_double(other)
+                return _transformed_to_double(other)
             if self.internal_type is InternalType.STRING:
-                return _formatted_as_string(other)
+                return _transformed_to_string(other)
         if self.internal_type is InternalType.STRING:
-            return _formatted_as_string(other)
+            return _transformed_to_string(other)
         raise TypeError(
             f'{repr(self)} with internal type {self.internal_type} '
             + f'is incompatible with {repr(other)}'
