@@ -1,4 +1,5 @@
 from ..writer import WRITER, LineType
+from ..internal_type import InternalType
 
 from typing import TYPE_CHECKING, final, TypeAlias
 if TYPE_CHECKING:
@@ -33,9 +34,11 @@ class ExpressionHandler:
         globals()[temporary_stat_cls.__name__] = temporary_stat_cls
 
     @staticmethod
-    def _import_expression_operator(
+    def _import_expression(
+        expression_cls: type['Expression'],
         expression_operator_cls: type['ExpressionOperator'],
     ) -> None:
+        globals()[expression_cls.__name__] = expression_cls
         globals()[expression_operator_cls.__name__] = expression_operator_cls
 
     _expressions: list['Expression'] = []
@@ -46,11 +49,29 @@ class ExpressionHandler:
     def is_empty(self) -> bool:
         return not self._expressions
 
+    def fix_lines(self) -> None:
+        for idx in range(len(self._expressions) - 1, -1, -1):
+            expression = self._expressions[idx]
+            if not isinstance(expression.right, Checkable):
+                continue
+            if not isinstance(expression.right, Expression):
+                continue
+            if expression.right.internal_type is InternalType.ANY:
+                continue
+            temporary_stat = expression.right.left
+            if not isinstance(temporary_stat, TemporaryStat):
+                continue
+            for i in range(idx -1, -1, -1):
+                other_expression = self._expressions[i]
+                if other_expression.left._equals(temporary_stat):
+                    other_expression.right = expression.right._other_as_type_compatible(other_expression.right)
+
     def create_lines(self) -> Lines:
         lines: Lines = []
         for expression in self._expressions:
             left = expression._all_the_way_left(expression.left)
             right = expression._all_the_way_left(expression.right)
+            # print(f'left: {repr(left)} {left.internal_type}, right: {repr(right)}')
             lines.append((left, expression.operator, right))
         return lines
 
@@ -203,20 +224,29 @@ class ExpressionHandler:
             ):
                 lines.pop(i)
 
+    def _add_to_temporary_stats_mapping(
+        self,
+        value: 'Checkable | HousingType',
+        temporary_stats: dict[int, list['TemporaryStat']],
+    ) -> None:
+        if isinstance(value, Expression):
+            self._add_to_temporary_stats_mapping(value.left, temporary_stats)
+            self._add_to_temporary_stats_mapping(value.right, temporary_stats)
+        if not isinstance(value, TemporaryStat):
+            return
+        temporary_stats.setdefault(value.number, []).append(value)
+
     def rename_temporary_stats(
         self,
         lines: Lines,
     ) -> None:
-        temporary_stats: list['TemporaryStat'] = []
-        stat_id_set: set[int] = set()
-        for stat, _, _ in lines:
-            if id(stat) in stat_id_set:
-                continue
-            if isinstance(stat, TemporaryStat):
-                temporary_stats.append(stat)
-            stat_id_set.add(id(stat))
-        for i, stat in enumerate(temporary_stats, start=TEMP_STATS_NUMBER_START):
-            stat.number = i
+        temporary_stats: dict[int, list['TemporaryStat']] = {}
+        for left, _, right in lines:
+            self._add_to_temporary_stats_mapping(left, temporary_stats)
+            self._add_to_temporary_stats_mapping(right, temporary_stats)
+        for i, stats in enumerate(temporary_stats.values(), start=TEMP_STATS_NUMBER_START):
+            for stat in stats:
+                stat.number = i
 
     def write_lines(
         self,
@@ -231,7 +261,9 @@ class ExpressionHandler:
     def push(self) -> None:
         if self.is_empty():
             return
+        self.fix_lines()
         lines = self.create_lines()
+        print(lines)
         self.optimize_lines(lines)
         self.take_out_useless(lines)
         self.rename_temporary_stats(lines)

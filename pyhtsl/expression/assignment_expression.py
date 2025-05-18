@@ -26,9 +26,6 @@ class ExpressionOperator(Enum):
         return self.value
 
 
-ExpressionHandler._import_expression_operator(ExpressionOperator)
-
-
 @final
 class Expression(Checkable):
     left: Editable
@@ -107,6 +104,10 @@ class Expression(Checkable):
             self.id,
         )
 
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}<{repr(self.left)} {self.operator.value} {repr(self.right)}>'
+
 
 Checkable._import_expression(Expression, ExpressionOperator)
 Editable._import_expression(Expression, ExpressionOperator)
+ExpressionHandler._import_expression(Expression, ExpressionOperator)

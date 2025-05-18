@@ -27,3 +27,6 @@ class PlayerStat(Stat):
 
     def copied(self) -> 'PlayerStat':
         return PlayerStat(self.name)
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}<{self.name}>'

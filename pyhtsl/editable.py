@@ -57,7 +57,9 @@ class Editable(Checkable):
         return self
 
     def set(self, right: 'Checkable | HousingType') -> None:
+        print('SETTING', repr(right))
         expr = Expression(self, self._other_as_type_compatible(right), ExpressionOperator.Set)
+        print('SET', repr(self._other_as_type_compatible(right)))
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
 

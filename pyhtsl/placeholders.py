@@ -56,6 +56,9 @@ class PlaceholderCheckable(Editable):
             in_string=self.inside_of_string,
         )
 
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}<{self.inside_of_string}>'
+
 
 @final
 class PlaceholderEditable(Editable):
@@ -105,6 +108,9 @@ class PlaceholderEditable(Editable):
             comparison_right_side=self.comparison_right_side,
             in_string=self.inside_of_string,
         )
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}<{self.inside_of_string}>'
 
 
 Checkable._import_placeholders(PlaceholderCheckable, PlaceholderEditable)
