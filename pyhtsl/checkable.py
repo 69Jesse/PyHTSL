@@ -145,11 +145,6 @@ class Checkable(ABC):
         return self._as_string()
 
     def _other_as_type_compatible(self, other: 'Checkable | HousingType') -> 'Checkable | HousingType':
-        # print(repr(other), self.internal_type)
-        # if isinstance(other, Expression):
-        #     other.left = self._other_as_type_compatible(other.left)  # type: ignore
-        #     other.right = self._other_as_type_compatible(other.right)
-        #     return other
         if self.internal_type is InternalType.ANY:
             return other
         if isinstance(other, Checkable):

@@ -71,7 +71,6 @@ class ExpressionHandler:
         for expression in self._expressions:
             left = expression._all_the_way_left(expression.left)
             right = expression._all_the_way_left(expression.right)
-            # print(f'left: {repr(left)} {left.internal_type}, right: {repr(right)}')
             lines.append((left, expression.operator, right))
         return lines
 
@@ -263,7 +262,6 @@ class ExpressionHandler:
             return
         self.fix_lines()
         lines = self.create_lines()
-        print(lines)
         self.optimize_lines(lines)
         self.take_out_useless(lines)
         self.rename_temporary_stats(lines)
