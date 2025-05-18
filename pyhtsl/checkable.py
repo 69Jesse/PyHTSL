@@ -10,6 +10,7 @@ from abc import ABC, abstractmethod
 
 from typing import TYPE_CHECKING, Self, overload
 if TYPE_CHECKING:
+    from .editable import Editable
     from .expression.assignment_expression import Expression, ExpressionOperator
     from .stats.temporary_stat import TemporaryStat
     from .placeholders import PlaceholderCheckable, PlaceholderEditable
@@ -146,6 +147,10 @@ class Checkable(ABC):
         return self._as_string()
 
     @overload
+    def _other_as_type_compatible(self, other: 'Editable') -> 'Editable':
+        ...
+
+    @overload
     def _other_as_type_compatible(self, other: 'Checkable') -> 'Checkable':
         ...
 
@@ -160,6 +165,7 @@ class Checkable(ABC):
     def _other_as_type_compatible(self, other: 'Checkable | HousingType') -> 'Checkable | HousingType':
         if self.internal_type is InternalType.ANY:
             return other
+
         if isinstance(other, Checkable):
             if self.internal_type is InternalType.LONG:
                 other = other.as_long()
@@ -168,6 +174,12 @@ class Checkable(ABC):
             elif self.internal_type is InternalType.STRING:
                 other = other.as_string()
 
+        if isinstance(other, Expression):
+            other.left = self._other_as_type_compatible(other.left)
+            other.right = self._other_as_type_compatible(other.right)
+            return other
+
+        if isinstance(other, Checkable):
             if self.internal_type is InternalType.LONG and (other.internal_type is InternalType.ANY or other.internal_type is InternalType.LONG):
                 return _transformed_to_long(other)
             if self.internal_type is InternalType.DOUBLE and (other.internal_type is InternalType.ANY or other.internal_type is InternalType.DOUBLE):

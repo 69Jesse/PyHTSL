@@ -11,12 +11,30 @@ if TYPE_CHECKING:
 
 
 __all__ = (
+    'AUTOMATIC_UNSET',
     'EXPR_HANDLER',
 )
 
 
 TEMP_STATS_NUMBER_START: int = 1
 Lines: TypeAlias = list[tuple['Editable', 'ExpressionOperator', 'Checkable | HousingType']]
+
+
+class AutomaticUnset:
+    counter: int = 0
+
+    def increment(self) -> None:
+        self.counter += 1
+
+    def decrement(self) -> None:
+        self.counter -= 1
+
+    @property
+    def value(self) -> bool:
+        return self.counter == 0
+
+
+AUTOMATIC_UNSET: AutomaticUnset = AutomaticUnset()
 
 
 @final
@@ -253,7 +271,7 @@ class ExpressionHandler:
     ) -> None:
         for left, operator, right in lines:
             WRITER.write(
-                f'{left._in_assignment_left_side()} {operator.value} {Checkable._to_assignment_right_side(right)} true',
+                f'{left._in_assignment_left_side()} {operator.value} {Checkable._to_assignment_right_side(right)} {str(AUTOMATIC_UNSET.value).lower()}',
                 LineType.variable_change,
             )
 
