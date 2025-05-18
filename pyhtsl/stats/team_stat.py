@@ -31,7 +31,7 @@ class TeamStat(Stat):
             return self.name == other.name and self.team == other.team
         return False
 
-    def copied(self) -> 'TeamStat':
+    def _copied(self) -> 'TeamStat':
         return TeamStat(self.name, self.team)
 
     def __repr__(self) -> str:

@@ -36,7 +36,7 @@ class TemporaryStat(BaseStat):
             return self.number == other.number
         return False
 
-    def copied(self) -> 'TemporaryStat':
+    def _copied(self) -> 'TemporaryStat':
         copy = TemporaryStat()
         copy.number = self.number
         return copy

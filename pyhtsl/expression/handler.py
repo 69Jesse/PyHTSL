@@ -208,7 +208,7 @@ class ExpressionHandler:
         for i in range(len(lines) - 1, -1, -1):
             left, operator, right = lines[i]
             if (
-                left._equals(right)
+                left.equals(right)
                 and operator is ExpressionOperator.Set
             ):
                 lines.pop(i)
@@ -253,7 +253,7 @@ class ExpressionHandler:
     ) -> None:
         for left, operator, right in lines:
             WRITER.write(
-                f'{left._in_assignment_left_side()} {operator.value} {Checkable._to_assignment_right_side(right)}',
+                f'{left._in_assignment_left_side()} {operator.value} {Checkable._to_assignment_right_side(right)} true',
                 LineType.variable_change,
             )
 

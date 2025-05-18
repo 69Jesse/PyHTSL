@@ -44,4 +44,8 @@ class DoubleSidedCondition(BaseCondition):
         self.operator = operator
 
     def create_line(self) -> str:
-        return f'{self.left._in_comparison_left_side()} {self.operator.value} {Checkable._to_comparison_right_side(self.right)}'
+        line = f'{self.left._in_comparison_left_side()} {self.operator.value} {Checkable._to_comparison_right_side(self.right)}'
+        fallback_value = self.left._get_formatted_fallback_value()
+        if fallback_value is not None:
+            line += f' {fallback_value}'
+        return line

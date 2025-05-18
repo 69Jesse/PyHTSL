@@ -51,7 +51,12 @@ class BaseStat(Editable):
         return f'{self._left_side_keyword()} {self.name}'
 
     def _in_assignment_right_side(self) -> str:
-        return f'%var.{self._right_side_keyword()}/{self.name}%'
+        name = f'%var.{self._right_side_keyword()}/{self.name}'
+        fallback_value = self._get_formatted_fallback_value()
+        if fallback_value is not None:
+            name += f' {fallback_value}'
+        name += '%'
+        return name
 
     def _in_comparison_left_side(self) -> str:
         return self._in_assignment_left_side()

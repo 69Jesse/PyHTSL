@@ -25,7 +25,7 @@ class PlayerStat(Stat):
             return self.name == other.name
         return False
 
-    def copied(self) -> 'PlayerStat':
+    def _copied(self) -> 'PlayerStat':
         return PlayerStat(self.name)
 
     def __repr__(self) -> str:

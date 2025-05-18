@@ -8,7 +8,7 @@ from .expression.housing_type import NumericHousingType, HousingType, _housing_t
 
 from abc import ABC, abstractmethod
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, overload
 if TYPE_CHECKING:
     from .expression.assignment_expression import Expression, ExpressionOperator
     from .stats.temporary_stat import TemporaryStat
@@ -25,7 +25,7 @@ def _transformed_to_long(value: 'Checkable | NumericHousingType') -> 'Checkable 
         return value  # TODO when typecasts are implemented
     if isinstance(value, NumericHousingType):
         return int(value)
-    raise TypeError(f'Cannot format {repr(value)} as long.')
+    raise TypeError(f'Cannot transform {repr(value)} to long.')
 
 
 def _transformed_to_double(value: 'Checkable | NumericHousingType') -> 'Checkable | NumericHousingType':
@@ -33,7 +33,7 @@ def _transformed_to_double(value: 'Checkable | NumericHousingType') -> 'Checkabl
         return value  # TODO when typecasts are implemented
     if isinstance(value, NumericHousingType):
         return float(value)
-    raise TypeError(f'Cannot format {repr(value)} as double.')
+    raise TypeError(f'Cannot transform {repr(value)} to double.')
 
 
 def _transformed_to_string(value: 'Checkable | HousingType') -> 'Checkable | HousingType':
@@ -41,12 +41,12 @@ def _transformed_to_string(value: 'Checkable | HousingType') -> 'Checkable | Hou
         return value  # TODO when typecasts are implemented
     if isinstance(value, HousingType):
         return str(value)
-    raise TypeError(f'Cannot format {repr(value)} as string.')
+    raise TypeError(f'Cannot transform {repr(value)} to string.')
 
 
 class Checkable(ABC):
     internal_type: InternalType = InternalType.ANY
-    # fallback_value: HousingType | None = None  # TODO
+    fallback_value: HousingType | None = None  # TODO
 
     @staticmethod
     def _import_expression(
@@ -114,21 +114,22 @@ class Checkable(ABC):
     def _equals(self, other: 'Checkable | HousingType') -> bool:
         raise NotImplementedError
 
+    def equals(self, other: 'Checkable | HousingType') -> bool:
+        """
+        Checks if the current object is equal to another object.
+        """
+        if not isinstance(other, Checkable):
+            return False
+        if self.internal_type is not other.internal_type:
+            return False
+        if self.fallback_value != other.fallback_value:
+            return False
+        return self._equals(other)
+
     @staticmethod
     def _to_assignment_right_side(
         value: 'Checkable | HousingType',
     ) -> str:
-        # TODO fix when typecasts are implemented
-        if isinstance(value, (PlaceholderCheckable, PlaceholderEditable)):
-            result = value._in_assignment_right_side()
-            if value.internal_type is InternalType.LONG:
-                result = f'{result}L'
-            elif value.internal_type is InternalType.DOUBLE:
-                result = f'{result}D'
-            elif value.internal_type is InternalType.STRING:
-                result = f'"{result}"'
-            return result
-
         if isinstance(value, Checkable):
             return value._in_assignment_right_side()
         return _housing_type_as_right_side(value)
@@ -143,6 +144,18 @@ class Checkable(ABC):
 
     def __str__(self) -> str:
         return self._as_string()
+
+    @overload
+    def _other_as_type_compatible(self, other: 'Checkable') -> 'Checkable':
+        ...
+
+    @overload
+    def _other_as_type_compatible(self, other: HousingType) -> HousingType:
+        ...
+
+    @overload
+    def _other_as_type_compatible(self, other: 'Checkable | HousingType') -> 'Checkable | HousingType':
+        ...
 
     def _other_as_type_compatible(self, other: 'Checkable | HousingType') -> 'Checkable | HousingType':
         if self.internal_type is InternalType.ANY:
@@ -173,7 +186,7 @@ class Checkable(ABC):
         raise TypeError(
             f'{repr(self)} with internal type {self.internal_type} '
             + f'is incompatible with {repr(other)}'
-            + (f' with internal type {other.internal_type}' if isinstance(other, Checkable) else '')
+            + (f' with internal type {other.internal_type.name}' if isinstance(other, Checkable) else '')
         )
 
     def is_type_compatible(self, other: 'Checkable | HousingType') -> bool:
@@ -184,43 +197,73 @@ class Checkable(ABC):
         return True
 
     @abstractmethod
+    def _copied(self) -> Self:
+        raise NotImplementedError
+
     def copied(self) -> Self:
         """
         Returns a copy of the current object.
         """
-        raise NotImplementedError
+        copy = self._copied()
+        copy.internal_type = self.internal_type
+        copy.fallback_value = self.fallback_value
+        return copy
+
+    def as_type(self, type_: InternalType) -> Self:
+        """
+        Creates a copy of the current object, with the internal type set to the specified type.
+        """
+        copy = self.copied()
+        copy.internal_type = type_
+        if copy.fallback_value is not None:
+            try:
+                copy.fallback_value = copy._other_as_type_compatible(copy.fallback_value)
+            except TypeError as exc:
+                raise TypeError(f'Cannot transform fallback value {repr(copy.fallback_value)} to internal type {type_.name}.') from exc
+        return copy
 
     def as_long(self) -> Self:
         """
         Creates a copy of the current object, with the internal type set to LONG.
         """
-        copy = self.copied()
-        copy.internal_type = InternalType.LONG
-        return copy
+        return self.as_type(InternalType.LONG)
 
     def as_double(self) -> Self:
         """
         Creates a copy of the current object, with the internal type set to DOUBLE.
         """
-        copy = self.copied()
-        copy.internal_type = InternalType.DOUBLE
-        return copy
+        return self.as_type(InternalType.DOUBLE)
 
     def as_string(self) -> Self:
         """
         Creates a copy of the current object, with the internal type set to STRING.
         """
-        copy = self.copied()
-        copy.internal_type = InternalType.STRING
-        return copy
+        return self.as_type(InternalType.STRING)
 
     def as_any(self) -> Self:
         """
         Creates a copy of the current object, with the internal type set to ANY.
         """
+        return self.as_type(InternalType.ANY)
+
+    def with_fallback(self, fallback_value: HousingType) -> Self:
+        """
+        Creates a copy of the current object, with the fallback value set to the specified value.
+        """
         copy = self.copied()
-        copy.internal_type = InternalType.ANY
+        copy.fallback_value = copy._other_as_type_compatible(fallback_value)
         return copy
+
+    def _get_formatted_fallback_value(self) -> str | None:
+        value: HousingType | None = self.fallback_value
+        if value is None:
+            if self.internal_type is InternalType.LONG:
+                value = 0
+            elif self.internal_type is InternalType.DOUBLE:
+                value = 0.0
+            elif self.internal_type is InternalType.STRING:
+                value = ''
+        return _housing_type_as_right_side(value) if value is not None else None
 
     def __add__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
         temp_stat = TemporaryStat()

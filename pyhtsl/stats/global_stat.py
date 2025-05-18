@@ -23,7 +23,7 @@ class GlobalStat(Stat):
             return self.name == other.name
         return False
 
-    def copied(self) -> 'GlobalStat':
+    def _copied(self) -> 'GlobalStat':
         return GlobalStat(self.name)
 
     def __repr__(self) -> str:
