@@ -68,6 +68,9 @@ from .public.player_location_x import PlayerLocationX as PlayerLocationX
 from .public.player_location_y import PlayerLocationY as PlayerLocationY
 from .public.player_location_yaw import PlayerLocationYaw as PlayerLocationYaw
 from .public.player_location_z import PlayerLocationZ as PlayerLocationZ
+from .public.player_position_x import PlayerPositionX as PlayerPositionX
+from .public.player_position_y import PlayerPositionY as PlayerPositionY
+from .public.player_position_z import PlayerPositionZ as PlayerPositionZ
 from .public.player_max_health import PlayerMaxHealth as PlayerMaxHealth
 from .public.player_name import PlayerName as PlayerName
 from .public.player_ping import PlayerPing as PlayerPing
