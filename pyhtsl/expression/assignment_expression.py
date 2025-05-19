@@ -5,6 +5,7 @@ from ..editable import Editable
 from .housing_type import HousingType
 from enum import Enum
 from .handler import ExpressionHandler, EXPR_HANDLER
+from ..internal_type import InternalType
 
 from typing import Optional, final, overload
 
@@ -64,6 +65,14 @@ class Expression(Checkable):
         while isinstance(value, Expression):
             value = value.left
         return value
+
+    @property
+    def internal_type(self) -> InternalType:
+        return self._all_the_way_left(self).internal_type
+
+    @internal_type.setter
+    def internal_type(self, value: InternalType) -> None:
+        self._all_the_way_left(self).internal_type = value
 
     def _in_assignment_left_side(self) -> str:
         return self._all_the_way_left(self)._in_assignment_left_side()

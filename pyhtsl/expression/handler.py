@@ -1,5 +1,4 @@
 from ..writer import WRITER, LineType
-from ..internal_type import InternalType
 
 from typing import TYPE_CHECKING, final, TypeAlias
 if TYPE_CHECKING:
@@ -66,23 +65,6 @@ class ExpressionHandler:
 
     def is_empty(self) -> bool:
         return not self._expressions
-
-    def fix_lines(self) -> None:
-        for idx in range(len(self._expressions) - 1, -1, -1):
-            expression = self._expressions[idx]
-            if not isinstance(expression.right, Checkable):
-                continue
-            if not isinstance(expression.right, Expression):
-                continue
-            if expression.right.internal_type is InternalType.ANY:
-                continue
-            temporary_stat = expression.right.left
-            if not isinstance(temporary_stat, TemporaryStat):
-                continue
-            for i in range(idx -1, -1, -1):
-                other_expression = self._expressions[i]
-                if other_expression.left._equals(temporary_stat):
-                    other_expression.right = expression.right._other_as_type_compatible(other_expression.right)
 
     def create_lines(self) -> Lines:
         lines: Lines = []
@@ -278,7 +260,6 @@ class ExpressionHandler:
     def push(self) -> None:
         if self.is_empty():
             return
-        self.fix_lines()
         lines = self.create_lines()
         self.optimize_lines(lines)
         self.take_out_useless(lines)

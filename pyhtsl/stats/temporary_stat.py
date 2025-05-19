@@ -3,6 +3,7 @@ from ..expression.housing_type import HousingType
 from .player_stat import PlayerStat
 from .base_stat import BaseStat
 from ..checkable import Checkable
+from ..internal_type import InternalType
 
 from typing import final
 
@@ -15,8 +16,12 @@ __all__ = (
 @final
 class TemporaryStat(BaseStat):
     number: int
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        internal_type: InternalType,
+    ) -> None:
         super().__init__(None, set_name=False)  # type: ignore
+        self.internal_type = internal_type
         self.number = id(self) + 1_000_000
  
     @property
@@ -37,9 +42,7 @@ class TemporaryStat(BaseStat):
         return False
 
     def _copied(self) -> 'TemporaryStat':
-        copy = TemporaryStat()
-        copy.number = self.number
-        return copy
+        return self
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.number}>'

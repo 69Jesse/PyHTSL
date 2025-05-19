@@ -278,7 +278,7 @@ class Checkable(ABC):
         return _housing_type_as_right_side(value) if value is not None else None
 
     def __add__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
-        temp_stat = TemporaryStat()
+        temp_stat = TemporaryStat(self.internal_type)
         expr = Expression(temp_stat, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat, self._other_as_type_compatible(other), ExpressionOperator.Increment)
@@ -289,7 +289,7 @@ class Checkable(ABC):
         return self.__add__(other)
 
     def __sub__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
-        temp_stat = TemporaryStat()
+        temp_stat = TemporaryStat(self.internal_type)
         expr = Expression(temp_stat, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat, self._other_as_type_compatible(other), ExpressionOperator.Decrement)
@@ -297,7 +297,7 @@ class Checkable(ABC):
         return expr
 
     def __rsub__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
-        temp_stat = TemporaryStat()
+        temp_stat = TemporaryStat(self.internal_type)
         expr = Expression(temp_stat, self._other_as_type_compatible(other), ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.add(
@@ -306,7 +306,7 @@ class Checkable(ABC):
         return expr
 
     def __mul__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
-        temp_stat = TemporaryStat()
+        temp_stat = TemporaryStat(self.internal_type)
         expr = Expression(temp_stat, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat, self._other_as_type_compatible(other), ExpressionOperator.Multiply)
@@ -317,7 +317,7 @@ class Checkable(ABC):
         return self.__mul__(other)
 
     def __truediv__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
-        temp_stat = TemporaryStat()
+        temp_stat = TemporaryStat(self.internal_type)
         expr = Expression(temp_stat, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat, self._other_as_type_compatible(other), ExpressionOperator.Divide)
@@ -325,7 +325,7 @@ class Checkable(ABC):
         return expr
 
     def __rtruediv__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
-        temp_stat = TemporaryStat()
+        temp_stat = TemporaryStat(self.internal_type)
         expr = Expression(temp_stat, self._other_as_type_compatible(other), ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.add(
@@ -342,7 +342,7 @@ class Checkable(ABC):
     def _pow_multiply_strat(self, other: int) -> 'Expression | int':
         if other == 0:
             return 1
-        temp_stat = TemporaryStat()
+        temp_stat = TemporaryStat(self.internal_type)
         expr = Expression(temp_stat, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         log2 = int(math.log2(other))
@@ -363,7 +363,7 @@ class Checkable(ABC):
     def _pow_divide_strat(self, other: int) -> 'Expression | int':
         if other == 0:
             return 1
-        temp_stat = TemporaryStat()
+        temp_stat = TemporaryStat(self.internal_type)
         expr = Expression(temp_stat, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         log2 = int(math.log2(other))
@@ -420,10 +420,10 @@ class Checkable(ABC):
 
     def unsafemod(self, other: 'Checkable | int') -> 'Expression':
         other = self._other_as_type_compatible(other)  # type: ignore
-        temp_stat_1 = TemporaryStat()
+        temp_stat_1 = TemporaryStat(self.internal_type)
         expr = Expression(temp_stat_1, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
-        temp_stat_2 = TemporaryStat()
+        temp_stat_2 = TemporaryStat(self.internal_type)
         expr = Expression(temp_stat_2, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat_2, other, ExpressionOperator.Divide)
@@ -436,12 +436,12 @@ class Checkable(ABC):
 
     def safemod(self, other: 'Checkable | int') -> 'Expression':
         other = self._other_as_type_compatible(other)  # type: ignore
-        temp_stat_1 = TemporaryStat()
+        temp_stat_1 = TemporaryStat(self.internal_type)
         expr = Expression(temp_stat_1, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat_1, other, ExpressionOperator.Increment)
         EXPR_HANDLER.add(expr)
-        temp_stat_2 = TemporaryStat()
+        temp_stat_2 = TemporaryStat(self.internal_type)
         expr = Expression(temp_stat_2, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat_2, other, ExpressionOperator.Divide)
@@ -464,7 +464,7 @@ class Checkable(ABC):
         greater_than_2_62: bool = False,
         multiplied_by: int = 1,
     ) -> 'Expression':
-        temp_stat = TemporaryStat()
+        temp_stat = TemporaryStat(self.internal_type)
         expr = Expression(temp_stat, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         if greater_than_2_62:
@@ -486,7 +486,7 @@ class Checkable(ABC):
         greater_than_2_62: bool = False,
         sign: 'Expression | int | None' = None,
     ) -> 'Expression':
-        temp_stat = TemporaryStat()
+        temp_stat = TemporaryStat(self.internal_type)
         expr = Expression(temp_stat, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = Expression(

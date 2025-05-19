@@ -65,4 +65,4 @@ class BaseStat(Editable):
         return self._in_assignment_right_side()
 
     def _as_string(self) -> str:
-        return self._in_assignment_right_side()
+        return f'%var.{self._right_side_keyword()}/{self.name}%'
