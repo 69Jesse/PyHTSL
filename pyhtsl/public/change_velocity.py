@@ -1,5 +1,6 @@
 from ..writer import WRITER, LineType
-from ..stats.base_stat import BaseStat
+from ..checkable import Checkable
+from ..expression.housing_type import NumericHousingType
 
 
 __all__ = (
@@ -8,9 +9,9 @@ __all__ = (
 
 
 def change_velocity(
-    x: BaseStat | int,
-    y: BaseStat | int,
-    z: BaseStat | int,
+    x: Checkable | NumericHousingType,
+    y: Checkable | NumericHousingType,
+    z: Checkable | NumericHousingType,
 ) -> None:
     WRITER.write(
         f'changeVelocity {x} {y} {z}',
