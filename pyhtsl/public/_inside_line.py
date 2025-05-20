@@ -1,0 +1,13 @@
+from ..checkable import Checkable
+from ..expression.housing_type import HousingType
+
+
+__all__ = (
+    '_inside_line',
+)
+
+
+def _inside_line(value: Checkable | HousingType) -> str:
+    if isinstance(value, HousingType):
+        return str(value)
+    return value._in_assignment_right_side()
