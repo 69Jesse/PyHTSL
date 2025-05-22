@@ -1,7 +1,6 @@
 from .checkable import Checkable
 from .expression.housing_type import HousingType
 from .editable import Editable
-from .internal_type import InternalType
 
 from typing import final
 
@@ -10,17 +9,6 @@ __all__ = (
     'PlaceholderCheckable',
     'PlaceholderEditable',
 )
-
-
-def _format_with_internal_type(
-    text: str,
-    internal_type: InternalType,
-) -> str:
-    if internal_type is InternalType.LONG:
-        text += 'L'
-    elif internal_type is InternalType.DOUBLE:
-        text += 'D'
-    return f'"{text}"'
 
 
 @final
@@ -46,13 +34,13 @@ class PlaceholderCheckable(Editable):
         raise RuntimeError(f'Cannot use {self.__class__.__name__} as left side of assignment.')
 
     def _in_assignment_right_side(self) -> str:
-        return _format_with_internal_type(self.assignment_right_side, self.internal_type)
+        return self._formatted_with_internal_type(self.assignment_right_side)
 
     def _in_comparison_left_side(self) -> str:
         return self.comparison_left_side
 
     def _in_comparison_right_side(self) -> str:
-        return _format_with_internal_type(self.comparison_right_side, self.internal_type)
+        return self._formatted_with_internal_type(self.comparison_right_side)
 
     def _as_string(self) -> str:
         return self.inside_of_string
@@ -98,13 +86,13 @@ class PlaceholderEditable(Editable):
         return self.assignment_left_side
 
     def _in_assignment_right_side(self) -> str:
-        return _format_with_internal_type(self.assignment_right_side, self.internal_type)
+        return self._formatted_with_internal_type(self.assignment_right_side)
 
     def _in_comparison_left_side(self) -> str:
         return self.comparison_left_side
 
     def _in_comparison_right_side(self) -> str:
-        return _format_with_internal_type(self.comparison_right_side, self.internal_type)
+        return self._formatted_with_internal_type(self.comparison_right_side)
 
     def _as_string(self) -> str:
         return self.inside_of_string

@@ -23,7 +23,7 @@ class TemporaryStat(BaseStat):
         super().__init__(None, set_name=False)  # type: ignore
         self.internal_type = internal_type
         self.number = id(self) + 1_000_000
- 
+
     @property
     def name(self) -> str:
         return f'temp{self.number}'
@@ -42,7 +42,9 @@ class TemporaryStat(BaseStat):
         return False
 
     def _copied(self) -> 'TemporaryStat':
-        return self
+        stat = TemporaryStat(self.internal_type)
+        stat.number = self.number
+        return stat
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.number}>'

@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Self, overload
 if TYPE_CHECKING:
     from .editable import Editable
     from .expression.assignment_expression import Expression, ExpressionOperator
+    from .stats.base_stat import BaseStat
     from .stats.temporary_stat import TemporaryStat
     from .placeholders import PlaceholderCheckable, PlaceholderEditable
 
@@ -23,7 +24,7 @@ __all__ = (
 
 def _transformed_to_long(value: 'Checkable | NumericHousingType') -> 'Checkable | NumericHousingType':
     if isinstance(value, Checkable):
-        return value  # TODO when typecasts are implemented
+        return value.as_long()
     if isinstance(value, NumericHousingType):
         return int(value)
     raise TypeError(f'Cannot transform {repr(value)} to long.')
@@ -31,7 +32,7 @@ def _transformed_to_long(value: 'Checkable | NumericHousingType') -> 'Checkable 
 
 def _transformed_to_double(value: 'Checkable | NumericHousingType') -> 'Checkable | NumericHousingType':
     if isinstance(value, Checkable):
-        return value  # TODO when typecasts are implemented
+        return value.as_double()
     if isinstance(value, NumericHousingType):
         return float(value)
     raise TypeError(f'Cannot transform {repr(value)} to double.')
@@ -39,7 +40,7 @@ def _transformed_to_double(value: 'Checkable | NumericHousingType') -> 'Checkabl
 
 def _transformed_to_string(value: 'Checkable | HousingType') -> 'Checkable | HousingType':
     if isinstance(value, Checkable):
-        return value  # TODO when typecasts are implemented
+        return value.as_string()
     if isinstance(value, HousingType):
         return str(value)
     raise TypeError(f'Cannot transform {repr(value)} to string.')
@@ -47,7 +48,7 @@ def _transformed_to_string(value: 'Checkable | HousingType') -> 'Checkable | Hou
 
 class Checkable(ABC):
     internal_type: InternalType = InternalType.ANY
-    fallback_value: HousingType | None = None  # TODO
+    fallback_value: HousingType | None = None
 
     @staticmethod
     def _import_expression(
@@ -56,6 +57,12 @@ class Checkable(ABC):
     ) -> None:
         globals()[expression_cls.__name__] = expression_cls
         globals()[expression_operator_cls.__name__] = expression_operator_cls
+
+    @staticmethod
+    def _import_base_stat(
+        base_stat_cls: type['BaseStat'],
+    ) -> None:
+        globals()[base_stat_cls.__name__] = base_stat_cls
 
     @staticmethod
     def _import_temporary_stat(
@@ -70,6 +77,16 @@ class Checkable(ABC):
     ) -> None:
         globals()[placeholder_checkable_cls.__name__] = placeholder_checkable_cls
         globals()[placeholder_editable_cls.__name__] = placeholder_editable_cls
+
+    def _formatted_with_internal_type(
+        self,
+        text: str,
+    ) -> str:
+        if self.internal_type is InternalType.LONG:
+            text += 'L'
+        elif self.internal_type is InternalType.DOUBLE:
+            text += 'D'
+        return f'"{text}"'
 
     @abstractmethod
     def _in_assignment_left_side(self) -> str:
@@ -164,6 +181,10 @@ class Checkable(ABC):
 
     def _other_as_type_compatible(self, other: 'Checkable | HousingType') -> 'Checkable | HousingType':
         if self.internal_type is InternalType.ANY:
+            return other
+
+        if isinstance(other, BaseStat) and not other.should_force_type_compatible:
+            print('yaaaaaaaaaaa', repr(other))
             return other
 
         if isinstance(other, Checkable):
@@ -418,7 +439,7 @@ class Checkable(ABC):
         EXPR_HANDLER._expressions.extend(multiply_expressions)
         return multiply_strat_expr
 
-    def unsafemod(self, other: 'Checkable | int') -> 'Expression':
+    def unsafemod(self, other: 'Checkable | NumericHousingType') -> 'Expression':
         other = self._other_as_type_compatible(other)  # type: ignore
         temp_stat_1 = TemporaryStat(self.internal_type)
         expr = Expression(temp_stat_1, self, ExpressionOperator.Set)
@@ -428,13 +449,22 @@ class Checkable(ABC):
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat_2, other, ExpressionOperator.Divide)
         EXPR_HANDLER.add(expr)
+        if self.internal_type is InternalType.DOUBLE or isinstance(other, float):
+            temp_stat_2_copied = temp_stat_2.copied().as_long()
+            temp_stat_2_copied.should_force_type_compatible = False
+            expr = Expression(temp_stat_2.as_any(), temp_stat_2_copied, ExpressionOperator.Set)
+            EXPR_HANDLER.add(expr)
+            temp_stat_2_copied = temp_stat_2.copied().as_double()
+            temp_stat_2_copied.should_force_type_compatible = False
+            expr = Expression(temp_stat_2.as_any(), temp_stat_2_copied, ExpressionOperator.Set)
+            EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat_2, other, ExpressionOperator.Multiply)
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat_1, temp_stat_2, ExpressionOperator.Decrement)
         EXPR_HANDLER.add(expr)
         return expr
 
-    def safemod(self, other: 'Checkable | int') -> 'Expression':
+    def safemod(self, other: 'Checkable | NumericHousingType') -> 'Expression':
         other = self._other_as_type_compatible(other)  # type: ignore
         temp_stat_1 = TemporaryStat(self.internal_type)
         expr = Expression(temp_stat_1, self, ExpressionOperator.Set)
@@ -446,13 +476,22 @@ class Checkable(ABC):
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat_2, other, ExpressionOperator.Divide)
         EXPR_HANDLER.add(expr)
+        if self.internal_type is InternalType.DOUBLE or isinstance(other, float):
+            temp_stat_2_copied = temp_stat_2.copied().as_long()
+            temp_stat_2_copied.should_force_type_compatible = False
+            expr = Expression(temp_stat_2.as_any(), temp_stat_2_copied, ExpressionOperator.Set)
+            EXPR_HANDLER.add(expr)
+            temp_stat_2_copied = temp_stat_2.copied().as_double()
+            temp_stat_2_copied.should_force_type_compatible = False
+            expr = Expression(temp_stat_2.as_any(), temp_stat_2_copied, ExpressionOperator.Set)
+            EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat_2, other, ExpressionOperator.Multiply)
         EXPR_HANDLER.add(expr)
         expr = Expression(temp_stat_1, temp_stat_2, ExpressionOperator.Decrement)
         EXPR_HANDLER.add(expr)
         return Expression.unsafemod(expr, other)
 
-    def __mod__(self, other: 'Checkable | int') -> 'Expression':
+    def __mod__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
         return self.safemod(other)
 
     def __neg__(self) -> 'Expression':

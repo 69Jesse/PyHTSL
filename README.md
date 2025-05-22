@@ -23,15 +23,15 @@ The following Python file named `example.py`:
 ```python
 from pyhtsl import *  # You can import everything you need individually if you want
 
-experience = PlayerStat('experience')
-reward = PlayerStat('reward')
-multiplier = PlayerStat('multiplier')
-global_multiplier = GlobalStat('multiplier')
+experience = PlayerStat('experience').as_long()
+reward = PlayerStat('reward').as_double()
+multiplier = PlayerStat('multiplier').as_double()
+global_multiplier = GlobalStat('multiplier').as_double()
 
 experience += reward * multiplier * global_multiplier
 chat(f'&eYour EXP has been updated to &a{experience}&e!')
 
-level = PlayerStat('level')
+level = PlayerStat('level').as_long()
 EXP_TO_LEVEL_UP = 100  # Python variable, ! not ! a stat
 
 with IfAnd(experience >= EXP_TO_LEVEL_UP):
@@ -47,18 +47,18 @@ python example.py
 Will generate the following HTSL code in `example.htsl`:
 ```
 // Generated with PyHTSL https://github.com/69Jesse/PyHTSL
-stat temp1 = "%stat.player/reward%"
-stat temp1 *= "%stat.player/multiplier%"
-stat temp1 *= "%stat.global/multiplier%"
-stat experience += "%stat.player/temp1%"
-chat "&eYour EXP has been updated to &a%stat.player/experience%&e!"
-if and (stat experience >= 100) {
-stat experience -= "100"
-stat level += "1"
-chat "&eYou leveled up to &dLevel %stat.player/level%&e!"
+var temp1 = "%var.player/reward 0.0%D" true
+var temp1 *= "%var.player/multiplier 0.0%D" true
+var temp1 *= "%var.global/multiplier 0.0%D" true
+var experience += "%var.player/temp1 0%L" true
+chat "&eYour EXP has been updated to &a%var.player/experience%&e!"
+if and (var experience >= 100 0) {
+var experience -= 100 true
+var level += 1 true
+chat "&eYou leveled up to &dLevel %var.player/level%&e!"
 } else {
-stat temp1 = "100"
-stat temp1 -= "%stat.player/experience%"
-chat "&eOnly &a%stat.player/temp1% EXP&e left to level up!"
+var temp1 = 100 true
+var temp1 -= "%var.player/experience 0%L" true
+chat "&eOnly &a%var.player/temp1% EXP&e left to level up!"
 }
 ```

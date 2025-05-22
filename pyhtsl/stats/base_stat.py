@@ -1,8 +1,9 @@
 from abc import abstractmethod
 
+from ..checkable import Checkable
 from ..editable import Editable
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 
 __all__ = (
@@ -12,6 +13,7 @@ __all__ = (
 
 class BaseStat(Editable):
     name: str
+    should_force_type_compatible: bool
     if TYPE_CHECKING:
         def __init__(self, name: str, /) -> None:
             ...
@@ -25,6 +27,7 @@ class BaseStat(Editable):
         ) -> None:
             if set_name:
                 self.name = name
+            self.should_force_type_compatible = True
 
     def __hash__(self) -> int:
         return hash((self.__class__, self.name))
@@ -56,7 +59,7 @@ class BaseStat(Editable):
         if fallback_value is not None:
             name += f' {fallback_value}'
         name += '%'
-        return name
+        return self._formatted_with_internal_type(name)
 
     def _in_comparison_left_side(self) -> str:
         return self._in_assignment_left_side()
@@ -66,3 +69,11 @@ class BaseStat(Editable):
 
     def _as_string(self) -> str:
         return f'%var.{self._right_side_keyword()}/{self.name}%'
+
+    def copied(self) -> Self:
+        copied = super().copied()
+        copied.should_force_type_compatible = self.should_force_type_compatible
+        return copied
+
+
+Checkable._import_base_stat(BaseStat)

@@ -52,7 +52,7 @@ class Editable(Checkable):
         self.set(self.__pow__(self._other_as_type_compatible(other)))  # type: ignore
         return self
 
-    def __imod__(self, other: 'Checkable | int') -> 'Self':
+    def __imod__(self, other: 'Checkable | NumericHousingType') -> 'Self':
         self.set(self.__mod__(self._other_as_type_compatible(other)))  # type: ignore
         return self
 

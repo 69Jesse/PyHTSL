@@ -3,7 +3,8 @@ from pathlib import Path
 import atexit
 import sys
 from .line_type import LineType
-from .fixer import Fixer
+from .fixer import Fixer, LOGGER
+from .public.display_htsl import should_display_htsl
 
 from types import TracebackType
 from typing import Optional, Callable
@@ -98,6 +99,9 @@ class Writer:
             else:
                 self.lines.append((line, line_type))
 
+    def get_content(self) -> str:
+        return '\n'.join((line for line, _ in self.lines))
+
     def write_to_files(self) -> bool:
         if not self.lines:
             print('Nothing found to write to your .htsl file. \x1b[38;2;255;0;0mPyHTSL will not do anything.\x1b[0m')
@@ -106,14 +110,7 @@ class Writer:
         self.file_name = os.path.basename(sys.argv[0]).rsplit('.', 1)[0]
 
         args: list[str] = sys.argv[1:]
-        if 'lines' in args and self.lines:
-            max_line_length: int = max(len(line) for line, _ in self.lines)
-            content = '\n'.join(
-                f'{line.ljust(max_line_length)}  // {line_type}'
-                for line, line_type in self.lines
-            )
-        else:
-            content = '\n'.join((line for line, _ in self.lines))
+        content = self.get_content()
 
         encoding: str = 'utf-8'
         self.htsl_file = HTSL_IMPORTS_FOLDER / f'{self.file_name}.htsl'
@@ -146,6 +143,11 @@ class Writer:
 
         if not self.write_to_files():
             return
+
+        if should_display_htsl():
+            print(self.get_content())
+        LOGGER.publish()
+
         print((
             '\n\x1b[38;2;0;255;0mAll done! Your .htsl file is written to the following location:\x1b[0m'
             f'\n{self.htsl_file.absolute()}'

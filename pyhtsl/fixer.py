@@ -26,9 +26,11 @@ class AntiSpamLogger:
             self.messages.append((message, 1))
 
     def publish(self) -> None:
+        content = '\n' * (len(self.messages) > 0)
         for message, amount in self.messages:
-            print(message + f' \x1b[38;2;255;0;0m(x{amount})\x1b[0m' * (amount > 1))
-        print()
+            content += '\n' + message + f' \x1b[38;2;255;0;0m(x{amount})\x1b[0m' * (amount > 1)
+        content += '\n' * (len(self.messages) > 0)
+        print(content)
 
 
 LOGGER = AntiSpamLogger()
@@ -232,7 +234,6 @@ class Fixer:
                 continue
             lines[i] = ('\n\n' + line[0], line[1])
 
-        LOGGER.publish()
         return lines
 
     def find_container_and_name_from_goto(self, line: str) -> tuple[str, str] | tuple[None, None]:
