@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import atexit
 import sys
+import re
 from .line_type import LineType
 from .fixer import Fixer, LOGGER
 from .public.display_htsl import should_display_htsl
@@ -111,6 +112,22 @@ class Writer:
 
         args: list[str] = sys.argv[1:]
         content = self.get_content()
+
+        if 'functions' in args:
+            lines = content.split('\n')
+            names_seen: set[str] = set()
+            regex = re.compile(r'goto function "(.+)"')
+            new_lines: list[str] = []
+            for line in lines:
+                match = regex.match(line)
+                if not match:
+                    continue
+                name = match.group(1)
+                if name in names_seen:
+                    continue
+                names_seen.add(name)
+                new_lines.append(line)
+            content = '\n'.join(new_lines)
 
         encoding: str = 'utf-8'
         self.htsl_file = HTSL_IMPORTS_FOLDER / f'{self.file_name}.htsl'
