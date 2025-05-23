@@ -2,6 +2,7 @@ from abc import abstractmethod
 
 from ..checkable import Checkable
 from ..editable import Editable
+from ..expression.handler import ExpressionHandler
 
 from typing import TYPE_CHECKING, Self
 
@@ -14,8 +15,15 @@ __all__ = (
 class BaseStat(Editable):
     name: str
     should_force_type_compatible: bool
+    unset: bool
     if TYPE_CHECKING:
-        def __init__(self, name: str, /) -> None:
+        def __init__(
+            self,
+            name: str,
+            /,
+            *,
+            unset: bool = True,
+        ) -> None:
             ...
     else:
         def __init__(
@@ -24,10 +32,12 @@ class BaseStat(Editable):
             /,
             *,
             set_name: bool = True,
+            unset: bool = True,
         ) -> None:
             if set_name:
                 self.name = name
             self.should_force_type_compatible = True
+            self.unset = unset
 
     def __hash__(self) -> int:
         return hash((self.__class__, self.name))
@@ -70,10 +80,28 @@ class BaseStat(Editable):
     def _as_string(self) -> str:
         return f'%var.{self._right_side_keyword()}/{self.name}%'
 
+    def with_automatic_unset(self) -> Self:
+        """
+        Creates a copy of the current object, with the automatic unset flag set to True.
+        """
+        copied = self.copied()
+        copied.unset = True
+        return copied
+
+    def without_automatic_unset(self) -> Self:
+        """
+        Creates a copy of the current object, with the automatic unset flag set to False.
+        """
+        copied = self.copied()
+        copied.unset = False
+        return copied
+
     def copied(self) -> Self:
         copied = super().copied()
         copied.should_force_type_compatible = self.should_force_type_compatible
+        copied.unset = self.unset
         return copied
 
 
 Checkable._import_base_stat(BaseStat)
+ExpressionHandler._import_base_stat(BaseStat)

@@ -2,6 +2,7 @@ from ..writer import WRITER, LineType
 
 from typing import TYPE_CHECKING, final, TypeAlias
 if TYPE_CHECKING:
+    from ..stats.base_stat import BaseStat
     from ..stats.temporary_stat import TemporaryStat
     from ..checkable import Checkable
     from .housing_type import HousingType
@@ -43,6 +44,12 @@ class ExpressionHandler:
         checkable_cls: type['Checkable'],
     ) -> None:
         globals()[checkable_cls.__name__] = checkable_cls
+
+    @staticmethod
+    def _import_base_stat(
+        base_stat_cls: type['BaseStat'],
+    ) -> None:
+        globals()[base_stat_cls.__name__] = base_stat_cls
 
     @staticmethod
     def _import_temporary_stat(
@@ -252,8 +259,11 @@ class ExpressionHandler:
         lines: Lines,
     ) -> None:
         for left, operator, right in lines:
+            line = f'{left._in_assignment_left_side()} {operator.value} {Checkable._to_assignment_right_side(right)}'
+            if isinstance(left, BaseStat):
+                line += f' {str(left.unset).lower()}'
             WRITER.write(
-                f'{left._in_assignment_left_side()} {operator.value} {Checkable._to_assignment_right_side(right)} {str(AUTOMATIC_UNSET.value).lower()}',
+                line,
                 LineType.variable_change,
             )
 

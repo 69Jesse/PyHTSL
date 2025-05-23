@@ -20,7 +20,7 @@ class TemporaryStat(BaseStat):
         self,
         internal_type: InternalType,
     ) -> None:
-        super().__init__(None, set_name=False)  # type: ignore
+        super().__init__(None, set_name=False, unset=False)  # type: ignore
         self.internal_type = internal_type
         self.number = id(self) + 1_000_000
 

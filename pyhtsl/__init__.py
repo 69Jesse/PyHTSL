@@ -103,7 +103,6 @@ from .public.within_region import WithinRegion as WithinRegion
 from .public.change_velocity import change_velocity as change_velocity
 from .public.launch_to_target import launch_to_target as launch_to_target
 from .public.drop_item import drop_item as drop_item
-from .public.disable_automatic_unset import disable_automatic_unset as disable_automatic_unset
 from .public.display_htsl import display_htsl as display_htsl
 
 from .writer import set_htsl_imports_folder as set_htsl_imports_folder
