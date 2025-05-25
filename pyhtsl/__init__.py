@@ -104,5 +104,6 @@ from .public.change_velocity import change_velocity as change_velocity
 from .public.launch_to_target import launch_to_target as launch_to_target
 from .public.drop_item import drop_item as drop_item
 from .public.display_htsl import display_htsl as display_htsl
+from .public.no_type_casting import NoTypeCasting as NoTypeCasting
 
 from .writer import set_htsl_imports_folder as set_htsl_imports_folder

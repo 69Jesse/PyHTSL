@@ -77,8 +77,8 @@ class Expression(Checkable):
     def _in_assignment_left_side(self) -> str:
         return self._all_the_way_left(self)._in_assignment_left_side()
 
-    def _in_assignment_right_side(self) -> str:
-        return self._all_the_way_left(self)._in_assignment_right_side()
+    def _in_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
+        return self._all_the_way_left(self)._in_assignment_right_side(include_internal_type=include_internal_type)
 
     def _in_comparison_left_side(self) -> str:
         return self._in_assignment_left_side()

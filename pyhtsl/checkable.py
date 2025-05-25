@@ -5,6 +5,7 @@ from .expression.handler import ExpressionHandler, EXPR_HANDLER
 from .condition.base_condition import BaseCondition
 from .condition.double_sided_condition import DoubleSidedConditionOperator, DoubleSidedCondition
 from .expression.housing_type import NumericHousingType, HousingType, _housing_type_as_right_side
+from .public.no_type_casting import no_type_casting
 
 from abc import ABC, abstractmethod
 
@@ -81,11 +82,14 @@ class Checkable(ABC):
     def _formatted_with_internal_type(
         self,
         text: str,
+        *,
+        include_internal_type: bool,
     ) -> str:
-        if self.internal_type is InternalType.LONG:
-            text += 'L'
-        elif self.internal_type is InternalType.DOUBLE:
-            text += 'D'
+        if include_internal_type and not no_type_casting():
+            if self.internal_type is InternalType.LONG:
+                text += 'L'
+            elif self.internal_type is InternalType.DOUBLE:
+                text += 'D'
         return f'"{text}"'
 
     @abstractmethod
@@ -97,7 +101,7 @@ class Checkable(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def _in_assignment_right_side(self) -> str:
+    def _in_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
         """
         var foo = %var.player/bar%
                   ^^^^^^^^^^^^^^^^

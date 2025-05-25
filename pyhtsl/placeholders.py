@@ -33,14 +33,14 @@ class PlaceholderCheckable(Editable):
     def _in_assignment_left_side(self) -> str:
         raise RuntimeError(f'Cannot use {self.__class__.__name__} as left side of assignment.')
 
-    def _in_assignment_right_side(self) -> str:
-        return self._formatted_with_internal_type(self.assignment_right_side)
+    def _in_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
+        return self._formatted_with_internal_type(self.assignment_right_side, include_internal_type=include_internal_type)
 
     def _in_comparison_left_side(self) -> str:
         return self.comparison_left_side
 
     def _in_comparison_right_side(self) -> str:
-        return self._formatted_with_internal_type(self.comparison_right_side)
+        return self._formatted_with_internal_type(self.comparison_right_side, include_internal_type=True)
 
     def _as_string(self) -> str:
         return self.inside_of_string
@@ -85,14 +85,14 @@ class PlaceholderEditable(Editable):
     def _in_assignment_left_side(self) -> str:
         return self.assignment_left_side
 
-    def _in_assignment_right_side(self) -> str:
-        return self._formatted_with_internal_type(self.assignment_right_side)
+    def _in_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
+        return self._formatted_with_internal_type(self.assignment_right_side, include_internal_type=include_internal_type)
 
     def _in_comparison_left_side(self) -> str:
         return self.comparison_left_side
 
     def _in_comparison_right_side(self) -> str:
-        return self._formatted_with_internal_type(self.comparison_right_side)
+        return self._formatted_with_internal_type(self.comparison_right_side, include_internal_type=True)
 
     def _as_string(self) -> str:
         return self.inside_of_string
