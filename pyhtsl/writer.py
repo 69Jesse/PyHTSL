@@ -82,6 +82,8 @@ class Writer:
     file_name: str
     htsl_file: Path
     python_save_file: Path
+    indent: bool = False
+
     def write(
         self,
         line: str,
@@ -90,6 +92,10 @@ class Writer:
         append_to_previous_line: bool = False,
         add_to_front: bool = False,
     ) -> None:
+        # Perfect!
+        if self.indent:
+            line = '    ' + line
+
         if append_to_previous_line:
             assert not add_to_front
             self.lines[-1] = (self.lines[-1][0] + ' ' + line, line_type)
@@ -171,6 +177,12 @@ class Writer:
             f'\nExecute it with HTSL by using the following name: \x1b[38;2;255;0;0m{self.file_name}\x1b[0m'
             '\n'
         ))
+
+    def begin_indent(self) -> None:
+        self.indent = True
+
+    def end_indent(self) -> None:
+        self.indent = False
 
 
 WRITER = Writer()

@@ -12,6 +12,7 @@ __all__ = (
 class _Random:
     def __enter__(self) -> None:
         WRITER.write('random {', LineType.random_enter)
+        WRITER.begin_indent()
 
     def __exit__(
         self,
@@ -19,6 +20,7 @@ class _Random:
         exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
     ) -> None:
+        WRITER.end_indent()
         WRITER.write('}', LineType.random_exit)
 
 
