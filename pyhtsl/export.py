@@ -3,9 +3,10 @@ from .writer import WRITER
 from .public.function import Function
 
 from typing import Sequence, Any
+from types import ModuleType
 
 
-type Exportable = Function | Sequence[Function] | dict[str, Function | Any]
+type Exportable = Function | Sequence[Function] | dict[str, Function | Any] | ModuleType
 
 
 def export(
@@ -22,10 +23,14 @@ def export(
     elif isinstance(exportable, dict):
         functions = [v for v in exportable.values() if isinstance(v, Function)]
     else:
-        raise TypeError(f'Expected a Function, Sequence of Functions, or a dict with Function values, got {exportable.__class__.__name__}.')
+        functions = []
+        for attr in dir(exportable):
+            value = getattr(exportable, attr)
+            if isinstance(value, Function):
+                functions.append(value)
 
     if not functions:
-        raise ValueError('No functions to export.')
+        raise ValueError(f'No functions to export. Double check {repr(exportable)} of type {exportable.__class__.__name__} is correct.')
 
     with WRITER.temporary_container_context(name=name) as container:
         container.registered_functions.extend(functions)

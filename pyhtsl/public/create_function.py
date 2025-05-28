@@ -61,7 +61,8 @@ def create_function(
 
         def callback() -> None:
             goto(container='function', name=name, add_to_front=True)  # type: ignore
-            if create if create is not None else (func.__module__ == '__main__'):
+            force = not WRITER.get_container().is_global
+            if force or (create if create is not None else (func.__module__ == '__main__')):
                 goto(container='function', name=name)
                 func(*(param.cls(name=param.name) for param in parameters))  # type: ignore
 
