@@ -92,9 +92,8 @@ class Writer:
         append_to_previous_line: bool = False,
         add_to_front: bool = False,
     ) -> None:
-        # Perfect!
-        if self.indent:
-            line = ('    ' * self.indent) + line
+        # Perfect!!!
+        line = ('    ' * self.indent) + line
 
         if append_to_previous_line:
             assert not add_to_front
