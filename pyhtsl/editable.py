@@ -63,13 +63,13 @@ class Editable(Checkable):
 
     def inc(self, other: 'Checkable | NumericHousingType') -> 'Self':
         return self.__iadd__(other)
-    
+
     def dec(self, other: 'Checkable | NumericHousingType') -> 'Self':
         return self.__isub__(other)
-    
+
     def mul(self, other: 'Checkable | NumericHousingType') -> 'Self':
         return self.__imul__(other)
-    
+
     def div(self, other: 'Checkable | NumericHousingType') -> 'Self':
         return self.__itruediv__(other)
 
