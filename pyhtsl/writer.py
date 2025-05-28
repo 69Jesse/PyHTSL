@@ -136,6 +136,13 @@ class Writer:
     export_globally: bool
     exported_names: set[str]
 
+    __slots__ = (
+        'containers',
+        'exception_raised',
+        'export_globally',
+        'exported_names',
+    )
+
     def __init__(self) -> None:
         global_name = os.path.basename(sys.argv[0]).rsplit('.', 1)[0]
         self.containers = [ExportContainer(global_name, is_global=True)]
@@ -253,10 +260,14 @@ class Writer:
         self.exported_names.add(container.name)
 
     def begin_indent(self) -> None:
-        self.indent += 1
+        container = self.get_container()
+        container.indent += 1
 
     def end_indent(self) -> None:
-        self.indent -= 1
+        container = self.get_container()
+        if container.indent <= 0:
+            raise RuntimeError('Cannot end indent when indent is already 0. This should never happen.')
+        container.indent -= 1
 
 
 WRITER = Writer()
