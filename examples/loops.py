@@ -22,33 +22,33 @@ for letter in ('A', 'B', 'C', 'D', 'E', 'F'):
 // Generated with PyHTSL https://github.com/69Jesse/PyHTSL
 chat "&aChecking for empty teams.."
 if and (stat team_A_players == 0) {
-chat "&eTeam A is empty!"
+    chat "&eTeam A is empty!"
 } else {
-chat "&aTeam A has %stat.player/team_A_players% player(s)!"
+    chat "&aTeam A has %stat.player/team_A_players% player(s)!"
 }
 if and (stat team_B_players == 0) {
-chat "&eTeam B is empty!"
+    chat "&eTeam B is empty!"
 } else {
-chat "&aTeam B has %stat.player/team_B_players% player(s)!"
+    chat "&aTeam B has %stat.player/team_B_players% player(s)!"
 }
 if and (stat team_C_players == 0) {
-chat "&eTeam C is empty!"
+    chat "&eTeam C is empty!"
 } else {
-chat "&aTeam C has %stat.player/team_C_players% player(s)!"
+    chat "&aTeam C has %stat.player/team_C_players% player(s)!"
 }
 if and (stat team_D_players == 0) {
-chat "&eTeam D is empty!"
+    chat "&eTeam D is empty!"
 } else {
-chat "&aTeam D has %stat.player/team_D_players% player(s)!"
+    chat "&aTeam D has %stat.player/team_D_players% player(s)!"
 }
 if and (stat team_E_players == 0) {
-chat "&eTeam E is empty!"
+    chat "&eTeam E is empty!"
 } else {
-chat "&aTeam E has %stat.player/team_E_players% player(s)!"
+    chat "&aTeam E has %stat.player/team_E_players% player(s)!"
 }
 if and (stat team_F_players == 0) {
-chat "&eTeam F is empty!"
+    chat "&eTeam F is empty!"
 } else {
-chat "&aTeam F has %stat.player/team_F_players% player(s)!"
+    chat "&aTeam F has %stat.player/team_F_players% player(s)!"
 }
 """

@@ -38,12 +38,12 @@ stat temp1 *= "%stat.global/multiplier%"
 stat experience += "%stat.player/temp1%"
 chat "&aYour EXP has been updated to &6%stat.player/experience%g"
 if and (stat experience >= 100) {
-stat experience -= "100"
-stat level += "1"
-chat "&eYou leveled up to &dLevel %stat.player/level%&e!"
+    stat experience -= "100"
+    stat level += "1"
+    chat "&eYou leveled up to &dLevel %stat.player/level%&e!"
 } else {
-stat temp1 = "100"
-stat temp1 -= "%stat.player/experience%"
-chat "&eOnly &a%stat.player/temp1% EXP&e left to level up!"
+    stat temp1 = "100"
+    stat temp1 -= "%stat.player/experience%"
+    chat "&eOnly &a%stat.player/temp1% EXP&e left to level up!"
 }
 """

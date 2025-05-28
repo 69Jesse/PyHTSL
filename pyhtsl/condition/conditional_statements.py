@@ -38,6 +38,7 @@ class IfStatement:
             f'if {self.mode.name.lower()} (' + ', '.join(map(str, self.conditions)) + ') {',
             self.mode.value,
         )
+        WRITER.begin_indent()
 
     def __exit__(
         self,
@@ -45,6 +46,7 @@ class IfStatement:
         exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
     ) -> None:
+        WRITER.end_indent()
         WRITER.write(
             '}',
             LineType.if_exit,
@@ -60,6 +62,7 @@ class ElseStatement:
             LineType.else_enter,
             append_to_previous_line=True,
         )
+        WRITER.begin_indent()
 
     def __exit__(
         self,
@@ -67,6 +70,7 @@ class ElseStatement:
         exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
     ) -> None:
+        WRITER.end_indent()
         WRITER.write(
             '}',
             LineType.else_exit,
