@@ -82,7 +82,7 @@ class Writer:
     file_name: str
     htsl_file: Path
     python_save_file: Path
-    indent: bool = False
+    indent: int = 0
 
     def write(
         self,
@@ -94,7 +94,7 @@ class Writer:
     ) -> None:
         # Perfect!
         if self.indent:
-            line = '    ' + line
+            line = ('    ' * self.indent) + line
 
         if append_to_previous_line:
             assert not add_to_front
@@ -179,10 +179,10 @@ class Writer:
         ))
 
     def begin_indent(self) -> None:
-        self.indent = True
+        self.indent += 1
 
     def end_indent(self) -> None:
-        self.indent = False
+        self.indent -= 1
 
 
 WRITER = Writer()
