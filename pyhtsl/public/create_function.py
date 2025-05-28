@@ -59,16 +59,17 @@ def create_function(
             param = StatParameter(name=renamed_parameters.get(param_name, param_name), cls=annotation)
             parameters.append(param)
 
-        def wrapper() -> None:
+        def callback() -> None:
             goto(container='function', name=name, add_to_front=True)  # type: ignore
             if create if create is not None else (func.__module__ == '__main__'):
                 goto(container='function', name=name)
                 func(*(param.cls(name=param.name) for param in parameters))  # type: ignore
 
+        function = Function(name=name, parameters=parameters, callback=callback)
         if run_right_now:
-            wrapper()
+            callback()
         else:
-            WRITER.registered_functions.append(wrapper)
+            WRITER.get_container().registered_functions.append(function)
+        return function
 
-        return Function(name=name, parameters=parameters)
     return decorator

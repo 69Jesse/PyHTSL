@@ -2,13 +2,15 @@ import os
 from pathlib import Path
 import atexit
 import sys
-import re
 from .line_type import LineType
-from .fixer import Fixer, LOGGER
+from .fixer import Fixer
+from .logger import AntiSpamLogger
 from .public.display_htsl import should_display_htsl
 
 from types import TracebackType
-from typing import Optional, Callable
+from typing import TYPE_CHECKING, Optional
+if TYPE_CHECKING:
+    from .public.function import Function
 
 
 __all__ = (
@@ -74,15 +76,83 @@ if not HTSL_IMPORTS_FOLDER.exists():
     raise FileNotFoundError(f'Could not find your HTSL imports folder at\n{HTSL_IMPORTS_FOLDER}')
 
 
+class ExportContainer:
+    name: str
+    is_global: bool
+    lines: list[tuple[str, LineType]]
+    registered_functions: list['Function']
+    in_front_index: int
+    indent: int
+    logger: AntiSpamLogger
+    def __init__(
+        self,
+        name: str,
+        *,
+        is_global: bool = False,
+    ) -> None:
+        self.name = name
+        self.is_global = is_global
+        self.lines = []
+        self.registered_functions = []
+        self.in_front_index = 0
+        self.indent = 0
+        self.logger = AntiSpamLogger()
+
+    def htsl_path(self) -> Path:
+        return HTSL_IMPORTS_FOLDER / f'{self.name}.htsl'
+
+
+class TemporaryContainerContextManager:
+    writer: 'Writer'
+    name: str
+    def __init__(
+        self,
+        writer: 'Writer',
+        name: str,
+    ) -> None:
+        self.writer = writer
+        self.name = name
+
+    def __enter__(self) -> ExportContainer:
+        container = ExportContainer(self.name)
+        self.writer.containers.append(container)
+        return container
+
+    def __exit__(
+        self,
+        exc_type: Optional[type[BaseException]],
+        exc_value: Optional[BaseException],
+        traceback: Optional[TracebackType],
+    ) -> None:
+        container = self.writer.get_container()
+        if container.name != self.name:
+            raise RuntimeError(f'Container "{self.name}" was not the last one created. This should never happen.')
+        self.writer.containers.pop()
+
+
 class Writer:
-    lines: list[tuple[str, LineType]] = []
-    exception_raised: bool = False
-    registered_functions: list[Callable[[], None]] = []
-    in_front_index: int = 0
-    file_name: str
-    htsl_file: Path
-    python_save_file: Path
-    indent: int = 0
+    containers: list[ExportContainer]
+    exception_raised: bool
+    export_globally: bool
+    exported_names: set[str]
+
+    def __init__(self) -> None:
+        global_name = os.path.basename(sys.argv[0]).rsplit('.', 1)[0]
+        self.containers = [ExportContainer(global_name, is_global=True)]
+        self.exception_raised = False
+        self.export_globally = True
+        self.exported_names = set()
+
+    def get_container(self) -> ExportContainer:
+        if not self.containers:
+            raise RuntimeError('No containers available. This should never happen.')
+        return self.containers[-1]
+
+    def temporary_container_context(
+        self,
+        name: str,
+    ) -> TemporaryContainerContextManager:
+        return TemporaryContainerContextManager(self, name)
 
     def write(
         self,
@@ -92,56 +162,36 @@ class Writer:
         append_to_previous_line: bool = False,
         add_to_front: bool = False,
     ) -> None:
-        # Perfect!!!
-        line = ('    ' * self.indent) + line
+        container = self.get_container()
+
+        line = ('    ' * container.indent) + line
 
         if append_to_previous_line:
             assert not add_to_front
-            self.lines[-1] = (self.lines[-1][0] + ' ' + line, line_type)
+            container.lines[-1] = (container.lines[-1][0] + ' ' + line, line_type)
         else:
             if add_to_front:
-                self.lines.insert(self.in_front_index, (line, line_type))
-                self.in_front_index += 1
+                container.lines.insert(container.in_front_index, (line, line_type))
+                container.in_front_index += 1
             else:
-                self.lines.append((line, line_type))
+                container.lines.append((line, line_type))
 
-    def get_content(self) -> str:
-        return '\n'.join((line for line, _ in self.lines))
+    def get_content(self, container: ExportContainer) -> str:
+        return '\n'.join((line for line, _ in container.lines))
 
-    def write_to_files(self) -> bool:
-        if not self.lines:
+    def write_htsl(self, container: ExportContainer) -> bool:
+        if not container.lines:
             print('Nothing found to write to your .htsl file. \x1b[38;2;255;0;0mPyHTSL will not do anything.\x1b[0m')
             return False
 
-        self.file_name = os.path.basename(sys.argv[0]).rsplit('.', 1)[0]
-
         args: list[str] = sys.argv[1:]
-        content = self.get_content()
+        content = self.get_content(container)
 
-        if 'functions' in args:
-            lines = content.split('\n')
-            names_seen: set[str] = set()
-            regex = re.compile(r'goto function "(.+)"')
-            new_lines: list[str] = []
-            for line in lines:
-                match = regex.match(line)
-                if not match:
-                    continue
-                name = match.group(1)
-                if name in names_seen:
-                    continue
-                names_seen.add(name)
-                new_lines.append(line)
-            content = '\n'.join(new_lines)
+        path = container.htsl_path()
+        path.write_text(f'// Generated with PyHTSL https://github.com/69Jesse/PyHTSL\n{content}', encoding='utf-8')
 
-        encoding: str = 'utf-8'
-        self.htsl_file = HTSL_IMPORTS_FOLDER / f'{self.file_name}.htsl'
-        self.htsl_file.write_text(
-            f'// Generated with PyHTSL https://github.com/69Jesse/PyHTSL\n{content}',
-            encoding=encoding,
-        )
         if 'code' in args:
-            os.system(f'code "{self.htsl_file.absolute()}"')
+            os.system(f'code "{path.absolute()}"')
 
         return True
 
@@ -157,25 +207,50 @@ class Writer:
     def on_program_exit(self) -> None:
         if self.exception_raised:
             return
-        for func in self.registered_functions:
-            func()
+        container = self.get_container()
+        if not container.is_global:
+            raise RuntimeError('Program exited without exporting a non-global container. This should never happen.')
+        if not self.export_globally:
+            print('\x1b[38;2;255;0;0mGlobal export is disabled. No .htsl file will be written.\x1b[0m')
+            return
+        self.run_export(container)
 
-        fixer = Fixer(self.lines)
-        self.lines = fixer.fix()
+    def run_export(self, container: ExportContainer) -> None:
+        if container.name in self.exported_names:
+            raise RuntimeError(
+                f'Container with name "{container.name}" has already been exported.'
+                + (' This is the global export, it is possible to disable the global export with "pyhtsl.disable_global_export()".' if container.is_global else '')
+            )
 
-        if not self.write_to_files():
+        if not container.is_global:
+            print(f'\n\x1b[38;2;0;255;0mExporting container named \x1b[38;2;255;0;0m{container.name}\x1b[0m')
+        else:
+            print(f'\n\x1b[38;2;0;255;0mExporting global container named \x1b[38;2;255;0;0m{container.name}\x1b[0m')
+
+        for function in container.registered_functions:
+            if function.callback is None:
+                raise RuntimeError(f'Function "{function.name}" has no callback. Unable to export.')
+            function.callback()
+
+        fixer = Fixer(container)
+        container.lines = fixer.fix()
+
+        if not self.write_htsl(container):
             return
 
         if should_display_htsl():
-            print(self.get_content())
-        LOGGER.publish()
+            print(self.get_content(container))
+        container.logger.publish()
 
+        path = container.htsl_path()
         print((
-            '\n\x1b[38;2;0;255;0mAll done! Your .htsl file is written to the following location:\x1b[0m'
-            f'\n{self.htsl_file.absolute()}'
-            f'\nExecute it with HTSL by using the following name: \x1b[38;2;255;0;0m{self.file_name}\x1b[0m'
+            '\x1b[38;2;0;255;0mAll done! Your .htsl file is written to the following location:\x1b[0m'
+            f'\n{path.absolute()}'
+            f'\nExecute it with HTSL by using the following name: \x1b[38;2;255;0;0m{container.name}\x1b[0m'
             '\n'
         ))
+
+        self.exported_names.add(container.name)
 
     def begin_indent(self) -> None:
         self.indent += 1
