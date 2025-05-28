@@ -18,7 +18,7 @@ def _housing_type_as_right_side(value: HousingType) -> str:
         if isinstance(value, int):
             return str(value)
         elif isinstance(value, float):
-            formatted = np.format_float_positional(value, trim="-")
+            formatted = np.format_float_positional(value, trim='-')
             if '.' not in formatted:
                 formatted += '.0'
             return formatted
