@@ -112,6 +112,8 @@ class EmptyIfAddon(Addon):
         *,
         container: 'ExportContainer',
     ) -> None:
+        for i, (line, line_type) in enumerate(lines):
+            lines[i] = ('    ' + line, line_type)
         super().__init__(lines, add_to_middle_index, container=container)
         self.container.logger.log('\x1b[38;2;0;255;0mNote:\x1b[0m Added a conditional to prevent too many stat changes.')
 
