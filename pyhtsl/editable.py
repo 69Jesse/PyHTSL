@@ -65,7 +65,7 @@ class Editable(Checkable):
     def unset(self) -> None:
         WRITER.write(
             f'{self._in_assignment_left_side()} unset', 
-            LineType.variable_change
+            LineType.variable_change,
         )
 
     def inc(self, other: 'Checkable | NumericHousingType') -> 'Self':
