@@ -15,7 +15,7 @@ __all__ = (
 class BaseStat(Editable):
     name: str
     should_force_type_compatible: bool
-    unset: bool
+    auto_unset: bool
     if TYPE_CHECKING:
         def __init__(
             self,
@@ -37,7 +37,7 @@ class BaseStat(Editable):
             if set_name:
                 self.name = name
             self.should_force_type_compatible = True
-            self.unset = unset
+            self.auto_unset = unset
 
     def __hash__(self) -> int:
         return hash((self.__class__, self.name))
@@ -85,7 +85,7 @@ class BaseStat(Editable):
         Creates a copy of the current object, with the automatic unset flag set to True.
         """
         copied = self.copied()
-        copied.unset = True
+        copied.auto_unset = True
         return copied
 
     def without_automatic_unset(self) -> Self:
@@ -93,7 +93,7 @@ class BaseStat(Editable):
         Creates a copy of the current object, with the automatic unset flag set to False.
         """
         copied = self.copied()
-        copied.unset = False
+        copied.auto_unset = False
         return copied
 
     def copied(self) -> Self:
