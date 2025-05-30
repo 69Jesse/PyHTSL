@@ -298,8 +298,13 @@ class Item:
         item = self.key_check()
         line = self.fetch_line(item)
         cached = SAVED_CACHE.get(line, None)
+
+        title = f'\033[38;2;0;255;0m{item['title']}\033[0m'
+        if self.count != 1:
+            title = f'\033[38;2;0;191;255m{self.count}x\033[0m ' + title
+
         if cached is not None:
-            print(f'Using cached \033[38;2;0;255;0m{item["title"]}\033[0m as \x1b[38;2;255;0;0m{cached}\x1b[0m.')
+            print(f'Using cached {title} as \x1b[38;2;255;0;0m{cached}\x1b[0m.')
             return cached
         suffix = hashlib.md5(line.encode()).hexdigest()[:8]
         name = f'_{self._key}_{suffix}'
@@ -308,7 +313,7 @@ class Item:
             file.write(line)
         SAVED_CACHE[line] = name
         print(
-            f'Successfully saved \033[38;2;0;255;0m{item["title"]}\033[0m as \x1b[38;2;255;0;0m{name}\x1b[0m to be used in your script:'
+            f'Successfully saved {title} as \x1b[38;2;255;0;0m{name}\x1b[0m to be used in your script:'
             f'\n  \033[38;2;0;255;0m+\033[0m {path.absolute()}'
         )
         return name
