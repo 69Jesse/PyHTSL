@@ -74,17 +74,17 @@ class Editable(Checkable):
     def div(self, other: Checkable | NumericHousingType) -> Self:
         return self.__itruediv__(other)
 
-    def execute(self, operator: 'ExpressionOperator', other: Checkable | NumericHousingType) -> Self:
+    def execute(self, operator: 'ExpressionOperator', other: Checkable | HousingType) -> Self:
         if operator is ExpressionOperator.Set:
             return self.set(other)
         elif operator is ExpressionOperator.Increment:
-            return self.inc(other)
+            return self.inc(other)  # type: ignore
         elif operator is ExpressionOperator.Decrement:
-            return self.dec(other)
+            return self.dec(other)  # type: ignore
         elif operator is ExpressionOperator.Multiply:
-            return self.mul(other)
+            return self.mul(other)  # type: ignore
         elif operator is ExpressionOperator.Divide:
-            return self.div(other)
+            return self.div(other)  # type: ignore
         else:
             raise ValueError(f'Unknown operator {operator}')
 
