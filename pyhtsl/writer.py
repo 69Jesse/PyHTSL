@@ -8,9 +8,13 @@ from .logger import AntiSpamLogger
 from .public.display_htsl import should_display_htsl
 
 from types import TracebackType
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Callable
 if TYPE_CHECKING:
     from .public.function import Function
+    from .checkable import Checkable
+    from .expression.housing_type import HousingType
+    from .expression.assignment_expression import ExpressionOperator
+    from .editable import Editable
 
 
 __all__ = (
@@ -76,6 +80,9 @@ if not HTSL_IMPORTS_FOLDER.exists():
     raise FileNotFoundError(f'Could not find your HTSL imports folder at\n{HTSL_IMPORTS_FOLDER}')
 
 
+type LinesCallbackType = Callable[[list[tuple['Editable', 'ExpressionOperator', 'Checkable | HousingType']]], None] | None
+
+
 class ExportContainer:
     name: str
     is_global: bool
@@ -84,14 +91,17 @@ class ExportContainer:
     in_front_index: int
     indent: int
     logger: AntiSpamLogger
+    lines_callback: LinesCallbackType | None
     def __init__(
         self,
         name: str,
         *,
         is_global: bool = False,
+        lines_callback: LinesCallbackType | None = None,
     ) -> None:
         self.name = name
         self.is_global = is_global
+        self.lines_callback = lines_callback
         self.lines = []
         self.registered_functions = []
         self.in_front_index = 0
@@ -105,24 +115,27 @@ class ExportContainer:
 class TemporaryContainerContextManager:
     writer: 'Writer'
     name: str
+    lines_callback: LinesCallbackType | None
     def __init__(
         self,
         writer: 'Writer',
         name: str,
+        lines_callback: LinesCallbackType | None = None,
     ) -> None:
         self.writer = writer
         self.name = name
+        self.lines_callback = lines_callback
 
     def __enter__(self) -> ExportContainer:
-        container = ExportContainer(self.name)
+        container = ExportContainer(self.name, lines_callback=self.lines_callback)
         self.writer.containers.append(container)
         return container
 
     def __exit__(
         self,
-        exc_type: Optional[type[BaseException]],
-        exc_value: Optional[BaseException],
-        traceback: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
     ) -> None:
         container = self.writer.get_container()
         if container.name != self.name:
@@ -158,8 +171,10 @@ class Writer:
     def temporary_container_context(
         self,
         name: str,
+        *,
+        lines_callback: LinesCallbackType | None = None,
     ) -> TemporaryContainerContextManager:
-        return TemporaryContainerContextManager(self, name)
+        return TemporaryContainerContextManager(self, name, lines_callback=lines_callback)
 
     def write(
         self,
@@ -206,7 +221,7 @@ class Writer:
         self,
         exc_type: type[BaseException],
         exc_value: BaseException,
-        traceback: Optional[TracebackType],
+        traceback: TracebackType | None,
     ) -> None:
         self.exception_raised = True
         sys.__excepthook__(exc_type, exc_value, traceback)

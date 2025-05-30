@@ -3,7 +3,7 @@ import re
 
 from .line_type import LineType
 
-from typing import TYPE_CHECKING, Generator, Optional, final
+from typing import TYPE_CHECKING, Generator, final
 if TYPE_CHECKING:
     from .writer import ExportContainer
 
@@ -17,11 +17,11 @@ GOTO_LINE_REGEX = re.compile(r'^goto (.+?) "(.+)"')
 
 
 class Part:
-    name: Optional[str]
+    name: str | None
     lines: list[tuple[str, LineType]]
     def __init__(
         self,
-        name: Optional[str],
+        name: str | None,
         lines: list[tuple[str, LineType]],
     ) -> None:
         self.name = name
@@ -135,13 +135,13 @@ FILLER_COMMENT_SUFFIX: str = '  // PyHTSL filler'
 
 @final
 class NewFunctionAddon(Addon):
-    raw_function_name: Optional[str]
+    raw_function_name: str | None
     function_index: int
     def __init__(
         self,
         lines: list[tuple[str, LineType]],
         add_to_middle_index: int,
-        function_name: Optional[str],
+        function_name: str | None,
         function_index: int,
         *,
         container: 'ExportContainer',
@@ -236,11 +236,11 @@ class Fixer:
 
     def create_parts(
         self,
-        lines: Optional[list[tuple[str, LineType]]] = None,
+        lines: list[tuple[str, LineType]] | None = None,
     ) -> Generator[Part, None, None]:
         if lines is None:
             lines = self.lines
-        name: Optional[str] = None
+        name: str | None = None
         current_lines: list[tuple[str, LineType]] = []
         for line, line_type in lines:
             if line_type is LineType.goto:
@@ -313,7 +313,7 @@ class Fixer:
         self,
         lines: list[tuple[str, LineType]],
         *,
-        current_name: Optional[str],
+        current_name: str | None,
         function_index: int = 1,
     ) -> list[Addon]:
         counter: Counter = Counter()
@@ -396,7 +396,7 @@ class Fixer:
 
         return addons
 
-    def find_goto_line_child_index(self, parent_line: str, child_line: str) -> Optional[int]:
+    def find_goto_line_child_index(self, parent_line: str, child_line: str) -> int | None:
         prefix = parent_line.removesuffix('"') + ' '
         suffix = '"' + FILLER_COMMENT_SUFFIX
         if not child_line.startswith(prefix):

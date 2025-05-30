@@ -4,7 +4,7 @@ from ..stats.player_stat import PlayerStat
 from ..stats.global_stat import GlobalStat
 from ..stats.team_stat import TeamStat
 
-from typing import Optional, Iterable
+from typing import Iterable
 
 
 __all__ = (
@@ -16,7 +16,7 @@ def trigger_function(
     function: Function | str,
     trigger_for_all_players: bool = False,
     *,
-    parameters: Optional[Iterable[PlayerStat | GlobalStat | TeamStat | int]] = None,
+    parameters: Iterable[PlayerStat | GlobalStat | TeamStat | int] | None = None,
 ) -> None:
     function = function if isinstance(function, Function) else Function(function)
     if parameters is not None:

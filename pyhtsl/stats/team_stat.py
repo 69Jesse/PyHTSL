@@ -3,7 +3,7 @@ from ..checkable import Checkable
 from ..expression.housing_type import HousingType
 from ..public.team import Team
 
-from typing import final, Optional
+from typing import final
 
 
 __all__ = (
@@ -13,8 +13,8 @@ __all__ = (
 
 @final
 class TeamStat(Stat):
-    team: Optional[Team]
-    def __init__(self, name: str, team: Optional[Team | str] = None, /) -> None:
+    team: Team | None
+    def __init__(self, name: str, team: Team | str | None = None, /) -> None:
         super().__init__(name)
         self.team = team if isinstance(team, Team) else Team(team) if team is not None else None
 

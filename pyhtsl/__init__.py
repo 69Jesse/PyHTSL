@@ -108,3 +108,5 @@ from .public.no_type_casting import NoTypeCasting as NoTypeCasting
 
 from .writer import set_htsl_imports_folder as set_htsl_imports_folder
 from .export import export as export, disable_global_export as disable_global_export
+from .evaluator import Evaluator as Evaluator
+from .expression.operator import ExpressionOperator as ExpressionOperator

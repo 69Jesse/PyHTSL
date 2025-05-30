@@ -1,13 +1,14 @@
 from ..writer import WRITER, LineType
 
-from typing import TYPE_CHECKING, final, TypeAlias
+from typing import TYPE_CHECKING, final
 if TYPE_CHECKING:
     from ..stats.base_stat import BaseStat
     from ..stats.temporary_stat import TemporaryStat
     from ..checkable import Checkable
     from .housing_type import HousingType
     from ..editable import Editable
-    from .assignment_expression import Expression, ExpressionOperator
+    from .assignment_expression import Expression
+    from .operator import ExpressionOperator
 
 
 __all__ = (
@@ -17,7 +18,7 @@ __all__ = (
 
 
 TEMP_STATS_NUMBER_START: int = 1
-Lines: TypeAlias = list[tuple['Editable', 'ExpressionOperator', 'Checkable | HousingType']]
+type LinesType = list[tuple['Editable', 'ExpressionOperator', 'Checkable | HousingType']]
 
 
 class AutomaticUnset:
@@ -73,8 +74,8 @@ class ExpressionHandler:
     def is_empty(self) -> bool:
         return not self._expressions
 
-    def create_lines(self) -> Lines:
-        lines: Lines = []
+    def create_lines(self) -> LinesType:
+        lines: LinesType = []
         for expression in self._expressions:
             left = expression._all_the_way_left(expression.left)
             right = expression._all_the_way_left(expression.right)
@@ -83,7 +84,7 @@ class ExpressionHandler:
 
     def optimize_lines(
         self,
-        lines: Lines,
+        lines: LinesType,
     ) -> None:
         for i in range(len(lines) - 1):
             left, _, _ = lines[i]
@@ -210,7 +211,7 @@ class ExpressionHandler:
 
     def take_out_useless(
         self,
-        lines: Lines,
+        lines: LinesType,
     ) -> None:
         for i in range(len(lines) - 1, -1, -1):
             left, operator, right = lines[i]
@@ -244,7 +245,7 @@ class ExpressionHandler:
 
     def rename_temporary_stats(
         self,
-        lines: Lines,
+        lines: LinesType,
     ) -> None:
         temporary_stats: dict[int, list['TemporaryStat']] = {}
         for left, _, right in lines:
@@ -256,7 +257,7 @@ class ExpressionHandler:
 
     def write_lines(
         self,
-        lines: Lines,
+        lines: LinesType,
     ) -> None:
         for left, operator, right in lines:
             line = f'{left._in_assignment_left_side()} {operator.value} {Checkable._to_assignment_right_side(right)}'
@@ -276,6 +277,9 @@ class ExpressionHandler:
         self.rename_temporary_stats(lines)
         self.write_lines(lines)
         self._expressions.clear()
+        container = WRITER.get_container()
+        if container.lines_callback is not None:
+            container.lines_callback(lines)
 
 
 EXPR_HANDLER = ExpressionHandler()

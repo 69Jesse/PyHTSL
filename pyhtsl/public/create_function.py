@@ -8,7 +8,7 @@ from ..stats.team_stat import TeamStat
 
 import inspect
 
-from typing import Callable, ParamSpec, Optional
+from typing import Callable, ParamSpec
 
 
 __all__ = (
@@ -43,7 +43,7 @@ def rename(**names: str) -> Callable[[F], F]:
 def create_function(
     name: str,
     *,
-    create: Optional[bool] = None,
+    create: bool | None = None,
     run_right_now: bool = False,
 ) -> Callable[[F], Function]:
     def decorator(func: F) -> Function:
