@@ -2,38 +2,57 @@ from .writer import WRITER
 
 from .public.function import Function
 
-from typing import Sequence, Any
+from typing import Sequence, Any, Callable
 from types import ModuleType
 
 
-type Exportable = Function | Sequence[Function] | dict[str, Function | Any] | ModuleType
+type CallableNoArgs = Callable[[], None | Any]
+type Exportable = Function | CallableNoArgs | Sequence[Function | CallableNoArgs] | dict[str, Function | Any] | ModuleType
 
 
 def export(
     exportable: Exportable,
     name: str,
 ) -> None:
+    callables: list[CallableNoArgs] = []
     if isinstance(exportable, Function):
-        functions = [exportable]
+        if exportable.callback is None:
+            raise ValueError(f'Function {exportable} has no callback to export.')
+        callables.append(exportable.callback)
+    elif callable(exportable):
+        callables.append(exportable)
     elif isinstance(exportable, Sequence):
-        functions = list(exportable)
-        for func in functions:
-            if not isinstance(func, Function):
-                raise TypeError(f'Expected a Function, got {func.__class__.__name__}.')
+        for item in exportable:
+            if isinstance(item, Function):
+                if item.callback is None:
+                    raise ValueError(f'Function {item} has no callback to export.')
+                callables.append(item.callback)
+            elif callable(item):
+                callables.append(item)
+            else:
+                raise TypeError(f'Item {item} in sequence is not a Function or callable.')
     elif isinstance(exportable, dict):
-        functions = [v for v in exportable.values() if isinstance(v, Function)]
+        for key, value in exportable.items():
+            if isinstance(value, Function):
+                if value.callback is None:
+                    raise ValueError(f'Function {value} has no callback to export.')
+                callables.append(value.callback)
+            else:
+                raise TypeError(f'Value {value} for key {key} in dict is not a Function or callable.')
     else:
-        functions = []
         for attr in dir(exportable):
             value = getattr(exportable, attr)
             if isinstance(value, Function):
-                functions.append(value)
+                if value.callback is None:
+                    raise ValueError(f'Function {value} has no callback to export.')
+                callables.append(value.callback)
 
-    if not functions:
+    if not callables:
         raise ValueError(f'No functions to export. Double check {repr(exportable)} of type {exportable.__class__.__name__} is correct.')
 
     with WRITER.temporary_container_context(name=name) as container:
-        container.registered_functions.extend(functions)
+        for call in callables:
+            call()
         WRITER.run_export(container)
 
 
