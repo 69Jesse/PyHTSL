@@ -1,4 +1,7 @@
 from ..writer import WRITER, LineType
+from ..checkable import Checkable
+from ..expression.housing_type import HousingType
+from ._inside_line import _inside_line
 
 
 __all__ = (
@@ -7,9 +10,9 @@ __all__ = (
 
 
 def display_action_bar(
-    text: str,
+    text: Checkable | HousingType | None = None,
 ) -> None:
     WRITER.write(
-        f'actionBar "{text or '&r'}"',
+        f'actionBar "{_inside_line(text or '&r')}"',
         LineType.miscellaneous,
     )
