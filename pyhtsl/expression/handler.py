@@ -262,7 +262,7 @@ class ExpressionHandler:
         for left, operator, right in lines:
             line = f'{left._in_assignment_left_side()} {operator.value} {Checkable._to_assignment_right_side(right)}'
             if isinstance(left, BaseStat):
-                line += f' {str(left.unset).lower()}'
+                line += f' {str(left.auto_unset).lower()}'
             WRITER.write(
                 line,
                 LineType.variable_change,

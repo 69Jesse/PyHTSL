@@ -1,3 +1,4 @@
+from .writer import WRITER, LineType
 from .expression.handler import EXPR_HANDLER
 from .checkable import Checkable
 from .expression.housing_type import NumericHousingType, HousingType
@@ -61,6 +62,12 @@ class Editable(Checkable):
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
         return self
+
+    def unset(self) -> None:
+        WRITER.write(
+            f'{self._in_assignment_left_side()} unset', 
+            LineType.variable_change,
+        )
 
     def inc(self, other: Checkable | NumericHousingType) -> Self:
         return self.__iadd__(other)
