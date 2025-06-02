@@ -16,7 +16,7 @@ from .public.close_menu import close_menu as close_menu
 from .public.consume_item import consume_item as consume_item
 from .public.create_function import create_function as create_function, rename as rename
 from .public.damage_cause import DamageCause as DamageCause
-from .public.date_unix import DateUnix as DateUnix
+from .public.date_unix import DateUnix as DateUnix, DateUnixMS as DateUnixMS
 from .public.delete_items import delete_all_items_from_imports_folder as delete_all_items_from_imports_folder
 from .public.display_action_bar import display_action_bar as display_action_bar
 from .public.display_menu import display_menu as display_menu
@@ -107,3 +107,6 @@ from .public.display_htsl import display_htsl as display_htsl
 from .public.no_type_casting import NoTypeCasting as NoTypeCasting
 
 from .writer import set_htsl_imports_folder as set_htsl_imports_folder
+from .export import export as export, disable_global_export as disable_global_export
+from .evaluator import Evaluator as Evaluator
+from .expression.operator import ExpressionOperator as ExpressionOperator

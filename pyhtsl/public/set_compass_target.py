@@ -1,8 +1,6 @@
 from ..writer import WRITER, LineType
 from ..types import ALL_LOCATIONS
 
-from typing import Optional
-
 
 __all__ = (
     'set_compass_target',
@@ -11,7 +9,7 @@ __all__ = (
 
 # TODO proper overload
 def set_compass_target(
-    coordinates: Optional[tuple[float, float, float] | str] = None,
+    coordinates: tuple[float, float, float] | str | None = None,
     location: ALL_LOCATIONS = 'invokers_location',
 ) -> None:
     line = f'compassTarget "{location}"'

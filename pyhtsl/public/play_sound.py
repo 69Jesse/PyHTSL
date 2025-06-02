@@ -1,8 +1,6 @@
 from ..writer import WRITER, LineType
 from ..types import ALL_SOUNDS, ALL_SOUNDS_PRETTY_TO_RAW, ALL_LOCATIONS
 
-from typing import Optional
-
 
 __all__ = (
     'play_sound',
@@ -14,7 +12,7 @@ def play_sound(
     sound: ALL_SOUNDS,
     volume: float = 0.7,
     pitch: float = 1.0,
-    coordinates: Optional[tuple[float, float, float] | str] = None,
+    coordinates: tuple[float, float, float] | str | None = None,
     location: ALL_LOCATIONS = 'invokers_location',
 ) -> None:
     sound = ALL_SOUNDS_PRETTY_TO_RAW.get(sound, sound)  # pyright: ignore[reportAssignmentType]

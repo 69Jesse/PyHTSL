@@ -13,16 +13,30 @@ __all__ = (
 )
 
 
+class Number:
+    value: int
+    def __init__(self, value: int) -> None:
+        self.value = value
+
+
 @final
 class TemporaryStat(BaseStat):
-    number: int
+    _number: Number
     def __init__(
         self,
         internal_type: InternalType,
     ) -> None:
         super().__init__(None, set_name=False, unset=False)  # type: ignore
         self.internal_type = internal_type
-        self.number = id(self) + 1_000_000
+        self._number = Number(id(self) + 1_000_000)
+
+    @property
+    def number(self) -> int:
+        return self._number.value
+
+    @number.setter
+    def number(self, value: int) -> None:
+        self._number.value = value
 
     @property
     def name(self) -> str:
@@ -43,7 +57,7 @@ class TemporaryStat(BaseStat):
 
     def _copied(self) -> 'TemporaryStat':
         stat = TemporaryStat(self.internal_type)
-        stat.number = self.number
+        stat._number = self._number
         return stat
 
     def __repr__(self) -> str:

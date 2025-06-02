@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
 import re
 
-from .writer import LineType
+from .line_type import LineType
 
-from typing import Generator, Optional, final
+from typing import TYPE_CHECKING, Generator, final
+if TYPE_CHECKING:
+    from .writer import ExportContainer
 
 
 __all__ = (
@@ -14,34 +16,12 @@ __all__ = (
 GOTO_LINE_REGEX = re.compile(r'^goto (.+?) "(.+)"')
 
 
-class AntiSpamLogger:
-    messages: list[tuple[str, int]]
-    def __init__(self) -> None:
-        self.messages = []
-
-    def log(self, message: str) -> None:
-        if self.messages and self.messages[-1][0] == message:
-            self.messages[-1] = (message, self.messages[-1][1] + 1)
-        else:
-            self.messages.append((message, 1))
-
-    def publish(self) -> None:
-        content = '\n' * (len(self.messages) > 0)
-        for message, amount in self.messages:
-            content += '\n' + message + f' \x1b[38;2;255;0;0m(x{amount})\x1b[0m' * (amount > 1)
-        content += '\n' * (len(self.messages) > 0)
-        print(content)
-
-
-LOGGER = AntiSpamLogger()
-
-
 class Part:
-    name: Optional[str]
+    name: str | None
     lines: list[tuple[str, LineType]]
     def __init__(
         self,
-        name: Optional[str],
+        name: str | None,
         lines: list[tuple[str, LineType]],
     ) -> None:
         self.name = name
@@ -102,13 +82,17 @@ class Counter:
 class Addon(ABC):
     lines: list[tuple[str, LineType]]
     add_to_middle_index: int
+    container: 'ExportContainer'
     def __init__(
         self,
         lines: list[tuple[str, LineType]],
         add_to_middle_index: int,
+        *,
+        container: 'ExportContainer',
     ) -> None:
         self.lines = lines
         self.add_to_middle_index = add_to_middle_index
+        self.container = container
 
     @abstractmethod
     def add_to_middle(self, append_to: list[tuple[str, LineType]]) -> int:
@@ -125,9 +109,13 @@ class EmptyIfAddon(Addon):
         self,
         lines: list[tuple[str, LineType]],
         add_to_middle_index: int,
+        *,
+        container: 'ExportContainer',
     ) -> None:
-        super().__init__(lines, add_to_middle_index)
-        LOGGER.log('\x1b[38;2;0;255;0mNote:\x1b[0m Added a conditional to prevent too many stat changes.')
+        for i, (line, line_type) in enumerate(lines):
+            lines[i] = ('    ' + line, line_type)
+        super().__init__(lines, add_to_middle_index, container=container)
+        self.container.logger.log('\x1b[38;2;0;255;0mNote:\x1b[0m Added a conditional to prevent too many stat changes.')
 
     def add_to_middle(self, append_to: list[tuple[str, LineType]]) -> int:
         for line in reversed((
@@ -147,22 +135,24 @@ FILLER_COMMENT_SUFFIX: str = '  // PyHTSL filler'
 
 @final
 class NewFunctionAddon(Addon):
-    raw_function_name: Optional[str]
+    raw_function_name: str | None
     function_index: int
     def __init__(
         self,
         lines: list[tuple[str, LineType]],
         add_to_middle_index: int,
-        function_name: Optional[str],
+        function_name: str | None,
         function_index: int,
+        *,
+        container: 'ExportContainer',
     ) -> None:
-        super().__init__(lines, add_to_middle_index)
+        super().__init__(lines, add_to_middle_index, container=container)
         self.raw_function_name = function_name
         self.function_index = function_index
         if not self.has_unknown_name():
-            LOGGER.log(f'\x1b[38;2;0;255;0mNote:\x1b[0m Created a new function named "\x1b[38;2;255;0;0m{self.function_name()}\x1b[0m" to prevent too many stat changes.')
+            self.container.logger.log(f'\x1b[38;2;0;255;0mNote:\x1b[0m Created a new function named "\x1b[38;2;255;0;0m{self.function_name()}\x1b[0m" to prevent too many stat changes.')
         else:
-            LOGGER.log(
+            self.container.logger.log(
                 '\x1b[38;2;255;0;0mWarning:\x1b[0m You exceeded the conditional limit, and you are not in an explicit container.'
                 '\n         To prevent this, use the \x1b[38;2;255;0;0m@create_function()\x1b[0m decorator or the \x1b[38;2;255;0;0mgoto()\x1b[0m function.'
                 f'\n         I created the function with the name "\x1b[38;2;255;0;0m{self.function_name()}\x1b[0m" to prevent any issues.'
@@ -193,10 +183,12 @@ class NewFunctionAddon(Addon):
 
 
 class Fixer:
+    container: 'ExportContainer'
     lines: list[tuple[str, LineType]]
     new_functions_added: list[NewFunctionAddon]
-    def __init__(self, lines: list[tuple[str, LineType]]) -> None:
-        self.lines = lines
+    def __init__(self, container: 'ExportContainer') -> None:
+        self.container = container
+        self.lines = container.lines.copy()
         self.new_functions_added = []
 
     def fix(self) -> list[tuple[str, LineType]]:
@@ -244,11 +236,11 @@ class Fixer:
 
     def create_parts(
         self,
-        lines: Optional[list[tuple[str, LineType]]] = None,
+        lines: list[tuple[str, LineType]] | None = None,
     ) -> Generator[Part, None, None]:
         if lines is None:
             lines = self.lines
-        name: Optional[str] = None
+        name: str | None = None
         current_lines: list[tuple[str, LineType]] = []
         for line, line_type in lines:
             if line_type is LineType.goto:
@@ -321,7 +313,7 @@ class Fixer:
         self,
         lines: list[tuple[str, LineType]],
         *,
-        current_name: Optional[str],
+        current_name: str | None,
         function_index: int = 1,
     ) -> list[Addon]:
         counter: Counter = Counter()
@@ -357,7 +349,13 @@ class Fixer:
                             previous_section = lines
                         else:
                             function_index += 1
-                            addon = NewFunctionAddon(section, index if previous_section is lines else len(previous_section), current_name, function_index)
+                            addon = NewFunctionAddon(
+                                lines=section,
+                                add_to_middle_index=index if previous_section is lines else len(previous_section),
+                                function_name=current_name,
+                                function_index=function_index,
+                                container=self.container,
+                            )
                             addons.append(addon)
                             index_diff = addon.add_to_middle(previous_section)
                             if previous_section is lines:
@@ -376,6 +374,7 @@ class Fixer:
                 addon = EmptyIfAddon(
                     lines=self.create_and_remove_line_section_that_can_be_inside_if(lines, index - 1),
                     add_to_middle_index=index - 1,
+                    container=self.container,
                 )
                 addons.append(addon)
                 index += addon.add_to_middle(lines) - 2
@@ -389,6 +388,7 @@ class Fixer:
                     add_to_middle_index=index,
                     function_name=current_name,
                     function_index=function_index,
+                    container=self.container,
                 )
                 addons.append(addon)
                 index += addon.add_to_middle(lines)
@@ -396,7 +396,7 @@ class Fixer:
 
         return addons
 
-    def find_goto_line_child_index(self, parent_line: str, child_line: str) -> Optional[int]:
+    def find_goto_line_child_index(self, parent_line: str, child_line: str) -> int | None:
         prefix = parent_line.removesuffix('"') + ' '
         suffix = '"' + FILLER_COMMENT_SUFFIX
         if not child_line.startswith(prefix):

@@ -8,7 +8,7 @@ from enum import Enum
 import hashlib
 import difflib
 
-from typing import TypedDict, overload, Optional, Any, Callable
+from typing import TypedDict, overload, Any, Callable
 
 
 __all__ = (
@@ -70,11 +70,11 @@ class Item:
         self,
         key: NON_SPECIAL_ITEM_KEYS,
         *,
-        name: Optional[str] = None,
-        lore: Optional[str] = None,
+        name: str | None = None,
+        lore: str | None = None,
         count: int = 1,
-        enchantments: Optional[list[Enchantment]] = None,
-        interaction_data_key: Optional[str] = None,
+        enchantments: list[Enchantment] | None = None,
+        interaction_data_key: str | None = None,
         hide_all_flags: bool = False,
         hide_enchantments_flag: bool = False,
         hide_modifiers_flag: bool = False,
@@ -87,11 +87,11 @@ class Item:
         self,
         key: DAMAGEABLE_ITEM_KEYS,
         *,
-        name: Optional[str] = None,
-        lore: Optional[str] = None,
+        name: str | None = None,
+        lore: str | None = None,
         count: int = 1,
-        enchantments: Optional[list[Enchantment]] = None,
-        interaction_data_key: Optional[str] = None,
+        enchantments: list[Enchantment] | None = None,
+        interaction_data_key: str | None = None,
         unbreakable: bool = False,
         damage: int = 0,
         hide_all_flags: bool = False,
@@ -107,14 +107,14 @@ class Item:
         self,
         key: LEATHER_ARMOR_KEYS,
         *,
-        name: Optional[str] = None,
-        lore: Optional[str] = None,
+        name: str | None = None,
+        lore: str | None = None,
         count: int = 1,
-        enchantments: Optional[list[Enchantment]] = None,
-        interaction_data_key: Optional[str] = None,
+        enchantments: list[Enchantment] | None = None,
+        interaction_data_key: str | None = None,
         unbreakable: bool = False,
         damage: int = 0,
-        color: Optional[int | str | tuple[int, int, int]] = None,
+        color: int | str | tuple[int, int, int] | None = None,
         hide_all_flags: bool = False,
         hide_enchantments_flag: bool = False,
         hide_modifiers_flag: bool = False,
@@ -129,11 +129,11 @@ class Item:
         self,
         key: COOKIE_ITEM_KEY,
         *,
-        name: Optional[str] = None,
-        lore: Optional[str] = None,
+        name: str | None = None,
+        lore: str | None = None,
         count: int = 1,
-        enchantments: Optional[list[Enchantment]] = None,
-        interaction_data_key: Optional[str] = None,
+        enchantments: list[Enchantment] | None = None,
+        interaction_data_key: str | None = None,
         hide_all_flags: bool = False,
         hide_enchantments_flag: bool = False,
         hide_modifiers_flag: bool = False,
@@ -147,11 +147,11 @@ class Item:
         self,
         key: ALL_ITEM_KEYS,
         *,
-        name: Optional[str] = None,
-        lore: Optional[str] = None,
+        name: str | None = None,
+        lore: str | None = None,
         count: int = 1,
-        enchantments: Optional[list[Enchantment]] = None,
-        interaction_data_key: Optional[str] = None,
+        enchantments: list[Enchantment] | None = None,
+        interaction_data_key: str | None = None,
         hide_all_flags: bool = False,
         hide_enchantments_flag: bool = False,
         hide_modifiers_flag: bool = False,
@@ -216,7 +216,7 @@ class Item:
             data['Damage'] = (extras_copy.pop('damage', 0), DataType.short)
         tags = data['tag']
 
-        enchantments: Optional[list[Enchantment]] = extras_copy.pop('enchantments', None)
+        enchantments: list[Enchantment] | None = extras_copy.pop('enchantments', None)
         if enchantments is not None:
             tags['ench'] = ([{
                 'lvl': enchantment.level or 1,
@@ -235,19 +235,19 @@ class Item:
         if hide_flags:
             tags['HideFlags'] = (hide_flags, DataType.integer)
 
-        lore: Optional[str] = extras_copy.pop('lore', None)
+        lore: str | None = extras_copy.pop('lore', None)
         if lore is not None:
             lore = self.replace_placeholders(lore)
             display = tags.setdefault('display', {})
             display['Lore'] = (lore.split('\n'), DataType.string)
 
-        name: Optional[str] = extras_copy.pop('name', None)
+        name: str | None = extras_copy.pop('name', None)
         if name is not None:
             name = self.replace_placeholders(name)
             display = tags.setdefault('display', {})
             display['Name'] = (name, DataType.string)
 
-        color: Optional[int | str | tuple[int, int, int]] = extras_copy.pop('color', None)
+        color: int | str | tuple[int, int, int] | None = extras_copy.pop('color', None)
         if color is not None:
             if not isinstance(color, (int, str, tuple)):
                 raise ValueError(f'Invalid color type: {type(color)}')
@@ -260,7 +260,7 @@ class Item:
 
         extra_attributes = {}
 
-        interaction_data_key: Optional[str] = extras_copy.pop('interaction_data_key', None)
+        interaction_data_key: str | None = extras_copy.pop('interaction_data_key', None)
         if interaction_data_key is not None:
             extra_attributes['interact_data'] = {
                 'data': (interaction_data_key, DataType.string),
@@ -298,8 +298,13 @@ class Item:
         item = self.key_check()
         line = self.fetch_line(item)
         cached = SAVED_CACHE.get(line, None)
+
+        title = f'\033[38;2;0;255;0m{item['title']}\033[0m'
+        if self.count != 1:
+            title = f'\033[38;2;0;191;255m{self.count}x\033[0m ' + title
+
         if cached is not None:
-            print(f'Using cached \033[38;2;0;255;0m{item["title"]}\033[0m as \x1b[38;2;255;0;0m{cached}\x1b[0m.')
+            print(f'Using cached {title} as \x1b[38;2;255;0;0m{cached}\x1b[0m.')
             return cached
         suffix = hashlib.md5(line.encode()).hexdigest()[:8]
         name = f'_{self._key}_{suffix}'
@@ -308,7 +313,7 @@ class Item:
             file.write(line)
         SAVED_CACHE[line] = name
         print(
-            f'Successfully saved \033[38;2;0;255;0m{item["title"]}\033[0m as \x1b[38;2;255;0;0m{name}\x1b[0m to be used in your script:'
+            f'Successfully saved {title} as \x1b[38;2;255;0;0m{name}\x1b[0m to be used in your script:'
             f'\n  \033[38;2;0;255;0m+\033[0m {path.absolute()}'
         )
         return name
@@ -325,21 +330,21 @@ class Item:
         self.key_check()
 
     @property
-    def name(self) -> Optional[str]:
+    def name(self) -> str | None:
         return self.extras.get('name', None)
 
     @name.setter
-    def name(self, value: Optional[str]) -> None:
+    def name(self, value: str | None) -> None:
         if value is not None and not isinstance(value, str):
             raise TypeError(f'Expected str, got {type(value).__name__}')
         self.extras['name'] = value
 
     @property
-    def lore(self) -> Optional[str]:
+    def lore(self) -> str | None:
         return self.extras.get('lore', None)
 
     @lore.setter
-    def lore(self, value: Optional[str]) -> None:
+    def lore(self, value: str | None) -> None:
         if value is not None and not isinstance(value, str):
             raise TypeError(f'Expected str, got {type(value).__name__}')
         self.extras['lore'] = value
@@ -355,11 +360,11 @@ class Item:
         self.extras['count'] = value
 
     @property
-    def enchantments(self) -> Optional[list[Enchantment]]:
+    def enchantments(self) -> list[Enchantment] | None:
         return self.extras.get('enchantments', None)
 
     @enchantments.setter
-    def enchantments(self, value: Optional[list[Enchantment]]) -> None:
+    def enchantments(self, value: list[Enchantment] | None) -> None:
         if value is not None and not isinstance(value, list):
             raise TypeError(f'Expected list, got {type(value).__name__}')
         self.extras['enchantments'] = value

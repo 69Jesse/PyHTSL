@@ -188,7 +188,6 @@ class Checkable(ABC):
             return other
 
         if isinstance(other, BaseStat) and not other.should_force_type_compatible:
-            print('yaaaaaaaaaaa', repr(other))
             return other
 
         if isinstance(other, Checkable):

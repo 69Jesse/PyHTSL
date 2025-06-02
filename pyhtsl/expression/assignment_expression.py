@@ -3,28 +3,16 @@ import os
 from ..checkable import Checkable
 from ..editable import Editable
 from .housing_type import HousingType
-from enum import Enum
 from .handler import ExpressionHandler, EXPR_HANDLER
 from ..internal_type import InternalType
+from .operator import ExpressionOperator
 
-from typing import Optional, final, overload
+from typing import final, overload
 
 
 __all__ = (
-    'ExpressionOperator',
     'Expression',
 )
-
-
-class ExpressionOperator(Enum):
-    Increment = '+='
-    Decrement = '-='
-    Set = '='
-    Multiply = '*='
-    Divide = '/='
-
-    def __repr__(self) -> str:
-        return self.value
 
 
 @final
@@ -38,7 +26,7 @@ class Expression(Checkable):
         left: Editable,
         right: Checkable | HousingType,
         operator: ExpressionOperator,
-        id: Optional[str] = None,
+        id: str | None = None,
     ) -> None:
         self.left = left
         self.right = right

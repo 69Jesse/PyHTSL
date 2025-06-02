@@ -1,6 +1,6 @@
 from ..stats.stat_parameter import StatParameter
 
-from typing import Optional
+from typing import Callable
 
 
 __all__ = (
@@ -11,13 +11,17 @@ __all__ = (
 class Function:
     name: str
     parameters: list[StatParameter]
+    callback: Callable[[], None] | None = None
     def __init__(
         self,
         name: str,
-        parameters: Optional[list[StatParameter]] = None,
+        parameters: list[StatParameter] | None = None,
+        *,
+        callback: Callable[[], None] | None = None,
     ) -> None:
         self.name = name
         self.parameters = parameters or []
+        self.callback = callback
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Function):

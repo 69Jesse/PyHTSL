@@ -3,10 +3,10 @@ PyHTSL is a Python wrapper for [HTSL](https://github.com/BusterBrown1218/HTSL) c
 
 ## Prerequisites
 - [ChatTriggers](https://www.chattriggers.com/) and [HTSL](https://github.com/BusterBrown1218/HTSL)
-- [Python](https://www.python.org/) 3.12 (most likely works with lower versions, but havent tested, will soon.)
+- [Python](https://www.python.org/) 3.12 or newer
 
 ## Installation
-To install PyHTSL, run the following command:
+To install PyHTSL, make sure Git is available in your system's PATH, then run the following command:
 ```bash
 pip install "git+https://github.com/69Jesse/PyHTSL.git" --upgrade
 ```

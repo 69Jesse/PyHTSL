@@ -8,7 +8,7 @@ from ..stats.team_stat import TeamStat
 
 import inspect
 
-from typing import Callable, ParamSpec, Optional
+from typing import Callable, ParamSpec
 
 
 __all__ = (
@@ -43,7 +43,7 @@ def rename(**names: str) -> Callable[[F], F]:
 def create_function(
     name: str,
     *,
-    create: Optional[bool] = None,
+    create: bool | None = None,
     run_right_now: bool = False,
 ) -> Callable[[F], Function]:
     def decorator(func: F) -> Function:
@@ -59,16 +59,18 @@ def create_function(
             param = StatParameter(name=renamed_parameters.get(param_name, param_name), cls=annotation)
             parameters.append(param)
 
-        def wrapper() -> None:
+        def callback() -> None:
             goto(container='function', name=name, add_to_front=True)  # type: ignore
-            if create if create is not None else (func.__module__ == '__main__'):
+            force = not WRITER.get_container().is_global
+            if force or (create if create is not None else (func.__module__ == '__main__')):
                 goto(container='function', name=name)
                 func(*(param.cls(name=param.name) for param in parameters))  # type: ignore
 
+        function = Function(name=name, parameters=parameters, callback=callback)
         if run_right_now:
-            wrapper()
+            callback()
         else:
-            WRITER.registered_functions.append(wrapper)
+            WRITER.get_container().registered_functions.append(function)
+        return function
 
-        return Function(name=name, parameters=parameters)
     return decorator

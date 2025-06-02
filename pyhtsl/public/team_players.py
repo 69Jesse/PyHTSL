@@ -1,8 +1,6 @@
 from ..placeholders import PlaceholderCheckable
 from .team import Team
 
-from typing import Optional
-
 
 __all__ = (
     'TeamPlayers',
@@ -10,7 +8,7 @@ __all__ = (
 
 
 def TeamPlayers(
-    team: Optional[Team | str],
+    team: Team | str | None,
 ) -> PlaceholderCheckable:
     if team is None:
         key = '%player.team.players%'

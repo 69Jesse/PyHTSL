@@ -3,7 +3,7 @@ from ..expression.handler import EXPR_HANDLER
 
 from enum import Enum
 
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from types import TracebackType
 if TYPE_CHECKING:
     from .base_condition import BaseCondition
@@ -42,9 +42,9 @@ class IfStatement:
 
     def __exit__(
         self,
-        exc_type: Optional[type[BaseException]],
-        exc_value: Optional[BaseException],
-        traceback: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
     ) -> None:
         WRITER.end_indent()
         WRITER.write(
@@ -66,9 +66,9 @@ class ElseStatement:
 
     def __exit__(
         self,
-        exc_type: Optional[type[BaseException]],
-        exc_value: Optional[BaseException],
-        traceback: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
     ) -> None:
         WRITER.end_indent()
         WRITER.write(

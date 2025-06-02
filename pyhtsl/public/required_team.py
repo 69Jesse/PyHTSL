@@ -1,7 +1,7 @@
 from ..condition.base_condition import BaseCondition
 from .team import Team
 
-from typing import Optional, final
+from typing import final
 
 
 __all__ = (
@@ -11,10 +11,10 @@ __all__ = (
 
 @final
 class RequiredTeam(BaseCondition):
-    team: Optional[Team]
+    team: Team | None
     def __init__(
         self,
-        team: Optional[Team | str],
+        team: Team | str | None,
     ) -> None:
         self.team = team if not isinstance(team, str) else Team(team)
 
