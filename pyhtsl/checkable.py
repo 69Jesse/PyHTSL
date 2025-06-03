@@ -299,6 +299,11 @@ class Checkable(ABC):
                 value = 0.0
             elif self.internal_type is InternalType.STRING:
                 value = ''
+
+        # HTSL doesnt let me escape quotes and I think this works since it defaults to empty string if its unset :D
+        if isinstance(value, str):
+            return value or None
+
         return _housing_type_as_right_side(value) if value is not None else None
 
     def __add__(self, other: 'Checkable | NumericHousingType') -> 'Expression':

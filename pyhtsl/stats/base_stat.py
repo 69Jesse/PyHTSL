@@ -64,11 +64,7 @@ class BaseStat(Editable):
         return f'{self._left_side_keyword()} {self.name}'
 
     def _in_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
-        name = f'%var.{self._right_side_keyword()}/{self.name}'
-        fallback_value = self._get_formatted_fallback_value()
-        if fallback_value is not None:
-            name += f' {fallback_value}'
-        name += '%'
+        name = self._as_string()
         return self._formatted_with_internal_type(name, include_internal_type=include_internal_type)
 
     def _in_comparison_left_side(self) -> str:
@@ -78,7 +74,12 @@ class BaseStat(Editable):
         return self._in_assignment_right_side()
 
     def _as_string(self) -> str:
-        return f'%var.{self._right_side_keyword()}/{self.name}%'
+        name = f'%var.{self._right_side_keyword()}/{self.name}'
+        fallback_value = self._get_formatted_fallback_value()
+        if fallback_value is not None:
+            name += f' {fallback_value}'
+        name += '%'
+        return name
 
     def with_automatic_unset(self) -> Self:
         """
