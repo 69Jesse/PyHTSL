@@ -105,6 +105,7 @@ from .public.launch_to_target import launch_to_target as launch_to_target
 from .public.drop_item import drop_item as drop_item
 from .public.display_htsl import display_htsl as display_htsl
 from .public.no_type_casting import NoTypeCasting as NoTypeCasting
+from .public.no_optimization import NoOptimization as NoOptimization
 
 from .writer import set_htsl_imports_folder as set_htsl_imports_folder
 from .export import export as export, disable_global_export as disable_global_export

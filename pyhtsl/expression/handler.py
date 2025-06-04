@@ -1,5 +1,7 @@
 from ..writer import WRITER, LineType
 
+from ..public.no_optimization import no_optimization
+
 from typing import TYPE_CHECKING, final
 if TYPE_CHECKING:
     from ..stats.base_stat import BaseStat
@@ -272,8 +274,9 @@ class ExpressionHandler:
         if self.is_empty():
             return
         lines = self.create_lines()
-        self.optimize_lines(lines)
-        self.take_out_useless(lines)
+        if not no_optimization():
+            self.optimize_lines(lines)
+            self.take_out_useless(lines)
         self.rename_temporary_stats(lines)
         self.write_lines(lines)
         self._expressions.clear()
