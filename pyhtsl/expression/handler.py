@@ -257,6 +257,14 @@ class ExpressionHandler:
             for stat in stats:
                 stat.number = i
 
+    def validate_lines(
+        self,
+        lines: LinesType,
+    ) -> None:
+        for left, operator, right in lines:
+            if isinstance(right, str) and len(right) > 32:
+                raise ValueError(f'Assignment of string "{right}" is too long ({len(right)}>32)')
+
     def write_lines(
         self,
         lines: LinesType,
@@ -278,6 +286,7 @@ class ExpressionHandler:
             self.optimize_lines(lines)
             self.take_out_useless(lines)
         self.rename_temporary_stats(lines)
+        self.validate_lines(lines)
         self.write_lines(lines)
         self._expressions.clear()
         container = WRITER.get_container()
