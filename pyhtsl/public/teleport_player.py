@@ -1,3 +1,4 @@
+from ._inside_line import _inside_line
 from ..checkable import Checkable
 from ..expression.housing_type import HousingType
 from ..writer import WRITER, LineType
@@ -30,7 +31,7 @@ def teleport_player(
         if coordinates is None:
             raise ValueError('coordinates must be provided when location is custom_coordinates')
         if isinstance(coordinates, tuple):
-            coordinates = ' '.join(map(str, coordinates))
+            coordinates = ' '.join(map(_inside_line, coordinates))
         line += f' "{coordinates}"'
     else:
         line += ' "~ ~ ~"'
