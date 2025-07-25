@@ -1,5 +1,5 @@
-from checkable import Checkable
-from expression.housing_type import HousingType
+from ..checkable import Checkable
+from ..expression.housing_type import HousingType
 from ..writer import WRITER, LineType
 from ..types import ALL_LOCATIONS
 
