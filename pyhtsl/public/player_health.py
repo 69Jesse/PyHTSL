@@ -7,7 +7,7 @@ __all__ = (
 
 
 PlayerHealth = PlaceholderEditable(
-    assignment_left_side='health',
+    assignment_left_side='changeHealth',
     assignment_right_side='%player.health%',
     comparison_left_side='placeholder "%player.health%"',
     comparison_right_side='%player.health%',
