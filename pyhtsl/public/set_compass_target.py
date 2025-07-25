@@ -1,3 +1,5 @@
+from checkable import Checkable
+from expression.housing_type import HousingType
 from ..writer import WRITER, LineType
 from ..types import ALL_LOCATIONS
 
@@ -9,8 +11,12 @@ __all__ = (
 
 # TODO proper overload
 def set_compass_target(
-    coordinates: tuple[float, float, float] | str | None = None,
-    location: ALL_LOCATIONS = 'invokers_location',
+    coordinates: tuple[
+        Checkable | HousingType,
+        Checkable | HousingType,
+        Checkable | HousingType,
+    ] | str | None = None,
+    location: ALL_LOCATIONS = 'custom_coordinates',
 ) -> None:
     line = f'compassTarget "{location}"'
     if location == 'custom_coordinates':

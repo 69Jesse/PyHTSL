@@ -1,3 +1,5 @@
+from checkable import Checkable
+from expression.housing_type import HousingType
 from ..writer import WRITER, LineType
 from ..types import ALL_LOCATIONS
 from .item import Item
@@ -12,13 +14,17 @@ __all__ = (
 
 def drop_item(
     item: Item | str,
-    coordinates: Optional[
-        tuple[float, float, float]  # (x, y, z)
-        | tuple[str, str, str]  # (~x, ~y, ~z)
-        | tuple[float, float, float, float, float]  # (x, y, z, yaw, pitch)
-        | tuple[str, str, str, float, float]  # (~x, ~y, ~z, yaw, pitch)
-        | str  # custom string
-    ],
+    coordinates: tuple[
+        Checkable | HousingType,
+        Checkable | HousingType,
+        Checkable | HousingType,
+    ] | tuple[
+        Checkable | HousingType,
+        Checkable | HousingType,
+        Checkable | HousingType,
+        Checkable | HousingType,
+        Checkable | HousingType,
+    ] | str | None,
     location: ALL_LOCATIONS = 'custom_coordinates',
     drop_naturally: bool = False,
     disable_item_merging: bool = False,
