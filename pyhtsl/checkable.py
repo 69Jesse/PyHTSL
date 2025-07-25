@@ -125,7 +125,7 @@ class Checkable(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def _as_string(self) -> str:
+    def _as_string(self, include_fallback_value: bool = True) -> str:
         """
         chat "hello %player.name%"
                     ^^^^^^^^^^^^^

@@ -74,13 +74,13 @@ class Expression(Checkable):
     def _in_comparison_right_side(self) -> str:
         return self._in_assignment_right_side()
 
-    def _as_string(self) -> str:
+    def _as_string(self, include_fallback_value: bool = True) -> str:
         """Pushing here so we can do something like
         foo = PlayerStat('foo')
         chat(f'Hello World! {foo + 1}')
         """
         EXPR_HANDLER.push()
-        return self._all_the_way_left(self)._as_string()
+        return self._all_the_way_left(self)._as_string(include_fallback_value=include_fallback_value)
 
     def _equals(self, other: Checkable | HousingType) -> bool:
         if not isinstance(other, Expression):

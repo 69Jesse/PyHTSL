@@ -42,7 +42,7 @@ class PlaceholderCheckable(Editable):
     def _in_comparison_right_side(self) -> str:
         return self._formatted_with_internal_type(self.comparison_right_side, include_internal_type=True)
 
-    def _as_string(self) -> str:
+    def _as_string(self, include_fallback_value: bool = True) -> str:
         return self.inside_of_string
 
     def _equals(self, other: Checkable | HousingType) -> bool:
@@ -94,7 +94,7 @@ class PlaceholderEditable(Editable):
     def _in_comparison_right_side(self) -> str:
         return self._formatted_with_internal_type(self.comparison_right_side, include_internal_type=True)
 
-    def _as_string(self) -> str:
+    def _as_string(self, include_fallback_value: bool = True) -> str:
         return self.inside_of_string
 
     def _equals(self, other: Checkable | HousingType) -> bool:
