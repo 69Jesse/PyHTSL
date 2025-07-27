@@ -26,6 +26,19 @@ class TeamStat(Stat):
     def _right_side_keyword() -> str:
         return 'team'
 
+    def _in_assignment_left_side(self) -> str:
+        value = super()._in_assignment_left_side()
+        if self.team is not None:
+            return f'{value} "{self.team.name}"'
+        return value
+
+    def _as_string_second(self, include_fallback_value: bool = True) -> str:
+        value = super()._as_string_second(include_fallback_value=include_fallback_value)
+        if self.team is not None or value:
+            name = self.team.name if isinstance(self.team, Team) else 'None'
+            return f' "{name}"{value}'
+        return value
+
     def _equals(self, other: Checkable | HousingType) -> bool:
         if isinstance(other, TeamStat):
             return self.name == other.name and self.team == other.team

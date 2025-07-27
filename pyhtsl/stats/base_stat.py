@@ -61,7 +61,7 @@ class BaseStat(Editable):
         raise NotImplementedError
 
     def _in_assignment_left_side(self) -> str:
-        return f'{self._left_side_keyword()} {self.name}'
+        return f'{self._left_side_keyword()} "{self.name}"'
 
     def _in_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
         name = self._as_string()
@@ -73,14 +73,26 @@ class BaseStat(Editable):
     def _in_comparison_right_side(self) -> str:
         return self._in_assignment_right_side()
 
+    def _as_string_first(self) -> str:
+        return f'%var.{self._right_side_keyword()}/{self.name}'
+
+    def _as_string_second(self, include_fallback_value: bool = True) -> str:
+        if not include_fallback_value:
+            return ''
+        fallback_value = self._get_formatted_fallback_value()
+        if fallback_value is None:
+            return ''
+        return f' {fallback_value}'
+
+    def _as_string_third(self) -> str:
+        return '%'
+
     def _as_string(self, include_fallback_value: bool = True) -> str:
-        name = f'%var.{self._right_side_keyword()}/{self.name}'
-        if include_fallback_value:
-            fallback_value = self._get_formatted_fallback_value()
-            if fallback_value is not None:
-                name += f' {fallback_value}'
-        name += '%'
-        return name
+        return (
+            self._as_string_first()
+            + self._as_string_second(include_fallback_value=include_fallback_value)
+            + self._as_string_third()
+        )
 
     def with_automatic_unset(self) -> Self:
         """
