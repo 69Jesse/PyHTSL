@@ -63,11 +63,11 @@ from .public.player_gamemode import PlayerGamemode as PlayerGamemode
 from .public.player_health import PlayerHealth as PlayerHealth
 from .public.player_hunger import PlayerHunger as PlayerHunger
 from .public.player_level import PlayerLevel as PlayerLevel
-from .public.player_location_pitch import PlayerLocationPitch as PlayerLocationPitch
-from .public.player_location_x import PlayerLocationX as PlayerLocationX
-from .public.player_location_y import PlayerLocationY as PlayerLocationY
-from .public.player_location_yaw import PlayerLocationYaw as PlayerLocationYaw
-from .public.player_location_z import PlayerLocationZ as PlayerLocationZ
+from .public.player_position_pitch import PlayerPositionPitch as PlayerPositionPitch
+from .public.player_block_x import PlayerBlockX as PlayerBlockX
+from .public.player_block_y import PlayerBlockY as PlayerBlockY
+from .public.player_position_yaw import PlayerPositionYaw as PlayerPositionYaw
+from .public.player_block_z import PlayerBlockZ as PlayerBlockZ
 from .public.player_position_x import PlayerPositionX as PlayerPositionX
 from .public.player_position_y import PlayerPositionY as PlayerPositionY
 from .public.player_position_z import PlayerPositionZ as PlayerPositionZ
