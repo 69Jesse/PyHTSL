@@ -36,7 +36,9 @@ class TeamStat(Stat):
         value = super()._as_string_second(include_fallback_value=include_fallback_value)
         if self.team is not None or value:
             name = self.team.name if isinstance(self.team, Team) else 'None'
-            return f' {name}"{value}'  # no quotes because htsl will break :( i need htsw
+            if ' ' in name:
+                name = f'"{name}"'  # this will break htsl :( waiting on htsw :D
+            return f' {name}{value}'
         return value
 
     def _equals(self, other: Checkable | HousingType) -> bool:
