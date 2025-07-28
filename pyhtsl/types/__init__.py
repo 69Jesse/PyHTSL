@@ -325,7 +325,7 @@ NON_SPECIAL_ITEM_KEYS = Literal[
     'guardian_spawn_egg', 'pig_spawn_egg', 'sheep_spawn_egg', 'cow_spawn_egg', 'chicken_spawn_egg', 'squid_spawn_egg', 'wolf_spawn_egg', 'mooshroom_spawn_egg',
     'ocelot_spawn_egg', 'horse_spawn_egg', 'rabbit_spawn_egg', 'villager_spawn_egg', 'bottle_o_enchanting', 'fire_charge', 'book_and_quill', 'written_book',
     'emerald', 'item_frame', 'flower_pot', 'carrot', 'potato', 'baked_potato', 'poisonous_potato', 'map',
-    'golden_carrot', 'skeleton_skull', 'wither_skeleton_skull', 'zombie_head', 'player_head', 'creeper_head', 'nether_star', 'pumpkin_pie',
+    'golden_carrot', 'skeleton_skull', 'wither_skeleton_skull', 'zombie_head', 'creeper_head', 'nether_star', 'pumpkin_pie',
     'firework_rocket', 'firework_star', 'enchanted_book', 'redstone_comparator', 'nether_brick', 'nether_quartz', 'minecart_with_tnt', 'minecart_with_hopper',
     'prismarine_shard', 'prismarine_crystals', 'raw_rabbit', 'cooked_rabbit', 'rabbit_stew', 'rabbits_foot', 'rabbit_hide', 'armor_stand',
     'iron_horse_armor', 'gold_horse_armor', 'diamond_horse_armor', 'lead', 'name_tag', 'minecart_with_command_block', 'raw_mutton', 'cooked_mutton',
@@ -355,7 +355,10 @@ LEATHER_ARMOR_KEYS = Literal[
 COOKIE_ITEM_KEY = Literal['cookie']
 
 
-ALL_ITEM_KEYS = NON_SPECIAL_ITEM_KEYS | DAMAGEABLE_ITEM_KEYS | LEATHER_ARMOR_KEYS | COOKIE_ITEM_KEY
+PLAYER_SKULL_ITEM_KEY = Literal['player_head']
+
+
+ALL_ITEM_KEYS = NON_SPECIAL_ITEM_KEYS | DAMAGEABLE_ITEM_KEYS | LEATHER_ARMOR_KEYS | COOKIE_ITEM_KEY | PLAYER_SKULL_ITEM_KEY
 
 
 ALL_LOCATIONS = Literal[

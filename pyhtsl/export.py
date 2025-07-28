@@ -32,13 +32,11 @@ def export(
             else:
                 raise TypeError(f'Item {item} in sequence is not a Function or callable.')
     elif isinstance(exportable, dict):
-        for key, value in exportable.items():
+        for value in exportable.values():
             if isinstance(value, Function):
                 if value.callback is None:
                     raise ValueError(f'Function {value} has no callback to export.')
                 callables.append(value.callback)
-            else:
-                raise TypeError(f'Value {value} for key {key} in dict is not a Function or callable.')
     else:
         for attr in dir(exportable):
             value = getattr(exportable, attr)

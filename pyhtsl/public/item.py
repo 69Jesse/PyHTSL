@@ -4,6 +4,7 @@ from ..types import (
     DAMAGEABLE_ITEM_KEYS,
     LEATHER_ARMOR_KEYS,
     COOKIE_ITEM_KEY,
+    PLAYER_SKULL_ITEM_KEY,
     ALL_ITEM_KEYS,
     ENCHANTMENT_TO_ID,
 )
@@ -18,7 +19,9 @@ import difflib
 from typing import TypedDict, overload, Any
 
 
-__all__ = ('Item',)
+__all__ = (
+    'Item',
+)
 
 
 class ItemJsonData(TypedDict):
@@ -134,6 +137,23 @@ class Item:
     @overload
     def __init__(
         self,
+        key: PLAYER_SKULL_ITEM_KEY,
+        *,
+        name: str | None = None,
+        lore: str | None = None,
+        count: int = 1,
+        enchantments: list[Enchantment] | None = None,
+        interaction_data_key: str | None = None,
+        hide_all_flags: bool = False,
+        hide_enchantments_flag: bool = False,
+        hide_modifiers_flag: bool = False,
+        hide_additional_flag: bool = False,
+        skull_data: NBTCompound | None = None,
+    ) -> None: ...
+
+    @overload
+    def __init__(
+        self,
         key: ALL_ITEM_KEYS,
         *,
         name: str | None = None,
@@ -240,6 +260,10 @@ class Item:
             elif isinstance(color, tuple):
                 color = color[0] << 16 | color[1] << 8 | color[2]
             display.put('color', NBTInt(color))
+
+        skull_data: NBTCompound | None = extras_copy.pop('skull_data', None)
+        if skull_data is not None:
+            tags.put('SkullOwner', skull_data)
 
         if not display.is_empty():
             tags.put('display', display)
