@@ -2287,7 +2287,7 @@ def read_skull_data() -> SkullData:
                     NBTList(
                         [
                             NBTCompound()
-                            .put('Signature', NBTString('I love PyHTSL!'))
+                            .put('Signature', NBTString('I love https://github.com/69Jesse'))
                             .put('Value', NBTString(sub_value['texture']))
                         ]
                     ),
