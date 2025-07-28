@@ -1,19 +1,24 @@
 from ..writer import HERE, HTSL_IMPORTS_FOLDER
-from ..types import NON_SPECIAL_ITEM_KEYS, DAMAGEABLE_ITEM_KEYS, LEATHER_ARMOR_KEYS, COOKIE_ITEM_KEY, ALL_ITEM_KEYS, ENCHANTMENT_TO_ID
+from ..types import (
+    NON_SPECIAL_ITEM_KEYS,
+    DAMAGEABLE_ITEM_KEYS,
+    LEATHER_ARMOR_KEYS,
+    COOKIE_ITEM_KEY,
+    ALL_ITEM_KEYS,
+    ENCHANTMENT_TO_ID,
+)
 from .enchantment import Enchantment
+from ..nbt import NBTByte, NBTCompound, NBTInt, NBTList, NBTShort, NBTString
 
 import json
 import re
-from enum import Enum
 import hashlib
 import difflib
 
-from typing import TypedDict, overload, Any, Callable
+from typing import TypedDict, overload, Any
 
 
-__all__ = (
-    'Item',
-)
+__all__ = ('Item',)
 
 
 class ItemJsonData(TypedDict):
@@ -42,20 +47,8 @@ HIDE_FLAGS: dict[str, int] = {
 HIDE_FLAGS['hide_all_flags'] = max(HIDE_FLAGS.values()) * 2 - 1
 
 
-class DataTypeCallback:
-    callback: Callable[[Any], str]
-    def __init__(self, callback: Callable[[Any], str]) -> None:
-        self.callback = callback
-
-    def __call__(self, value: Any) -> str:
-        return self.callback(value)
-
-
-class DataType(Enum):
-    byte = DataTypeCallback(lambda x: f'{x}b')
-    short = DataTypeCallback(lambda x: f'{x}s')
-    integer = DataTypeCallback(lambda x: f'{x}')
-    string = DataTypeCallback(lambda x: '\\"' + x.replace('"', '\\"') + '\\"')
+def replace_placeholders(text: str) -> str:
+    return re.sub(r'&([0-9a-fk-or])', r'§\1', text)
 
 
 SAVED_CACHE: dict[str, str] = {}
@@ -79,8 +72,7 @@ class Item:
         hide_enchantments_flag: bool = False,
         hide_modifiers_flag: bool = False,
         hide_additional_flag: bool = False,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -99,8 +91,7 @@ class Item:
         hide_modifiers_flag: bool = False,
         hide_unbreakable_flag: bool = False,
         hide_additional_flag: bool = False,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -121,8 +112,7 @@ class Item:
         hide_unbreakable_flag: bool = False,
         hide_additional_flag: bool = False,
         hide_dye_flag: bool = False,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -139,8 +129,7 @@ class Item:
         hide_modifiers_flag: bool = False,
         hide_additional_flag: bool = False,
         is_cookie_item: bool = False,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -157,8 +146,7 @@ class Item:
         hide_modifiers_flag: bool = False,
         hide_additional_flag: bool = False,
         **extras: Any,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def __init__(
         self,
@@ -167,85 +155,81 @@ class Item:
     ) -> None:
         self._key = key
         self.extras = extras
-        self.key_check()
+        self._get_item_data()
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Item):
             return False
         return self._key == other._key and self.extras == other.extras
 
-    def as_title(self) -> str:
-        return self.key_check()['title']
+    def get_item_name(self) -> str:
+        return self._get_item_data()['title']
 
-    def replace_placeholders(self, text: str) -> str:
-        return re.sub(r'&([0-9a-fk-or])', r'§\1', text)
-
-    def one_lineify(
-        self,
-        data: dict[
-            str, tuple[int | str | list[int] | list[str] | list[dict[str, int]], DataType] | dict[
-                str, tuple[int | str | list[int] | list[str] | list[dict[str, int]], DataType] | dict[
-                    str, tuple[int | str | list[int] | list[str] | list[dict[str, int]], DataType]
-                ]
-            ]
-        ] | tuple[int | str | list[int] | list[str] | list[dict[str, int]], DataType],
-    ) -> str:
-        if isinstance(data, tuple):
-            left, right = data
-            if isinstance(left, (int, str)):
-                return right.value(left)
-            else:
-                inside = type(left[0])
-                if inside is dict:
-                    mappings: list[dict[str, int]] = left  # type: ignore
-                    return '[' + ','.join(f'{i}:{{' + ','.join(f'{k}:{right.value(v)}' for k, v in item.items()) + '}' for i, item in enumerate(mappings)) + ']'
-                else:
-                    return '[' + ','.join(f'{i}:{right.value(x)}' for i, x in enumerate(left)) + ']'
-        return '{' + ','.join(f'{k}:{self.one_lineify(v)}' for k, v in data.items()) + '}'  # type: ignore
-
-    def fetch_line(self, item: ItemJsonData) -> str:
+    def _as_json(self, data: ItemJsonData) -> str:
         extras_copy = self.extras.copy()
-        # cant be arsed to annotate the following because look at `one_lineify`
-        data = {
-            'id': (item['name'], DataType.string),
-            'Count': (extras_copy.pop('count', 1), DataType.byte),
-            'tag': {},
-            'Damage': (item['data_value'], DataType.short),
-        }
-        if item['can_be_damaged']:
-            data['Damage'] = (extras_copy.pop('damage', 0), DataType.short)
-        tags = data['tag']
+
+        tags = NBTCompound()
+        compound = (
+            NBTCompound()
+            .put(
+                'id',
+                NBTString(data['name']),
+            )
+            .put(
+                'Count',
+                NBTByte(extras_copy.pop('count', 1)),
+            )
+            .put(
+                'Damage',
+                NBTShort(data['data_value']),
+            )
+        )
+
+        if data['can_be_damaged']:
+            compound.put('Damage', NBTShort(extras_copy.pop('damage', 0)))
 
         enchantments: list[Enchantment] | None = extras_copy.pop('enchantments', None)
         if enchantments is not None:
-            tags['ench'] = ([{
-                'lvl': enchantment.level or 1,
-                'id': ENCHANTMENT_TO_ID[enchantment.name],
-            } for enchantment in enchantments], DataType.short)
+            tags.put(
+                'ench',
+                NBTList(
+                    [
+                        NBTCompound()
+                        .put('lvl', NBTShort(enchantment.level or 1))
+                        .put('id', NBTShort(ENCHANTMENT_TO_ID[enchantment.name]))
+                        for enchantment in enchantments
+                    ]
+                ),
+            )
 
         unbreakable: int = int(extras_copy.pop('unbreakable', False))
         if unbreakable:
-            if not item['can_be_damaged']:
+            if not data['can_be_damaged']:
                 raise ValueError(f'Item "{self._key}" cannot be unbreakable.')
-            tags['Unbreakable'] = (1, DataType.byte)
+            tags.put('Unbreakable', NBTByte(unbreakable))
 
-        hide_flags: int = min(sum(
-            value for key, value in HIDE_FLAGS.items() if extras_copy.pop(key, False)
-        ), HIDE_FLAGS['hide_all_flags'])
+        hide_flags: int = min(
+            sum(
+                value
+                for key, value in HIDE_FLAGS.items()
+                if extras_copy.pop(key, False)
+            ),
+            HIDE_FLAGS['hide_all_flags'],
+        )
         if hide_flags:
-            tags['HideFlags'] = (hide_flags, DataType.integer)
+            tags.put('HideFlags', NBTInt(hide_flags))
+
+        display = NBTCompound()
 
         lore: str | None = extras_copy.pop('lore', None)
         if lore is not None:
-            lore = self.replace_placeholders(lore)
-            display = tags.setdefault('display', {})
-            display['Lore'] = (lore.split('\n'), DataType.string)
+            lore = replace_placeholders(lore)
+            display.put('Lore', NBTList([NBTString(line) for line in lore.split('\n')]))
 
         name: str | None = extras_copy.pop('name', None)
         if name is not None:
-            name = self.replace_placeholders(name)
-            display = tags.setdefault('display', {})
-            display['Name'] = (name, DataType.string)
+            name = replace_placeholders(name)
+            display.put('Name', NBTString(name))
 
         color: int | str | tuple[int, int, int] | None = extras_copy.pop('color', None)
         if color is not None:
@@ -255,63 +239,76 @@ class Item:
                 color = int(color.removeprefix('#'), 16)
             elif isinstance(color, tuple):
                 color = color[0] << 16 | color[1] << 8 | color[2]
-            display = tags.setdefault('display', {})
-            display['color'] = (color, DataType.integer)
+            display.put('color', NBTInt(color))
 
-        extra_attributes = {}
+        if not display.is_empty():
+            tags.put('display', display)
+
+        extra_attributes = NBTCompound()
 
         interaction_data_key: str | None = extras_copy.pop('interaction_data_key', None)
         if interaction_data_key is not None:
-            extra_attributes['interact_data'] = {
-                'data': (interaction_data_key, DataType.string),
-                'version': (2, DataType.integer),
-            }
+            interact_data = (
+                NBTCompound()
+                .put('data', NBTString(interaction_data_key))
+                .put('version', NBTInt(2))
+            )
+            extra_attributes.put('interact_data', interact_data)
 
         is_cookie_item: bool = extras_copy.pop('is_cookie_item', False)
         if is_cookie_item:
-            extra_attributes['COOKIE_ITEM'] = (1, DataType.byte)
+            extra_attributes.put('COOKIE_ITEM', NBTByte(1))
 
-        if extra_attributes:
-            tags['ExtraAttributes'] = extra_attributes
+        if not extra_attributes.is_empty():
+            tags.put('ExtraAttributes', extra_attributes)
 
-        if not tags:
-            del data['tag']
+        if not tags.is_empty():
+            compound.put('tag', tags)
 
         if extras_copy:
-            print(f'\x1b[38;2;255;0;0mIgnoring unused keys whilst saving "{self._key}": {', '.join(extras_copy.keys())}\x1b[0m')
+            print(
+                f'\x1b[38;2;255;0;0mIgnoring unused keys whilst saving "{self._key}": {", ".join(extras_copy.keys())}\x1b[0m'
+            )
 
-        return '{"item": "' + self.one_lineify(data) + '"}'
+        return json.dumps(
+            {
+                'item': compound.to_snbt(),
+            }
+        )
 
-    def key_check(self) -> ItemJsonData:
+    def _get_item_data(self) -> ItemJsonData:
         item = ITEMS.get(self._key, None)
         if item is None:
-            closest = difflib.get_close_matches(self._key.lower(), ITEMS.keys(), n=1, cutoff=0.0)[0]
+            closest = difflib.get_close_matches(
+                self._key.lower(), ITEMS.keys(), n=1, cutoff=0.0
+            )[0]
             raise ValueError(
                 f'Invalid item key: \x1b[38;2;255;0;0m{self._key}\x1b[0m. Did you mean \x1b[38;2;0;255;0m{closest}\x1b[0m?\nHave you already saved this in your imports folder? Do not create an Item, use the string "{self._key}" instead.'
             )
         return item
 
-    def copy(self) -> 'Item':
+    def copied(self) -> 'Item':
         return Item(self._key, **self.extras)  # type: ignore
 
     def save(self) -> str:
-        item = self.key_check()
-        line = self.fetch_line(item)
-        cached = SAVED_CACHE.get(line, None)
+        data = self._get_item_data()
+        json_repr = self._as_json(data)
+        cached = SAVED_CACHE.get(json_repr, None)
 
-        title = f'\033[38;2;0;255;0m{item['title']}\033[0m'
+        title = f'\033[38;2;0;255;0m{data["title"]}\033[0m'
         if self.count != 1:
             title = f'\033[38;2;0;191;255m{self.count}x\033[0m ' + title
 
         if cached is not None:
             print(f'Using cached {title} as \x1b[38;2;255;0;0m{cached}\x1b[0m.')
             return cached
-        suffix = hashlib.md5(line.encode()).hexdigest()[:8]
+
+        suffix = hashlib.md5(json_repr.encode()).hexdigest()[:8]
         name = f'_{self._key}_{suffix}'
         path = HTSL_IMPORTS_FOLDER / f'{name}.json'
-        with path.open('w', encoding='utf-8') as file:
-            file.write(line)
-        SAVED_CACHE[line] = name
+        path.write_text(json_repr, encoding='utf-8')
+
+        SAVED_CACHE[json_repr] = name
         print(
             f'Successfully saved {title} as \x1b[38;2;255;0;0m{name}\x1b[0m to be used in your script:'
             f'\n  \033[38;2;0;255;0m+\033[0m {path.absolute()}'
@@ -327,7 +324,7 @@ class Item:
         if not isinstance(value, str):
             raise TypeError(f'Expected str, got {type(value).__name__}')
         self._key = value
-        self.key_check()
+        self._get_item_data()
 
     @property
     def name(self) -> str | None:
