@@ -480,3 +480,19 @@ class Item:
         new_item = self.copied()
         new_item.enchantments = enchantments
         return new_item
+
+    @property
+    def interaction_data_key(self) -> str | None:
+        return self.extras.get('interaction_data_key', None)
+
+    @interaction_data_key.setter
+    def interaction_data_key(self, value: str | None) -> None:
+        if value is not None and not isinstance(value, str):
+            raise TypeError(f'Expected str, got {type(value).__name__}')
+        self.extras['interaction_data_key'] = value
+
+    def with_interaction_data_key(self, key: str | None) -> 'Item':
+        """Returns a copy of the item with the specified interaction data key."""
+        new_item = self.copied()
+        new_item.interaction_data_key = key
+        return new_item
