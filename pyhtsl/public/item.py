@@ -411,6 +411,12 @@ class Item:
         self._key = value
         self._get_item_data()
 
+    def with_key(self, key: ALL_ITEM_KEYS) -> 'Item':
+        """Returns a copy of the item with the specified key."""
+        new_item = self.copied()
+        new_item.key = key
+        return new_item
+
     @property
     def name(self) -> str | None:
         return self.extras.get('name', None)
@@ -420,6 +426,12 @@ class Item:
         if value is not None and not isinstance(value, str):
             raise TypeError(f'Expected str, got {type(value).__name__}')
         self.extras['name'] = value
+
+    def with_name(self, name: str | None) -> 'Item':
+        """Returns a copy of the item with the specified name."""
+        new_item = self.copied()
+        new_item.name = name
+        return new_item
 
     @property
     def lore(self) -> str | None:
@@ -431,6 +443,12 @@ class Item:
             raise TypeError(f'Expected str, got {type(value).__name__}')
         self.extras['lore'] = value
 
+    def with_lore(self, lore: str | None) -> 'Item':
+        """Returns a copy of the item with the specified lore."""
+        new_item = self.copied()
+        new_item.lore = lore
+        return new_item
+
     @property
     def count(self) -> int:
         return self.extras.get('count', 1)
@@ -441,6 +459,12 @@ class Item:
             raise TypeError(f'Expected int, got {type(value).__name__}')
         self.extras['count'] = value
 
+    def with_count(self, count: int) -> 'Item':
+        """Returns a copy of the item with the specified count."""
+        new_item = self.copied()
+        new_item.count = count
+        return new_item
+
     @property
     def enchantments(self) -> list[Enchantment] | None:
         return self.extras.get('enchantments', None)
@@ -450,3 +474,9 @@ class Item:
         if value is not None and not isinstance(value, list):
             raise TypeError(f'Expected list, got {type(value).__name__}')
         self.extras['enchantments'] = value
+
+    def with_enchantments(self, enchantments: list[Enchantment] | None) -> 'Item':
+        """Returns a copy of the item with the specified enchantments."""
+        new_item = self.copied()
+        new_item.enchantments = enchantments
+        return new_item
