@@ -58,7 +58,7 @@ SAVED_CACHE: dict[str, str] = {}
 
 
 class Item:
-    _key: str
+    _key: ALL_ITEM_KEYS
     extras: dict[str, Any]
 
     @overload
@@ -340,11 +340,11 @@ class Item:
         return name
 
     @property
-    def key(self) -> str:
+    def key(self) -> ALL_ITEM_KEYS:
         return self._key
 
     @key.setter
-    def key(self, value: str) -> None:
+    def key(self, value: ALL_ITEM_KEYS) -> None:
         if not isinstance(value, str):
             raise TypeError(f'Expected str, got {type(value).__name__}')
         self._key = value
