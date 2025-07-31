@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 import re
 
 from typing import Any, Self
+from typing import _GenericAlias  # type: ignore
 
 
 class NBT[T](ABC):
@@ -351,6 +352,14 @@ class NBTList[T: NBT](NBT[list[T]]):
             value = []
         if not isinstance(value, list):
             raise TypeError('Value must be a list')
+        if len(value) > 0:
+            if not isinstance(value[0], NBT):
+                raise ValueError('All items must be NBT instances')
+            for i in range(1, len(value)):
+                if not isinstance(value[i], value[0].__class__):
+                    raise ValueError(
+                        f'All items must be instances of {value[0].__class__.__name__}'
+                    )
         super().__init__(value)
 
     def to_snbt(self) -> str:
@@ -365,7 +374,7 @@ class NBTList[T: NBT](NBT[list[T]]):
             raise ValueError('Invalid SNBT format for NBTList')
         offset = 1
         items: list[T] = []
-        while offset < len(s):
+        while offset < len(s) and s[offset] != ']':
             rest = s[offset:]
             maybe_prefix = f'{len(items)}:'
             if rest.startswith(maybe_prefix):
@@ -388,6 +397,36 @@ class NBTList[T: NBT](NBT[list[T]]):
         if isinstance(obj, NBTList):
             return obj
         return cls(obj)
+
+    def __len__(self) -> int:
+        return len(self.value)
+
+    def is_empty(self) -> bool:
+        return len(self.value) == 0
+
+    def __getitem__(self, index: int) -> T:
+        if not isinstance(index, int):
+            raise TypeError('Index must be an integer')
+        return self.value[index]
+
+    def __setitem__(self, index: int, value: T) -> None:
+        if not isinstance(index, int):
+            raise TypeError('Index must be an integer')
+        if len(self.value) > 0:
+            if not isinstance(value, self.value[0].__class__):
+                raise ValueError(
+                    f'Value must be an instance of {self.value[0].__class__.__name__}'
+                )
+        self.value[index] = value
+
+    def append(self, value: T) -> Self:
+        if len(self.value) > 0:
+            if not isinstance(value, self.value[0].__class__):
+                raise ValueError(
+                    f'Value must be an instance of {self.value[0].__class__.__name__}'
+                )
+        self.value.append(value)
+        return self
 
 
 class NBTCompound(NBT[dict[str, NBT]]):
@@ -429,10 +468,7 @@ class NBTCompound(NBT[dict[str, NBT]]):
             raise ValueError('Invalid SNBT format for NBTCompound')
         offset = 1
         compound: dict[str, NBT] = {}
-        while offset < len(s):
-            if s[offset] == '}':
-                return cls(compound), offset + 1
-
+        while offset < len(s) and s[offset] != '}':
             key_start = offset
             while offset < len(s) and s[offset] not in (':', ',', '}'):
                 offset += 1
@@ -472,6 +508,35 @@ class NBTCompound(NBT[dict[str, NBT]]):
             compound[key] = NBT.from_object(value)
         return cls(compound)
 
+    def __len__(self) -> int:
+        return len(self.value)
+
+    def is_empty(self) -> bool:
+        return len(self.value) == 0
+
+    def get[T: NBT](self, key: str, cls: type[T] | None = None) -> T:
+        if not isinstance(key, str):
+            raise TypeError('Key must be a string')
+        result = self.value.get(key)
+        if result is None:
+            raise KeyError(f'Key {repr(key)} not found in NBTCompound')
+
+        if isinstance(cls, _GenericAlias):
+            cls = cls.__origin__  # type: ignore
+
+        if cls is not None and not isinstance(result, cls):
+            raise TypeError(
+                f'Value for key {repr(key)} must be an instance of {cls.__name__}'
+            )
+        return result  # type: ignore
+
+    def __getitem__(self, key: str) -> NBT:
+        if not isinstance(key, str):
+            raise TypeError('Key must be a string')
+        if key not in self.value:
+            raise KeyError(f'Key {repr(key)} not found in NBTCompound')
+        return self.value[key]
+
     def put(self, key: str, value: NBT) -> Self:
         if not isinstance(key, str):
             raise TypeError('Key must be a string')
@@ -479,17 +544,6 @@ class NBTCompound(NBT[dict[str, NBT]]):
             raise ValueError('Value must be an NBT instance')
         self.value[key] = value
         return self
-
-    def get(self, key: str, default: NBT | None = None) -> NBT | None:
-        if not isinstance(key, str):
-            raise TypeError('Key must be a string')
-        return self.value.get(key, default)
-
-    def __len__(self) -> int:
-        return len(self.value)
-
-    def is_empty(self) -> bool:
-        return len(self.value) == 0
 
 
 def parse_array[T: NBT](
@@ -551,7 +605,7 @@ class NBTGenericArray[IT: NBT, OT](NBT[list[IT]]):
             )
         offset = 3
         items: list[IT] = []
-        while offset < len(s):
+        while offset < len(s) and s[offset] != ']':
             item, length = cls.item_type._parse_snbt(s[offset:])
             items.append(item)
             offset += length
@@ -569,6 +623,30 @@ class NBTGenericArray[IT: NBT, OT](NBT[list[IT]]):
         if not isinstance(obj, list):
             raise TypeError('Value must be a list')
         return cls([cls.item_type.from_object(item) for item in obj])  # type: ignore
+
+    def __len__(self) -> int:
+        return len(self.value)
+
+    def is_empty(self) -> bool:
+        return len(self.value) == 0
+
+    def __getitem__(self, index: int) -> IT:
+        if not isinstance(index, int):
+            raise TypeError('Index must be an integer')
+        return self.value[index]
+
+    def __setitem__(self, index: int, value: IT) -> None:
+        if not isinstance(index, int):
+            raise TypeError('Index must be an integer')
+        if not isinstance(value, self.item_type):
+            raise ValueError(f'Value must be an instance of {self.item_type.__name__}')
+        self.value[index] = value
+
+    def append(self, value: IT) -> Self:
+        if not isinstance(value, self.item_type):
+            raise ValueError(f'Value must be an instance of {self.item_type.__name__}')
+        self.value.append(value)
+        return self
 
 
 class NBTByteArray(NBTGenericArray[NBTByte, int], item_type=NBTByte, id_character='B'):

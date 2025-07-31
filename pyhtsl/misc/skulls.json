@@ -8629,6 +8629,614 @@
             "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTBhNmRmMzg3OWI1MjlhMzQ5NGE1YTk1ODc2NTZjODM1NGFmMGJkY2VjNjdjZDhjZjczMzVmM2Q2YTdmIn19fQ=="
         }
     },
+    "Holiday": {
+        "Steve Plushie": {
+            "name": "Steve Plushie",
+            "id": "df8ff1e4-a2f8-4821-8484-78c8ca59fc33",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2Y1YzM5YTQ4MTFiYTE3MTNmMTcwMGExNmRkOGI4MGFkMmI1ZTlhNjE0NGMzNWY0OWRhYzBhN2FiNzMzMmU0YiJ9fX0="
+        },
+        "Alex Plushie": {
+            "name": "Alex Plushie",
+            "id": "1dc216a5-9e53-4761-a2ff-41b4676d4855",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWEyZDIyOGEzNGI5M2M1MWZiMzc0ZmJiOTU0M2RhYmI0MGI5OTY5ZTEwMWIyNjdmOGE2YTM2YmE3MDk2YzVkOSJ9fX0="
+        },
+        "Snowman": {
+            "name": "Snowman",
+            "id": "c45201b6-c18c-4a18-a83e-66aa08bb9514",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2Y5YmE2OWFhMjQ2N2RlZGFlNjljZWFmNzhlZDhjNzM0YTcwNWQzN2NmZTUxYWZiZTAyYTc1YjZmYjk4YmNlNyJ9fX0="
+        },
+        "Holiday Tree Candy": {
+            "name": "Holiday Tree Candy",
+            "id": "458bedf6-0a29-4293-89f8-f899e7b3018d",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGZiMzJiNmViYWE3MzczZWY3NDQ3Mzg1ZTBiOTYxNmI2N2VmOTgyZjY5MzQxMzcxNDI5MWZmMzVlYjAyM2MifX19"
+        },
+        "Holiday Tree Candle": {
+            "name": "Holiday Tree Candle",
+            "id": "ad3ead0b-8cd0-4368-8a0f-3ce2f45f45c4",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjlkNWYyNWNlOWE4YmZmNWJhZDBmNTZiYjUxYjUyZmQ2MjM0NjM5NWQ2ZWM3YzY0NzE0ODRlYzdlYWJhZiJ9fX0="
+        },
+        "Holiday Sock": {
+            "name": "Holiday Sock",
+            "id": "c71d65e2-ed55-4b1a-9e50-7198311157ff",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2VkZjFmNDhlMDhlZjBiZTFlNTc3ZDVlNWFiOGY0OTUxYzQ0MzI3NDJjMTZlMjQ3ZjVhOTliYmY0ZDU0NzkifX19"
+        },
+        "Snowglobe": {
+            "name": "Snowglobe",
+            "id": "813b072a-c9c8-4a54-a6bf-cf27971c17eb",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDIxNGEzMmMxZTg2ODJlYzU1OGU2OGY5ODg2YWVhNWVhNGNiOTI0NjM2NmZkNmVkNmQyNGZkZjg1NTEifX19"
+        },
+        "Advent Wreath Snowflakes": {
+            "name": "Advent Wreath Snowflakes",
+            "id": "1d82196f-3669-4fed-aeaa-b659b2beeb48",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOThiZDk4YTg5NTBiN2E3ZTY1OGI5MTVhOWEwZDExZTM1ODZlNWEzNDQxNTZmODFkMTllMzJjMTM0ZDMyZWEifX19"
+        },
+        "Ball Ornament": {
+            "name": "Ball Ornament",
+            "id": "1779a2fb-4023-4233-b970-cf4e7218060f",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODg0ZTkyNDg3YzY3NDk5OTViNzk3MzdiOGE5ZWI0YzQzOTU0Nzk3YTZkZDZjZDliNGVmY2UxN2NmNDc1ODQ2In19fQ=="
+        },
+        "Polar Bear": {
+            "name": "Polar Bear",
+            "id": "1e0b52c8-d8b3-4b61-9f01-cbc621133332",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWFmM2IxYWNjZjkyYzFlMDg0MWFmNDY1MTBiNTlkZjNjNDZkNmI2OTIzYzZiOWYzMDNiZjFlZWJhYWU4NSJ9fX0="
+        },
+        "Ice": {
+            "name": "Ice",
+            "id": "a21cabb1-d3e7-4efb-bb05-ecd542a538bc",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmE4M2QxYWFjMDY2ZGZkN2Q2NjhhZjFmNmIyZTUyMDE1MmFlYmI2MjQ1MjRhMGY5OWQ1MDkzNWJhM2Q0ZTIyYSJ9fX0="
+        },
+        "Snowball": {
+            "name": "Snowball",
+            "id": "05f7a8d2-9e34-453b-a3c8-83bc062a594a",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWRmZDc3MjRjNjlhMDI0ZGNmYzYwYjE2ZTAwMzM0YWI1NzM4ZjRhOTJiYWZiOGZiYzc2Y2YxNTMyMmVhMDI5MyJ9fX0="
+        },
+        "Steve and Alex Doll Present": {
+            "name": "Steve and Alex Doll Present",
+            "id": "7bd1b155-3871-4fb9-9aaf-5df906ab6fb9",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjRjNDE4YWVjMDI2ZTU3MWYxNTEwNGM0YTNhODcwMzA3OTI5NDVkOGZiMTljN2VlZTNiM2VkMDAxODg2NGRiZSJ9fX0="
+        },
+        "Green Present": {
+            "name": "Green Present",
+            "id": "b1b1a3e4-63ee-47fb-b3cb-a0a6b1391a50",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTNjZmJmMmJkZmQ0ODUxNGJmYmFjZTk1MThjNzY2NDExMmRmMmMxNzNlOGM3YWQ5MmIzZTY1NjIxYTllZDZlMCJ9fX0="
+        },
+        "Blue Present": {
+            "name": "Blue Present",
+            "id": "5e301ace-f63a-45b4-b6c5-3b268cb5368b",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjNiYTdiYzhlM2MwOTNiZDQ4YzFmNzdiZjQ4ZTM1YmZhMGVhYzlhYjQ4ZDBhZDEzZWJkOWUzYzIyZjcxYWZhIn19fQ=="
+        },
+        "Red Present": {
+            "name": "Red Present",
+            "id": "b34f6eeb-f5a5-4726-93ce-d1df196e6f5a",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmY2ODQ5NzE5NzVmMjA5ZTY4NjEzM2Y2ZjNjZTNkYWFiM2YyYmZjZmE0Yzc4N2I3MDMyNzNjYmI4NGFhZWEifX19"
+        },
+        "Yellow Ornament": {
+            "name": "Yellow Ornament",
+            "id": "c4835215-ed3a-4f6b-9936-088d3ddc1c8b",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTRlODk1ZjY5ZDYzNTgzYWQ1ODAyNDVkNDIzODhiZGRjODk1MjZhODk0NjFjNzliZmU5NzA5ZDE2ODJhNDAifX19"
+        },
+        "Holiday Toy": {
+            "name": "Holiday Toy",
+            "id": "d7a4c963-23d5-4956-b429-9c9a5a59af56",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2JiZThmZDFhYTM5ZjE1MDc2ZTg4NGRmZTZkZGI5YTNmMzc2MWRiMzFlMmIxZjk5NDBiNWRmZDM0ZDFjNGQifX19"
+        }
+    },
+        "Spring": {
+        "Strawberry": {
+            "name": "Strawberry",
+            "id": "3d8a8cbe-2782-4f76-9b0b-63e23d718ecc",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2JjODI2YWFhZmI4ZGJmNjc4ODFlNjg5NDQ0MTRmMTM5ODUwNjRhM2Y4ZjA0NGQ4ZWRmYjQ0NDNlNzZiYSJ9fX0="
+        },
+        "Chocolate Strawberry": {
+            "name": "Chocolate Strawberry",
+            "id": "2554ac93-c3b4-4711-a771-6fb24c1524ef",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmFjYTAyMGNlNDRmMTEwYzgzODQxNWIwY2VhYzY2ZGQyMWFjOTE3NGVlZDZlOWNiYWFmMGZiMmQ4MDA5NzE1ZCJ9fX0="
+        },
+        "Sliced Kiwi": {
+            "name": "Sliced Kiwi",
+            "id": "7cc5602d-4e70-4cf2-bc58-0b6937d94862",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjAxNTVkNDFlNjg2NTc3M2YyYWQyZTlmZTRjZjgyZjJmODgwZTU0YWZlNzFhMTNiYmUyMzkwZDRhYTgxZjRmNCJ9fX0="
+        },
+        "Blueberry Basket": {
+            "name": "Blueberry Basket",
+            "id": "319649ee-dc20-40ab-8bf3-049105cd7b2f",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWJhMzRhZTliODY0NWEzZjQ4Y2IxODEzMmU3ZDQyNzkzMDMxNTRkOTZlMTE2OTY1ODc0YzUyZTAxYzBkMDg1ZCJ9fX0="
+        },
+        "Carrot Cake": {
+            "name": "Carrot Cake",
+            "id": "a3c7c1bb-e5be-43d2-877d-99267f523562",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmIyNmMxMjJlZGYwZDExZTQ2NWE1OTEyMDkwMDYwYWUyOTI3NGQyM2IxOWZkYjhkNzdiMWQ0YjM3NzNhN2VjZCJ9fX0="
+        },
+        "Basket of Flowers": {
+            "name": "Basket of Flowers",
+            "id": "517d6433-39ce-4577-ad8b-984619331675",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWNlM2RmODRlOGNhMGFjZjE4YWRlNWYxNjQ0MjMxMjU4Y2VkMDVhYzNjYWNjZjIwZjVkYWUzYTZkNDllZDZhOSJ9fX0="
+        },
+        "Lit Candle with Flowers": {
+            "name": "Lit Candle with Flowers",
+            "id": "075071ed-9c2f-41ea-98a8-000f2b760878",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjY1NzZmNWU0YTk1MTM4ZTU1NTQ0Mjg1NDEwYzQyYzBmMTdkMWZmY2IzMTU2ZDBkYzQyNzllYThiMmUxMTMwMyJ9fX0="
+        },
+        "Bunny Ears": {
+            "name": "Bunny Ears",
+            "id": "36e6e9d2-c475-43db-b444-06216c44c010",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWMzNDE4MGI3ZGU3MWY4YWI2NDVjMDk5ZGEwMTkwMzk1OTU3ZDVmMGEwM2RjNmRlNGJmYmE5Y2I0MjAyNTNlMiJ9fX0="
+        },
+        "Easter Basket": {
+            "name": "Easter Basket",
+            "id": "9155d72c-6dfb-4fb8-8770-aba3d2290749",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODNjMjVhN2ExODgxOTZiMTg3MTcyNjRmZmU4MzdjYTM0OGNmNzE5ZTgyNzE3OWVkYzRiNzhjYmNiOGM3ZGQ4In19fQ=="
+        },
+        "Rabbit": {
+            "name": "Rabbit",
+            "id": "f95f1648-8e4e-4327-aec9-b125f6ce9e12",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTdhYjZlYjg4MjQ2NDg5ZjQyNDVlMTVlMjAzNWYyMzQ3NmQwNThlMWVhMzA4Mjc2Mzg3MzE2YWFiY2M1MmVkIn19fQ=="
+        },
+        "Easter Egg with Chick": {
+            "name": "Easter Egg with Chick",
+            "id": "a8dcc21a-73a1-4045-8400-b36c67d7adb4",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDAwMTRjZTA3NGVhNmU3MTkyODdlNzRhNzk2MTVkNTkyOWZjNmZmNDJhYzgxYTdlMWU0NWEwMDVmNzY0MjE3OSJ9fX0="
+        },
+        "Chick": {
+            "name": "Chick",
+            "id": "b7795ade-f89f-42f6-972c-a41db41394a4",
+            "texture": "ewogICJ0aW1lc3RhbXAiIDogMTYxNzA2MTQ2MDg4MiwKICAicHJvZmlsZUlkIiA6ICIxOTI1MjFiNGVmZGI0MjVjODkzMWYwMmE4NDk2ZTExYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJTZXJpYWxpemFibGUiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDE1NWMwZWYwNDEzNTk0MDY5MTBmYWYxZTcyMDdhZjFhOTAwZGEyMzg4ZTU0ODUxODdiYWIyNGYwMTU0ODk5MCIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
+        },
+        "Chicken": {
+            "name": "Chicken",
+            "id": "d63d0eb8-08f5-45a4-b966-3853038b8dad",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjVkZGVmMzE2NmUxZjVlYmFjYjE3ODMyZWE0MGUwY2QzN2U4MmY0ZmVhNTc0ODM3MGY0OGUxODc2M2JhMTJkNSJ9fX0="
+        },
+        "Young Chicken": {
+            "name": "Young Chicken",
+            "id": "6720be24-c4c7-4bc8-857b-ca23f4bcc4d7",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzAyNmM5ZjYxZjg1YjFlZTNlNjRiM2M0YWRjYTBhMDI3ZTg5ZmIxZjMwMTk0ZjQyYmNkZmMyOGFkMGQyOTQifX19"
+        },
+        "Bee": {
+            "name": "Bee",
+            "id": "f2de2fba-40b8-47c3-ab2e-ebd0a661ccec",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2U5NDE5ODdlODI1YTI0ZWE3YmFhZmFiOTgxOTM0NGI2YzI0N2M3NWM1NGE2OTE5ODdjZDI5NmJjMTYzYzI2MyJ9fX0="
+        },
+        "Bee Hive": {
+            "name": "Bee Hive",
+            "id": "7994474b-1f87-4ff8-abae-13e3c746c3fb",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzdjYmYyNThhMGUyZGUzNGM4MThhYThhODk4NjMxM2Y3MjkyOWU1YWJhOTg3OTcxNWY0MTM0YmRjNmM0MDJkNCJ9fX0="
+        }
+    },
+    "Halloween": {
+        "Un-carved Pumpkin": {
+            "name": "Un-carved Pumpkin",
+            "id": "7120eea1-ab27-484e-9945-3cb80d3ddacf",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWE4NTk4YjQ2OWE5OWNhZDA2MDBlMjk4YWEyNjBjZThjN2M2YmM0ZGJhMzgyNmRkOWJhNjI2ODQ1NDhkMzc5OCJ9fX0="
+        },
+        "Cat Pumpkin": {
+            "name": "Cat Pumpkin",
+            "id": "1bcc2a11-2f42-4a37-8a95-dd79ee97701c",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDU5NTU3MTE2NDFkMTZmMTVhYTRiZjhiNDllYTg4M2IwM2M5ZTU4MmQ1Mjg5OWM3YTVjOGQ3YzgyMjI4OWQ2In19fQ=="
+        },
+        "Crazy Pumpkin": {
+            "name": "Crazy Pumpkin",
+            "id": "6bc940f5-8a53-4b2d-93c0-8f84c68c033c",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODg2ZTY2NjZjOWZlZTM1ZWU2OWMzZmE2ZjdhODYxNWViNzU1ZTk1Mjg1YTVlNzMyN2Y3YzI1NmZkMWM1YjU0In19fQ=="
+        },
+        "Happy Pumpkin": {
+            "name": "Happy Pumpkin",
+            "id": "106d5851-d873-444d-a231-4105a07863a6",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjhmMmZmYzZmYjRlOTk1OWI5YTdhMzE3ZjUxYTY3NzVhMTU5ZGRjMjI0MWRiZDZjNzc0ZDNhYzA4YjYifX19"
+        },
+        "Golden Pumpkin": {
+            "name": "Golden Pumpkin",
+            "id": "062f5fe4-62cd-4760-9ca2-402ef24f942a",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjRmYTRhMjIxMjZhNTBmOGE1MDdmMDM5Zjg1MTI3N2VjZDZhNjgyMzI1YjRkMjg2MmY1YjViYTRhMTMzZjZjNSJ9fX0="
+        },
+        "Pumpkin Chest": {
+            "name": "Pumpkin Chest",
+            "id": "aad0e672-a02b-4dcd-a8d6-308659cf93f6",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDU5NTVjM2MyZGNiYjZmYzY2NDdmZDVkMTFlMDNmYTI2OTgwMTI2ZmY1NTEwZDZiYjNiOWY3ODY3MWY1ODQwNyJ9fX0="
+        },
+        "Bowl of Eye Scream": {
+            "name": "Bowl of Eye Scream",
+            "id": "3c6dddbb-5c88-430f-a2d2-9b5c8b288bf5",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDY3MjQ1ODA0NzUwMWMyNTFmMzZiN2YyYmY2NmJiYWJhM2IwMWZiZWQ1Mzc0N2ExMjYxMzdhZDI3MDBlYzQ2NyJ9fX0="
+        },
+        "Pumpkin Spice Latte": {
+            "name": "Pumpkin Spice Latte",
+            "id": "caae0c11-3479-4bf8-bf6e-61247e68d20f",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODRlMWNlZDFkNTRhNTNmN2RiMTNiN2NjMTBiZjg1MGUzMmVmMThhYWVhNDJmZTIyMTk1MWY2MWIwYzc2NjhiYiJ9fX0="
+        },
+        "Pumpkin Pie": {
+            "name": "Pumpkin Pie",
+            "id": "71301f40-ad69-421f-a5ae-32cc44da2c9a",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzhhOTcxZGY1MWU5Y2E5YTViOTJlNDVkM2ZhNTQ3ZGQzMTkxODc3OTI5YTQzN2Q1MDE1Mzg5MmU1ODVhIn19fQ=="
+        },
+        "Pumpkin Pie Slice": {
+            "name": "Pumpkin Pie Slice",
+            "id": "38fa8bba-e0c7-45ec-a32c-37ed6bf8da9e",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmNlYTU5M2YyM2U0YjM5NWNjMWYzZmRjYjcwNjRiNjc2ZjI1ZjE1NTZjNWQ3ZDg0OGQzMTRhZGViNjc5NTQwNiJ9fX0="
+        },
+        "Great Horned Owl": {
+            "name": "Great Horned Owl",
+            "id": "1a1ff632-bff5-48f8-ba2a-23fde23dafed",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWRiZDhiNmNiM2IxZWNkOWNhMzU5YjgzM2MxYmVmMjJlOTczMmZiN2FhMGQwZmY0ZmI1NTg4ODZmNWE2YSJ9fX0="
+        },
+        "Hay Bale": {
+            "name": "Hay Bale",
+            "id": "8a2ac269-2546-4ecf-b3cf-5f23d727b4ea",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzEwZjkwMDA5MzZlYzhlZDUxZDFiZjVhMmMyMWEwNDkzYTQzOTMwYTMzNmE0MTIwZjk1YjhkNzQ4MjMxYTBmNiJ9fX0="
+        },
+        "Skull Sack": {
+            "name": "Skull Sack",
+            "id": "ea7d247d-92e1-4e52-b5ff-cdbdcd7aaa93",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmI5NmM1ODVjY2QzNWYwNzNkYTM4ZDE2NWNiOWJiMThmZjEzNmYxYTE4NGVlZTNmNDQ3MjUzNTQ2NDBlYmJkNCJ9fX0="
+        },
+        "Skull Treasure": {
+            "name": "Skull Treasure",
+            "id": "590364a8-8925-4004-8825-babc1b464547",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2FmN2NhMzc2YTE0MjRjZTA4YWI1OWE3ZTNkYzJlODZmMWM1MzdiOTA2OTBkYWNkOGY1M2MyNGNmNTMyYTZmMiJ9fX0="
+        },
+        "Stack of Enchanted Books": {
+            "name": "Stack of Enchanted Books",
+            "id": "46e77623-9b48-46e8-afa2-cb69d1c018b5",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjYyNjUxODc5ZDg3MDQ5OWRhNTBlMzQwMzY4MDBkZGZmZDUyZjNlNGUxOTkzYzVmYzBmYzgyNWQwMzQ0NmQ4YiJ9fX0="
+        },
+        "Stack of Books": {
+            "name": "Stack of Books",
+            "id": "e24272f9-7549-4817-9b23-4a02c0cd1786",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODdlYzQ0NGY3NmNkYWJlMjUxZDlhMTgyNjA0NTJkMzkyM2VhNTJmNTcxZWVjNTE3ZTIyNzMzNWI2YTMwYWEifX19"
+        },
+        "Ghost": {
+            "name": "Ghost",
+            "id": "1895695d-fbe6-4d98-8107-98a7a3d7a657",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjhkMjE4MzY0MDIxOGFiMzMwYWM1NmQyYWFiN2UyOWE5NzkwYTU0NWY2OTE2MTllMzg1NzhlYTRhNjlhZTBiNiJ9fX0="
+        },
+        "Ghost in a Bottle": {
+            "name": "Ghost in a Bottle",
+            "id": "0267c2b0-603f-4691-afa9-788d28c227e8",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmQ0NWZkYTc5MzY4ZTM2YTQ1NTM3MDRhODQyZDQ1ZDdkYjM3Y2Y0MmNkMWZkZjI1MGE2NDc1YjQyODQ2NTFkNiJ9fX0="
+        },
+        "Bouquet": {
+            "name": "Bouquet",
+            "id": "ac4bf46d-45ac-4319-9356-d02bbf5fef9e",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODEzMDJkYmYyZDdkNTM5ZmMzMzZiNmQzMTI1NzJhNTFmZDkwYzY5ODcwZTYzNDYxZGE1MzkwNTAzYTE1ODhkYiJ9fX0="
+        },
+        "Spider Villager": {
+            "name": "Spider Villager",
+            "id": "3474557d-4bf4-49d1-bb62-c8c42df636e7",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjdmYTgzOWE2NmM1ODQ2NzBiOWRlMGJmOTJiNTQyNjY0YTJkNzc2MjhhMDk3NDcwYWEyMzkyZTA5YjI4YTliMSJ9fX0="
+        },
+        "Cave Spider Villager": {
+            "name": "Cave Spider Villager",
+            "id": "2fcd0dbe-f8a8-4e64-a42d-5483ddc31be9",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmIzMzIwZWRiZjYxYWZhYzZlZDJjZmFhNmQwYTc1ZTA5YjUxZTU3ZGI4MTVmNGZlODYxMzAzNWUyNjM5MmZkNCJ9fX0="
+        },
+        "Crow": {
+            "name": "Crow",
+            "id": "aefdb5a1-0b83-4a03-8e8e-6ba154773079",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODVkYmFiNzdkMmYwMmMxMDBhZDA3MDI4YzU4ZTA5ZWIyOWQyNjM3M2MxMTFkNWM1YmViMWY2ZmNmNzk3MzQxMCJ9fX0="
+        },
+        "Bat": {
+            "name": "Bat",
+            "id": "b95dd97f-68dd-48f6-948b-4c582b81b230",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDczYWY2OWVkOWJmNjdlMmY1NDAzZGQ3ZDI4YmJlMzIwMzQ3NDliYmZiNjM1YWMxNzg5YTQxMjA1M2NkY2JmMCJ9fX0="
+        },
+        "Owl": {
+            "name": "Owl",
+            "id": "c2a39560-96bf-4c35-b696-434d00a11be8",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGEzMjE2ZGE1NGU3MzY4ZmI0MGI3MjEyMzlhZDk1ZTA3ZWY0Zjk3ZDkzZjFjNDJmZjMxOWJhYjlhNTM4ODJhZiJ9fX0="
+        },
+        "Purple Owl": {
+            "name": "Purple Owl",
+            "id": "1aa332c0-268b-4e37-a728-461f232df51d",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjc4YmE5NTZkZWE4N2U0Mzg4MTQxZmZlMzg2NzNjOWRkMTExYjNmOGU3NGM1YjY0MDBhNThmZjE4NjVjNDZhZiJ9fX0="
+        },
+        "Gremlin (Green)": {
+            "name": "Gremlin (Green)",
+            "id": "00cec698-caad-4c84-970f-d9bbaa043233",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWRiZjUyMmJjZDIxNDAwNDEwOGZhODkzYjlhNjY0YjgyZWJjYmQxNzE2OTVlNDZkYTE1NGRhYmE2MGZhYmVmOSJ9fX0="
+        },
+        "Gremlin (Black)": {
+            "name": "Gremlin (Black)",
+            "id": "edebfb39-f8d9-4b96-be84-d025c9aca0f0",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjlhMzI0MzA1ZmU4OGRlM2M0MTVkYzkzMjM4ODUxYjg4ZGU0ODc0NWY0YTE4ODk0ZGM5N2NiZTM5ZGU5NWY2NCJ9fX0="
+        },
+        "Gremlin (Brown)": {
+            "name": "Gremlin (Brown)",
+            "id": "a3651e32-246b-4906-8a82-30dcce2df5ec",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODAxNWRjNzRjNTliYjQ4NDdhNzczODAxNTIxM2I2M2ZlZjRlZmM4YzEyYzQ0NjQ2YmM2MTJjNWIzZGI4YzUwNiJ9fX0="
+        },
+        "Raven": {
+            "name": "Raven",
+            "id": "69bd9ed9-62ac-4c5d-9ba7-dd733aaa34ec",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmVlNGQ2NWJiNmY0NGExNDJlYTVlZjEyYTA3ZWNjMjQyMzAxZWE3Y2QxNTA3ODY5NDhlNDE5ODFhYzFhYzBiMyJ9fX0="
+        },
+        "Witch": {
+            "name": "Witch",
+            "id": "0a1808b8-7967-42f2-9d43-05c50cf92f81",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjU1MjU2ODkyM2U1NDU2YWIzMWRhOThlYzMyN2RiMGFjMDY5YTY4NzZkZTRhOWZkZDZlMGJjNWQwMTI3YzMxOSJ9fX0="
+        },
+        "Chuckie": {
+            "name": "Chuckie",
+            "id": "76d28e2a-b6d4-46bb-9b0b-ef441fab1d3e",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTRiOWY2N2Q5ODM1YWE2MzcyYWZkYzhmMGZjNzBjNjc5NWE1NWQzZGNiOTBlNmZkNGIyNGFlYTExNTM2NDEwNiJ9fX0="
+        },
+        "Clown": {
+            "name": "Clown",
+            "id": "2d73e334-0844-49e1-90eb-da297682f690",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWM2YTdiZWNlNzQ5ODEwMTdmZjg2M2M0ZmNhYmFkNzA3ZjZkZGFjYWNjMTEwNGIxMjMwYjg1YzI4ZGZhNzllYyJ9fX0="
+        },
+        "Pot of Bones": {
+            "name": "Pot of Bones",
+            "id": "bd7f2ed1-2ae4-46ff-9f5c-0af1f2c72fb0",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmMwMWJlMjI4ZDQ2MzMyYWVkOTI3NzkzMzk5ODMzZGQxZGI3Y2Q3YTBmYTY5NzMwODI4MTljNGE5ZWIyZTQ4MSJ9fX0="
+        },
+        "Trick or Treat Basket (Red)": {
+            "name": "Trick or Treat Basket (Red)",
+            "id": "1dbd3954-83f0-4e12-b61f-5f7bfc5fddb6",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzdjYjA5ODJkNjk3NWQ1OGI2MzE0NzkzMmYzNzNjZDIxZTNjY2JjYWVhZDMyNzVjNWFhZThiMjcwMTVmODBjNiJ9fX0="
+        },
+        "Trick or Treat Basket (Red Creeper)": {
+            "name": "Trick or Treat Basket (Red Creeper)",
+            "id": "9db8ed72-4224-4968-9161-0e28e48d245a",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ2MzQ3NDY1NDU4Y2Y2YjFjMmRjNzIyYmQyNjdmN2U3MjBiYTk4NTY2YWE0MWU4ZGMwZWQzNmNlNGJlNGE4OCJ9fX0="
+        },
+        "Trick or Treat Basket (Orange Ghost)": {
+            "name": "Trick or Treat Basket (Orange Ghost)",
+            "id": "599258af-c1c3-42d0-8386-7161cb03d8a2",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOThhY2JkMTMxNzgyZWY2ZDIyZmU0MTg3YWQ0NjlhMjNmYjc0OGMyNzAyMWQ5NjVhMDEyMWFkNjQ4MWRmNGQzOCJ9fX0="
+        },
+        "Trick or Treat Basket (White Ghost)": {
+            "name": "Trick or Treat Basket (White Ghost)",
+            "id": "d85029d0-79c9-4893-8925-02d5bfde6499",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGIwMjM5OTY4YWViNDAzZTkwYzQ0N2M3ZjQ0ZWNmYjNiMzNhODdhMDg4ZGZhM2I5MGMyZjFjZjRkZjYyZWU5MiJ9fX0="
+        },
+        "Trick or Treat Basket (Gray Ghost)": {
+            "name": "Trick or Treat Basket (Gray Ghost)",
+            "id": "af6bb684-8a20-4750-9b33-56b5be65840f",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTRmZjg4ZjIxZTAxNDljNGRlODlhYTMxYzdkYzBjZDM0MjljYjZjOWFiMjM3YmJmOTRiZjYwOTEwZjc4OWI5OSJ9fX0="
+        },
+        "Trick or Treat Basket (Purple Ghost)": {
+            "name": "Trick or Treat Basket (Purple Ghost)",
+            "id": "145d9a10-3767-463e-b783-d25e6ba3527d",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWE1OGU0NDFiNWRhZGZhMDM3MTc2NTk3MzJlYTQ3NGQxMjQzMDE2ODg0MmMyYzFlM2EzNTMxMjJlZWVkMDMxNiJ9fX0="
+        },
+        "Trick or Treat Basket (Blue Ghost)": {
+            "name": "Trick or Treat Basket (Blue Ghost)",
+            "id": "1586b8b2-6bba-46c7-84f0-4dd8434f4862",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTAwZWY2NDdhODVlMGE4MTBjYzkzZTMzZTZmNmRiOTdkNjE1YzlkZmYyNjVhZTk4MzE3OTliMWY3ZWZkOGNlMyJ9fX0="
+        },
+        "Trick or Treat Basket (Red Ghost)": {
+            "name": "Trick or Treat Basket (Red Ghost)",
+            "id": "0e53dae7-3df5-4e2c-b193-4dab959466a2",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWIzZTczNmFlNDQ5NjRhOWIzYjEzMmJmZjY0YzRiMjlmYjU0ZGE4MTAyNmI5Y2Q3YjBjOGNlZjE4ODBmZGM2OSJ9fX0="
+        },
+        "Trick or Treat Basket (sus)": {
+            "name": "Trick or Treat Basket (sus)",
+            "id": "f4e5e9f0-1b57-4d39-8667-bc841ad9cd8d",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTVhYThjM2E5MWQzMjVkNDVmYzUzODY3NjY3ZWY5ZDRlNzQ1NWQyY2ZlZGU0YjA1NjA3ZTZkYWY2ODYwZTdkNSJ9fX0="
+        },
+        "Poisoned Candy": {
+            "name": "Poisoned Candy",
+            "id": "a4dd1130-bea8-44d2-8905-f879695f2828",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjk3NzkwNmFiZGIwMGI0OTVjYzVhNjg1MWU5MmNlYjY1ZTFiZjg5ZmFmMWJlOTE0YjVkMzZjODQ4NzU3NmE3MyJ9fX0="
+        },
+        "Drowned": {
+            "name": "Drowned",
+            "id": "8e86e88e-2458-4f36-af01-841888a1755a",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmIxNTMxYzA0ZTI1ZDdmYTY0NTc2OTgyNjg0OTFjYjg5NmQzMzAyZDI2ODg0ZmNmZGYxYTBiMmY5MmQ3N2M4ZiJ9fX0="
+        },
+        "Scary Villager": {
+            "name": "Scary Villager",
+            "id": "5a3fa26b-d75a-468d-b149-7cf5fe47ee47",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTA0N2RhMGIzOTM4NDU1NmJjMzdlNTc4YWExYjM3NjU2Zjg4ZmUxNDNkMWI1ZGVhZDllMDZlNDM2ZjEyNzk0NyJ9fX0="
+        },
+        "Scary Illager": {
+            "name": "Scary Illager",
+            "id": "92675b5b-0212-4dd8-9fc0-8b5c05c52cb3",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzdlM2UxZjQyYjJmYjQ2MmJiZjc1NTBmYWRjYTRiMDdiYjFhYWRlMzRkZGZlNjFiZmMwZGQyMjVhYWY2MTBlZSJ9fX0="
+        },
+        "Spooky Mask": {
+            "name": "Spooky Mask",
+            "id": "f7d7c8ff-6184-42c5-a545-8beaaa8f7a8a",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjNkZjkzZGMwYjUxZmZlODFkZDIxYzIzZDZiYzI0NzVmZjQyNDQxYzIzZjUwNWNiNWI1OGQwNjFjYmY2MjJlOSJ9fX0="
+        }
+    },
+    "Summer": {
+        "Rainbow Sundae": {
+            "name": "Rainbow Sundae",
+            "id": "240ea6d8-0638-4448-bb94-199d13382aaa",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2M5MzBkMjBkMDRhYzk5MjFiNDlhNTk5YWQ5OWI5OTc2NjcwMzRlNTAyODVhM2U4ZTIyYTdhN2U2ZjI0YjczZSJ9fX0="
+        },
+        "Peach": {
+            "name": "Peach",
+            "id": "2baf4cac-c7d6-4b56-8ceb-7578e0cb79ba",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTQ3MWRhNTA4MmJhMzIyYjliN2Y2MGI0OTFjNzZlNDA1ODI2ZTczMzJlMTM5NzZmOGUzZjhkZmU5ODAxYmVjZSJ9fX0="
+        },
+        "Cantaloupe": {
+            "name": "Cantaloupe",
+            "id": "62e0f29e-d6a8-486a-8f75-5a17ca40121f",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTIzMmI0M2IzOTgwMzJkMGQ4ODU3MWVhMTFiZGVkMThjYjI2NzdmM2U3ODZmNGYxMDlmY2FiOWZhOCJ9fX0="
+        },
+        "Mango": {
+            "name": "Mango",
+            "id": "1b003168-7dcb-4310-a534-f3e06dc7af6e",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzMxOGJlYWJkYTE3NDdkYzQ0NTNjYmZiODc1MmM4NDQ3M2E2ZDM4Y2ExMzYyOTRhYjYzYzVmOTEyMDUxZDk3In19fQ=="
+        },
+        "Stack of Melon Slices": {
+            "name": "Stack of Melon Slices",
+            "id": "9a59c0d6-1d52-44f4-87da-e00a1935900a",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWU3MGViYjkxYTk1ZjIzZGUwZjkwOWNkYjY5MzE4ZWExNTg1NzAwMWYxMmE2MWRlMTE4ZDM0Zjc5ODliZWJiZSJ9fX0="
+        },
+        "Passionfruit": {
+            "name": "Passionfruit",
+            "id": "59a82c80-6922-4853-99b0-49d58c46867a",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTkyZTRjYjNjNjk5OTM0MmZlYTVhYjk4OGM4NDc3Y2MyOTkzOTg3NWQxMzA2MjhkOTViYmNiN2UzNTQ0Njc4YyJ9fX0="
+        },
+        "Wildberry": {
+            "name": "Wildberry",
+            "id": "fe518af3-21b8-4300-b268-35c423a9cc2e",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjg0MGU4ZmY5YmM2ZmFhZjhiNWRkNmJjZmUxYTc2MWI0MzU5N2M3Zjg4YzdkMjAzOTM1MDRkYTdjMTRiNWJkMiJ9fX0="
+        },
+        "Petrified Wood": {
+            "name": "Petrified Wood",
+            "id": "856d5669-3cd5-4fc4-888c-af3f1e5bfc41",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjgxOGQ2M2YwNTZlYjQ3OTYxM2QxYzRkODZlZDFiY2UwYjM3YmNmMzhlZDdkZDkzZWNiZmM2NmZhZGUxYmY2In19fQ=="
+        },
+        "Antique Diver Helmet": {
+            "name": "Antique Diver Helmet",
+            "id": "69a4254e-8666-4913-b4ca-7f1592a71510",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzZmNzkzMGUzOWY3NTRjNzYwZGY5MDdmNmJiNjE3NWI1ZjQyNDljZTk3YTk3ZmQzZDAzMmVjNWZiY2VhNjQ2MSJ9fX0="
+        },
+        "Sea Pickles": {
+            "name": "Sea Pickles",
+            "id": "7fce85a7-32f7-4ce8-87d6-270c567dce8f",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjhlMWZkZWYwOTY4YjNkMTk1ZGUxMmI5Y2FhNjZjYmIwOTI1ODNmZmIxMWVlMjVjZDY5OGJhZTliZWZhNDczNyJ9fX0="
+        },
+        "Blue Sea Urchin": {
+            "name": "Blue Sea Urchin",
+            "id": "c96c07d8-dda2-4c70-b82d-c88a51ed8775",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTU5ZGY5YTM2ZTUyYTBmMzM3ODczOGZhMjM5YzZmYTkzMmIzZjQ0NDZiZjBhMGUwYjExZDhiNTFlN2IyMTViMyJ9fX0="
+        },
+        "Purple Sea Urchin": {
+            "name": "Purple Sea Urchin",
+            "id": "a5cbb210-9fb3-4720-b598-58ece9f97ba7",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODJjZDkxNGEzMGU2NGUzMDI4MDMzMGY4ODVhODVkYzc5ODM0ZWYwN2VjZGM4ZDNhY2M0Nzg5YThiZDA5MGE3YSJ9fX0="
+        },
+        "Red Sea Urchin": {
+            "name": "Red Sea Urchin",
+            "id": "4c3a609b-8309-4866-ba42-9a09ae308088",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWQ0MDQxYzAzMzRmN2IxOGZlOTdmN2Q0Y2MzODI2NzgzMjY2Y2E0ZTQ1MWI0ZjEwYTA4MDA2YzUzMjk4NTRmYiJ9fX0="
+        },
+        "Sea Anemone": {
+            "name": "Sea Anemone",
+            "id": "7adb1091-1013-491f-99a1-c5f716c0d9e3",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTA4MjM5YmExMjU2NTU4Y2UwNzMzNDMwNTNjMWUyYmQ1ZmNjZWJiMjQ0M2FlYTg4M2MzOGY0ZTEyMzA4NDg0MSJ9fX0="
+        },
+        "Barnacle": {
+            "name": "Barnacle",
+            "id": "dcf4c675-1f7e-407b-8d54-e9eb63adc46a",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmQyZDgzYTQzZjlkNjYzNzVmYWFlNzcwNWRhYjMzN2RiZDVhYmM0Y2JkYzU4MTUxZGJkZmQxNTBmOGIxMThkZiJ9fX0="
+        },
+        "Water": {
+            "name": "Water",
+            "id": "fba06992-9fdf-4354-adfa-fb94ef16601f",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWQ1OTlhZWY0M2YxNzIxZTA3YTRlMjlkY2JlZjY3YTgxNDMxNjVjODBjMzQ2ZGZmZjI5YWRlN2IzOTdhNTYwMCJ9fX0="
+        },
+        "Brown Clam Shell": {
+            "name": "Brown Clam Shell",
+            "id": "4d6ee784-be08-4e45-909e-77a018c3b42c",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTM5YTc4OTkxMmJiZGY2MTllODkyNTZiZTFiNTY4ZmY2ZjczNTdkOWQzNzNjOWI1ODdlZjdlYzE2YmExNzAwZCJ9fX0="
+        },
+        "Pink Clam Shell": {
+            "name": "Pink Clam Shell",
+            "id": "8d1028d5-110c-420f-bd86-aa6ff03889ca",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTc4ZjdmYjdjZjgzZGYxZTgyZmU3N2IxODRiNTVjYmU5NWZiODVlMWVhZGY0YzQxZDI4ODViZDllMzNjMGUxNCJ9fX0="
+        },
+        "Purple Shell": {
+            "name": "Purple Shell",
+            "id": "00dc457e-3f29-43f1-b807-447c1212d150",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDVjMTY1Yzg5ZWVhMjBjMjAwMjY0NmYzNmVjNDk2N2U3NmVkNzJiYjE1NzVhMTc4Mzk5YWUzNzUyNTdiMWYwMyJ9fX0="
+        },
+        "Nautilus Shell": {
+            "name": "Nautilus Shell",
+            "id": "2655fe50-0027-4cd2-81a3-5f1b99dc3b49",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODEyNmNhYzE2ZmQ4ZTQ3NTE2ZTg0NTIwY2QzOTgxYzQ1ZDcwOGY1NWQzNDU4NDk0ZDhmMDgxYzUwNWQ2ZDMwNCJ9fX0="
+        },
+        "Hermit Crab": {
+            "name": "Hermit Crab",
+            "id": "22653477-e5ed-4dd4-a50c-29f846aa3f2b",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjU5NjY3ZjhlZjRhOGQwZjI3YTVmYzhmNDZiMmZiNDAwMzQyM2JjOTQ1ZGE0M2IwMzFlN2I2MzYxYzJkMmRmMiJ9fX0="
+        },
+        "Crab": {
+            "name": "Crab",
+            "id": "fa15eecf-550e-430f-a0c3-367f1c4b2510",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQ2MjA2ZGZlMzRkMmVkYzM4MmI1NWI2MDU2ODI1ODRlOWQ4ZWVhMGFjMzVmN2M0NzM4ZGRlY2ZjZmQ5NTlmNyJ9fX0="
+        },
+        "Salmon": {
+            "name": "Salmon",
+            "id": "cb7b238c-f716-4ac6-b57e-94b2d93510e1",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjc3MGQ5MTdkMWNjYzEyZjNhMWNmNzNmZTdkZThjNjU0OGY0YTg0MjA4NjkyM2M3YmI0NDQ2YmNjN2FhZWJmYSJ9fX0="
+        },
+        "Fish Head": {
+            "name": "Fish Head",
+            "id": "77d4aeb6-3d1c-4631-91f5-fb01f700e300",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2NjNGE0NTVkNTM3YzgyMTgyMGFhZDIwYjk1MzY4NjQ4NDBhODczYmM5MDE2M2FhMzU1ODY2YjMyZTM1ZDA0MCJ9fX0="
+        },
+        "Fish Body": {
+            "name": "Fish Body",
+            "id": "61a4f184-baea-4da2-aef7-c77eae4541fd",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjFlNTYxMDBhN2E2Mjk0MTQyOGE2N2Y1NDVmZGVlYWNlNmFiNDgxODNiZGMxOTk4MzQ0ZTIxOWZlMTYyMDlmMSJ9fX0="
+        },
+        "Fish Tail": {
+            "name": "Fish Tail",
+            "id": "49ba66b5-b776-486e-a825-5b318b3c01e4",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2Y4NTcyY2UyMDkyZmQwNWIyOGUxZTljN2M2YjA2NWI2MzI3MjhlYmY3ZTAwZDAxZTQ0MjcyMDkzMzc3MzNmZCJ9fX0="
+        },
+        "Net": {
+            "name": "Net",
+            "id": "b9c37aa6-d935-482d-99d5-1266cb36a46d",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjE5M2IyNGQ3Y2IwZjg2M2I5ODdhNTRiMDI2YmQ5MDE4ZmFjMTU2NzFiM2ZiYmVjYzdkNmUyNTNjMjU3YiJ9fX0="
+        },
+        "Rope Coil with Anchor": {
+            "name": "Rope Coil with Anchor",
+            "id": "e8dde870-6f5a-46da-bfd9-5459d2c668c9",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTcwNTA5YTY0YzQ5NmNkZGJhNDEzNWU2NzEyYmIwNWQ5YWFkNDIwNTJhMThmZWVlZWQ3ZDQ0ZGEyYzNiZDBjYyJ9fX0="
+        },
+        "Life Jacket": {
+            "name": "Life Jacket",
+            "id": "ad74ef0a-2a2d-4793-a673-b0442e41a9fd",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2RlNWZjNzU3NjE1Y2Y0NDUyOTZiMGRhM2Y4NDdkYzFlNjkyNTJlNTIwNjY3NjY5MzY0N2ZjZGIxZjM3NWNlMyJ9fX0="
+        },
+        "Pink Axolotl": {
+            "name": "Pink Axolotl",
+            "id": "3b9c953a-31cc-496d-a000-1727e9dbd5aa",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTc3M2Q4ODc1Yzk4OTExNTM4ZTEwMGFjMDJlMTdhMjc2M2FlN2Y3MTI1ODIyNGI4YmY5NTU3YjNkNWRkZTAwNiJ9fX0="
+        },
+        "Light Blue Axolotl": {
+            "name": "Light Blue Axolotl",
+            "id": "ae0cce8e-f508-43ac-be31-cbaced0a49eb",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWU4YzcwZTZhNTYxNjFlY2RjNmI3NTY3NDA3MGZiMzA4NzE0YTJiMmI3MGUxZTZkNzZiYzkyMGNlNmNlN2RlNiJ9fX0="
+        },
+        "Beach Ball": {
+            "name": "Beach Ball",
+            "id": "982b0cc6-ed4b-4c46-ba29-0db531334d5b",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWE1YWIwNWVhMjU0YzMyZTNjNDhmM2ZkY2Y5ZmQ5ZDc3ZDNjYmEwNGU2YjVlYzJlNjhiM2NiZGNmYWMzZmQifX19"
+        },
+        "Red Cooler": {
+            "name": "Red Cooler",
+            "id": "4914d4c7-2699-4115-9b6d-5a32673a2da6",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjk2NmFmMzc2MGUyODMzOGMwNjU3ZjlmMzhjYzU4ZDhjY2ZhM2VlYTM2NDg2M2Q4N2JlOTljODc2ZDVmMzMwIn19fQ=="
+        },
+        "Portable Grill": {
+            "name": "Portable Grill",
+            "id": "3aca9a7c-d196-4de4-9413-743e0f0d4248",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzE4ZTM1ZWM0YjRiNGMxNTkxYzUxNzczODZkZTE4Nzk3NDU0Mjk4Yjc0NTU5ODJlM2FlODNiYWNjZWQwZjFhMiJ9fX0="
+        },
+        "Ice Cream": {
+            "name": "Ice Cream",
+            "id": "60178861-2ad1-4cdd-a482-b500ef4221ba",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTUzNjZjYTE3OTc0ODkyZTRmZDRjN2I5YjE4ZmViMTFmMDViYTJlYzQ3YWE1MDM1YzgxYTk1MzNiMjgifX19`"
+        },
+        "Frozen Yogurt": {
+            "name": "Frozen Yogurt",
+            "id": "cfb4660a-fbdb-4850-8fce-f4561ac63f86",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2I3N2Q5ZWM0MmNlNmRjMzk0MTQ1MDI1ZDhiYWVkZjRmZjk1ODIwMjZiMzZhZGY3NGM0YzZhZDljYzM5MCJ9fX0="
+        },
+        "Chocolate Mint Scoop": {
+            "name": "Chocolate Mint Scoop",
+            "id": "413e1b78-f48c-4298-b2c3-888c5c40aa0a",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMDZiZTAyZGU5ZjYxYTJjYzdjNTJhNzNjZmFkYzgxMGI1ZTQ1NTVhMmU4NzZkNTY5YTU0NjkxYTIyNmMzYiJ9fX0="
+        },
+        "Soda Can": {
+            "name": "Soda Can",
+            "id": "3b14b74b-27cf-4a98-a810-319c175371e6",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjhhMzRkODZhN2JiMTNkNDVhZmRjNTBkM2RjZTVlZWQ5NWUxODQ0ZmJkZWUwY2NhNzUzYzZkMzM0NmUzMzllIn19fQ=="
+        },
+        "Sand Bucket": {
+            "name": "Sand Bucket",
+            "id": "79759705-031e-4405-be8e-b789d75e3486",
+            "texture": "eyJ0aW1lc3RhbXAiOjE0NjQzNjk5Mzg3NjksInByb2ZpbGVJZCI6ImI0MDA3MmM4Y2RmOTQ1OGFhZmM0NDZmNWU1N2U2ZjcwIiwicHJvZmlsZU5hbWUiOiJTaGVyb20iLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzM0MzVmNDIyODQxNmQyYzZlMzU1N2Y5MWUzZjY5MGQ1OGQyM2I0NDFmZjlmOWY0OGU3ODllYmIzNWIxIn19fQ=="
+        }
+    },
     "Garden": {
         "Garden Gnome": {
             "name": "Garden Gnome",
@@ -10873,6 +11481,13 @@
             "name": "Piano Keys",
             "id": "fd0cccfd-d9f4-486d-9324-7c3177d4b038",
             "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTY0YzZlOWE0NWFjZDA1MjZhYzMyNWE1YzUwN2YzNzcxMTkwM2Q0MWY0MjcyYTVkNGQ3MzcwNjEwZDIyNmUyMSJ9fX0="
+        }
+    },
+    "Misc": {
+        "Discord": {
+            "name": "Discord",
+            "id": "e0a96788-b35d-25c1-b936-74b4dcc757d1",
+            "texture": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzg3M2MxMmJmZmI1MjUxYTBiODhkNWFlNzVjNzI0N2NiMzlhNzVmZjFhODFjYmU0YzhhMzliMzExZGRlZGEifX19"
         }
     }
 }
