@@ -19,9 +19,7 @@ import difflib
 from typing import TypedDict, overload, Any
 
 
-__all__ = (
-    'Item',
-)
+__all__ = ('Item',)
 
 
 class ItemJsonData(TypedDict):
@@ -50,8 +48,58 @@ HIDE_FLAGS: dict[str, int] = {
 HIDE_FLAGS['hide_all_flags'] = max(HIDE_FLAGS.values()) * 2 - 1
 
 
-def replace_placeholders(text: str) -> str:
+def replace_formatting(text: str) -> str:
     return re.sub(r'&([0-9a-fk-or])', r'§\1', text)
+
+
+def remove_formatting(text: str) -> str:
+    return re.sub(r'[&§][0-9a-fk-or]', '', text)
+
+
+COLOR_MAPPINGS: dict[str, int] = {
+    '§0': 0x000000,
+    '§1': 0x0000AA,
+    '§2': 0x00AA00,
+    '§3': 0x00AAAA,
+    '§4': 0xAA0000,
+    '§5': 0xAA00AA,
+    '§6': 0xFFAA00,
+    '§7': 0xAAAAAA,
+    '§8': 0x555555,
+    '§9': 0x5555FF,
+    '§a': 0x55FF55,
+    '§b': 0x55FFFF,
+    '§c': 0xFF5555,
+    '§d': 0xFF55FF,
+    '§e': 0xFFFF55,
+    '§f': 0xFFFFFF,
+}
+
+
+def ansi_color(
+    text: str,
+    color: int,
+    *,
+    reset: bool = True,
+) -> str:
+    return (
+        f'\033[38;2;{color >> 16 & 0xFF};{color >> 8 & 0xFF};{color & 0xFF}m{text}'
+        + ('\033[0m' if reset else '')
+    )
+
+
+def formatting_to_ansi(text: str) -> str:
+    text = replace_formatting(text)
+    def replace(match: re.Match) -> str:
+        key = match.group()
+        if key == '§r':
+            return '\033[0m'
+        color = COLOR_MAPPINGS.get(key, None)
+        if color is None:
+            return ''
+        return ansi_color('', color, reset=False)
+
+    return re.sub(r'§[0-9a-fk-or]', replace, text) + '\033[0m'
 
 
 SAVED_CACHE: dict[str, str] = {}
@@ -243,12 +291,12 @@ class Item:
 
         lore: str | None = extras_copy.pop('lore', None)
         if lore is not None:
-            lore = replace_placeholders(lore)
+            lore = replace_formatting(lore)
             display.put('Lore', NBTList([NBTString(line) for line in lore.split('\n')]))
 
         name: str | None = extras_copy.pop('name', None)
         if name is not None:
-            name = replace_placeholders(name)
+            name = replace_formatting(name)
             display.put('Name', NBTString(name))
 
         color: int | str | tuple[int, int, int] | None = extras_copy.pop('color', None)
@@ -314,25 +362,38 @@ class Item:
     def copied(self) -> 'Item':
         return Item(self._key, **self.extras)  # type: ignore
 
+    def _get_save_name(self, json_data: str) -> str:
+        prefix: str | None = self.extras.get('name', None)
+        if prefix is not None:
+            prefix = re.sub(r'[&§][0-9a-fk-or]', '', prefix)
+            prefix = prefix.lower().replace(' ', '_')
+            prefix = re.sub(r'[^a-z0-9_]', '', prefix)
+        if not prefix:
+            prefix = self._key
+        suffix = hashlib.md5(json_data.encode()).hexdigest()[:8]
+        return f'_{prefix}_{suffix}'
+
     def save(self) -> str:
         data = self._get_item_data()
-        json_repr = self._as_json(data)
-        cached = SAVED_CACHE.get(json_repr, None)
+        json_data = self._as_json(data)
+        cached = SAVED_CACHE.get(json_data, None)
 
         title = f'\033[38;2;0;255;0m{data["title"]}\033[0m'
         if self.count != 1:
-            title = f'\033[38;2;0;191;255m{self.count}x\033[0m ' + title
+            title = f'\033[38;2;0;191;255mx{self.count}\033[0m ' + title
+        display_name = self.extras.get('name', None)
+        if display_name is not None:
+            title += f' ({formatting_to_ansi(display_name)})'
 
         if cached is not None:
             print(f'Using cached {title} as \x1b[38;2;255;0;0m{cached}\x1b[0m.')
             return cached
 
-        suffix = hashlib.md5(json_repr.encode()).hexdigest()[:8]
-        name = f'_{self._key}_{suffix}'
+        name = self._get_save_name(json_data)
         path = HTSL_IMPORTS_FOLDER / f'{name}.json'
-        path.write_text(json_repr, encoding='utf-8')
+        path.write_text(json_data, encoding='utf-8')
 
-        SAVED_CACHE[json_repr] = name
+        SAVED_CACHE[json_data] = name
         print(
             f'Successfully saved {title} as \x1b[38;2;255;0;0m{name}\x1b[0m to be used in your script:'
             f'\n  \033[38;2;0;255;0m+\033[0m {path.absolute()}'
