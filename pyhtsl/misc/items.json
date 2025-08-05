@@ -2177,7 +2177,7 @@
     },
     "stained_clay": {
         "key": "stained_clay",
-        "title": "Stained Clay",
+        "title": "Hardened Clay",
         "name": "minecraft:hardened_clay",
         "id": 172,
         "data_value": 0,
