@@ -272,8 +272,6 @@ class Item:
 
         unbreakable: int = int(extras_copy.pop('unbreakable', False))
         if unbreakable:
-            if not data['can_be_damaged']:
-                raise ValueError(f'Item "{self._key}" cannot be unbreakable.')
             tags.put('Unbreakable', NBTByte(unbreakable))
 
         hide_flags: int = min(
