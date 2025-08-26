@@ -118,8 +118,8 @@ class ExpressionHandler:
                         other_left, other_operator, other_right = lines[j]
                         assert type(other_left) is not type(left)
                         if (
-                            isinstance(other_left, TemporaryStat) and other_left.number == right.number
-                            and type(other_right) is type(left) and other_right.name == left.name  # type: ignore
+                            right.equals(other_left)
+                            and left.equals(other_right)
                             and other_operator is not ExpressionOperator.Set
                         ):
                             used_before = True
@@ -130,10 +130,7 @@ class ExpressionHandler:
                     used_after = False
                     for j in range(i + 1, len(lines)):
                         other_left, other_operator, other_right = lines[j]
-                        if isinstance(other_left, TemporaryStat) and other_left.number == right.number:
-                            used_after = True
-                            break
-                        if isinstance(other_right, TemporaryStat) and other_right.number == right.number:
+                        if right.equals(other_left) or right.equals(other_right):
                             used_after = True
                             break
                     if used_after:
@@ -142,10 +139,10 @@ class ExpressionHandler:
                     for j in range(i, -1, -1):
                         other_left, other_operator, other_right = lines[j]
                         changing = False
-                        if isinstance(other_left, TemporaryStat) and other_left.number == right.number:
+                        if right.equals(other_left):
                             other_left = left
                             changing = True
-                        if isinstance(other_right, TemporaryStat) and other_right.number == right.number:
+                        if right.equals(other_right):
                             other_right = left
                             changing = True
                         if changing:
@@ -173,14 +170,14 @@ class ExpressionHandler:
                     for j in range(i - 1, -1, -1):
                         other_left, other_operator, other_right = lines[j]
                         if (
-                            isinstance(other_left, TemporaryStat) and other_left.number == left.number
-                            and isinstance(other_right, TemporaryStat) and other_right.number == right.number
+                            left.equals(other_left)
+                            and right.equals(other_right)
                         ):
                             used_before = True
                             break
                         if (
-                            isinstance(other_left, TemporaryStat) and other_left.number == right.number
-                            and isinstance(other_right, TemporaryStat) and other_right.number == left.number
+                            right.equals(other_left)
+                            and left.equals(other_right)
                             and other_operator is not ExpressionOperator.Set
                         ):
                             used_before = True
@@ -189,10 +186,10 @@ class ExpressionHandler:
                     used_after = False
                     for j in range(i + 1, len(lines)):
                         other_left, other_operator, other_right = lines[j]
-                        if isinstance(other_left, TemporaryStat) and other_left.number == right.number:
+                        if right.equals(other_left):
                             used_after = True
                             break
-                        if isinstance(other_right, TemporaryStat) and other_right.number == right.number:
+                        if right.equals(other_right):
                             used_after = True
                             break
                     if used_after:
@@ -201,10 +198,10 @@ class ExpressionHandler:
                     for j in range(i, -1, -1):
                         other_left, other_operator, other_right = lines[j]
                         changing = False
-                        if isinstance(other_left, TemporaryStat) and other_left.number == right.number:
+                        if right.equals(other_left):
                             other_left = left
                             changing = True
-                        if isinstance(other_right, TemporaryStat) and other_right.number == right.number:
+                        if right.equals(other_right):
                             other_right = left
                             changing = True
                         if changing:
