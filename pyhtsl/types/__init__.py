@@ -2,11 +2,15 @@ from ..condition.base_condition import BaseCondition
 from ..condition.conditional_statements import IfStatement
 from ..expression.assignment_expression import Expression
 from ..stats.base_stat import BaseStat
+from ..checkable import Checkable
+from ..editable import Editable
 
 from typing import Literal
 
 
 __all__ = (
+    'Checkable',
+    'Editable',
     'BaseCondition',
     'IfStatement',
     'Expression',
