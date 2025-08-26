@@ -1,6 +1,7 @@
 from ..condition.base_condition import BaseCondition
 from ..condition.conditional_statements import IfStatement
 from ..expression.assignment_expression import Expression
+from ..stats.base_stat import BaseStat
 
 from typing import Literal
 
@@ -9,6 +10,7 @@ __all__ = (
     'BaseCondition',
     'IfStatement',
     'Expression',
+    'BaseStat',
     'ALL_POTION_EFFECTS',
     'ALL_DAMAGE_CAUSES',
     'ALL_ENCHANTMENTS',
