@@ -12,7 +12,7 @@ __all__ = (
 
 
 @final
-class PlaceholderCheckable(Editable):
+class PlaceholderCheckable(Checkable):
     assignment_right_side: str
     comparison_left_side: str
     comparison_right_side: str
