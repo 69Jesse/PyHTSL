@@ -455,7 +455,6 @@ class Checkable(ABC):
         return expr
 
     def __mod__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
-        print('CALLED MOD', self, other)
         is_double = (
             self.internal_type is InternalType.DOUBLE
             or isinstance(other, float)
