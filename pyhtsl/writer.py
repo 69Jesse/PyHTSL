@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import atexit
 import sys
+
 from .line_type import LineType
 from .fixer import Fixer
 from .logger import AntiSpamLogger
@@ -11,10 +12,7 @@ from types import TracebackType
 from typing import TYPE_CHECKING, Callable
 if TYPE_CHECKING:
     from .public.function import Function
-    from .checkable import Checkable
-    from .expression.housing_type import HousingType
-    from .expression.assignment_expression import ExpressionOperator
-    from .editable import Editable
+    from pyhtsl.expression.handler import LinesType
 
 
 __all__ = (
@@ -80,7 +78,7 @@ if not HTSL_IMPORTS_FOLDER.exists():
     raise FileNotFoundError(f'Could not find your HTSL imports folder at\n{HTSL_IMPORTS_FOLDER}')
 
 
-type LinesCallbackType = Callable[[list[tuple['Editable', 'ExpressionOperator', 'Checkable | HousingType']]], None] | None
+type LinesCallbackType = Callable[['LinesType'], None] | None
 
 
 class ExportContainer:

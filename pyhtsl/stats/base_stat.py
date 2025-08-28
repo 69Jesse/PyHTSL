@@ -1,6 +1,5 @@
 from abc import abstractmethod
 
-from ..internal_type import InternalType
 from ..checkable import Checkable
 from ..editable import Editable
 from ..expression.handler import ExpressionHandler
@@ -15,7 +14,6 @@ __all__ = (
 
 class BaseStat(Editable):
     name: str
-    should_force_type_compatible: bool
     auto_unset: bool
     if TYPE_CHECKING:
         def __init__(
@@ -113,22 +111,17 @@ class BaseStat(Editable):
 
     def copied(self) -> Self:
         copied = super().copied()
-        copied.should_force_type_compatible = self.should_force_type_compatible
         copied.unset = self.unset
         return copied
 
-    def cast_to_type(self, internal_type: InternalType) -> None:
-        copied = self.as_any()
-        copied.value = self.as_type(internal_type)
+    def cast_to_long(self) -> Self:
+        return self.set(self.as_long(), is_self_cast=True)
 
-    def cast_to_long(self) -> None:
-        return self.cast_to_type(InternalType.LONG)
+    def cast_to_double(self) -> Self:
+        return self.set(self.as_double(), is_self_cast=True)
 
-    def cast_to_double(self) -> None:
-        return self.cast_to_type(InternalType.DOUBLE)
-
-    def cast_to_string(self) -> None:
-        return self.cast_to_type(InternalType.STRING)
+    def cast_to_string(self) -> Self:
+        return self.set(self.as_string(), is_self_cast=True)
 
 
 Checkable._import_base_stat(BaseStat)

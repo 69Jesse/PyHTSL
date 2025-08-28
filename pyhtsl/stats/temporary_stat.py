@@ -61,7 +61,7 @@ class TemporaryStat(BaseStat):
         return stat
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}<{self.number}>'
+        return f'{self.__class__.__name__}<{self.number} {self.internal_type.name}>'
 
 
 ExpressionHandler._import_temporary_stat(TemporaryStat)

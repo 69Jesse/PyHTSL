@@ -136,14 +136,15 @@ class Checkable(ABC):
     def _equals(self, other: 'Checkable | HousingType') -> bool:
         raise NotImplementedError
 
-    def equals(self, other: 'Checkable | HousingType') -> bool:
+    def equals(self, other: 'Checkable | HousingType', *, check_internal_type: bool = True) -> bool:
         """
         Checks if the current object is equal to another object.
         """
         if not isinstance(other, Checkable):
             return False
-        if self.internal_type is not other.internal_type:
-            return False
+        if check_internal_type:
+            if self.internal_type is not other.internal_type:
+                return False
         if self.fallback_value != other.fallback_value:
             return False
         return self._equals(other)
@@ -168,34 +169,35 @@ class Checkable(ABC):
         return self._as_string()
 
     @overload
-    def _other_as_type_compatible(self, other: 'Editable') -> 'Editable':
+    def _other_as_type_compatible(self, other: 'Editable', internal_type: InternalType | None = None) -> 'Editable':
         ...
 
     @overload
-    def _other_as_type_compatible(self, other: 'Checkable') -> 'Checkable':
+    def _other_as_type_compatible(self, other: 'Checkable', internal_type: InternalType | None = None) -> 'Checkable':
         ...
 
     @overload
-    def _other_as_type_compatible(self, other: HousingType) -> HousingType:
+    def _other_as_type_compatible(self, other: HousingType, internal_type: InternalType | None = None) -> HousingType:
         ...
 
     @overload
-    def _other_as_type_compatible(self, other: 'Checkable | HousingType') -> 'Checkable | HousingType':
+    def _other_as_type_compatible(self, other: 'Checkable | HousingType', internal_type: InternalType | None = None) -> 'Checkable | HousingType':
         ...
 
-    def _other_as_type_compatible(self, other: 'Checkable | HousingType') -> 'Checkable | HousingType':
-        if self.internal_type is InternalType.ANY:
+    def _other_as_type_compatible(self, other: 'Checkable | HousingType', internal_type: InternalType | None = None) -> 'Checkable | HousingType':
+        internal_type = internal_type or self.internal_type
+        if internal_type is InternalType.ANY:
             return other
 
-        if isinstance(other, BaseStat) and not other.should_force_type_compatible:
+        if isinstance(other, BaseStat) and self.equals(other, check_internal_type=False):
             return other
 
         if isinstance(other, Checkable):
-            if self.internal_type is InternalType.LONG:
+            if internal_type is InternalType.LONG:
                 other = other.as_long()
-            elif self.internal_type is InternalType.DOUBLE:
+            elif internal_type is InternalType.DOUBLE:
                 other = other.as_double()
-            elif self.internal_type is InternalType.STRING:
+            elif internal_type is InternalType.STRING:
                 other = other.as_string()
 
         if isinstance(other, Expression):
@@ -204,23 +206,23 @@ class Checkable(ABC):
             return other
 
         if isinstance(other, Checkable):
-            if self.internal_type is InternalType.LONG and (other.internal_type is InternalType.ANY or other.internal_type is InternalType.LONG):
+            if internal_type is InternalType.LONG and (other.internal_type is InternalType.ANY or other.internal_type is InternalType.LONG):
                 return _transformed_to_long(other)
-            if self.internal_type is InternalType.DOUBLE and (other.internal_type is InternalType.ANY or other.internal_type is InternalType.DOUBLE):
+            if internal_type is InternalType.DOUBLE and (other.internal_type is InternalType.ANY or other.internal_type is InternalType.DOUBLE):
                 return _transformed_to_double(other)
-            if self.internal_type is InternalType.STRING and (other.internal_type is InternalType.ANY or other.internal_type is InternalType.STRING):
+            if internal_type is InternalType.STRING and (other.internal_type is InternalType.ANY or other.internal_type is InternalType.STRING):
                 return _transformed_to_string(other)
         if isinstance(other, NumericHousingType):
-            if self.internal_type is InternalType.LONG:
+            if internal_type is InternalType.LONG:
                 return _transformed_to_long(other)
-            if self.internal_type is InternalType.DOUBLE:
+            if internal_type is InternalType.DOUBLE:
                 return _transformed_to_double(other)
-            if self.internal_type is InternalType.STRING:
+            if internal_type is InternalType.STRING:
                 return _transformed_to_string(other)
-        if self.internal_type is InternalType.STRING:
+        if internal_type is InternalType.STRING:
             return _transformed_to_string(other)
         raise TypeError(
-            f'{repr(self)} with internal type {self.internal_type} '
+            f'{repr(self)} with internal type {internal_type} '
             + f'is incompatible with {repr(other)}'
             + (f' with internal type {other.internal_type.name}' if isinstance(other, Checkable) else '')
         )
@@ -443,46 +445,25 @@ class Checkable(ABC):
         EXPR_HANDLER._expressions.extend(multiply_expressions)
         return multiply_strat_expr
 
-    def _cast_to(self, temp_stat: 'TemporaryStat', internal_type: InternalType) -> 'Expression':
-        temp_stat_copied = temp_stat.copied().as_type(internal_type)
-        temp_stat_copied.should_force_type_compatible = False
-        expr = Expression(temp_stat.as_any(), temp_stat_copied, ExpressionOperator.Set)
+    def remainder(self, other: 'Checkable | NumericHousingType') -> 'Expression':
+        temp_stat_1 = TemporaryStat(self.internal_type)
+        expr = Expression(temp_stat_1, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
-        return expr
-
-    def __mod__(self, other: 'Checkable | NumericHousingType') -> 'Expression':
-        is_double = (
-            self.internal_type is InternalType.DOUBLE
-            or isinstance(other, float)
-            or (
-                isinstance(other, Checkable)
-                and other.internal_type is InternalType.DOUBLE
-            )
-        )
-
-        temp_stat_1 = TemporaryStat(InternalType.DOUBLE)
-        expr = Expression(temp_stat_1, self.as_double(), ExpressionOperator.Set)
-        EXPR_HANDLER.add(expr)
-        expr = Expression(temp_stat_1, other if is_double else _transformed_to_long(other), ExpressionOperator.Divide)
-        EXPR_HANDLER.add(expr)
-        expr = Expression(temp_stat_1, 1.0, ExpressionOperator.Increment)
-        EXPR_HANDLER.add(expr)
-        expr = self._cast_to(temp_stat_1, InternalType.LONG)
-        expr = self._cast_to(temp_stat_1, InternalType.DOUBLE)
-
-        other_as_double = other.as_double() if isinstance(other, Checkable) else other
-        expr = Expression(temp_stat_1, other_as_double, ExpressionOperator.Divide)
-        EXPR_HANDLER.add(expr)
-        expr = Expression(temp_stat_1, other_as_double, ExpressionOperator.Decrement)
-        EXPR_HANDLER.add(expr)
-
-        if not is_double:
-            self._cast_to(temp_stat_1, InternalType.LONG)
 
         temp_stat_2 = TemporaryStat(self.internal_type)
         expr = Expression(temp_stat_2, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
-        expr = Expression(temp_stat_2, temp_stat_1, ExpressionOperator.Decrement)
+        expr = Expression(temp_stat_2, self._other_as_type_compatible(other), ExpressionOperator.Divide)
+        EXPR_HANDLER.add(expr)
+        if self.internal_type is InternalType.DOUBLE:
+            expr = Expression(temp_stat_2, temp_stat_2.as_long(), ExpressionOperator.Set, is_self_cast=True)
+            EXPR_HANDLER.add(expr)
+            expr = Expression(temp_stat_2, temp_stat_2.as_double(), ExpressionOperator.Set, is_self_cast=True)
+            EXPR_HANDLER.add(expr)
+        expr = Expression(temp_stat_2, self._other_as_type_compatible(other), ExpressionOperator.Multiply)
+        EXPR_HANDLER.add(expr)
+
+        expr = Expression(temp_stat_1, temp_stat_2, ExpressionOperator.Decrement)
         EXPR_HANDLER.add(expr)
         return expr
 

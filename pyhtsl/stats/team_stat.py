@@ -50,7 +50,7 @@ class TeamStat(Stat):
         return TeamStat(self.name, self.team)
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}<{self.name}, {repr(self.team)}>'
+        return f'{self.__class__.__name__}<{self.name}, {repr(self.team)} {self.internal_type.name}>'
 
 
 Team._import_team_stat(TeamStat)

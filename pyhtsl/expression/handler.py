@@ -3,6 +3,7 @@ from ..writer import WRITER, LineType
 from ..public.no_optimization import no_optimization
 
 from typing import TYPE_CHECKING, final
+
 if TYPE_CHECKING:
     from ..stats.base_stat import BaseStat
     from ..stats.temporary_stat import TemporaryStat
@@ -20,7 +21,14 @@ __all__ = (
 
 
 TEMP_STATS_NUMBER_START: int = 1
-type LinesType = list[tuple['Editable', 'ExpressionOperator', 'Checkable | HousingType']]
+type LinesType = list[
+    tuple[
+        'Editable',
+        'ExpressionOperator',
+        'Checkable | HousingType',
+        'Expression',
+    ]
+]
 
 
 class AutomaticUnset:
@@ -81,7 +89,7 @@ class ExpressionHandler:
         for expression in self._expressions:
             left = expression._all_the_way_left(expression.left)
             right = expression._all_the_way_left(expression.right)
-            lines.append((left, expression.operator, right))
+            lines.append((left, expression.operator, right, expression))
         return lines
 
     def optimize_lines(
@@ -89,14 +97,14 @@ class ExpressionHandler:
         lines: LinesType,
     ) -> None:
         for i in range(len(lines) - 1):
-            left, _, _ = lines[i]
+            left, *_ = lines[i]
             assert isinstance(left, TemporaryStat)
 
         has_changed = True
         while has_changed:
             has_changed = False
             for i in range(len(lines)):
-                left, operator, right = lines[i]
+                left, operator, right, _ = lines[i]
 
                 if not isinstance(left, TemporaryStat):
                     if not isinstance(right, TemporaryStat):
@@ -115,11 +123,11 @@ class ExpressionHandler:
 
                     used_before = False
                     for j in range(i - 1, -1, -1):
-                        other_left, other_operator, other_right = lines[j]
+                        other_left, other_operator, other_right, _ = lines[j]
                         assert type(other_left) is not type(left)
                         if (
-                            right.equals(other_left)
-                            and left.equals(other_right)
+                            right.equals(other_left, check_internal_type=False)
+                            and left.equals(other_right, check_internal_type=False)
                             and other_operator is not ExpressionOperator.Set
                         ):
                             used_before = True
@@ -129,24 +137,26 @@ class ExpressionHandler:
 
                     used_after = False
                     for j in range(i + 1, len(lines)):
-                        other_left, other_operator, other_right = lines[j]
-                        if right.equals(other_left) or right.equals(other_right):
+                        other_left, other_operator, other_right, _ = lines[j]
+                        if right.equals(
+                            other_left, check_internal_type=False
+                        ) or right.equals(other_right, check_internal_type=False):
                             used_after = True
                             break
                     if used_after:
                         continue
 
                     for j in range(i, -1, -1):
-                        other_left, other_operator, other_right = lines[j]
+                        other_left, other_operator, other_right, expression = lines[j]
                         changing = False
-                        if right.equals(other_left):
+                        if right.equals(other_left, check_internal_type=False):
                             other_left = left
                             changing = True
-                        if right.equals(other_right):
+                        if right.equals(other_right, check_internal_type=False):
                             other_right = left
                             changing = True
                         if changing:
-                            lines[j] = (other_left, other_operator, other_right)
+                            lines[j] = (other_left, other_operator, other_right, expression)
                             has_changed = True
 
                     continue
@@ -155,6 +165,8 @@ class ExpressionHandler:
                     if not isinstance(right, TemporaryStat):
                         continue
                     if operator is not ExpressionOperator.Set:
+                        continue
+                    if left.equals(right, check_internal_type=False):
                         continue
 
                     # We have:
@@ -168,16 +180,15 @@ class ExpressionHandler:
 
                     used_before = False
                     for j in range(i - 1, -1, -1):
-                        other_left, other_operator, other_right = lines[j]
-                        if (
-                            left.equals(other_left)
-                            and right.equals(other_right)
-                        ):
+                        other_left, other_operator, other_right, _ = lines[j]
+                        if left.equals(
+                            other_left, check_internal_type=False
+                        ) and right.equals(other_right, check_internal_type=False):
                             used_before = True
                             break
                         if (
-                            right.equals(other_left)
-                            and left.equals(other_right)
+                            right.equals(other_left, check_internal_type=False)
+                            and left.equals(other_right, check_internal_type=False)
                             and other_operator is not ExpressionOperator.Set
                         ):
                             used_before = True
@@ -185,27 +196,27 @@ class ExpressionHandler:
 
                     used_after = False
                     for j in range(i + 1, len(lines)):
-                        other_left, other_operator, other_right = lines[j]
-                        if right.equals(other_left):
+                        other_left, other_operator, other_right, _ = lines[j]
+                        if right.equals(other_left, check_internal_type=False):
                             used_after = True
                             break
-                        if right.equals(other_right):
+                        if right.equals(other_right, check_internal_type=False):
                             used_after = True
                             break
                     if used_after:
                         continue
 
                     for j in range(i, -1, -1):
-                        other_left, other_operator, other_right = lines[j]
+                        other_left, other_operator, other_right, expression = lines[j]
                         changing = False
-                        if right.equals(other_left):
+                        if right.equals(other_left, check_internal_type=False):
                             other_left = left
                             changing = True
-                        if right.equals(other_right):
+                        if right.equals(other_right, check_internal_type=False):
                             other_right = left
                             changing = True
                         if changing:
-                            lines[j] = (other_left, other_operator, other_right)
+                            lines[j] = (other_left, other_operator, other_right, expression)
                             has_changed = True
 
     def take_out_useless(
@@ -213,20 +224,27 @@ class ExpressionHandler:
         lines: LinesType,
     ) -> None:
         for i in range(len(lines) - 1, -1, -1):
-            left, operator, right = lines[i]
+            left, operator, right, expression = lines[i]
             if (
-                left.equals(right)
+                left.equals(right, check_internal_type=False)
                 and operator is ExpressionOperator.Set
+                and not expression.is_self_cast
             ):
                 lines.pop(i)
             elif (
-                (operator is ExpressionOperator.Increment or operator is ExpressionOperator.Decrement)
-                and ((isinstance(right, int) and right == 0) or (isinstance(right, float) and right == 0.0))
+                operator is ExpressionOperator.Increment
+                or operator is ExpressionOperator.Decrement
+            ) and (
+                (isinstance(right, int) and right == 0)
+                or (isinstance(right, float) and right == 0.0)
             ):
                 lines.pop(i)
             elif (
-                (operator is ExpressionOperator.Multiply or operator is ExpressionOperator.Divide)
-                and ((isinstance(right, int) and right == 1) or (isinstance(right, float) and right == 1.0))
+                operator is ExpressionOperator.Multiply
+                or operator is ExpressionOperator.Divide
+            ) and (
+                (isinstance(right, int) and right == 1)
+                or (isinstance(right, float) and right == 1.0)
             ):
                 lines.pop(i)
 
@@ -247,10 +265,13 @@ class ExpressionHandler:
         lines: LinesType,
     ) -> None:
         temporary_stats: dict[int, list['TemporaryStat']] = {}
-        for left, _, right in lines:
+        for left, _, right, _ in lines:
             self._add_to_temporary_stats_mapping(left, temporary_stats)
             self._add_to_temporary_stats_mapping(right, temporary_stats)
-        for i, stats in enumerate(temporary_stats.values(), start=TEMP_STATS_NUMBER_START):
+        for i, stats in enumerate(
+            temporary_stats.values(),
+            start=TEMP_STATS_NUMBER_START,
+        ):
             for stat in stats:
                 stat.number = i
 
@@ -258,18 +279,22 @@ class ExpressionHandler:
         self,
         lines: LinesType,
     ) -> None:
-        for left, operator, right in lines:
+        for left, operator, right, expression in lines:
             if isinstance(right, str) and len(right) > 32:
-                raise ValueError(f'Assignment of string "{right}" is too long ({len(right)}>32)')
+                raise ValueError(
+                    f'Assignment of string "{right}" is too long ({len(right)}>32)'
+                )
 
     def write_lines(
         self,
         lines: LinesType,
     ) -> None:
-        for left, operator, right in lines:
+        for left, operator, right, expression in lines:
             line = f'{left._in_assignment_left_side()} {operator.value} {Checkable._to_assignment_right_side(right)}'
             if isinstance(left, BaseStat):
                 line += f' {str(left.auto_unset).lower()}'
+            if expression.is_self_cast:
+                line += '  // PyHTSL intended type cast'
             WRITER.write(
                 line,
                 LineType.variable_change,

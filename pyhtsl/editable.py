@@ -1,3 +1,4 @@
+from pyhtsl.public.if_and import IfAnd
 from .writer import WRITER, LineType
 from .expression.handler import EXPR_HANDLER
 from .checkable import Checkable
@@ -54,11 +55,15 @@ class Editable(Checkable):
         return self
 
     def __imod__(self, other: Checkable | NumericHousingType) -> Self:
-        self.set(self.__mod__(self._other_as_type_compatible(other)))  # type: ignore
+        self.set(self.remainder(other))
+        with IfAnd(self.value < self._other_as_type_compatible(0)):
+            self.dec(self._other_as_type_compatible(other))  # type: ignore
         return self
 
-    def set(self, right: Checkable | HousingType) -> Self:
-        expr = Expression(self, self._other_as_type_compatible(right), ExpressionOperator.Set)
+    def set(self, right: Checkable | HousingType, *, is_self_cast: bool = False) -> Self:
+        if is_self_cast and not self.equals(right, check_internal_type=False):
+            raise ValueError('is_self_cast can only be True if lhs is equal to rhs')
+        expr = Expression(self, self._other_as_type_compatible(right), ExpressionOperator.Set, is_self_cast=is_self_cast)
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
         return self

@@ -21,17 +21,21 @@ class Expression(Checkable):
     right: Checkable | HousingType
     operator: ExpressionOperator
     id: str
+    is_self_cast: bool
+
     def __init__(
         self,
         left: Editable,
         right: Checkable | HousingType,
         operator: ExpressionOperator,
         id: str | None = None,
+        is_self_cast: bool = False,
     ) -> None:
         self.left = left
         self.right = right
         self.operator = operator
         self.id = id or os.urandom(8).hex()
+        self.is_self_cast = is_self_cast
 
     @overload
     def _all_the_way_left(self, value: Editable) -> Editable:
