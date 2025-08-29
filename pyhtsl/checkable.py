@@ -450,20 +450,22 @@ class Checkable(ABC):
         expr = Expression(temp_stat_1, self, ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
 
-        temp_stat_2 = TemporaryStat(self.internal_type)
-        expr = Expression(temp_stat_2, self, ExpressionOperator.Set)
+        internal_type = self.internal_type if not (isinstance(other, (int, float)) and other.is_integer()) else InternalType.LONG
+
+        temp_stat_2 = TemporaryStat(internal_type)
+        expr = Expression(temp_stat_2, self.as_type(internal_type), ExpressionOperator.Set)
         EXPR_HANDLER.add(expr)
-        expr = Expression(temp_stat_2, self._other_as_type_compatible(other), ExpressionOperator.Divide)
+        expr = Expression(temp_stat_2, self._other_as_type_compatible(other, internal_type=internal_type), ExpressionOperator.Divide)
         EXPR_HANDLER.add(expr)
-        if self.internal_type is InternalType.DOUBLE:
+        if internal_type is InternalType.DOUBLE:
             expr = Expression(temp_stat_2, temp_stat_2.as_long(), ExpressionOperator.Set, is_self_cast=True)
             EXPR_HANDLER.add(expr)
             expr = Expression(temp_stat_2, temp_stat_2.as_double(), ExpressionOperator.Set, is_self_cast=True)
             EXPR_HANDLER.add(expr)
-        expr = Expression(temp_stat_2, self._other_as_type_compatible(other), ExpressionOperator.Multiply)
+        expr = Expression(temp_stat_2, self._other_as_type_compatible(other, internal_type=internal_type), ExpressionOperator.Multiply)
         EXPR_HANDLER.add(expr)
 
-        expr = Expression(temp_stat_1, temp_stat_2, ExpressionOperator.Decrement)
+        expr = Expression(temp_stat_1, temp_stat_2.as_type(self.internal_type), ExpressionOperator.Decrement)
         EXPR_HANDLER.add(expr)
         return expr
 
