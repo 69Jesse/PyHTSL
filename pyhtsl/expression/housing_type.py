@@ -22,4 +22,4 @@ def _housing_type_as_right_side(value: HousingType) -> str:
             if '.' not in formatted:
                 formatted += '.0'
             return formatted
-    return f'"{value.replace('"', '\\"')}"'
+    return value

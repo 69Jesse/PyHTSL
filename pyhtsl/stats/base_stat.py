@@ -79,6 +79,12 @@ class BaseStat(Editable):
         if not include_fallback_value:
             return ''
         fallback_value = self._get_formatted_fallback_value()
+
+        if isinstance(fallback_value, str) and not fallback_value:
+            return ''
+        if isinstance(fallback_value, str) and ' ' in fallback_value:
+            raise ValueError('Fallback values cannot have spaces inside of them because of HTSL\'s limitations..')
+
         if fallback_value is None:
             return ''
         return f' {fallback_value}'
