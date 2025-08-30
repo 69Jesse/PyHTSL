@@ -1,5 +1,5 @@
-from ..writer import WRITER, LineType
-
+from ..condition.binary_condition import BinaryCondition
+from ..writer import WRITER
 from ..public.no_optimization import no_optimization
 
 from typing import TYPE_CHECKING, final
@@ -8,10 +8,11 @@ if TYPE_CHECKING:
     from ..stats.base_stat import BaseStat
     from ..stats.temporary_stat import TemporaryStat
     from ..checkable import Checkable
-    from .housing_type import HousingType
     from ..editable import Editable
-    from .assignment_expression import Expression
-    from .operator import ExpressionOperator
+    from .housing_type import HousingType
+    from .expression import Expression
+    from .conditional_expressions import ConditionalEnterExpression, ConditionalExitExpression
+    from .binary_expression import BinaryExpressionOperator, BinaryExpression
 
 
 __all__ = (
@@ -21,14 +22,6 @@ __all__ = (
 
 
 TEMP_STATS_NUMBER_START: int = 1
-type LinesType = list[
-    tuple[
-        'Editable',
-        'ExpressionOperator',
-        'Checkable | HousingType',
-        'Expression',
-    ]
-]
 
 
 class AutomaticUnset:
@@ -69,12 +62,20 @@ class ExpressionHandler:
         globals()[temporary_stat_cls.__name__] = temporary_stat_cls
 
     @staticmethod
-    def _import_expression(
-        expression_cls: type['Expression'],
-        expression_operator_cls: type['ExpressionOperator'],
+    def _import_binary_expression(
+        binary_expression_cls: type['BinaryExpression'],
+        binary_operator_cls: type['BinaryExpressionOperator'],
     ) -> None:
-        globals()[expression_cls.__name__] = expression_cls
-        globals()[expression_operator_cls.__name__] = expression_operator_cls
+        globals()[binary_expression_cls.__name__] = binary_expression_cls
+        globals()[binary_operator_cls.__name__] = binary_operator_cls
+
+    @staticmethod
+    def _import_conditional_expressions(
+        conditional_enter_expression_cls: type['ConditionalEnterExpression'],
+        conditional_exit_expression_cls: type['ConditionalExitExpression'],
+    ) -> None:
+        globals()[conditional_enter_expression_cls.__name__] = conditional_enter_expression_cls
+        globals()[conditional_exit_expression_cls.__name__] = conditional_exit_expression_cls
 
     _expressions: list['Expression'] = []
 
@@ -84,190 +85,246 @@ class ExpressionHandler:
     def is_empty(self) -> bool:
         return not self._expressions
 
-    def create_lines(self) -> LinesType:
-        lines: LinesType = []
-        for expression in self._expressions:
-            left = expression._all_the_way_left(expression.left)
-            right = expression._all_the_way_left(expression.right)
-            lines.append((left, expression.operator, right, expression))
-        return lines
+    @staticmethod
+    def used_before(
+        expressions: list['Expression'],
+        left: 'Editable',
+        right: 'Editable',
+        indexes: range,
+    ) -> bool:
+        for j in indexes:
+            other_expression = expressions[j]
+            if isinstance(other_expression, BinaryExpression):
+                if left.equals(
+                    other_expression.left,
+                    check_internal_type=False,
+                ) and right.equals(
+                    other_expression.right,
+                    check_internal_type=False,
+                ):
+                    return True
+                if (
+                    right.equals(
+                        other_expression.left,
+                        check_internal_type=False,
+                    )
+                    and left.equals(
+                        other_expression.right,
+                        check_internal_type=False,
+                    )
+                    and other_expression.operator is not BinaryExpressionOperator.Set
+                ):
+                    return True
+            elif isinstance(other_expression, ConditionalEnterExpression):
+                if any(
+                    (
+                        left.equals(
+                            cond.left,
+                            check_internal_type=False,
+                        )
+                        and right.equals(
+                            cond.right,
+                            check_internal_type=False,
+                        )
+                    )
+                    or (
+                        left.equals(
+                            cond.right,
+                            check_internal_type=False,
+                        )
+                        and right.equals(
+                            cond.left,
+                            check_internal_type=False,
+                        )
+                    )
+                    for cond in other_expression.statement.conditions
+                    if isinstance(cond, BinaryCondition)
+                ):
+                    return True
+        return False
 
-    def optimize_lines(
-        self,
-        lines: LinesType,
-    ) -> None:
-        for i in range(len(lines) - 1):
-            left, *_ = lines[i]
-            assert isinstance(left, TemporaryStat)
+    @staticmethod
+    def used_after(
+        expressions: list['Expression'],
+        right: 'Editable',
+        indexes: range,
+    ) -> bool:
+        for j in indexes:
+            other_expression = expressions[j]
+            if isinstance(other_expression, BinaryExpression):
+                if right.equals(
+                    other_expression.left,
+                    check_internal_type=False,
+                ):
+                    return True
+                if right.equals(
+                    other_expression.right,
+                    check_internal_type=False,
+                ):
+                    return True
+            elif isinstance(other_expression, ConditionalEnterExpression):
+                if any(
+                    (
+                        right.equals(
+                            cond.left,
+                            check_internal_type=False,
+                        )
+                        or right.equals(
+                            cond.right,
+                            check_internal_type=False,
+                        )
+                    )
+                    for cond in other_expression.statement.conditions
+                    if isinstance(cond, BinaryCondition)
+                ):
+                    return True
+        return False
+
+    @staticmethod
+    def change_all(
+        expressions: list['Expression'],
+        left: 'Editable',
+        right: 'Editable',
+        indexes: range,
+    ) -> bool:
+        has_changed: bool = False
+        for j in indexes:
+            other_expression = expressions[j]
+            if isinstance(other_expression, BinaryExpression):
+                if right.equals(
+                    other_expression.left, check_internal_type=False
+                ):
+                    other_expression.left = left
+                    has_changed = True
+                if right.equals(
+                    other_expression.right, check_internal_type=False
+                ):
+                    other_expression.right = left
+                    has_changed = True
+            elif isinstance(other_expression, ConditionalEnterExpression):
+                for condition in other_expression.statement.conditions:
+                    if not isinstance(condition, BinaryCondition):
+                        continue
+                    if right.equals(
+                        condition.left, check_internal_type=False
+                    ):
+                        condition.left = left
+                        has_changed = True
+                    if right.equals(
+                        condition.right, check_internal_type=False
+                    ):
+                        condition.right = left
+                        has_changed = True
+        return has_changed
+
+    @staticmethod
+    def optimize_lines(expressions: list['Expression']) -> None:
+        for expression in expressions[:-1]:
+            if not isinstance(expression, BinaryExpression):
+                continue
+            assert isinstance(expression.left, TemporaryStat)
 
         has_changed = True
         while has_changed:
             has_changed = False
-            for i in range(len(lines)):
-                left, operator, right, _ = lines[i]
-
-                if not isinstance(left, TemporaryStat):
-                    if not isinstance(right, TemporaryStat):
-                        continue
-                    if operator is not ExpressionOperator.Set:
-                        continue
-
-                    # We have:
-                    # `stat = tempstat`
-                    # this means that
-                    #     - we can replace all previous tempstat with stat
-                    #     - but ONLY IF
-                    #         * stat is not used before this line in relation with tempstat
-                    #             the exception being `tempstat = stat`
-                    #         * tempstat is not used after this line
-
-                    used_before = False
-                    for j in range(i - 1, -1, -1):
-                        other_left, other_operator, other_right, _ = lines[j]
-                        assert type(other_left) is not type(left)
-                        if (
-                            right.equals(other_left, check_internal_type=False)
-                            and left.equals(other_right, check_internal_type=False)
-                            and other_operator is not ExpressionOperator.Set
-                        ):
-                            used_before = True
-                            break
-                    if used_before:
-                        continue
-
-                    used_after = False
-                    for j in range(i + 1, len(lines)):
-                        other_left, other_operator, other_right, _ = lines[j]
-                        if right.equals(
-                            other_left, check_internal_type=False
-                        ) or right.equals(other_right, check_internal_type=False):
-                            used_after = True
-                            break
-                    if used_after:
-                        continue
-
-                    for j in range(i, -1, -1):
-                        other_left, other_operator, other_right, expression = lines[j]
-                        changing = False
-                        if right.equals(other_left, check_internal_type=False):
-                            other_left = left
-                            changing = True
-                        if right.equals(other_right, check_internal_type=False):
-                            other_right = left
-                            changing = True
-                        if changing:
-                            lines[j] = (other_left, other_operator, other_right, expression)
-                            has_changed = True
-
+            for i, expression in enumerate(expressions):
+                if not isinstance(expression, BinaryExpression):
                     continue
 
-                else:
-                    if not isinstance(right, TemporaryStat):
-                        continue
-                    if operator is not ExpressionOperator.Set:
-                        continue
-                    if left.equals(right, check_internal_type=False):
-                        continue
+                if not isinstance(expression.right, TemporaryStat):
+                    continue
+                if expression.operator is not BinaryExpressionOperator.Set:
+                    continue
 
-                    # We have:
-                    # `tempstat1 = tempstat2`
-                    # this means that
-                    #     - we can replace all previous tempstat2 with tempstat1
-                    #     - but ONLY IF
-                    #         * tempstat1 is not used before this line in relation with tempstat2
-                    #             the exception being `tempstat2 = tempstat1`
-                    #         * tempstat2 is not used after this line
+                # We have:
+                # `left = right`
+                # this means that
+                #     - we can replace all previous right with left
+                #     - but ONLY IF
+                #         * left is not used before this line in relation with right
+                #             the exception being `right = left`
+                #         * right is not used after this line
 
-                    used_before = False
-                    for j in range(i - 1, -1, -1):
-                        other_left, other_operator, other_right, _ = lines[j]
-                        if left.equals(
-                            other_left, check_internal_type=False
-                        ) and right.equals(other_right, check_internal_type=False):
-                            used_before = True
-                            break
-                        if (
-                            right.equals(other_left, check_internal_type=False)
-                            and left.equals(other_right, check_internal_type=False)
-                            and other_operator is not ExpressionOperator.Set
-                        ):
-                            used_before = True
-                            break
+                if ExpressionHandler.used_before(
+                    expressions,
+                    expression.left,
+                    expression.right,
+                    range(i - 1, -1, -1),
+                ):
+                    continue
 
-                    used_after = False
-                    for j in range(i + 1, len(lines)):
-                        other_left, other_operator, other_right, _ = lines[j]
-                        if right.equals(other_left, check_internal_type=False):
-                            used_after = True
-                            break
-                        if right.equals(other_right, check_internal_type=False):
-                            used_after = True
-                            break
-                    if used_after:
-                        continue
+                if ExpressionHandler.used_after(
+                    expressions,
+                    expression.right,
+                    range(i + 1, len(expressions)),
+                ):
+                    continue
 
-                    for j in range(i, -1, -1):
-                        other_left, other_operator, other_right, expression = lines[j]
-                        changing = False
-                        if right.equals(other_left, check_internal_type=False):
-                            other_left = left
-                            changing = True
-                        if right.equals(other_right, check_internal_type=False):
-                            other_right = left
-                            changing = True
-                        if changing:
-                            lines[j] = (other_left, other_operator, other_right, expression)
-                            has_changed = True
+                has_changed |= ExpressionHandler.change_all(
+                    expressions,
+                    expression.left,
+                    expression.right,
+                    range(i + 1),
+                )
 
-    def take_out_useless(
-        self,
-        lines: LinesType,
-    ) -> None:
-        for i in range(len(lines) - 1, -1, -1):
-            left, operator, right, expression = lines[i]
+    @staticmethod
+    def take_out_useless(expressions: list['Expression']) -> None:
+        for i in range(len(expressions) - 1, -1, -1):
+            expression = expressions[i]
+            if not isinstance(expression, BinaryExpression):
+                continue
+
             if (
-                left.equals(right, check_internal_type=False)
-                and operator is ExpressionOperator.Set
+                expression.left.equals(expression.right, check_internal_type=False)
+                and expression.operator is BinaryExpressionOperator.Set
                 and not expression.is_self_cast
             ):
-                lines.pop(i)
+                expressions.pop(i)
             elif (
-                operator is ExpressionOperator.Increment
-                or operator is ExpressionOperator.Decrement
+                expression.operator is BinaryExpressionOperator.Increment
+                or expression.operator is BinaryExpressionOperator.Decrement
             ) and (
-                (isinstance(right, int) and right == 0)
-                or (isinstance(right, float) and right == 0.0)
+                (isinstance(expression.right, int) and expression.right == 0)
+                or (isinstance(expression.right, float) and expression.right == 0.0)
             ):
-                lines.pop(i)
+                expressions.pop(i)
             elif (
-                operator is ExpressionOperator.Multiply
-                or operator is ExpressionOperator.Divide
+                expression.operator is BinaryExpressionOperator.Multiply
+                or expression.operator is BinaryExpressionOperator.Divide
             ) and (
-                (isinstance(right, int) and right == 1)
-                or (isinstance(right, float) and right == 1.0)
+                (isinstance(expression.right, int) and expression.right == 1)
+                or (isinstance(expression.right, float) and expression.right == 1.0)
             ):
-                lines.pop(i)
+                expressions.pop(i)
 
+    @staticmethod
     def _add_to_temporary_stats_mapping(
-        self,
         value: 'Checkable | HousingType',
         temporary_stats: dict[int, list['TemporaryStat']],
     ) -> None:
-        if isinstance(value, Expression):
-            self._add_to_temporary_stats_mapping(value.left, temporary_stats)
-            self._add_to_temporary_stats_mapping(value.right, temporary_stats)
+        if isinstance(value, BinaryExpression):
+            ExpressionHandler._add_to_temporary_stats_mapping(
+                value._left, temporary_stats
+            )
+            ExpressionHandler._add_to_temporary_stats_mapping(
+                value._right, temporary_stats
+            )
         if not isinstance(value, TemporaryStat):
             return
         temporary_stats.setdefault(value.number, []).append(value)
 
-    def rename_temporary_stats(
-        self,
-        lines: LinesType,
-    ) -> None:
+    @staticmethod
+    def rename_temporary_stats(expressions: list['Expression']) -> None:
         temporary_stats: dict[int, list['TemporaryStat']] = {}
-        for left, _, right, _ in lines:
-            self._add_to_temporary_stats_mapping(left, temporary_stats)
-            self._add_to_temporary_stats_mapping(right, temporary_stats)
+        for expression in expressions:
+            if not isinstance(expression, BinaryExpression):
+                continue
+            ExpressionHandler._add_to_temporary_stats_mapping(
+                expression.left, temporary_stats
+            )
+            ExpressionHandler._add_to_temporary_stats_mapping(
+                expression.right, temporary_stats
+            )
         for i, stats in enumerate(
             temporary_stats.values(),
             start=TEMP_STATS_NUMBER_START,
@@ -275,45 +332,37 @@ class ExpressionHandler:
             for stat in stats:
                 stat.number = i
 
-    def validate_lines(
-        self,
-        lines: LinesType,
-    ) -> None:
-        for left, operator, right, expression in lines:
-            if isinstance(right, str) and len(right) > 32:
+    @staticmethod
+    def validate_lines(expressions: list['Expression']) -> None:
+        for expression in expressions:
+            if not isinstance(expression, BinaryExpression):
+                continue
+            if isinstance(expression.right, str) and len(expression.right) > 32:
                 raise ValueError(
-                    f'Assignment of string "{right}" is too long ({len(right)}>32)'
+                    f'Assignment of string "{expression.right}" is too long ({len(expression.right)}>32)'
                 )
 
-    def write_lines(
-        self,
-        lines: LinesType,
-    ) -> None:
-        for left, operator, right, expression in lines:
-            line = f'{left._in_assignment_left_side()} {operator.value} {Checkable._to_assignment_right_side(right)}'
-            if isinstance(left, BaseStat):
-                line += f' {str(left.auto_unset).lower()}'
-            if expression.is_self_cast:
-                line += '  // PyHTSL intended type cast'
-            WRITER.write(
-                line,
-                LineType.variable_change,
-            )
+    @staticmethod
+    def write_lines(expressions: list['Expression']) -> None:
+        for expression in expressions:
+            expression._before_write_line()
+            WRITER.write(*expression._write_line())
+            expression._after_write_line()
 
     def push(self) -> None:
         if self.is_empty():
             return
-        lines = self.create_lines()
-        if not no_optimization():
-            self.optimize_lines(lines)
-            self.take_out_useless(lines)
-        self.rename_temporary_stats(lines)
-        self.validate_lines(lines)
-        self.write_lines(lines)
+        expressions = self._expressions.copy()
         self._expressions.clear()
+        if not no_optimization():
+            ExpressionHandler.optimize_lines(expressions)
+            ExpressionHandler.take_out_useless(expressions)
+        ExpressionHandler.rename_temporary_stats(expressions)
+        ExpressionHandler.validate_lines(expressions)
+        ExpressionHandler.write_lines(expressions)
         container = WRITER.get_container()
-        if container.lines_callback is not None:
-            container.lines_callback(lines)
+        if container.expressions_callback is not None:
+            container.expressions_callback(expressions)
 
 
 EXPR_HANDLER = ExpressionHandler()

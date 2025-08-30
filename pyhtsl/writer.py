@@ -8,11 +8,11 @@ from .fixer import Fixer
 from .logger import AntiSpamLogger
 from .public.display_htsl import should_display_htsl
 
-from types import TracebackType
+from types import TracebackType  # type: ignore
 from typing import TYPE_CHECKING, Callable
 if TYPE_CHECKING:
     from .public.function import Function
-    from pyhtsl.expression.handler import LinesType
+    from .expression.expression import Expression
 
 
 __all__ = (
@@ -78,7 +78,7 @@ if not HTSL_IMPORTS_FOLDER.exists():
     raise FileNotFoundError(f'Could not find your HTSL imports folder at\n{HTSL_IMPORTS_FOLDER}')
 
 
-type LinesCallbackType = Callable[['LinesType'], None] | None
+type ExpressionsCallbackType = Callable[[list['Expression']], None] | None
 
 
 class ExportContainer:
@@ -89,17 +89,17 @@ class ExportContainer:
     in_front_index: int
     indent: int
     logger: AntiSpamLogger
-    lines_callback: LinesCallbackType | None
+    expressions_callback: ExpressionsCallbackType | None
     def __init__(
         self,
         name: str,
         *,
         is_global: bool = False,
-        lines_callback: LinesCallbackType | None = None,
+        lines_callback: ExpressionsCallbackType | None = None,
     ) -> None:
         self.name = name
         self.is_global = is_global
-        self.lines_callback = lines_callback
+        self.expressions_callback = lines_callback
         self.lines = []
         self.registered_functions = []
         self.in_front_index = 0
@@ -113,12 +113,12 @@ class ExportContainer:
 class TemporaryContainerContextManager:
     writer: 'Writer'
     name: str
-    lines_callback: LinesCallbackType | None
+    lines_callback: ExpressionsCallbackType | None
     def __init__(
         self,
         writer: 'Writer',
         name: str,
-        lines_callback: LinesCallbackType | None = None,
+        lines_callback: ExpressionsCallbackType | None = None,
     ) -> None:
         self.writer = writer
         self.name = name
@@ -170,7 +170,7 @@ class Writer:
         self,
         name: str,
         *,
-        lines_callback: LinesCallbackType | None = None,
+        lines_callback: ExpressionsCallbackType | None = None,
     ) -> TemporaryContainerContextManager:
         return TemporaryContainerContextManager(self, name, lines_callback=lines_callback)
 

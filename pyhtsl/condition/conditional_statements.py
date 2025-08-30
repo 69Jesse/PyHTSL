@@ -4,7 +4,8 @@ from ..expression.handler import EXPR_HANDLER
 from enum import Enum
 
 from typing import TYPE_CHECKING
-from types import TracebackType
+from types import TracebackType  # pyright: ignore[reportShadowedImports]
+
 if TYPE_CHECKING:
     from .base_condition import BaseCondition
 
@@ -24,6 +25,7 @@ class ConditionalMode(Enum):
 class IfStatement:
     conditions: list['BaseCondition']
     mode: ConditionalMode
+
     def __init__(
         self,
         conditions: list['BaseCondition'],
@@ -32,13 +34,26 @@ class IfStatement:
         self.conditions = conditions if isinstance(conditions, list) else [conditions]
         self.mode = mode
 
-    def __enter__(self) -> None:
-        EXPR_HANDLER.push()
-        WRITER.write(
-            f'if {self.mode.name.lower()} (' + ', '.join(map(str, self.conditions)) + ') {',
+    def _enter_line(self) -> tuple[str, LineType]:
+        return (
+            (
+                f'if {self.mode.name.lower()} ('
+                + ', '.join(map(str, self.conditions))
+                + ') {'
+            ),
             self.mode.value,
         )
+
+    def __enter__(self) -> None:
+        EXPR_HANDLER.push()
+        WRITER.write(*self._enter_line())
         WRITER.begin_indent()
+
+    def _exit_line(self) -> tuple[str, LineType]:
+        return (
+            '}',
+            LineType.if_exit,
+        )
 
     def __exit__(
         self,
@@ -47,10 +62,10 @@ class IfStatement:
         traceback: TracebackType | None,
     ) -> None:
         WRITER.end_indent()
-        WRITER.write(
-            '}',
-            LineType.if_exit,
-        )
+        WRITER.write(*self._exit_line())
+
+    def __repr__(self) -> str:
+        return f'If<{f' {self.mode.name} '.join(map(repr, self.conditions))}>'
 
 
 class ElseStatement:
@@ -75,3 +90,6 @@ class ElseStatement:
             '}',
             LineType.else_exit,
         )
+
+    def __repr__(self) -> str:
+        return 'Else'

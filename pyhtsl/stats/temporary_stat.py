@@ -1,4 +1,4 @@
-from ..expression.handler import ExpressionHandler
+from ..expression.handler import EXPR_HANDLER, ExpressionHandler
 from ..expression.housing_type import HousingType
 from .player_stat import PlayerStat
 from .base_stat import BaseStat
@@ -59,6 +59,14 @@ class TemporaryStat(BaseStat):
         stat = TemporaryStat(self.internal_type)
         stat._number = self._number
         return stat
+
+    def _as_string(self, include_fallback_value: bool = True) -> str:
+        """Pushing here so we can do something like
+        foo = PlayerStat('foo')
+        chat(f'Hello World! {foo + 1}')
+        """
+        EXPR_HANDLER.push()
+        return super()._as_string(include_fallback_value=include_fallback_value)
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.number} {self.internal_type.name}>'

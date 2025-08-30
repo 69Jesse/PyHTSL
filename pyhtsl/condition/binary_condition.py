@@ -9,12 +9,12 @@ if TYPE_CHECKING:
 
 
 __all__ = (
-    'DoubleSidedConditionOperator',
-    'DoubleSidedCondition',
+    'BinaryConditionOperator',
+    'BinaryCondition',
 )
 
 
-class DoubleSidedConditionOperator(Enum):
+class BinaryConditionOperator(Enum):
     Equal = '=='
     GreaterThan = '>'
     LessThan = '<'
@@ -23,7 +23,7 @@ class DoubleSidedConditionOperator(Enum):
 
 
 @final
-class DoubleSidedCondition(BaseCondition):
+class BinaryCondition(BaseCondition):
     @staticmethod
     def _import_checkable(
         checkable_cls: type['Checkable'],
@@ -32,12 +32,12 @@ class DoubleSidedCondition(BaseCondition):
 
     left: 'Checkable'
     right: 'Checkable | HousingType'
-    operator: DoubleSidedConditionOperator
+    operator: BinaryConditionOperator
     def __init__(
         self,
         left: 'Checkable',
         right: 'Checkable | HousingType',
-        operator: DoubleSidedConditionOperator,
+        operator: BinaryConditionOperator,
     ) -> None:
         self.left = left
         self.right = right
@@ -49,3 +49,6 @@ class DoubleSidedCondition(BaseCondition):
         if fallback_value is not None:
             line += f' {fallback_value}'
         return line
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}<{repr(self.left)} {self.operator.value} {repr(self.right)}>'

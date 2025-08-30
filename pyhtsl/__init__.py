@@ -110,5 +110,8 @@ from .public.no_optimization import NoOptimization as NoOptimization
 from .writer import set_htsl_imports_folder as set_htsl_imports_folder
 from .export import export as export, disable_global_export as disable_global_export
 from .evaluator import Evaluator as Evaluator
-from .expression.operator import ExpressionOperator as ExpressionOperator
 from .misc.skull_data import SKULL_DATA as SKULL_DATA
+
+from typing import TYPE_CHECKING
+if not TYPE_CHECKING:
+    from .expression.conditional_expressions import *  # noqa: F403

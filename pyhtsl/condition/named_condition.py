@@ -19,3 +19,6 @@ class NamedCondition(BaseCondition):
 
     def create_line(self) -> str:
         return self.name
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}<{self.name}>'
