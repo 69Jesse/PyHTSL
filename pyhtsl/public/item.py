@@ -369,7 +369,7 @@ class Item:
         if not prefix:
             prefix = self._key
         suffix = hashlib.md5(json_data.encode()).hexdigest()[:8]
-        return f'_{prefix}_{suffix}'
+        return f'_{len(SAVED_CACHE) % 1000:03}_{prefix}_{suffix}'
 
     def save(self) -> str:
         data = self._get_item_data()
