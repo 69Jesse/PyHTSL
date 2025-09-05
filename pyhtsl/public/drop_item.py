@@ -1,8 +1,7 @@
-from public.no_fallback_values import NoFallbackValues
+from .no_fallback_values import NoFallbackValues
 from ..checkable import Checkable
 from ..expression.housing_type import HousingType
 from ..writer import WRITER, LineType
-from ..types import ALL_LOCATIONS
 from .item import Item
 
 
