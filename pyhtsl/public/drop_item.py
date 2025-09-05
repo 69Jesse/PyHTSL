@@ -1,3 +1,4 @@
+from public.no_fallback_values import NoFallbackValues
 from ..checkable import Checkable
 from ..expression.housing_type import HousingType
 from ..writer import WRITER, LineType
@@ -23,7 +24,6 @@ def drop_item(
         Checkable | HousingType,
         Checkable | HousingType,
     ] | str | None,
-    location: ALL_LOCATIONS = 'custom_coordinates',
     drop_naturally: bool = False,
     disable_item_merging: bool = False,
     prioritize_player: bool = False,
@@ -34,14 +34,12 @@ def drop_item(
     else:
         name = item
     line = f'dropItem "{name}"'
-    if location == 'custom_coordinates':
-        if coordinates is None:
-            raise ValueError('coordinates must be provided when location is custom_coordinates')
-        if isinstance(coordinates, tuple):
+    if coordinates is None:
+        raise ValueError('coordinates must be provided when location is custom_coordinates')
+    if isinstance(coordinates, tuple):
+        with NoFallbackValues():
             coordinates = ' '.join(map(str, coordinates))
-        line += f' "{coordinates}"'
-    else:
-        line += ' "~ ~ ~"'
+    line += f' "custom_coordinates" "{coordinates}"'
     line += f' {str(drop_naturally).lower()} {str(disable_item_merging).lower()} {str(prioritize_player).lower()} {str(fallback_to_inventory).lower()}'
     WRITER.write(
         line,

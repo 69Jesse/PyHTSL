@@ -1,5 +1,6 @@
 from abc import abstractmethod
 
+from ..public.no_fallback_values import no_fallback_values
 from ..checkable import Checkable
 from ..editable import Editable
 from ..expression.handler import ExpressionHandler
@@ -76,7 +77,7 @@ class BaseStat(Editable):
         return f'%var.{self._right_side_keyword()}/{self.name}'
 
     def _as_string_second(self, include_fallback_value: bool = True) -> str:
-        if not include_fallback_value:
+        if not include_fallback_value or no_fallback_values():
             return ''
         fallback_value = self._get_formatted_fallback_value()
 

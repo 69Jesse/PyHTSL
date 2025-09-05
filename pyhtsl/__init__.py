@@ -4,7 +4,9 @@ from .stats.team_stat import TeamStat as TeamStat
 from .stats.temporary_stat import TemporaryStat as TemporaryStat
 
 from .public._else import Else as Else
-from .public.apply_inventory_layout import apply_inventory_layout as apply_inventory_layout
+from .public.apply_inventory_layout import (
+    apply_inventory_layout as apply_inventory_layout,
+)
 from .public.apply_potion_effect import apply_potion_effect as apply_potion_effect
 from .public.block_type import BlockType as BlockType
 from .public.can_pvp import CanPVP as CanPVP
@@ -17,7 +19,9 @@ from .public.consume_item import consume_item as consume_item
 from .public.create_function import create_function as create_function, rename as rename
 from .public.damage_cause import DamageCause as DamageCause
 from .public.date_unix import DateUnix as DateUnix, DateUnixMS as DateUnixMS
-from .public.delete_items import delete_all_items_from_imports_folder as delete_all_items_from_imports_folder
+from .public.delete_items import (
+    delete_all_items_from_imports_folder as delete_all_items_from_imports_folder,
+)
 from .public.display_action_bar import display_action_bar as display_action_bar
 from .public.display_menu import display_menu as display_menu
 from .public.display_title import display_title as display_title
@@ -29,7 +33,9 @@ from .public.fail_parkour import fail_parkour as fail_parkour
 from .public.fishing_environment import FishingEnvironment as FishingEnvironment
 from .public.full_heal import full_heal as full_heal
 from .public.function import Function as Function
-from .public.give_experience_levels import give_experience_levels as give_experience_levels
+from .public.give_experience_levels import (
+    give_experience_levels as give_experience_levels,
+)
 from .public.give_item import give_item as give_item
 from .public.go_to_house_spawn import go_to_house_spawn as go_to_house_spawn
 from .public.goto import goto as goto
@@ -106,6 +112,7 @@ from .public.drop_item import drop_item as drop_item
 from .public.display_htsl import display_htsl as display_htsl
 from .public.no_type_casting import NoTypeCasting as NoTypeCasting
 from .public.no_optimization import NoOptimization as NoOptimization
+from .public.no_fallback_values import NoFallbackValues as NoFallbackValues
 
 from .writer import set_htsl_imports_folder as set_htsl_imports_folder
 from .export import export as export, disable_global_export as disable_global_export
@@ -113,5 +120,6 @@ from .evaluator import Evaluator as Evaluator
 from .misc.skull_data import SKULL_DATA as SKULL_DATA
 
 from typing import TYPE_CHECKING
+
 if not TYPE_CHECKING:
     from .expression.conditional_expressions import *  # noqa: F403
