@@ -83,8 +83,8 @@ class BaseStat(Editable):
 
         if isinstance(fallback_value, str) and not fallback_value or fallback_value == '""':
             return ''
-        if isinstance(fallback_value, str) and ' ' in fallback_value:
-            raise ValueError('Fallback values cannot have spaces inside of them because of HTSL\'s limitations..')
+        if isinstance(fallback_value, str) and ' ' in fallback_value and not (fallback_value.startswith('"') and fallback_value.endswith('"')):
+            raise ValueError('Fallback values cannot have spaces inside of them because of HTSL\'s limitations.. Wrap them in double quotes yourself.')
 
         if fallback_value is None:
             return ''
