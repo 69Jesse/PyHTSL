@@ -11,5 +11,5 @@ def pause_execution(
 ) -> None:
     WRITER.write(
         f'pause {ticks}',
-        LineType.miscellaneous,
+        LineType.pause_execution,
     )

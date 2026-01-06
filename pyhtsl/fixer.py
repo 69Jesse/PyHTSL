@@ -71,6 +71,9 @@ class Counter:
             self.if_enters() > Counter.IF_ENTER_LIMIT
             or self.mapping.get(LineType.variable_change, 0) > 25
 
+            or self.mapping.get(LineType.display_title, 0) > 5
+            or self.mapping.get(LineType.pause_execution, 0) > 30
+
             # 9 instead of 10 to account for the filler function call if nessessary
             # This results in some tiny inefficiencies in some cases.
             # See [9 INSTEAD OF 10] for a fix in one case. Maybe TODO:

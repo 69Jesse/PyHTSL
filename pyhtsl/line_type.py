@@ -17,6 +17,8 @@ class LineType(Enum):
     goto_move_to_end = auto()
     random_enter = auto()
     random_exit = auto()
+    display_title = auto()
+    pause_execution = auto()
 
     def is_if_enter(self) -> bool:
         return self is LineType.if_and_enter or self is LineType.if_or_enter

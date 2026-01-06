@@ -18,5 +18,5 @@ def display_title(
 ) -> None:
     WRITER.write(
         f'title "{_inside_line(title or '&r')}" "{_inside_line(subtitle or '&r')}" {fadein} {stay} {fadeout}',
-        LineType.miscellaneous,
+        LineType.display_title,
     )
