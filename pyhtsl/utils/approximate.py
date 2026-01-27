@@ -1,9 +1,7 @@
-from pyhtsl import (
-    PlayerStat,
-    IfAnd,
-    Else,
-)
-from pyhtsl.types import Editable, Checkable, BaseStat
+from ..stats.player_stat import PlayerStat
+from ..public.if_and import IfAnd
+from ..public._else import Else
+from ..types import Editable, Checkable, BaseStat
 
 from typing import Literal, overload
 
