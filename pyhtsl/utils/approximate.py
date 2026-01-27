@@ -23,7 +23,7 @@ def approximate_sqrt(
     x: Checkable,
     *,
     assign_to: Editable,
-    can_modify_x: Literal[False],
+    can_modify_x: Literal[False] = False,
 ) -> None: ...
 
 
@@ -119,7 +119,7 @@ def approximate_sin_cos(
     *,
     assign_to_sin: Editable,
     assign_to_cos: Editable,
-    can_modify_x: Literal[False],
+    can_modify_x: Literal[False] = False,
     certain_x_in_range: Literal[90, 180] | None = None,
     sin_sign: Literal[1, -1] = 1,
     cos_sign: Literal[1, -1] = 1,
