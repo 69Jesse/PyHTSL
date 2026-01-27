@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 import re
 
 from typing import Any, Self
-from typing import _GenericAlias  # type: ignore
 
 
 class NBT[T](ABC):
@@ -429,8 +428,8 @@ class NBTList[T: NBT](NBT[list[T]]):
         return self
 
 
-class NBTCompound(NBT[dict[str, NBT]]):
-    def __init__(self, value: dict[str, NBT] | None = None) -> None:
+class NBTCompound[V: NBT](NBT[dict[str, V]]):
+    def __init__(self, value: dict[str, V] | None = None) -> None:
         if value is None:
             value = {}
         if not isinstance(value, dict):
@@ -467,7 +466,7 @@ class NBTCompound(NBT[dict[str, NBT]]):
         if not s.startswith('{'):
             raise ValueError('Invalid SNBT format for NBTCompound')
         offset = 1
-        compound: dict[str, NBT] = {}
+        compound: dict[str, V] = {}
         while offset < len(s) and s[offset] != '}':
             key_start = offset
             while offset < len(s) and s[offset] not in (':', ',', '}'):
@@ -486,7 +485,7 @@ class NBTCompound(NBT[dict[str, NBT]]):
 
             offset += 1
             value, length = NBT._parse_snbt(s[offset:])
-            compound[key] = value
+            compound[key] = value  # type: ignore
             offset += length
 
             if s[offset] == '}':
@@ -498,14 +497,14 @@ class NBTCompound(NBT[dict[str, NBT]]):
         return cls(compound), offset + 1
 
     @classmethod
-    def from_object(cls, obj: dict[str, Any]) -> 'NBTCompound':
+    def from_object(cls, obj: dict[str, Any]) -> 'NBTCompound[V]':
         if isinstance(obj, NBTCompound):
             return obj
-        compound: dict[str, NBT] = {}
+        compound: dict[str, V] = {}
         for key, value in obj.items():
             if not isinstance(key, str):
                 raise TypeError('Keys must be strings')
-            compound[key] = NBT.from_object(value)
+            compound[key] = NBT.from_object(value)  # type: ignore
         return cls(compound)
 
     def __len__(self) -> int:
@@ -514,56 +513,25 @@ class NBTCompound(NBT[dict[str, NBT]]):
     def is_empty(self) -> bool:
         return len(self.value) == 0
 
-    def get[T: NBT](self, key: str, cls: type[T] | None = None) -> T:
+    def get(self, key: str, default: V | None = None) -> V | None:
         if not isinstance(key, str):
             raise TypeError('Key must be a string')
-        result = self.value.get(key)
-        if result is None:
-            raise KeyError(f'Key {repr(key)} not found in NBTCompound')
+        return self.value.get(key, default)
 
-        if isinstance(cls, _GenericAlias):
-            cls = cls.__origin__  # type: ignore
-
-        if cls is not None and not isinstance(result, cls):
-            raise TypeError(
-                f'Value for key {repr(key)} must be an instance of {cls.__name__}'
-            )
-        return result  # type: ignore
-
-    def __getitem__(self, key: str) -> NBT:
+    def __getitem__(self, key: str) -> V:
         if not isinstance(key, str):
             raise TypeError('Key must be a string')
         if key not in self.value:
             raise KeyError(f'Key {repr(key)} not found in NBTCompound')
         return self.value[key]
 
-    def put(self, key: str, value: NBT) -> Self:
+    def put(self, key: str, value: V) -> Self:
         if not isinstance(key, str):
             raise TypeError('Key must be a string')
         if not isinstance(value, NBT):
             raise ValueError('Value must be an NBT instance')
         self.value[key] = value
         return self
-
-
-def parse_array[T: NBT](
-    s: str, id_character: str, nbt_class: type[T]
-) -> tuple[list[T], int]:
-    assert len(id_character) == 1
-    if not s.startswith(f'[{id_character};'):
-        raise ValueError(f'Invalid SNBT format for NBT{id_character.upper()}Array')
-    offset = 3
-    items: list[T] = []
-    while offset < len(s):
-        item, length = nbt_class._parse_snbt(s[offset:])
-        items.append(item)
-        offset += length
-        if s[offset] == ']':
-            break
-        if s[offset] != ',':
-            raise ValueError('Invalid SNBT format for NBTArray')
-        offset += 1
-    return items, offset + 1
 
 
 class NBTGenericArray[IT: NBT, OT](NBT[list[IT]]):
