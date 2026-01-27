@@ -10,6 +10,7 @@ from .public.display_htsl import should_display_htsl
 
 from types import TracebackType  # type: ignore
 from typing import TYPE_CHECKING, Callable
+
 if TYPE_CHECKING:
     from .public.function import Function
     from .expression.expression import Expression
@@ -33,12 +34,18 @@ def set_htsl_imports_folder(htsl_folder: Path | str) -> None:
         raise NotADirectoryError('The provided HTSL imports folder is not a directory.')
     if not htsl_folder.exists():
         raise FileNotFoundError('The provided HTSL imports folder does not exist.')
-    content = CACHED_HTSL_IMPORTS_FOLDER_PATH.read_text() if CACHED_HTSL_IMPORTS_FOLDER_PATH.exists() else None
+    content = (
+        CACHED_HTSL_IMPORTS_FOLDER_PATH.read_text()
+        if CACHED_HTSL_IMPORTS_FOLDER_PATH.exists()
+        else None
+    )
     new_content = htsl_folder.resolve().as_posix()
     if content is not None and content == new_content:
         return
     CACHED_HTSL_IMPORTS_FOLDER_PATH.write_text(new_content)
-    print(f'Saved your HTSL imports folder \x1b[38;2;0;255;0m{htsl_folder.as_posix()}\x1b[0m for future use at\n\x1b[38;2;0;255;0m{CACHED_HTSL_IMPORTS_FOLDER_PATH}\x1b[0m')
+    print(
+        f'Saved your HTSL imports folder \x1b[38;2;0;255;0m{htsl_folder.as_posix()}\x1b[0m for future use at\n\x1b[38;2;0;255;0m{CACHED_HTSL_IMPORTS_FOLDER_PATH}\x1b[0m'
+    )
 
 
 def get_htsl_import_folder() -> Path:
@@ -48,9 +55,27 @@ def get_htsl_import_folder() -> Path:
         if raw_path:
             maybe_path = Path(raw_path)
     elif os.name == 'nt':
-        maybe_path = Path(os.getenv('APPDATA')) / '.minecraft' / 'config' / 'ChatTriggers' / 'modules' / 'HTSL' / 'imports'  # type: ignore
+        maybe_path = (
+            Path(os.getenv('APPDATA') or '')
+            / '.minecraft'
+            / 'config'
+            / 'ChatTriggers'
+            / 'modules'
+            / 'HTSL'
+            / 'imports'
+        )
     elif os.name == 'posix':
-        maybe_path = Path.home() / 'Library' / 'Application Support' / 'minecraft' / 'config' / 'ChatTriggers' / 'modules' / 'HTSL' / 'imports'
+        maybe_path = (
+            Path.home()
+            / 'Library'
+            / 'Application Support'
+            / 'minecraft'
+            / 'config'
+            / 'ChatTriggers'
+            / 'modules'
+            / 'HTSL'
+            / 'imports'
+        )
 
     if maybe_path is not None:
         maybe_path = maybe_path.resolve()
@@ -60,7 +85,9 @@ def get_htsl_import_folder() -> Path:
 
     print('\x1b[38;2;255;0;0mCould not find your HTSL imports folder.\x1b[0m')
     while True:
-        raw_path = input('Please enter the path to your \x1b[38;2;0;255;0mHTSL imports folder\x1b[0m (relative or absolute): ').strip()
+        raw_path = input(
+            'Please enter the path to your \x1b[38;2;0;255;0mHTSL imports folder\x1b[0m (relative or absolute): '
+        ).strip()
         if not raw_path:
             print('\x1b[38;2;255;0;0mPlease provide a valid path.\x1b[0m')
             continue
@@ -75,7 +102,9 @@ def get_htsl_import_folder() -> Path:
 
 HTSL_IMPORTS_FOLDER: Path = get_htsl_import_folder()
 if not HTSL_IMPORTS_FOLDER.exists():
-    raise FileNotFoundError(f'Could not find your HTSL imports folder at\n{HTSL_IMPORTS_FOLDER}')
+    raise FileNotFoundError(
+        f'Could not find your HTSL imports folder at\n{HTSL_IMPORTS_FOLDER}'
+    )
 
 
 type ExpressionsCallbackType = Callable[[list['Expression']], None] | None
@@ -90,6 +119,7 @@ class ExportContainer:
     indent: int
     logger: AntiSpamLogger
     expressions_callback: ExpressionsCallbackType | None
+
     def __init__(
         self,
         name: str,
@@ -114,6 +144,7 @@ class TemporaryContainerContextManager:
     writer: 'Writer'
     name: str
     lines_callback: ExpressionsCallbackType | None
+
     def __init__(
         self,
         writer: 'Writer',
@@ -137,7 +168,9 @@ class TemporaryContainerContextManager:
     ) -> None:
         container = self.writer.get_container()
         if container.name != self.name:
-            raise RuntimeError(f'Container "{self.name}" was not the last one created. This should never happen.')
+            raise RuntimeError(
+                f'Container "{self.name}" was not the last one created. This should never happen.'
+            )
         self.writer.containers.pop()
 
 
@@ -172,7 +205,9 @@ class Writer:
         *,
         lines_callback: ExpressionsCallbackType | None = None,
     ) -> TemporaryContainerContextManager:
-        return TemporaryContainerContextManager(self, name, lines_callback=lines_callback)
+        return TemporaryContainerContextManager(
+            self, name, lines_callback=lines_callback
+        )
 
     def write(
         self,
@@ -201,14 +236,19 @@ class Writer:
 
     def write_htsl(self, container: ExportContainer) -> bool:
         if not container.lines:
-            print('Nothing found to write to your .htsl file. \x1b[38;2;255;0;0mPyHTSL will not do anything.\x1b[0m')
+            print(
+                'Nothing found to write to your .htsl file. \x1b[38;2;255;0;0mPyHTSL will not do anything.\x1b[0m'
+            )
             return False
 
         args: list[str] = sys.argv[1:]
         content = self.get_content(container)
 
         path = container.htsl_path()
-        path.write_text(f'// Generated with PyHTSL https://github.com/69Jesse/PyHTSL\n{content}', encoding='utf-8')
+        path.write_text(
+            f'// Generated with PyHTSL https://github.com/69Jesse/PyHTSL\n{content}',
+            encoding='utf-8',
+        )
 
         if 'code' in args:
             os.system(f'code "{path.absolute()}"')
@@ -229,9 +269,13 @@ class Writer:
             return
         container = self.get_container()
         if not container.is_global:
-            raise RuntimeError('Program exited without exporting a non-global container. This should never happen.')
+            raise RuntimeError(
+                'Program exited without exporting a non-global container. This should never happen.'
+            )
         if not self.export_globally:
-            print('\x1b[38;2;255;0;0mGlobal export is disabled. No .htsl file will be written.\x1b[0m')
+            print(
+                '\x1b[38;2;255;0;0mGlobal export is disabled. No .htsl file will be written.\x1b[0m'
+            )
             return
         self.run_export(container)
 
@@ -239,17 +283,27 @@ class Writer:
         if container.name in self.exported_names:
             raise RuntimeError(
                 f'Container with name "{container.name}" has already been exported.'
-                + (' This is the global export, it is possible to disable the global export with "pyhtsl.disable_global_export()".' if container.is_global else '')
+                + (
+                    ' This is the global export, it is possible to disable the global export with "pyhtsl.disable_global_export()".'
+                    if container.is_global
+                    else ''
+                )
             )
 
         if not container.is_global:
-            print(f'\n\x1b[38;2;0;255;0mExporting container named \x1b[38;2;255;0;0m{container.name}\x1b[0m')
+            print(
+                f'\n\x1b[38;2;0;255;0mExporting container named \x1b[38;2;255;0;0m{container.name}\x1b[0m'
+            )
         else:
-            print(f'\n\x1b[38;2;0;255;0mExporting global container named \x1b[38;2;255;0;0m{container.name}\x1b[0m')
+            print(
+                f'\n\x1b[38;2;0;255;0mExporting global container named \x1b[38;2;255;0;0m{container.name}\x1b[0m'
+            )
 
         for function in container.registered_functions:
             if function.callback is None:
-                raise RuntimeError(f'Function "{function.name}" has no callback. Unable to export.')
+                raise RuntimeError(
+                    f'Function "{function.name}" has no callback. Unable to export.'
+                )
             function.callback()
 
         fixer = Fixer(container)
@@ -263,12 +317,14 @@ class Writer:
         container.logger.publish()
 
         path = container.htsl_path()
-        print((
-            '\x1b[38;2;0;255;0mAll done! Your .htsl file is written to the following location:\x1b[0m'
-            f'\n{path.absolute()}'
-            f'\nExecute it with HTSL by using the following name: \x1b[38;2;255;0;0m{container.name}\x1b[0m'
-            '\n'
-        ))
+        print(
+            (
+                '\x1b[38;2;0;255;0mAll done! Your .htsl file is written to the following location:\x1b[0m'
+                f'\n{path.absolute()}'
+                f'\nExecute it with HTSL by using the following name: \x1b[38;2;255;0;0m{container.name}\x1b[0m'
+                '\n'
+            )
+        )
 
         self.exported_names.add(container.name)
 
@@ -279,7 +335,9 @@ class Writer:
     def end_indent(self) -> None:
         container = self.get_container()
         if container.indent <= 0:
-            raise RuntimeError('Cannot end indent when indent is already 0. This should never happen.')
+            raise RuntimeError(
+                'Cannot end indent when indent is already 0. This should never happen.'
+            )
         container.indent -= 1
 
 

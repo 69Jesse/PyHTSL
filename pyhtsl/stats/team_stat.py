@@ -6,17 +6,18 @@ from ..public.team import Team
 from typing import final
 
 
-__all__ = (
-    'TeamStat',
-)
+__all__ = ('TeamStat',)
 
 
 @final
 class TeamStat(Stat):
     team: Team | None
+
     def __init__(self, name: str, team: Team | str | None = None, /) -> None:
         super().__init__(name)
-        self.team = team if isinstance(team, Team) else Team(team) if team is not None else None
+        self.team = (
+            team if isinstance(team, Team) else Team(team) if team is not None else None
+        )
 
     @staticmethod
     def _left_side_keyword() -> str:

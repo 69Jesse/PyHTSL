@@ -1,9 +1,7 @@
 from ..placeholders import PlaceholderCheckable
 
 
-__all__ = (
-    'ServerName',
-)
+__all__ = ('ServerName',)
 
 
 ServerName = PlaceholderCheckable(

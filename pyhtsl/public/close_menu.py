@@ -1,9 +1,7 @@
 from ..writer import WRITER, LineType
 
 
-__all__ = (
-    'close_menu',
-)
+__all__ = ('close_menu',)
 
 
 def close_menu() -> None:

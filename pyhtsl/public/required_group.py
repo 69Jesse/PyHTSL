@@ -4,15 +4,14 @@ from .group import Group
 from typing import final
 
 
-__all__ = (
-    'RequiredGroup',
-)
+__all__ = ('RequiredGroup',)
 
 
 @final
 class RequiredGroup(BaseCondition):
     group: Group
     include_higher_groups: bool
+
     def __init__(
         self,
         group: Group | str,

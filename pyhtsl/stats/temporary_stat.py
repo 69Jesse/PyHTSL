@@ -8,13 +8,12 @@ from ..internal_type import InternalType
 from typing import final
 
 
-__all__ = (
-    'TemporaryStat',
-)
+__all__ = ('TemporaryStat',)
 
 
 class Number:
     value: int
+
     def __init__(self, value: int) -> None:
         self.value = value
 
@@ -22,6 +21,7 @@ class Number:
 @final
 class TemporaryStat(BaseStat):
     _number: Number
+
     def __init__(
         self,
         internal_type: InternalType,

@@ -1,9 +1,7 @@
 from ..writer import WRITER, LineType
 
 
-__all__ = (
-    'exit_function',
-)
+__all__ = ('exit_function',)
 
 
 def exit_function() -> None:

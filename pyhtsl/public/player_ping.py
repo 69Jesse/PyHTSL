@@ -1,9 +1,7 @@
 from ..placeholders import PlaceholderCheckable
 
 
-__all__ = (
-    'PlayerPing',
-)
+__all__ = ('PlayerPing',)
 
 
 PlayerPing = PlaceholderCheckable(

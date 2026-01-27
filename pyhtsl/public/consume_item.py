@@ -1,9 +1,7 @@
 from ..writer import WRITER, LineType
 
 
-__all__ = (
-    'consume_item',
-)
+__all__ = ('consume_item',)
 
 
 def consume_item() -> None:

@@ -1,9 +1,7 @@
 from ..placeholders import PlaceholderCheckable
 
 
-__all__ = (
-    'GroupTag',
-)
+__all__ = ('GroupTag',)
 
 
 GroupTag = PlaceholderCheckable(
@@ -12,4 +10,3 @@ GroupTag = PlaceholderCheckable(
     comparison_right_side='%player.group.tag%',
     in_string='%player.group.tag%',
 )
-

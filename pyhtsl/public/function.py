@@ -3,15 +3,14 @@ from ..stats.stat_parameter import StatParameter
 from typing import Callable
 
 
-__all__ = (
-    'Function',
-)
+__all__ = ('Function',)
 
 
 class Function:
     name: str
     parameters: list[StatParameter]
     callback: Callable[[], None] | None = None
+
     def __init__(
         self,
         name: str,

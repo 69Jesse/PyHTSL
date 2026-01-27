@@ -1,5 +1,6 @@
 class AntiSpamLogger:
     messages: list[tuple[str, int]]
+
     def __init__(self) -> None:
         self.messages = []
 
@@ -12,7 +13,9 @@ class AntiSpamLogger:
     def publish(self) -> None:
         content = '\n' * (len(self.messages) > 0)
         for message, amount in self.messages:
-            content += '\n' + message + f' \x1b[38;2;255;0;0m(x{amount})\x1b[0m' * (amount > 1)
+            content += (
+                '\n' + message + f' \x1b[38;2;255;0;0m(x{amount})\x1b[0m' * (amount > 1)
+            )
         content += '\n' * (len(self.messages) > 0)
         if content:
             print(content)

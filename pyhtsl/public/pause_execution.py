@@ -1,9 +1,7 @@
 from ..writer import WRITER, LineType
 
 
-__all__ = (
-    'pause_execution',
-)
+__all__ = ('pause_execution',)
 
 
 def pause_execution(

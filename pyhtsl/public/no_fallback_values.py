@@ -13,6 +13,7 @@ def no_fallback_values() -> bool:
 
 class NoFallbackValues:
     counter: ClassVar[int] = 0
+
     def __enter__(self) -> None:
         NoFallbackValues.counter += 1
 

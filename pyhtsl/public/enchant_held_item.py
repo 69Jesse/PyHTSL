@@ -3,9 +3,7 @@ from ..types import ALL_ENCHANTMENTS
 from .enchantment import Enchantment
 
 
-__all__ = (
-    'enchant_held_item',
-)
+__all__ = ('enchant_held_item',)
 
 
 def enchant_held_item(

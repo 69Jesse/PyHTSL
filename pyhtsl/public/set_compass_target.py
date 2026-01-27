@@ -4,9 +4,7 @@ from ..writer import WRITER, LineType
 from ..types import ALL_LOCATIONS
 
 
-__all__ = (
-    'set_compass_target',
-)
+__all__ = ('set_compass_target',)
 
 
 # TODO proper overload
@@ -15,13 +13,17 @@ def set_compass_target(
         Checkable | HousingType,
         Checkable | HousingType,
         Checkable | HousingType,
-    ] | str | None = None,
+    ]
+    | str
+    | None = None,
     location: ALL_LOCATIONS = 'custom_coordinates',
 ) -> None:
     line = f'compassTarget "{location}"'
     if location == 'custom_coordinates':
         if coordinates is None:
-            raise ValueError('coordinates must be provided when location is custom_coordinates')
+            raise ValueError(
+                'coordinates must be provided when location is custom_coordinates'
+            )
         if isinstance(coordinates, tuple):
             coordinates = ' '.join(map(str, coordinates))
         line += f' "{coordinates}"'

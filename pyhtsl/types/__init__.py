@@ -1,3 +1,4 @@
+# fmt: off
 # pyright: ignore[reportShadowedImports]
 from ..condition.base_condition import BaseCondition
 from ..condition.conditional_statements import IfStatement

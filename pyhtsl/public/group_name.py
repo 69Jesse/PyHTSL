@@ -1,9 +1,7 @@
 from ..placeholders import PlaceholderCheckable
 
 
-__all__ = (
-    'GroupName',
-)
+__all__ = ('GroupName',)
 
 
 GroupName = PlaceholderCheckable(

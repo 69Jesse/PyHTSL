@@ -1,9 +1,7 @@
 from ..placeholders import PlaceholderCheckable
 
 
-__all__ = (
-    'RandomDecimal',
-)
+__all__ = ('RandomDecimal',)
 
 
 def RandomDecimal(

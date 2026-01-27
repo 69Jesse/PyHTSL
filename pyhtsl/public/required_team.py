@@ -4,14 +4,13 @@ from .team import Team
 from typing import final
 
 
-__all__ = (
-    'RequiredTeam',
-)
+__all__ = ('RequiredTeam',)
 
 
 @final
 class RequiredTeam(BaseCondition):
     team: Team | None
+
     def __init__(
         self,
         team: Team | str | None,

@@ -1,9 +1,7 @@
 from ..writer import WRITER, LineType
 
 
-__all__ = (
-    'reset_inventory',
-)
+__all__ = ('reset_inventory',)
 
 
 def reset_inventory() -> None:

@@ -2,9 +2,7 @@ from ..placeholders import PlaceholderCheckable
 from .team import Team
 
 
-__all__ = (
-    'TeamPlayers',
-)
+__all__ = ('TeamPlayers',)
 
 
 def TeamPlayers(

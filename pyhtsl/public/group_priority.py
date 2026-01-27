@@ -1,9 +1,7 @@
 from ..placeholders import PlaceholderCheckable
 
 
-__all__ = (
-    'GroupPriority',
-)
+__all__ = ('GroupPriority',)
 
 
 GroupPriority = PlaceholderCheckable(

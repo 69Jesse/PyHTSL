@@ -1,9 +1,7 @@
 from ..placeholders import PlaceholderCheckable
 
 
-__all__ = (
-    'PlayerGamemode',
-)
+__all__ = ('PlayerGamemode',)
 
 
 PlayerGamemode = PlaceholderCheckable(

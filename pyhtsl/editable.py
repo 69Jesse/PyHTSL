@@ -4,13 +4,12 @@ from .checkable import Checkable
 from .expression.housing_type import NumericHousingType, HousingType
 
 from typing import TYPE_CHECKING, Self
+
 if TYPE_CHECKING:
     from .expression.binary_expression import BinaryExpression, BinaryExpressionOperator
 
 
-__all__ = (
-    'Editable',
-)
+__all__ = ('Editable',)
 
 
 class Editable(Checkable):
@@ -23,25 +22,39 @@ class Editable(Checkable):
         globals()[binary_operator_cls.__name__] = binary_operator_cls
 
     def __iadd__(self, other: Checkable | NumericHousingType) -> Self:
-        expr = BinaryExpression(self, self._other_as_type_compatible(other), BinaryExpressionOperator.Increment)
+        expr = BinaryExpression(
+            self,
+            self._other_as_type_compatible(other),
+            BinaryExpressionOperator.Increment,
+        )
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
         return self
 
     def __isub__(self, other: Checkable | NumericHousingType) -> Self:
-        expr = BinaryExpression(self, self._other_as_type_compatible(other), BinaryExpressionOperator.Decrement)
+        expr = BinaryExpression(
+            self,
+            self._other_as_type_compatible(other),
+            BinaryExpressionOperator.Decrement,
+        )
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
         return self
 
     def __imul__(self, other: Checkable | NumericHousingType) -> Self:
-        expr = BinaryExpression(self, self._other_as_type_compatible(other), BinaryExpressionOperator.Multiply)
+        expr = BinaryExpression(
+            self,
+            self._other_as_type_compatible(other),
+            BinaryExpressionOperator.Multiply,
+        )
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
         return self
 
     def __itruediv__(self, other: Checkable | NumericHousingType) -> Self:
-        expr = BinaryExpression(self, self._other_as_type_compatible(other), BinaryExpressionOperator.Divide)
+        expr = BinaryExpression(
+            self, self._other_as_type_compatible(other), BinaryExpressionOperator.Divide
+        )
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
         return self
@@ -57,17 +70,24 @@ class Editable(Checkable):
         self.set(self.__mod__(other))
         return self
 
-    def set(self, right: Checkable | HousingType, *, is_self_cast: bool = False) -> Self:
+    def set(
+        self, right: Checkable | HousingType, *, is_self_cast: bool = False
+    ) -> Self:
         if is_self_cast and not self.equals(right, check_internal_type=False):
             raise ValueError('is_self_cast can only be True if lhs is equal to rhs')
-        expr = BinaryExpression(self, self._other_as_type_compatible(right), BinaryExpressionOperator.Set, is_self_cast=is_self_cast)
+        expr = BinaryExpression(
+            self,
+            self._other_as_type_compatible(right),
+            BinaryExpressionOperator.Set,
+            is_self_cast=is_self_cast,
+        )
         EXPR_HANDLER.add(expr)
         EXPR_HANDLER.push()
         return self
 
     def unset(self) -> None:
         WRITER.write(
-            f'{self._in_assignment_left_side()} unset', 
+            f'{self._in_assignment_left_side()} unset',
             LineType.variable_change,
         )
 
@@ -83,7 +103,9 @@ class Editable(Checkable):
     def div(self, other: Checkable | NumericHousingType) -> Self:
         return self.__itruediv__(other)
 
-    def execute(self, operator: 'BinaryExpressionOperator', other: Checkable | HousingType) -> Self:
+    def execute(
+        self, operator: 'BinaryExpressionOperator', other: Checkable | HousingType
+    ) -> Self:
         if operator is BinaryExpressionOperator.Set:
             return self.set(other)
         elif operator is BinaryExpressionOperator.Increment:

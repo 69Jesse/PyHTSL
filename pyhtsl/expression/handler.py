@@ -11,7 +11,10 @@ if TYPE_CHECKING:
     from ..editable import Editable
     from .housing_type import HousingType
     from .expression import Expression
-    from .conditional_expressions import ConditionalEnterExpression, ConditionalExitExpression
+    from .conditional_expressions import (
+        ConditionalEnterExpression,
+        ConditionalExitExpression,
+    )
     from .binary_expression import BinaryExpressionOperator, BinaryExpression
 
 
@@ -74,8 +77,12 @@ class ExpressionHandler:
         conditional_enter_expression_cls: type['ConditionalEnterExpression'],
         conditional_exit_expression_cls: type['ConditionalExitExpression'],
     ) -> None:
-        globals()[conditional_enter_expression_cls.__name__] = conditional_enter_expression_cls
-        globals()[conditional_exit_expression_cls.__name__] = conditional_exit_expression_cls
+        globals()[conditional_enter_expression_cls.__name__] = (
+            conditional_enter_expression_cls
+        )
+        globals()[conditional_exit_expression_cls.__name__] = (
+            conditional_exit_expression_cls
+        )
 
     _expressions: list['Expression'] = []
 
@@ -191,28 +198,20 @@ class ExpressionHandler:
         for j in indexes:
             other_expression = expressions[j]
             if isinstance(other_expression, BinaryExpression):
-                if right.equals(
-                    other_expression.left, check_internal_type=False
-                ):
+                if right.equals(other_expression.left, check_internal_type=False):
                     other_expression.left = left
                     has_changed = True
-                if right.equals(
-                    other_expression.right, check_internal_type=False
-                ):
+                if right.equals(other_expression.right, check_internal_type=False):
                     other_expression.right = left
                     has_changed = True
             elif isinstance(other_expression, ConditionalEnterExpression):
                 for condition in other_expression.statement.conditions:
                     if not isinstance(condition, BinaryCondition):
                         continue
-                    if right.equals(
-                        condition.left, check_internal_type=False
-                    ):
+                    if right.equals(condition.left, check_internal_type=False):
                         condition.left = left
                         has_changed = True
-                    if right.equals(
-                        condition.right, check_internal_type=False
-                    ):
+                    if right.equals(condition.right, check_internal_type=False):
                         condition.right = left
                         has_changed = True
         return has_changed

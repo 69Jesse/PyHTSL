@@ -3,9 +3,7 @@ from .stat import Stat
 from typing import final
 
 
-__all__ = (
-    'GlobalStat',
-)
+__all__ = ('GlobalStat',)
 
 
 @final

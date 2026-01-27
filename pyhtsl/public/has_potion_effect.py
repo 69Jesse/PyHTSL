@@ -4,14 +4,13 @@ from ..types import ALL_POTION_EFFECTS
 from typing import final
 
 
-__all__ = (
-    'HasPotionEffect',
-)
+__all__ = ('HasPotionEffect',)
 
 
 @final
 class HasPotionEffect(BaseCondition):
     effect: str
+
     def __init__(
         self,
         effect: ALL_POTION_EFFECTS,

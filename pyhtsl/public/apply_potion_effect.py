@@ -2,9 +2,7 @@ from ..writer import WRITER, LineType
 from ..types import ALL_POTION_EFFECTS
 
 
-__all__ = (
-    'apply_potion_effect',
-)
+__all__ = ('apply_potion_effect',)
 
 
 def apply_potion_effect(

@@ -3,9 +3,7 @@ from ..expression.housing_type import HousingType
 from ..expression.handler import EXPR_HANDLER
 
 
-__all__ = (
-    '_inside_line',
-)
+__all__ = ('_inside_line',)
 
 
 def _inside_line(value: Checkable | HousingType) -> str:

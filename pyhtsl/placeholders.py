@@ -17,6 +17,7 @@ class PlaceholderCheckable(Checkable):
     comparison_left_side: str
     comparison_right_side: str
     inside_of_string: str
+
     def __init__(
         self,
         *,
@@ -31,16 +32,22 @@ class PlaceholderCheckable(Checkable):
         self.inside_of_string = in_string
 
     def _in_assignment_left_side(self) -> str:
-        raise RuntimeError(f'Cannot use {self.__class__.__name__} as left side of assignment.')
+        raise RuntimeError(
+            f'Cannot use {self.__class__.__name__} as left side of assignment.'
+        )
 
     def _in_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
-        return self._formatted_with_internal_type(self.assignment_right_side, include_internal_type=include_internal_type)
+        return self._formatted_with_internal_type(
+            self.assignment_right_side, include_internal_type=include_internal_type
+        )
 
     def _in_comparison_left_side(self) -> str:
         return self.comparison_left_side
 
     def _in_comparison_right_side(self) -> str:
-        return self._formatted_with_internal_type(self.comparison_right_side, include_internal_type=True)
+        return self._formatted_with_internal_type(
+            self.comparison_right_side, include_internal_type=True
+        )
 
     def _as_string(self, include_fallback_value: bool = True) -> str:
         return self.inside_of_string
@@ -67,6 +74,7 @@ class PlaceholderEditable(Editable):
     comparison_left_side: str
     comparison_right_side: str
     inside_of_string: str
+
     def __init__(
         self,
         *,
@@ -86,13 +94,17 @@ class PlaceholderEditable(Editable):
         return self.assignment_left_side
 
     def _in_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
-        return self._formatted_with_internal_type(self.assignment_right_side, include_internal_type=include_internal_type)
+        return self._formatted_with_internal_type(
+            self.assignment_right_side, include_internal_type=include_internal_type
+        )
 
     def _in_comparison_left_side(self) -> str:
         return self.comparison_left_side
 
     def _in_comparison_right_side(self) -> str:
-        return self._formatted_with_internal_type(self.comparison_right_side, include_internal_type=True)
+        return self._formatted_with_internal_type(
+            self.comparison_right_side, include_internal_type=True
+        )
 
     def _as_string(self, include_fallback_value: bool = True) -> str:
         return self.inside_of_string

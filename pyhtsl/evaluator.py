@@ -13,7 +13,9 @@ class Evaluator:
 
     def __init__(self) -> None:
         self.all_expressions = []
-        self.context = WRITER.temporary_container_context('temp-evaluator', lines_callback=self._expressions_callback)
+        self.context = WRITER.temporary_container_context(
+            'temp-evaluator', lines_callback=self._expressions_callback
+        )
         self.container = self.context.__enter__()
 
     def _expressions_callback(self, expressions: list[Expression]) -> None:
@@ -34,4 +36,8 @@ class Evaluator:
         return [expr for sublist in self.all_expressions for expr in sublist]
 
     def get_expressions(self) -> list[BinaryExpression]:
-        return list(filter(lambda e: isinstance(e, BinaryExpression), self.flattened_expressions()))  # type: ignore
+        return list(
+            filter(
+                lambda e: isinstance(e, BinaryExpression), self.flattened_expressions()
+            )
+        )  # type: ignore

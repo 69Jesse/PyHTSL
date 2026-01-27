@@ -1,4 +1,3 @@
-
 __all__ = (
     'should_display_htsl',
     'display_htsl',

@@ -13,6 +13,7 @@ def no_optimization() -> bool:
 
 class NoOptimization:
     counter: ClassVar[int] = 0
+
     def __enter__(self) -> None:
         NoOptimization.counter += 1
 

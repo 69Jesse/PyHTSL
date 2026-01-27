@@ -3,9 +3,7 @@ from ..writer import WRITER, LineType
 from types import TracebackType
 
 
-__all__ = (
-    'Random',
-)
+__all__ = ('Random',)
 
 
 class _Random:

@@ -1,9 +1,7 @@
 from ..placeholders import PlaceholderEditable
 
 
-__all__ = (
-    'PlayerMaxHealth',
-)
+__all__ = ('PlayerMaxHealth',)
 
 
 PlayerMaxHealth = PlaceholderEditable(

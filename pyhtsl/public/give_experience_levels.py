@@ -1,9 +1,7 @@
 from ..writer import WRITER, LineType
 
 
-__all__ = (
-    'give_experience_levels',
-)
+__all__ = ('give_experience_levels',)
 
 
 def give_experience_levels(

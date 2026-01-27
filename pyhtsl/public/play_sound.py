@@ -2,9 +2,7 @@ from ..writer import WRITER, LineType
 from ..types import ALL_SOUNDS, ALL_SOUNDS_PRETTY_TO_RAW, ALL_LOCATIONS
 
 
-__all__ = (
-    'play_sound',
-)
+__all__ = ('play_sound',)
 
 
 # TODO proper overload
@@ -19,7 +17,9 @@ def play_sound(
     line = f'sound "{sound}" {volume} {pitch} "{location}"'
     if location == 'custom_coordinates':
         if coordinates is None:
-            raise ValueError('coordinates must be provided when location is custom_coordinates')
+            raise ValueError(
+                'coordinates must be provided when location is custom_coordinates'
+            )
         if isinstance(coordinates, tuple):
             coordinates = ' '.join(map(str, coordinates))
         line += f' "{coordinates}"'

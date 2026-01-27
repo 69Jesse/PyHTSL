@@ -3,9 +3,7 @@ from ..line_type import LineType
 from abc import ABC, abstractmethod
 
 
-__all__ = (
-    'Expression',
-)
+__all__ = ('Expression',)
 
 
 class Expression(ABC):

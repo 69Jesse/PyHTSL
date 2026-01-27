@@ -1,9 +1,7 @@
 from ..placeholders import PlaceholderCheckable
 
 
-__all__ = (
-    'PlayerPositionYaw',
-)
+__all__ = ('PlayerPositionYaw',)
 
 
 PlayerPositionYaw = PlaceholderCheckable(

@@ -1,9 +1,7 @@
 from ..placeholders import PlaceholderCheckable
 
 
-__all__ = (
-    'HouseCookies',
-)
+__all__ = ('HouseCookies',)
 
 
 HouseCookies = PlaceholderCheckable(
@@ -12,4 +10,3 @@ HouseCookies = PlaceholderCheckable(
     comparison_right_side='%house.cookies%',
     in_string='%house.cookies%',
 )
-

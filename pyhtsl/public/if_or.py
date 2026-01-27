@@ -2,9 +2,7 @@ from ..condition.base_condition import BaseCondition
 from ..condition.conditional_statements import ConditionalMode, IfStatement
 
 
-__all__ = (
-    'IfOr',
-)
+__all__ = ('IfOr',)
 
 
 def IfOr(

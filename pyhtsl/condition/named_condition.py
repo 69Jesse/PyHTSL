@@ -3,14 +3,13 @@ from .base_condition import BaseCondition
 from typing import final
 
 
-__all__ = (
-    'NamedCondition',
-)
+__all__ = ('NamedCondition',)
 
 
 @final
 class NamedCondition(BaseCondition):
     name: str
+
     def __init__(
         self,
         name: str,

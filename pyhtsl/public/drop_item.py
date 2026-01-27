@@ -5,9 +5,7 @@ from ..writer import WRITER, LineType
 from .item import Item
 
 
-__all__ = (
-    'drop_item',
-)
+__all__ = ('drop_item',)
 
 
 def drop_item(
@@ -16,13 +14,16 @@ def drop_item(
         Checkable | HousingType,
         Checkable | HousingType,
         Checkable | HousingType,
-    ] | tuple[
+    ]
+    | tuple[
         Checkable | HousingType,
         Checkable | HousingType,
         Checkable | HousingType,
         Checkable | HousingType,
         Checkable | HousingType,
-    ] | str | None,
+    ]
+    | str
+    | None,
     drop_naturally: bool = False,
     disable_item_merging: bool = False,
     prioritize_player: bool = False,
@@ -34,7 +35,9 @@ def drop_item(
         name = item
     line = f'dropItem "{name}"'
     if coordinates is None:
-        raise ValueError('coordinates must be provided when location is custom_coordinates')
+        raise ValueError(
+            'coordinates must be provided when location is custom_coordinates'
+        )
     if isinstance(coordinates, tuple):
         with NoFallbackValues():
             coordinates = ' '.join(map(str, coordinates))

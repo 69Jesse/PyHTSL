@@ -1,9 +1,7 @@
 from ..writer import WRITER, LineType
 
 
-__all__ = (
-    'fail_parkour',
-)
+__all__ = ('fail_parkour',)
 
 
 def fail_parkour(

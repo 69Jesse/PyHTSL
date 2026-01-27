@@ -1,9 +1,7 @@
 from ..placeholders import PlaceholderEditable
 
 
-__all__ = (
-    'PlayerHunger',
-)
+__all__ = ('PlayerHunger',)
 
 
 PlayerHunger = PlaceholderEditable(

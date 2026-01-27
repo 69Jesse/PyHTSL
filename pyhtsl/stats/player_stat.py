@@ -5,9 +5,7 @@ from .stat import Stat
 from typing import final
 
 
-__all__ = (
-    'PlayerStat',
-)
+__all__ = ('PlayerStat',)
 
 
 @final

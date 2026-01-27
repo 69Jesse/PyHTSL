@@ -7,9 +7,7 @@ from ..stats.team_stat import TeamStat
 from typing import Iterable
 
 
-__all__ = (
-    'trigger_function',
-)
+__all__ = ('trigger_function',)
 
 
 def trigger_function(
@@ -22,11 +20,19 @@ def trigger_function(
     if parameters is not None:
         parameters = tuple(parameters)
         if len(parameters) != len(function.parameters):
-            raise TypeError(f'Expected {len(function.parameters)} parameters, got {len(parameters)}.')
-        for i, (param, expected_param) in enumerate(zip(parameters, function.parameters)):
+            raise TypeError(
+                f'Expected {len(function.parameters)} parameters, got {len(parameters)}.'
+            )
+        for i, (param, expected_param) in enumerate(
+            zip(parameters, function.parameters)
+        ):
             if type(param) not in (PlayerStat, GlobalStat, TeamStat, int):
-                raise TypeError(f'Parameter {i} must be either "{PlayerStat.__name__}", "{GlobalStat.__name__}", "{TeamStat.__name__}", or "{int.__name__}", not "{type(param).__name__}".')
-            stat: PlayerStat | GlobalStat | TeamStat = expected_param.cls(name=expected_param.name)  # type: ignore
+                raise TypeError(
+                    f'Parameter {i} must be either "{PlayerStat.__name__}", "{GlobalStat.__name__}", "{TeamStat.__name__}", or "{int.__name__}", not "{type(param).__name__}".'
+                )
+            stat: PlayerStat | GlobalStat | TeamStat = expected_param.cls(
+                name=expected_param.name
+            )  # type: ignore
             stat.value = param
     WRITER.write(
         f'function "{function.name}" {str(trigger_for_all_players).lower()}',

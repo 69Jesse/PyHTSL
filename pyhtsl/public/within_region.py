@@ -7,6 +7,7 @@ from typing import final
 @final
 class WithinRegion(BaseCondition):
     region: Region
+
     def __init__(
         self,
         region: Region | str,

@@ -1,14 +1,13 @@
 from ..types import ALL_ENCHANTMENTS
 
 
-__all__ = (
-    'Enchantment',
-)
+__all__ = ('Enchantment',)
 
 
 class Enchantment:
     name: ALL_ENCHANTMENTS
     level: int | None
+
     def __init__(
         self,
         name: ALL_ENCHANTMENTS,

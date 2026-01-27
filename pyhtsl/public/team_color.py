@@ -1,9 +1,7 @@
 from ..placeholders import PlaceholderCheckable
 
 
-__all__ = (
-    'TeamColor',
-)
+__all__ = ('TeamColor',)
 
 
 TeamColor = PlaceholderCheckable(

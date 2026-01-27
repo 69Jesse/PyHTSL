@@ -2,9 +2,7 @@ from ..writer import WRITER, LineType
 from .layout import Layout
 
 
-__all__ = (
-    'apply_inventory_layout',
-)
+__all__ = ('apply_inventory_layout',)
 
 
 def apply_inventory_layout(

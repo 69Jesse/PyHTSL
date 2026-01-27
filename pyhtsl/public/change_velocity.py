@@ -4,9 +4,7 @@ from ..expression.housing_type import NumericHousingType
 from ._inside_line import _inside_line
 
 
-__all__ = (
-    'change_velocity',
-)
+__all__ = ('change_velocity',)
 
 
 def change_velocity(

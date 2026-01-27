@@ -1,9 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-__all__ = (
-    'BaseCondition',
-)
+__all__ = ('BaseCondition',)
 
 
 class BaseCondition(ABC):

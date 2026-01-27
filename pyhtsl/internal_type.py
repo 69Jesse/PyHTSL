@@ -1,9 +1,7 @@
 from enum import Enum
 
 
-__all__ = (
-    'InternalType',
-)
+__all__ = ('InternalType',)
 
 
 class InternalType(Enum):

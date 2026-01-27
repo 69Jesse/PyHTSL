@@ -2,9 +2,7 @@ from ..writer import WRITER, LineType
 from .item import Item
 
 
-__all__ = (
-    'remove_item',
-)
+__all__ = ('remove_item',)
 
 
 def remove_item(

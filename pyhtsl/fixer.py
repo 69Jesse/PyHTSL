@@ -4,13 +4,12 @@ import re
 from .line_type import LineType
 
 from typing import TYPE_CHECKING, Generator, final
+
 if TYPE_CHECKING:
     from .writer import ExportContainer
 
 
-__all__ = (
-    'Fixer',
-)
+__all__ = ('Fixer',)
 
 
 GOTO_LINE_REGEX = re.compile(r'^goto (.+?) "(.+)"')
@@ -19,6 +18,7 @@ GOTO_LINE_REGEX = re.compile(r'^goto (.+?) "(.+)"')
 class Part:
     name: str | None
     lines: list[tuple[str, LineType]]
+
     def __init__(
         self,
         name: str | None,
@@ -30,6 +30,7 @@ class Part:
 
 class Counter:
     mapping: dict[LineType, int]
+
     def __init__(self) -> None:
         self.mapping = {}
 
@@ -52,16 +53,22 @@ class Counter:
     IF_ENTER_LIMIT: int = 15
 
     def if_enters(self) -> int:
-        return self.mapping.get(LineType.if_and_enter, 0) + self.mapping.get(LineType.if_or_enter, 0)
+        return self.mapping.get(LineType.if_and_enter, 0) + self.mapping.get(
+            LineType.if_or_enter, 0
+        )
 
     def can_add_another_if_enter(self) -> bool:
         return self.if_enters() < Counter.IF_ENTER_LIMIT
 
     def add_fake_if_enter(self) -> None:
-        self.mapping[LineType.if_and_enter] = self.mapping.get(LineType.if_and_enter, 0) + 1
+        self.mapping[LineType.if_and_enter] = (
+            self.mapping.get(LineType.if_and_enter, 0) + 1
+        )
 
     def add_fake_function_trigger(self) -> None:
-        self.mapping[LineType.trigger_function] = self.mapping.get(LineType.trigger_function, 0) + 1
+        self.mapping[LineType.trigger_function] = (
+            self.mapping.get(LineType.trigger_function, 0) + 1
+        )
 
     def remove_fake_function_trigger(self) -> None:
         self.mapping[LineType.trigger_function] -= 1
@@ -70,10 +77,8 @@ class Counter:
         return (
             self.if_enters() > Counter.IF_ENTER_LIMIT
             or self.mapping.get(LineType.variable_change, 0) > 25
-
             or self.mapping.get(LineType.display_title, 0) > 5
             or self.mapping.get(LineType.pause_execution, 0) > 30
-
             # 9 instead of 10 to account for the filler function call if nessessary
             # This results in some tiny inefficiencies in some cases.
             # See [9 INSTEAD OF 10] for a fix in one case. Maybe TODO:
@@ -86,6 +91,7 @@ class Addon(ABC):
     lines: list[tuple[str, LineType]]
     add_to_middle_index: int
     container: 'ExportContainer'
+
     def __init__(
         self,
         lines: list[tuple[str, LineType]],
@@ -118,14 +124,18 @@ class EmptyIfAddon(Addon):
         for i, (line, line_type) in enumerate(lines):
             lines[i] = ('    ' + line, line_type)
         super().__init__(lines, add_to_middle_index, container=container)
-        self.container.logger.log('\x1b[38;2;0;255;0mNote:\x1b[0m Added a conditional to prevent too many stat changes.')
+        self.container.logger.log(
+            '\x1b[38;2;0;255;0mNote:\x1b[0m Added a conditional to prevent too many stat changes.'
+        )
 
     def add_to_middle(self, append_to: list[tuple[str, LineType]]) -> int:
-        for line in reversed((
-            ('if and () {', LineType.if_and_enter),
-            *self.lines,
-            ('}', LineType.if_exit),
-        )):
+        for line in reversed(
+            (
+                ('if and () {', LineType.if_and_enter),
+                *self.lines,
+                ('}', LineType.if_exit),
+            )
+        ):
             append_to.insert(self.add_to_middle_index, line)
         return len(self.lines) + 2
 
@@ -140,6 +150,7 @@ FILLER_COMMENT_SUFFIX: str = '  // PyHTSL filler'
 class NewFunctionAddon(Addon):
     raw_function_name: str | None
     function_index: int
+
     def __init__(
         self,
         lines: list[tuple[str, LineType]],
@@ -153,7 +164,9 @@ class NewFunctionAddon(Addon):
         self.raw_function_name = function_name
         self.function_index = function_index
         if not self.has_unknown_name():
-            self.container.logger.log(f'\x1b[38;2;0;255;0mNote:\x1b[0m Created a new function named "\x1b[38;2;255;0;0m{self.function_name()}\x1b[0m" to prevent too many stat changes.')
+            self.container.logger.log(
+                f'\x1b[38;2;0;255;0mNote:\x1b[0m Created a new function named "\x1b[38;2;255;0;0m{self.function_name()}\x1b[0m" to prevent too many stat changes.'
+            )
         else:
             self.container.logger.log(
                 '\x1b[38;2;255;0;0mWarning:\x1b[0m You exceeded the conditional limit, and you are not in an explicit container.'
@@ -168,10 +181,13 @@ class NewFunctionAddon(Addon):
         return f'{self.raw_function_name if not self.has_unknown_name() else "!!! Rename Me"} {self.function_index}'
 
     def add_to_middle(self, append_to: list[tuple[str, LineType]]) -> int:
-        append_to.insert(self.add_to_middle_index, (
-            f'function "{self.function_name()}" false' + FILLER_COMMENT_SUFFIX,
-            LineType.trigger_function,
-        ))
+        append_to.insert(
+            self.add_to_middle_index,
+            (
+                f'function "{self.function_name()}" false' + FILLER_COMMENT_SUFFIX,
+                LineType.trigger_function,
+            ),
+        )
         return 1
 
     def create_goto_line(self) -> tuple[str, LineType]:
@@ -189,6 +205,7 @@ class Fixer:
     container: 'ExportContainer'
     lines: list[tuple[str, LineType]]
     new_functions_added: list[NewFunctionAddon]
+
     def __init__(self, container: 'ExportContainer') -> None:
         self.container = container
         self.lines = container.lines.copy()
@@ -222,16 +239,15 @@ class Fixer:
             line = lines[i]
             if line[1] is not LineType.goto:
                 continue
-            if (
-                i < (len(lines) - 1)
-                and lines[i + 1][1] is LineType.goto
-            ):
+            if i < (len(lines) - 1) and lines[i + 1][1] is LineType.goto:
                 continue
             lines[i] = ('\n\n' + line[0], line[1])
 
         return lines
 
-    def find_container_and_name_from_goto(self, line: str) -> tuple[str, str] | tuple[None, None]:
+    def find_container_and_name_from_goto(
+        self, line: str
+    ) -> tuple[str, str] | tuple[None, None]:
         match = GOTO_LINE_REGEX.match(line)
         if match is None:
             return (None, None)
@@ -342,7 +358,9 @@ class Fixer:
             if counter.possible_to_increment(line_type):
                 counter.increment(line_type)
                 if line_type.is_if_enter() or line_type is LineType.else_enter:
-                    line_sections = list(self.create_and_remove_line_sections_inside_if(lines, index))
+                    line_sections = list(
+                        self.create_and_remove_line_sections_inside_if(lines, index)
+                    )
                     previous_section: list[tuple[str, LineType]] = []
                     for i, section in enumerate(line_sections):
                         if i == 0:
@@ -354,7 +372,9 @@ class Fixer:
                             function_index += 1
                             addon = NewFunctionAddon(
                                 lines=section,
-                                add_to_middle_index=index if previous_section is lines else len(previous_section),
+                                add_to_middle_index=index
+                                if previous_section is lines
+                                else len(previous_section),
                                 function_name=current_name,
                                 function_index=function_index,
                                 container=self.container,
@@ -375,7 +395,9 @@ class Fixer:
             if counter.can_add_another_if_enter():
                 counter.add_fake_if_enter()
                 addon = EmptyIfAddon(
-                    lines=self.create_and_remove_line_section_that_can_be_inside_if(lines, index - 1),
+                    lines=self.create_and_remove_line_section_that_can_be_inside_if(
+                        lines, index - 1
+                    ),
                     add_to_middle_index=index - 1,
                     container=self.container,
                 )
@@ -385,7 +407,9 @@ class Fixer:
                 counter.add_fake_function_trigger()
                 rest = self.remove_rest_from_lines(lines, index - 1)
                 function_index += 1
-                rest_addons = self.fix_lines(rest, current_name=current_name, function_index=function_index)
+                rest_addons = self.fix_lines(
+                    rest, current_name=current_name, function_index=function_index
+                )
                 addon = NewFunctionAddon(
                     lines=rest,
                     add_to_middle_index=index,
@@ -399,7 +423,9 @@ class Fixer:
 
         return addons
 
-    def find_goto_line_child_index(self, parent_line: str, child_line: str) -> int | None:
+    def find_goto_line_child_index(
+        self, parent_line: str, child_line: str
+    ) -> int | None:
         prefix = parent_line.removesuffix('"') + ' '
         suffix = '"' + FILLER_COMMENT_SUFFIX
         if not child_line.startswith(prefix):
@@ -408,7 +434,7 @@ class Fixer:
             return None
 
         try:
-            return int(child_line[len(prefix):-len(suffix)].strip())
+            return int(child_line[len(prefix) : -len(suffix)].strip())
         except ValueError:
             return None
 
@@ -430,17 +456,20 @@ class Fixer:
         visited_indexes: set[int] = set()
         parents_with_children: dict[
             tuple[tuple[str, LineType], tuple[str, str]],
-            list[tuple[tuple[str, LineType], int]]
+            list[tuple[tuple[str, LineType], int]],
         ] = {}
         for i, (line, pair) in enumerate(gotos):
             if i in visited_indexes:
                 continue
             is_child_of_any = False
             for maybe_parent_line, _ in gotos:
-                if self.find_goto_line_child_index(
-                    maybe_parent_line[0],
-                    line[0],
-                ) is not None:
+                if (
+                    self.find_goto_line_child_index(
+                        maybe_parent_line[0],
+                        line[0],
+                    )
+                    is not None
+                ):
                     is_child_of_any = True
                     break
             if is_child_of_any:

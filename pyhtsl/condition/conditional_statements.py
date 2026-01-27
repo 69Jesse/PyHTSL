@@ -65,7 +65,7 @@ class IfStatement:
         WRITER.write(*self._exit_line())
 
     def __repr__(self) -> str:
-        return f'If<{f' {self.mode.name} '.join(map(repr, self.conditions))}>'
+        return f'If<{f" {self.mode.name} ".join(map(repr, self.conditions))}>'
 
 
 class ElseStatement:

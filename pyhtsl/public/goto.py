@@ -3,9 +3,7 @@ from ..writer import WRITER, LineType
 from typing import TYPE_CHECKING, Literal
 
 
-__all__ = (
-    'goto',
-)
+__all__ = ('goto',)
 
 
 def _goto(
@@ -29,6 +27,7 @@ def _goto(
 
 
 if TYPE_CHECKING:
+
     def goto(
         container: Literal[
             'function',
@@ -39,7 +38,6 @@ if TYPE_CHECKING:
             'pad',
         ],
         name: str,
-    ) -> None:
-        ...
+    ) -> None: ...
 else:
     goto = _goto

@@ -2,9 +2,7 @@ from ..writer import WRITER, LineType
 from .menu import Menu
 
 
-__all__ = (
-    'display_menu',
-)
+__all__ = ('display_menu',)
 
 
 def display_menu(

@@ -1,14 +1,13 @@
 from .stat import Stat
 
 
-__all__ = (
-    'StatParameter',
-)
+__all__ = ('StatParameter',)
 
 
 class StatParameter:
     name: str
     cls: type['Stat']
+
     def __init__(
         self,
         name: str,

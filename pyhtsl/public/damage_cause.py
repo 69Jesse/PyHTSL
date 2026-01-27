@@ -4,14 +4,13 @@ from ..types import ALL_DAMAGE_CAUSES
 from typing import final
 
 
-__all__ = (
-    'DamageCause',
-)
+__all__ = ('DamageCause',)
 
 
 @final
 class DamageCause(BaseCondition):
     damage_cause: str
+
     def __init__(
         self,
         damage_cause: ALL_DAMAGE_CAUSES,

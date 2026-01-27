@@ -4,15 +4,14 @@ from .item import Item
 from typing import final
 
 
-__all__ = (
-    'BlockType',
-)
+__all__ = ('BlockType',)
 
 
 @final
 class BlockType(BaseCondition):
     block: Item | str
     match_type_only: bool
+
     def __init__(
         self,
         block: Item | str,

@@ -1,9 +1,7 @@
 from ..writer import WRITER, LineType
 
 
-__all__ = (
-    'parkour_checkpoint',
-)
+__all__ = ('parkour_checkpoint',)
 
 
 def parkour_checkpoint() -> None:

@@ -7,7 +7,13 @@ from types import ModuleType
 
 
 type CallableNoArgs = Callable[[], None | Any]
-type Exportable = Function | CallableNoArgs | Sequence[Function | CallableNoArgs] | dict[str, Function | Any] | ModuleType
+type Exportable = (
+    Function
+    | CallableNoArgs
+    | Sequence[Function | CallableNoArgs]
+    | dict[str, Function | Any]
+    | ModuleType
+)
 
 
 def export(
@@ -30,7 +36,9 @@ def export(
             elif callable(item):
                 callables.append(item)
             else:
-                raise TypeError(f'Item {item} in sequence is not a Function or callable.')
+                raise TypeError(
+                    f'Item {item} in sequence is not a Function or callable.'
+                )
     elif isinstance(exportable, dict):
         for value in exportable.values():
             if isinstance(value, Function):
@@ -46,7 +54,9 @@ def export(
                 callables.append(value.callback)
 
     if not callables:
-        raise ValueError(f'No functions to export. Double check {repr(exportable)} of type {exportable.__class__.__name__} is correct.')
+        raise ValueError(
+            f'No functions to export. Double check {repr(exportable)} of type {exportable.__class__.__name__} is correct.'
+        )
 
     with WRITER.temporary_container_context(name=name) as container:
         for call in callables:

@@ -1,14 +1,13 @@
 from ..placeholders import PlaceholderCheckable
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from ..stats.team_stat import TeamStat
     from .team_players import TeamPlayers
 
 
-__all__ = (
-    'Team',
-)
+__all__ = ('Team',)
 
 
 class Team:
@@ -21,6 +20,7 @@ class Team:
         globals()[team_players.__name__] = team_players
 
     name: str
+
     def __init__(self, name: str) -> None:
         self.name = name
 

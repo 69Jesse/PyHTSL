@@ -2,9 +2,7 @@ from .group import Group
 from ..writer import WRITER, LineType
 
 
-__all__ = (
-    'change_player_group',
-)
+__all__ = ('change_player_group',)
 
 
 def change_player_group(

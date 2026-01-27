@@ -1,9 +1,7 @@
 from ..placeholders import PlaceholderCheckable
 
 
-__all__ = (
-    'RandomWhole',
-)
+__all__ = ('RandomWhole',)
 
 
 def RandomWhole(

@@ -1,9 +1,7 @@
 from ..writer import WRITER, LineType
 
 
-__all__ = (
-    'chat',
-)
+__all__ = ('chat',)
 
 
 def chat(

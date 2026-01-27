@@ -8,24 +8,23 @@ from ..expression.handler import ExpressionHandler
 from typing import TYPE_CHECKING, Self
 
 
-__all__ = (
-    'BaseStat',
-)
+__all__ = ('BaseStat',)
 
 
 class BaseStat(Editable):
     name: str
     auto_unset: bool
     if TYPE_CHECKING:
+
         def __init__(
             self,
             name: str,
             /,
             *,
             unset: bool = True,
-        ) -> None:
-            ...
+        ) -> None: ...
     else:
+
         def __init__(
             self,
             name: str,
@@ -65,7 +64,9 @@ class BaseStat(Editable):
 
     def _in_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
         name = self._as_string()
-        return self._formatted_with_internal_type(name, include_internal_type=include_internal_type)
+        return self._formatted_with_internal_type(
+            name, include_internal_type=include_internal_type
+        )
 
     def _in_comparison_left_side(self) -> str:
         return self._in_assignment_left_side()
@@ -81,10 +82,20 @@ class BaseStat(Editable):
             return ''
         fallback_value = self._get_formatted_fallback_value()
 
-        if isinstance(fallback_value, str) and not fallback_value or fallback_value == '""':
+        if (
+            isinstance(fallback_value, str)
+            and not fallback_value
+            or fallback_value == '""'
+        ):
             return ''
-        if isinstance(fallback_value, str) and ' ' in fallback_value and not (fallback_value.startswith('"') and fallback_value.endswith('"')):
-            raise ValueError('Fallback values cannot have spaces inside of them because of HTSL\'s limitations.. Wrap them in double quotes yourself.')
+        if (
+            isinstance(fallback_value, str)
+            and ' ' in fallback_value
+            and not (fallback_value.startswith('"') and fallback_value.endswith('"'))
+        ):
+            raise ValueError(
+                "Fallback values cannot have spaces inside of them because of HTSL's limitations.. Wrap them in double quotes yourself."
+            )
 
         if fallback_value is None:
             return ''

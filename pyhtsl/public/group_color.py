@@ -1,9 +1,7 @@
 from ..placeholders import PlaceholderCheckable
 
 
-__all__ = (
-    'GroupColor',
-)
+__all__ = ('GroupColor',)
 
 
 GroupColor = PlaceholderCheckable(

@@ -13,6 +13,7 @@ def no_type_casting() -> bool:
 
 class NoTypeCasting:
     counter: ClassVar[int] = 0
+
     def __enter__(self) -> None:
         NoTypeCasting.counter += 1
 

@@ -3,6 +3,7 @@ from .base_condition import BaseCondition
 from enum import Enum
 
 from typing import TYPE_CHECKING, final
+
 if TYPE_CHECKING:
     from ..checkable import Checkable
     from ..expression.housing_type import HousingType
@@ -33,6 +34,7 @@ class BinaryCondition(BaseCondition):
     left: 'Checkable'
     right: 'Checkable | HousingType'
     operator: BinaryConditionOperator
+
     def __init__(
         self,
         left: 'Checkable',
