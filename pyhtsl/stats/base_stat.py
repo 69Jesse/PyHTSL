@@ -132,15 +132,6 @@ class BaseStat(Editable):
         copied.unset = self.unset
         return copied
 
-    def cast_to_long(self) -> Self:
-        return self.set(self.as_long(), is_self_cast=True)
-
-    def cast_to_double(self) -> Self:
-        return self.set(self.as_double(), is_self_cast=True)
-
-    def cast_to_string(self) -> Self:
-        return self.set(self.as_string(), is_self_cast=True)
-
 
 Checkable._import_base_stat(BaseStat)
 ExpressionHandler._import_base_stat(BaseStat)

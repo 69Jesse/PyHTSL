@@ -8,5 +8,6 @@ from .smaller import (
     remove_formatting as remove_formatting,
     formatting_to_ansi as formatting_to_ansi,
     get_placeholder_parts as get_placeholder_parts,
+    round_double as round_double,
 )
 from .set_string import set_string as set_string
