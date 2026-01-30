@@ -32,7 +32,12 @@ def get_set_string_parts(value: str) -> list[str]:
     return parts
 
 
-def set_string(stat: Editable, value: str) -> None:
+def set_string(
+    stat: Editable,
+    value: str,
+    *,
+    unset_temp_stat: bool = False,
+) -> None:
     parts = get_set_string_parts(value)
     assert len(parts) >= 1
 
@@ -58,5 +63,5 @@ def set_string(stat: Editable, value: str) -> None:
                 used_temp_stat = True
                 part = f'{stat}{temp_stat}'
         stat.value = part
-    if used_temp_stat:
+    if used_temp_stat and unset_temp_stat:
         temp_stat.unset()
