@@ -115,7 +115,7 @@ class Checkable(ABC):
                 text += 'L'
             elif self.internal_type is InternalType.DOUBLE:
                 text += 'D'
-        return f'"{text}"'
+        return f'"{text}"' if ' ' in text else text  # ugly hack until htsw
 
     @abstractmethod
     def _in_assignment_left_side(self) -> str:
