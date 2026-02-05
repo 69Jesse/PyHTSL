@@ -14,32 +14,16 @@ __all__ = ('BaseStat',)
 class BaseStat(Editable):
     name: str
     auto_unset: bool
-    if TYPE_CHECKING:
 
-        def __init__(
-            self,
-            name: str,
-            /,
-            *,
-            unset: bool = True,
-        ) -> None: ...
-    else:
-
-        def __init__(
-            self,
-            name: str,
-            /,
-            *,
-            set_name: bool = True,
-            unset: bool = True,
-        ) -> None:
-            if set_name:
-                self.name = name
-            self.should_force_type_compatible = True
-            self.auto_unset = unset
-
-    def __hash__(self) -> int:
-        return hash((self.__class__, self.name))
+    def __init__(
+        self,
+        name: str,
+        /,
+        *,
+        auto_unset: bool = True,
+    ) -> None:
+        self.name = name
+        self.auto_unset = auto_unset
 
     @staticmethod
     @abstractmethod
@@ -129,9 +113,5 @@ class BaseStat(Editable):
 
     def copied(self) -> Self:
         copied = super().copied()
-        copied.unset = self.unset
+        copied.auto_unset = self.auto_unset
         return copied
-
-
-Checkable._import_base_stat(BaseStat)
-ExpressionHandler._import_base_stat(BaseStat)

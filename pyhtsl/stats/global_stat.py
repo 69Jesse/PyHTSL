@@ -16,7 +16,7 @@ class GlobalStat(Stat):
     def _right_side_keyword() -> str:
         return 'global'
 
-    def _equals(self, other: 'GlobalStat') -> bool:
+    def equals_raw(self, other: 'GlobalStat') -> bool:
         if isinstance(other, GlobalStat):
             return self.name == other.name
         return False

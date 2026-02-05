@@ -26,6 +26,8 @@ __all__ = (
 HERE: Path = Path(__file__).parent
 CACHED_HTSL_IMPORTS_FOLDER_PATH: Path = HERE / 'cached_htsl_imports_folder.txt'
 
+INDENT: str = ' ' * 4
+
 
 def set_htsl_imports_folder(htsl_folder: Path | str) -> None:
     if isinstance(htsl_folder, str):

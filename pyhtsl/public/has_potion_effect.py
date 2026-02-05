@@ -17,5 +17,5 @@ class HasPotionEffect(BaseCondition):
     ) -> None:
         self.effect = effect
 
-    def create_line(self) -> str:
+    def into_htsl_raw(self) -> str:
         return f'hasPotion "{self.effect}"'

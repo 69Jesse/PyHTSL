@@ -14,5 +14,5 @@ class WithinRegion(BaseCondition):
     ) -> None:
         self.region = region if isinstance(region, Region) else Region(region)
 
-    def create_line(self) -> str:
+    def into_htsl_raw(self) -> str:
         return f'inRegion "{self.region.name}"'

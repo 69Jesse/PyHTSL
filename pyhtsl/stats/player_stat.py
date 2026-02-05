@@ -18,7 +18,7 @@ class PlayerStat(Stat):
     def _right_side_keyword() -> str:
         return 'player'
 
-    def _equals(self, other: Checkable | HousingType) -> bool:
+    def equals_raw(self, other: Checkable | HousingType) -> bool:
         if isinstance(other, PlayerStat):
             return self.name == other.name
         return False

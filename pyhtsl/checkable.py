@@ -2,25 +2,28 @@ from .condition.conditional_statements import IfStatement
 from .internal_type import InternalType
 from .expression.handler import ExpressionHandler, EXPR_HANDLER
 from .condition.base_condition import BaseCondition
-from .condition.binary_condition import BinaryConditionOperator, BinaryCondition
+from .condition.comparison_condition import ComparisonOperator, ComparisonCondition
 from .expression.housing_type import (
     NumericHousingType,
     HousingType,
     _housing_type_as_right_side,
 )
 from .public.no_type_casting import no_type_casting
+from .base_object import BaseObject
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 import math
 
-from typing import TYPE_CHECKING, Self, overload
+from typing import TYPE_CHECKING, Self, overload, final
 
 if TYPE_CHECKING:
     from .editable import Editable
-    from .expression.binary_expression import BinaryExpression, BinaryExpressionOperator
-    from .expression.conditional_expressions import (
-        ConditionalEnterExpression,
-        ConditionalExitExpression,
+    from .expression.binary_expression import (
+        BinaryExpression,
+        BinaryOperator,
+    )
+    from .expression.condition.conditional_expressions import (
+        ConditionalExpression,
     )
     from .stats.base_stat import BaseStat
     from .stats.temporary_stat import TemporaryStat
@@ -60,49 +63,18 @@ def _transformed_to_string(
     raise TypeError(f'Cannot transform {repr(value)} to string.')
 
 
-class Checkable(ABC):
-    internal_type: InternalType = InternalType.ANY
-    fallback_value: HousingType | None = None
+class Checkable(BaseObject):
+    internal_type: InternalType
+    fallback_value: HousingType | None
 
-    @staticmethod
-    def _import_binary_expression(
-        binary_expression_cls: type['BinaryExpression'],
-        binary_operator_cls: type['BinaryExpressionOperator'],
+    def __init__(
+        self,
+        *,
+        internal_type: InternalType = InternalType.ANY,
+        fallback_value: HousingType | None = None,
     ) -> None:
-        globals()[binary_expression_cls.__name__] = binary_expression_cls
-        globals()[binary_operator_cls.__name__] = binary_operator_cls
-
-    @staticmethod
-    def _import_conditional_expressions(
-        conditional_enter_expression_cls: type['ConditionalEnterExpression'],
-        conditional_exit_expression_cls: type['ConditionalExitExpression'],
-    ) -> None:
-        globals()[conditional_enter_expression_cls.__name__] = (
-            conditional_enter_expression_cls
-        )
-        globals()[conditional_exit_expression_cls.__name__] = (
-            conditional_exit_expression_cls
-        )
-
-    @staticmethod
-    def _import_base_stat(
-        base_stat_cls: type['BaseStat'],
-    ) -> None:
-        globals()[base_stat_cls.__name__] = base_stat_cls
-
-    @staticmethod
-    def _import_temporary_stat(
-        temporary_stat_cls: type['TemporaryStat'],
-    ) -> None:
-        globals()[temporary_stat_cls.__name__] = temporary_stat_cls
-
-    @staticmethod
-    def _import_placeholders(
-        placeholder_checkable_cls: type['PlaceholderCheckable'],
-        placeholder_editable_cls: type['PlaceholderEditable'],
-    ) -> None:
-        globals()[placeholder_checkable_cls.__name__] = placeholder_checkable_cls
-        globals()[placeholder_editable_cls.__name__] = placeholder_editable_cls
+        self.internal_type = internal_type
+        self.fallback_value = fallback_value
 
     def _formatted_with_internal_type(
         self,
@@ -158,23 +130,21 @@ class Checkable(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def _equals(self, other: 'Checkable | HousingType') -> bool:
+    def equals_raw(self, other: 'Checkable | HousingType') -> bool:
         raise NotImplementedError
 
+    @final
     def equals(
-        self, other: 'Checkable | HousingType', *, check_internal_type: bool = True
+        self,
+        other: object,
     ) -> bool:
-        """
-        Checks if the current object is equal to another object.
-        """
         if not isinstance(other, Checkable):
             return False
-        if check_internal_type:
-            if self.internal_type is not other.internal_type:
-                return False
+        if self.internal_type is not other.internal_type:
+            return False
         if self.fallback_value != other.fallback_value:
             return False
-        return self._equals(other)
+        return self.equals_raw(other)
 
     @staticmethod
     def _to_assignment_right_side(
@@ -362,12 +332,12 @@ class Checkable(ABC):
 
     def __add__(self, other: 'Checkable | NumericHousingType') -> 'TemporaryStat':
         temp_stat = TemporaryStat(self.internal_type)
-        expr = BinaryExpression(temp_stat, self, BinaryExpressionOperator.Set)
+        expr = BinaryExpression(temp_stat, self, BinaryOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = BinaryExpression(
             temp_stat,
             self._other_as_type_compatible(other),
-            BinaryExpressionOperator.Increment,
+            BinaryOperator.Increment,
         )
         EXPR_HANDLER.add(expr)
         return temp_stat
@@ -377,12 +347,12 @@ class Checkable(ABC):
 
     def __sub__(self, other: 'Checkable | NumericHousingType') -> 'TemporaryStat':
         temp_stat = TemporaryStat(self.internal_type)
-        expr = BinaryExpression(temp_stat, self, BinaryExpressionOperator.Set)
+        expr = BinaryExpression(temp_stat, self, BinaryOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = BinaryExpression(
             temp_stat,
             self._other_as_type_compatible(other),
-            BinaryExpressionOperator.Decrement,
+            BinaryOperator.Decrement,
         )
         EXPR_HANDLER.add(expr)
         return temp_stat
@@ -392,21 +362,21 @@ class Checkable(ABC):
         expr = BinaryExpression(
             temp_stat,
             self._other_as_type_compatible(other),
-            BinaryExpressionOperator.Set,
+            BinaryOperator.Set,
         )
         EXPR_HANDLER.add(expr)
-        expr = BinaryExpression(temp_stat, self, BinaryExpressionOperator.Decrement)
+        expr = BinaryExpression(temp_stat, self, BinaryOperator.Decrement)
         EXPR_HANDLER.add(expr)
         return temp_stat
 
     def __mul__(self, other: 'Checkable | NumericHousingType') -> 'TemporaryStat':
         temp_stat = TemporaryStat(self.internal_type)
-        expr = BinaryExpression(temp_stat, self, BinaryExpressionOperator.Set)
+        expr = BinaryExpression(temp_stat, self, BinaryOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = BinaryExpression(
             temp_stat,
             self._other_as_type_compatible(other),
-            BinaryExpressionOperator.Multiply,
+            BinaryOperator.Multiply,
         )
         EXPR_HANDLER.add(expr)
         return temp_stat
@@ -416,12 +386,12 @@ class Checkable(ABC):
 
     def __truediv__(self, other: 'Checkable | NumericHousingType') -> 'TemporaryStat':
         temp_stat = TemporaryStat(self.internal_type)
-        expr = BinaryExpression(temp_stat, self, BinaryExpressionOperator.Set)
+        expr = BinaryExpression(temp_stat, self, BinaryOperator.Set)
         EXPR_HANDLER.add(expr)
         expr = BinaryExpression(
             temp_stat,
             self._other_as_type_compatible(other),
-            BinaryExpressionOperator.Divide,
+            BinaryOperator.Divide,
         )
         EXPR_HANDLER.add(expr)
         return temp_stat
@@ -431,10 +401,10 @@ class Checkable(ABC):
         expr = BinaryExpression(
             temp_stat,
             self._other_as_type_compatible(other),
-            BinaryExpressionOperator.Set,
+            BinaryOperator.Set,
         )
         EXPR_HANDLER.add(expr)
-        expr = BinaryExpression(temp_stat, self, BinaryExpressionOperator.Divide)
+        expr = BinaryExpression(temp_stat, self, BinaryOperator.Divide)
         EXPR_HANDLER.add(expr)
         return temp_stat
 
@@ -448,23 +418,23 @@ class Checkable(ABC):
         if other == 0:
             return 1
         temp_stat = TemporaryStat(self.internal_type)
-        expr = BinaryExpression(temp_stat, self, BinaryExpressionOperator.Set)
+        expr = BinaryExpression(temp_stat, self, BinaryOperator.Set)
         EXPR_HANDLER.add(expr)
         log2 = int(math.log2(other))
         for _ in range(log2):
             expr = BinaryExpression(
-                temp_stat, temp_stat, BinaryExpressionOperator.Multiply
+                temp_stat, temp_stat, BinaryOperator.Multiply
             )
             EXPR_HANDLER.add(expr)
         remaining = other - 2**log2
         if remaining == 0:
             return temp_stat
         if remaining == 1:
-            expr = BinaryExpression(temp_stat, self, BinaryExpressionOperator.Multiply)
+            expr = BinaryExpression(temp_stat, self, BinaryOperator.Multiply)
             EXPR_HANDLER.add(expr)
             return temp_stat
         expr = BinaryExpression(
-            temp_stat, self.__pow__(remaining), BinaryExpressionOperator.Multiply
+            temp_stat, self.__pow__(remaining), BinaryOperator.Multiply
         )
         EXPR_HANDLER.add(expr)
         return temp_stat
@@ -473,36 +443,36 @@ class Checkable(ABC):
         if other == 0:
             return 1
         temp_stat = TemporaryStat(self.internal_type)
-        expr = BinaryExpression(temp_stat, self, BinaryExpressionOperator.Set)
+        expr = BinaryExpression(temp_stat, self, BinaryOperator.Set)
         EXPR_HANDLER.add(expr)
         log2 = int(math.log2(other))
         for _ in range(log2 + 1):
             expr = BinaryExpression(
-                temp_stat, temp_stat, BinaryExpressionOperator.Multiply
+                temp_stat, temp_stat, BinaryOperator.Multiply
             )
             EXPR_HANDLER.add(expr)
         remaining = 2 ** (log2 + 1) - other
         assert remaining > 0
         if remaining == 1:
-            expr = BinaryExpression(temp_stat, self, BinaryExpressionOperator.Divide)
+            expr = BinaryExpression(temp_stat, self, BinaryOperator.Divide)
             EXPR_HANDLER.add(expr)
             return temp_stat
         if remaining == 2:
-            expr = BinaryExpression(temp_stat, self, BinaryExpressionOperator.Divide)
+            expr = BinaryExpression(temp_stat, self, BinaryOperator.Divide)
             EXPR_HANDLER.add(expr)
-            expr = BinaryExpression(temp_stat, self, BinaryExpressionOperator.Divide)
+            expr = BinaryExpression(temp_stat, self, BinaryOperator.Divide)
             EXPR_HANDLER.add(expr)
             return temp_stat
         if remaining & (remaining - 1) == 0:
             expr = BinaryExpression(
                 temp_stat,
                 Checkable._pow_multiply_strat(self, remaining),
-                BinaryExpressionOperator.Divide,
+                BinaryOperator.Divide,
             )
             EXPR_HANDLER.add(expr)
             return temp_stat
         expr = BinaryExpression(
-            temp_stat, self.__pow__(remaining), BinaryExpressionOperator.Divide
+            temp_stat, self.__pow__(remaining), BinaryOperator.Divide
         )
         EXPR_HANDLER.add(expr)
         return temp_stat
@@ -537,7 +507,7 @@ class Checkable(ABC):
 
     def remainder(self, other: 'Checkable | NumericHousingType') -> 'TemporaryStat':
         temp_stat_1 = TemporaryStat(self.internal_type)
-        expr = BinaryExpression(temp_stat_1, self, BinaryExpressionOperator.Set)
+        expr = BinaryExpression(temp_stat_1, self, BinaryOperator.Set)
         EXPR_HANDLER.add(expr)
 
         internal_type = (
@@ -548,41 +518,41 @@ class Checkable(ABC):
 
         temp_stat_2 = TemporaryStat(internal_type)
         expr = BinaryExpression(
-            temp_stat_2, self.as_type(internal_type), BinaryExpressionOperator.Set
+            temp_stat_2, self.as_type(internal_type), BinaryOperator.Set
         )
         EXPR_HANDLER.add(expr)
         expr = BinaryExpression(
             temp_stat_2,
             self._other_as_type_compatible(other, internal_type=internal_type),
-            BinaryExpressionOperator.Divide,
+            BinaryOperator.Divide,
         )
         EXPR_HANDLER.add(expr)
         if internal_type is InternalType.DOUBLE:
             expr = BinaryExpression(
                 temp_stat_2,
                 temp_stat_2.as_long(),
-                BinaryExpressionOperator.Set,
+                BinaryOperator.Set,
                 is_self_cast=True,
             )
             EXPR_HANDLER.add(expr)
             expr = BinaryExpression(
                 temp_stat_2,
                 temp_stat_2.as_double(),
-                BinaryExpressionOperator.Set,
+                BinaryOperator.Set,
                 is_self_cast=True,
             )
             EXPR_HANDLER.add(expr)
         expr = BinaryExpression(
             temp_stat_2,
             self._other_as_type_compatible(other, internal_type=internal_type),
-            BinaryExpressionOperator.Multiply,
+            BinaryOperator.Multiply,
         )
         EXPR_HANDLER.add(expr)
 
         expr = BinaryExpression(
             temp_stat_1,
             temp_stat_2.as_type(self.internal_type),
-            BinaryExpressionOperator.Decrement,
+            BinaryOperator.Decrement,
         )
         EXPR_HANDLER.add(expr)
         return temp_stat_1
@@ -591,12 +561,12 @@ class Checkable(ABC):
         temp_stat = self.remainder(other)
 
         statement = IfStatement(conditions=[temp_stat < 0])
-        expr = ConditionalEnterExpression(statement)
+        expr = ConditionalExpression(statement)
         EXPR_HANDLER.add(expr)
         expr = BinaryExpression(
             temp_stat,
             self._other_as_type_compatible(other),
-            BinaryExpressionOperator.Increment,
+            BinaryOperator.Increment,
         )
         EXPR_HANDLER.add(expr)
         expr = ConditionalExitExpression(statement)
@@ -609,13 +579,13 @@ class Checkable(ABC):
 
     def abs(self) -> 'TemporaryStat':
         temp_stat = TemporaryStat(self.internal_type)
-        expr = BinaryExpression(temp_stat, self, BinaryExpressionOperator.Set)
+        expr = BinaryExpression(temp_stat, self, BinaryOperator.Set)
         EXPR_HANDLER.add(expr)
 
         statement = IfStatement(conditions=[self < 0])
-        expr = ConditionalEnterExpression(statement)
+        expr = ConditionalExpression(statement)
         EXPR_HANDLER.add(expr)
-        expr = BinaryExpression(temp_stat, -1, BinaryExpressionOperator.Multiply)
+        expr = BinaryExpression(temp_stat, -1, BinaryOperator.Multiply)
         EXPR_HANDLER.add(expr)
         expr = ConditionalExitExpression(statement)
         EXPR_HANDLER.add(expr)
@@ -626,39 +596,39 @@ class Checkable(ABC):
         return self.abs()
 
     def __eq__(self, other: 'Checkable | HousingType') -> BaseCondition:
-        return BinaryCondition(
-            self, self._other_as_type_compatible(other), BinaryConditionOperator.Equal
+        return ComparisonCondition(
+            self, self._other_as_type_compatible(other), ComparisonOperator.Equal
         )
 
     def __ne__(self, other: 'Checkable | HousingType') -> BaseCondition:
         return ~self.__eq__(other)
 
     def __gt__(self, other: 'Checkable | HousingType') -> BaseCondition:
-        return BinaryCondition(
+        return ComparisonCondition(
             self,
             self._other_as_type_compatible(other),
-            BinaryConditionOperator.GreaterThan,
+            ComparisonOperator.GreaterThan,
         )
 
     def __lt__(self, other: 'Checkable | HousingType') -> BaseCondition:
-        return BinaryCondition(
+        return ComparisonCondition(
             self,
             self._other_as_type_compatible(other),
-            BinaryConditionOperator.LessThan,
+            ComparisonOperator.LessThan,
         )
 
     def __ge__(self, other: 'Checkable | HousingType') -> BaseCondition:
-        return BinaryCondition(
+        return ComparisonCondition(
             self,
             self._other_as_type_compatible(other),
-            BinaryConditionOperator.GreaterThanOrEqual,
+            ComparisonOperator.GreaterThanOrEqual,
         )
 
     def __le__(self, other: 'Checkable | HousingType') -> BaseCondition:
-        return BinaryCondition(
+        return ComparisonCondition(
             self,
             self._other_as_type_compatible(other),
-            BinaryConditionOperator.LessThanOrEqual,
+            ComparisonOperator.LessThanOrEqual,
         )
 
     @property
@@ -671,4 +641,4 @@ class Checkable(ABC):
 
 
 ExpressionHandler._import_checkable(Checkable)
-BinaryCondition._import_checkable(Checkable)
+ComparisonCondition._import_checkable(Checkable)

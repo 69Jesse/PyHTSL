@@ -16,5 +16,5 @@ class FishingEnvironment(BaseCondition):
     ) -> None:
         self.environment = environment
 
-    def create_line(self) -> str:
+    def into_htsl_raw(self) -> str:
         return f'fishingEnv "{self.environment}"'

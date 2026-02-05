@@ -1,4 +1,4 @@
-from ..condition.binary_condition import BinaryCondition
+from ..condition.comparison_condition import ComparisonCondition
 from ..writer import WRITER
 from ..public.no_optimization import no_optimization
 
@@ -11,11 +11,11 @@ if TYPE_CHECKING:
     from ..editable import Editable
     from .housing_type import HousingType
     from .expression import Expression
-    from .conditional_expressions import (
-        ConditionalEnterExpression,
+    from .condition.conditional_expressions import (
+        ConditionalExpression,
         ConditionalExitExpression,
     )
-    from .binary_expression import BinaryExpressionOperator, BinaryExpression
+    from .binary_expression import BinaryOperator, BinaryExpression
 
 
 __all__ = (
@@ -67,14 +67,14 @@ class ExpressionHandler:
     @staticmethod
     def _import_binary_expression(
         binary_expression_cls: type['BinaryExpression'],
-        binary_operator_cls: type['BinaryExpressionOperator'],
+        binary_operator_cls: type['BinaryOperator'],
     ) -> None:
         globals()[binary_expression_cls.__name__] = binary_expression_cls
         globals()[binary_operator_cls.__name__] = binary_operator_cls
 
     @staticmethod
     def _import_conditional_expressions(
-        conditional_enter_expression_cls: type['ConditionalEnterExpression'],
+        conditional_enter_expression_cls: type['ConditionalExpression'],
         conditional_exit_expression_cls: type['ConditionalExitExpression'],
     ) -> None:
         globals()[conditional_enter_expression_cls.__name__] = (
@@ -119,10 +119,10 @@ class ExpressionHandler:
                         other_expression.right,
                         check_internal_type=False,
                     )
-                    and other_expression.operator is not BinaryExpressionOperator.Set
+                    and other_expression.operator is not BinaryOperator.Set
                 ):
                     return True
-            elif isinstance(other_expression, ConditionalEnterExpression):
+            elif isinstance(other_expression, ConditionalExpression):
                 if any(
                     (
                         left.equals(
@@ -145,7 +145,7 @@ class ExpressionHandler:
                         )
                     )
                     for cond in other_expression.statement.conditions
-                    if isinstance(cond, BinaryCondition)
+                    if isinstance(cond, ComparisonCondition)
                 ):
                     return True
         return False
@@ -169,7 +169,7 @@ class ExpressionHandler:
                     check_internal_type=False,
                 ):
                     return True
-            elif isinstance(other_expression, ConditionalEnterExpression):
+            elif isinstance(other_expression, ConditionalExpression):
                 if any(
                     (
                         right.equals(
@@ -182,7 +182,7 @@ class ExpressionHandler:
                         )
                     )
                     for cond in other_expression.statement.conditions
-                    if isinstance(cond, BinaryCondition)
+                    if isinstance(cond, ComparisonCondition)
                 ):
                     return True
         return False
@@ -204,9 +204,9 @@ class ExpressionHandler:
                 if right.equals(other_expression.right, check_internal_type=False):
                     other_expression.right = left
                     has_changed = True
-            elif isinstance(other_expression, ConditionalEnterExpression):
+            elif isinstance(other_expression, ConditionalExpression):
                 for condition in other_expression.statement.conditions:
-                    if not isinstance(condition, BinaryCondition):
+                    if not isinstance(condition, ComparisonCondition):
                         continue
                     if right.equals(condition.left, check_internal_type=False):
                         condition.left = left
@@ -232,7 +232,7 @@ class ExpressionHandler:
 
                 if not isinstance(expression.right, TemporaryStat):
                     continue
-                if expression.operator is not BinaryExpressionOperator.Set:
+                if expression.operator is not BinaryOperator.Set:
                     continue
 
                 # We have:
@@ -275,21 +275,21 @@ class ExpressionHandler:
 
             if (
                 expression.left.equals(expression.right, check_internal_type=False)
-                and expression.operator is BinaryExpressionOperator.Set
+                and expression.operator is BinaryOperator.Set
                 and not expression.is_self_cast
             ):
                 expressions.pop(i)
             elif (
-                expression.operator is BinaryExpressionOperator.Increment
-                or expression.operator is BinaryExpressionOperator.Decrement
+                expression.operator is BinaryOperator.Increment
+                or expression.operator is BinaryOperator.Decrement
             ) and (
                 (isinstance(expression.right, int) and expression.right == 0)
                 or (isinstance(expression.right, float) and expression.right == 0.0)
             ):
                 expressions.pop(i)
             elif (
-                expression.operator is BinaryExpressionOperator.Multiply
-                or expression.operator is BinaryExpressionOperator.Divide
+                expression.operator is BinaryOperator.Multiply
+                or expression.operator is BinaryOperator.Divide
             ) and (
                 (isinstance(expression.right, int) and expression.right == 1)
                 or (isinstance(expression.right, float) and expression.right == 1.0)
@@ -345,7 +345,7 @@ class ExpressionHandler:
     def write_lines(expressions: list['Expression']) -> None:
         for expression in expressions:
             expression._before_write_line()
-            WRITER.write(*expression._write_line())
+            WRITER.write(*expression.into_htsl())
             expression._after_write_line()
 
     def push(self) -> None:

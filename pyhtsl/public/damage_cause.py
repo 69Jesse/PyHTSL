@@ -17,5 +17,5 @@ class DamageCause(BaseCondition):
     ) -> None:
         self.damage_cause = damage_cause
 
-    def create_line(self) -> str:
+    def into_htsl_raw(self) -> str:
         return f'damageCause "{self.damage_cause}"'

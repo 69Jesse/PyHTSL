@@ -1,6 +1,6 @@
 from .base_condition import BaseCondition
 
-from typing import final
+from typing import Self, final
 
 
 __all__ = ('NamedCondition',)
@@ -16,8 +16,18 @@ class NamedCondition(BaseCondition):
     ) -> None:
         self.name = name
 
-    def create_line(self) -> str:
+    def into_htsl_raw(self) -> str:
         return self.name
+
+    def cloned(self) -> Self:
+        return self.__class__(
+            name=self.name,
+        )
+
+    def equals_raw(self, other: object) -> bool:
+        if not isinstance(other, NamedCondition):
+            return False
+        return self.name == other.name
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.name}>'

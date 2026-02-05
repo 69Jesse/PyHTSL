@@ -52,7 +52,7 @@ class PlaceholderCheckable(Checkable):
     def _as_string(self, include_fallback_value: bool = True) -> str:
         return self.inside_of_string
 
-    def _equals(self, other: Checkable | HousingType) -> bool:
+    def equals_raw(self, other: Checkable | HousingType) -> bool:
         return self is other
 
     def _copied(self) -> 'PlaceholderCheckable':
@@ -109,7 +109,7 @@ class PlaceholderEditable(Editable):
     def _as_string(self, include_fallback_value: bool = True) -> str:
         return self.inside_of_string
 
-    def _equals(self, other: Checkable | HousingType) -> bool:
+    def equals_raw(self, other: Checkable | HousingType) -> bool:
         return self is other
 
     def _copied(self) -> 'PlaceholderEditable':

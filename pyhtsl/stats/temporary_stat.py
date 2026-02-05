@@ -26,7 +26,7 @@ class TemporaryStat(BaseStat):
         self,
         internal_type: InternalType,
     ) -> None:
-        super().__init__(None, set_name=False, unset=False)  # type: ignore
+        super().__init__(None, set_name=False, auto_unset=False)  # type: ignore
         self.internal_type = internal_type
         self._number = Number(id(self) + 1_000_000)
 
@@ -50,7 +50,7 @@ class TemporaryStat(BaseStat):
     def _right_side_keyword() -> str:
         return PlayerStat._right_side_keyword()
 
-    def _equals(self, other: Checkable | HousingType) -> bool:
+    def equals_raw(self, other: Checkable | HousingType) -> bool:
         if isinstance(other, TemporaryStat):
             return self.number == other.number
         return False

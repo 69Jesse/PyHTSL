@@ -1,18 +1,12 @@
-from ..line_type import LineType
+from abc import abstractmethod
 
-from abc import ABC, abstractmethod
+from ..base_object import BaseObject
 
 
 __all__ = ('Expression',)
 
 
-class Expression(ABC):
-    def _before_write_line(self) -> None:
-        pass
-
+class Expression(BaseObject):
     @abstractmethod
-    def _write_line(self) -> tuple[str, LineType]:
+    def into_htsl(self) -> str:
         raise NotImplementedError()
-
-    def _after_write_line(self) -> None:
-        pass

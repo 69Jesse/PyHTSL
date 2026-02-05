@@ -20,5 +20,5 @@ class RequiredGroup(BaseCondition):
         self.group = group if isinstance(group, Group) else Group(group)
         self.include_higher_groups = include_higher_groups
 
-    def create_line(self) -> str:
+    def into_htsl_raw(self) -> str:
         return f'hasGroup "{self.group.name}" {str(self.include_higher_groups).lower()}'

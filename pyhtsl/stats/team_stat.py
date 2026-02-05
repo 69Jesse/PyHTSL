@@ -42,7 +42,7 @@ class TeamStat(Stat):
             return f' {name}{value}'
         return value
 
-    def _equals(self, other: Checkable | HousingType) -> bool:
+    def equals_raw(self, other: Checkable | HousingType) -> bool:
         if isinstance(other, TeamStat):
             return self.name == other.name and self.team == other.team
         return False

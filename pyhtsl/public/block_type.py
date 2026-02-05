@@ -20,7 +20,7 @@ class BlockType(BaseCondition):
         self.block = block
         self.match_type_only = match_type_only
 
-    def create_line(self) -> str:
+    def into_htsl_raw(self) -> str:
         if isinstance(self.block, Item):
             name = self.block.save()
         else:

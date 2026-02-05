@@ -17,5 +17,5 @@ class RequiredTeam(BaseCondition):
     ) -> None:
         self.team = team if not isinstance(team, str) else Team(team)
 
-    def create_line(self) -> str:
+    def into_htsl_raw(self) -> str:
         return f'hasTeam "{self.team.name if self.team is not None else "None"}"'

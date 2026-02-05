@@ -16,5 +16,5 @@ class RequiredGamemode(BaseCondition):
     ) -> None:
         self.gamemode = gamemode
 
-    def create_line(self) -> str:
+    def into_htsl_raw(self) -> str:
         return f'gamemode {self.gamemode}'
