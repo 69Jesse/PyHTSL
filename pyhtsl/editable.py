@@ -1,12 +1,11 @@
-from expression.expression import Expression
-from .expression.compound_expression import CompoundExpression
-from .writer import WRITER
+from .expression.expression import Expression
 from .checkable import Checkable
 from .expression.housing_type import NumericHousingType, HousingType
 
 from typing import TYPE_CHECKING, Literal, Self
 
 if TYPE_CHECKING:
+    from .expression.compound_expression import CompoundExpression
     from .expression.binary_expression import BinaryExpression, BinaryOperator
 
 
@@ -44,13 +43,13 @@ class Editable(Checkable):
     ) -> 'BinaryExpression[Self, T]':
         return self.__floordiv__(other).execute()
 
-    def __ipow__(self, other: int) -> CompoundExpression | Self | Literal[1]:
+    def __ipow__(self, other: int) -> 'CompoundExpression | Self | Literal[1]':
         result = self.__pow__(other)
         if isinstance(result, Expression):
             return result.execute()
         return result
 
-    def __imod__(self, other: Checkable | NumericHousingType) -> CompoundExpression:
+    def __imod__(self, other: Checkable | NumericHousingType) -> 'CompoundExpression':
         return self.__mod__(other).execute()
 
     def set[T: Checkable | HousingType](
@@ -58,7 +57,9 @@ class Editable(Checkable):
         value: T,
         *,
         allow_self_assignment: bool = False,
-    ) -> BinaryExpression[Self, T]:
+    ) -> 'BinaryExpression[Self, T]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+
         return BinaryExpression(
             left=self,
             right=value,
@@ -68,29 +69,29 @@ class Editable(Checkable):
 
     def inc[T: Checkable | NumericHousingType](
         self, other: T
-    ) -> BinaryExpression[Self, T]:
+    ) -> 'BinaryExpression[Self, T]':
         return self.__iadd__(other)
 
     def dec[T: Checkable | NumericHousingType](
         self, other: T
-    ) -> BinaryExpression[Self, T]:
+    ) -> 'BinaryExpression[Self, T]':
         return self.__isub__(other)
 
     def mul[T: Checkable | NumericHousingType](
         self, other: T
-    ) -> BinaryExpression[Self, T]:
+    ) -> 'BinaryExpression[Self, T]':
         return self.__imul__(other)
 
     def div[T: Checkable | NumericHousingType](
         self, other: T
-    ) -> BinaryExpression[Self, T]:
+    ) -> 'BinaryExpression[Self, T]':
         return self.__itruediv__(other)
 
     def execute[T: Checkable | HousingType](
         self,
         operator: 'BinaryOperator',
         other: T,
-    ) -> BinaryExpression[Self, T]:
+    ) -> 'BinaryExpression[Self, T]':
         from .expression.binary_expression import BinaryOperator
 
         if operator is BinaryOperator.Set:

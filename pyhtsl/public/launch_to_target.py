@@ -2,7 +2,7 @@ from ..checkable import Checkable
 from ..expression.housing_type import HousingType
 from ..writer import WRITER, LineType
 from ..types import ALL_LOCATIONS
-from ..stats.base_stat import BaseStat
+from ..stats.stat import Stat
 
 
 __all__ = ('launch_to_target',)
@@ -25,7 +25,7 @@ def launch_to_target(
     | str
     | None,
     location: ALL_LOCATIONS = 'custom_coordinates',
-    strength: BaseStat | int = 2,
+    strength: Stat | int = 2,
 ) -> None:
     line = f'launchTarget "{location}"'
     if location == 'custom_coordinates':

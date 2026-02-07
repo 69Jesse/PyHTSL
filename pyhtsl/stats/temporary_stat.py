@@ -1,8 +1,5 @@
-from ..expression.handler import EXPR_HANDLER
-from ..expression.housing_type import HousingType
 from .player_stat import PlayerStat
-from .base_stat import BaseStat
-from ..checkable import Checkable
+from .stat import Stat
 from ..internal_type import InternalType
 
 from typing import final
@@ -19,7 +16,7 @@ class Number:
 
 
 @final
-class TemporaryStat(BaseStat):
+class TemporaryStat(Stat):
     _number: Number
 
     def __init__(
@@ -42,6 +39,10 @@ class TemporaryStat(BaseStat):
     def name(self) -> str:
         return f'temp{self.number}'
 
+    @name.setter
+    def name(self, value: str) -> None:
+        pass  # ignore on purpose
+
     @staticmethod
     def _left_side_keyword() -> str:
         return PlayerStat._left_side_keyword()
@@ -50,7 +51,7 @@ class TemporaryStat(BaseStat):
     def _right_side_keyword() -> str:
         return PlayerStat._right_side_keyword()
 
-    def equals_raw(self, other: Checkable | HousingType) -> bool:
+    def equals_raw(self, other: object) -> bool:
         if isinstance(other, TemporaryStat):
             return self.number == other.number
         return False
@@ -59,14 +60,6 @@ class TemporaryStat(BaseStat):
         stat = TemporaryStat(self.internal_type)
         stat._number = self._number
         return stat
-
-    def into_string(self, include_fallback_value: bool = True) -> str:
-        """Pushing here so we can do something like
-        foo = PlayerStat('foo')
-        chat(f'Hello World! {foo + 1}')
-        """
-        EXPR_HANDLER.push()
-        return super().into_string(include_fallback_value=include_fallback_value)
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.number} {self.internal_type.name}>'

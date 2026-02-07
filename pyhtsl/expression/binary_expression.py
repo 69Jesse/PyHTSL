@@ -1,9 +1,11 @@
+from ..internal_type import InternalType
+from ..stats.temporary_stat import TemporaryStat
 from ..base_object import BaseObject
 from ..checkable import Checkable
 from ..editable import Editable
 from .housing_type import HousingType, housing_type_as_right_side
 from .expression import Expression
-from ..stats.base_stat import BaseStat
+from ..stats.stat import Stat
 
 from enum import Enum
 
@@ -52,7 +54,8 @@ class BinaryExpression[
 
         if (
             self.allow_self_assignment
-            or not isinstance(self.left, BaseStat)
+            or not isinstance(self.left, Stat)
+            or not isinstance(self.right, Checkable)
             or not self.left.equals_raw(self.right)
             or operator is not BinaryOperator.Set
         ):
@@ -61,7 +64,52 @@ class BinaryExpression[
     def into_assignment_expressions(
         self,
     ) -> list['BinaryExpression[Editable, Checkable | HousingType]']:
-        return []  # TODO
+        assignment_expressions: list[
+            BinaryExpression[Editable, Checkable | HousingType]
+        ] = []
+
+        def minimize(expr: BinaryExpression) -> Checkable | HousingType:
+            if isinstance(expr.left, BinaryExpression):
+                expr.left = minimize(expr.left)
+            if isinstance(expr.right, BinaryExpression):
+                expr.right = minimize(expr.right)
+
+            assert not (
+                isinstance(expr.left, HousingType) and isinstance(expr.left, Checkable)
+            )
+
+            internal_type = InternalType.from_value(expr.left)
+            stat = TemporaryStat(internal_type)
+            assignment_expressions.append(
+                BinaryExpression(
+                    left=stat,
+                    right=expr.left,
+                    operator=BinaryOperator.Set,
+                )
+            )
+            assignment_expressions.append(
+                BinaryExpression(
+                    left=stat,
+                    right=expr.right,
+                    operator=expr.operator,
+                )
+            )
+            return stat
+
+        # minimize(self)
+        assignment_expressions.append(
+            BinaryExpression(
+                left=self.left
+                if not isinstance(self.left, BinaryExpression)
+                else minimize(self.left),
+                right=self.right
+                if not isinstance(self.right, BinaryExpression)
+                else minimize(self.right),
+                operator=self.operator,
+            ),
+        )
+
+        return assignment_expressions
 
     def into_htsl(self) -> str:
         def into_line(
@@ -74,7 +122,7 @@ class BinaryExpression[
 
             line = f'{expr.left.into_assignment_left_side()} {expr.operator.value} {format_rhs(expr.right)}'
 
-            if isinstance(expr.left, BaseStat):
+            if isinstance(expr.left, Stat):
                 line += f' {str(expr.left.auto_unset).lower()}'
 
             return line

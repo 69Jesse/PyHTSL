@@ -1,6 +1,4 @@
 from .stat import Stat
-from ..checkable import Checkable
-from ..expression.housing_type import HousingType
 from ..public.team import Team
 
 from typing import final
@@ -42,7 +40,7 @@ class TeamStat(Stat):
             return f' {name}{value}'
         return value
 
-    def equals_raw(self, other: Checkable | HousingType) -> bool:
+    def equals_raw(self, other: object) -> bool:
         if isinstance(other, TeamStat):
             return self.name == other.name and self.team == other.team
         return False

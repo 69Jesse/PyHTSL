@@ -3,7 +3,7 @@
 from ..condition.base_condition import BaseCondition
 from ..condition.conditional_statements import IfStatement
 from ..expression.binary_expression import BinaryExpression
-from ..stats.base_stat import BaseStat
+from ..stats.stat import Stat
 from ..checkable import Checkable
 from ..editable import Editable
 
@@ -16,7 +16,7 @@ __all__ = (
     'BaseCondition',
     'IfStatement',
     'BinaryExpression',
-    'BaseStat',
+    'Stat',
     'ALL_POTION_EFFECTS',
     'ALL_DAMAGE_CAUSES',
     'ALL_ENCHANTMENTS',

@@ -1,6 +1,8 @@
 from abc import abstractmethod
 from typing import Self
 
+from ..container import get_current_container
+
 from ..base_object import BaseObject
 
 
@@ -13,5 +15,5 @@ class Expression(BaseObject):
         raise NotImplementedError()
 
     def execute(self) -> Self:
-        # TODO write htsl
+        get_current_container().expressions.append(self.cloned())
         return self

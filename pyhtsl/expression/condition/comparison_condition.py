@@ -1,4 +1,4 @@
-from expression.housing_type import housing_type_as_right_side
+from ..housing_type import housing_type_as_right_side
 from .condition import Condition
 
 from enum import Enum

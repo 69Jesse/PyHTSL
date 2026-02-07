@@ -1,12 +1,6 @@
-from ..writer import WRITER
+from ..container import get_current_container
 from .goto import goto
 from .function import Function
-from ..stats.stat_parameter import StatParameter
-from ..stats.player_stat import PlayerStat
-from ..stats.global_stat import GlobalStat
-from ..stats.team_stat import TeamStat
-
-import inspect
 
 from typing import Callable, ParamSpec
 
@@ -54,7 +48,7 @@ def create_function(
                 force_create
                 if force_create is not None
                 else (func.__module__ == '__main__')
-            ) or (not WRITER.get_container().is_global)
+            ) or (not get_current_container().is_global)
             if create:
                 goto(container='function', name=name)
                 func()
@@ -63,7 +57,7 @@ def create_function(
         if run_right_now:
             callback()
         else:
-            WRITER.get_container().registered_functions.append(function)
+            get_current_container().registered_functions.append(function)
 
         return function
 

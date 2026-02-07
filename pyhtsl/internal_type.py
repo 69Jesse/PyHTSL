@@ -1,6 +1,10 @@
 from enum import Enum
 
-from expression.housing_type import HousingType
+from .expression.housing_type import HousingType
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .checkable import Checkable
 
 
 __all__ = ('InternalType',)
@@ -40,3 +44,14 @@ class InternalType(Enum):
             raise TypeError(
                 f'Cannot transform value {repr(value)} to internal type {self.name}.'
             ) from exc
+
+    @staticmethod
+    def from_value(value: 'Checkable | HousingType') -> 'InternalType':
+        if isinstance(value, str):
+            return InternalType.STRING
+        elif isinstance(value, int):
+            return InternalType.LONG
+        elif isinstance(value, float):
+            return InternalType.DOUBLE
+
+        return value.internal_type

@@ -1,5 +1,4 @@
 from .checkable import Checkable
-from .expression.housing_type import HousingType
 from .editable import Editable
 
 from typing import final
@@ -52,7 +51,7 @@ class PlaceholderCheckable(Checkable):
     def into_string(self, include_fallback_value: bool = True) -> str:
         return self.inside_of_string
 
-    def equals_raw(self, other: Checkable | HousingType) -> bool:
+    def equals_raw(self, other: object) -> bool:
         return self is other
 
     def cloned_raw(self) -> 'PlaceholderCheckable':
@@ -109,7 +108,7 @@ class PlaceholderEditable(Editable):
     def into_string(self, include_fallback_value: bool = True) -> str:
         return self.inside_of_string
 
-    def equals_raw(self, other: Checkable | HousingType) -> bool:
+    def equals_raw(self, other: object) -> bool:
         return self is other
 
     def cloned_raw(self) -> 'PlaceholderEditable':
@@ -123,6 +122,3 @@ class PlaceholderEditable(Editable):
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.inside_of_string}>'
-
-
-Checkable._import_placeholders(PlaceholderCheckable, PlaceholderEditable)

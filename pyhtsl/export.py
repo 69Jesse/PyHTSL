@@ -1,6 +1,5 @@
-from .writer import WRITER
-
 from .public.function import Function
+from .container import Container
 
 from typing import Sequence, Any, Callable
 from types import ModuleType
@@ -54,11 +53,7 @@ def export(
             f'No functions to export. Double check {repr(exportable)} of type {exportable.__class__.__name__} is correct.'
         )
 
-    with WRITER.temporary_container_context(name=name) as container:
+    with Container(name=name) as container:
         for call in callables:
             call()
-        WRITER.run_export(container)
-
-
-def disable_global_export() -> None:
-    WRITER.export_globally = False
+        container.export()

@@ -1,14 +1,16 @@
-from ..stats.base_stat import BaseStat
 from .expression import Expression
 
-from typing import Self, final
+from typing import TYPE_CHECKING, Self, final
+
+if TYPE_CHECKING:
+    from ..stats.stat import Stat
 
 
 @final
 class UnsetExpression(Expression):
-    target: BaseStat
+    target: 'Stat'
 
-    def __init__(self, target: BaseStat) -> None:
+    def __init__(self, target: 'Stat') -> None:
         self.target = target
 
     def cloned(self) -> Self:

@@ -1,8 +1,6 @@
 import numpy as np
 from typing import TypeAlias
 
-from internal_type import InternalType
-
 
 __all__ = (
     'NumericHousingType',

@@ -1,4 +1,4 @@
-from editable import Editable
+from ..editable import Editable
 from .expression import Expression
 
 from typing import Self, final

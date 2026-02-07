@@ -1,7 +1,7 @@
 from ..stats.player_stat import PlayerStat
 from ..public.if_and import IfAnd
 from ..public._else import Else
-from ..types import Editable, Checkable, BaseStat
+from ..types import Editable, Checkable, Stat
 
 from typing import Literal, overload
 
@@ -61,7 +61,7 @@ def approximate_sqrt(
     else:
         assert isinstance(x, Editable)
         x_or_temp5 = x.as_double()
-        if isinstance(x_or_temp5, BaseStat):
+        if isinstance(x_or_temp5, Stat):
             x_or_temp5 = x_or_temp5.without_automatic_unset()
 
     assign_to = assign_to.as_double()
@@ -175,7 +175,7 @@ def approximate_sin_cos(
     else:
         assert isinstance(x, Editable)
         x_or_temp2 = x.as_double()
-        if isinstance(x_or_temp2, BaseStat):
+        if isinstance(x_or_temp2, Stat):
             x_or_temp2 = x_or_temp2.without_automatic_unset()
     original_x = (
         PlayerStat('temp2' if can_modify_x else 'temp3')

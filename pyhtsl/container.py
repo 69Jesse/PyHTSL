@@ -1,14 +1,19 @@
 import atexit
 from pathlib import Path
 
-from .config import DISABLE_GLOBAL_EXPORT, get_htsl_import_folder
-from .expression.expression import Expression
+from .public.function import Function
+
+from .logger import AntiSpamLogger
+from .config import DISABLE_GLOBAL_EXPORT, DISPLAY_HTSL, get_htsl_import_folder
 
 import os
 import sys
 
-from typing import Protocol, Self
+from typing import TYPE_CHECKING, Callable, ClassVar, Protocol, Self
 from types import TracebackType
+
+if TYPE_CHECKING:
+    from .expression.expression import Expression
 
 
 __all__ = (
@@ -18,20 +23,26 @@ __all__ = (
 
 
 class ContextEntry(Protocol):
-    expressions: list[Expression]
+    expressions: list['Expression']
 
 
 class Container:
     name: str
 
-    expressions: list[Expression]
+    logger: AntiSpamLogger
+    registered_functions: list[Function[Callable[[], None]]]
+    expressions: list['Expression']
     contexts: list[ContextEntry]
+
+    exported_names: ClassVar[set[str]] = set()
 
     def __init__(
         self,
         name: str,
     ) -> None:
         self.name = name
+        self.logger = AntiSpamLogger()
+        self.registered_functions = []
         self.expressions = []
         self.contexts = []
 
@@ -65,12 +76,23 @@ class Container:
     def htsl_path(self) -> Path:
         return get_htsl_import_folder() / f'{self.name}.htsl'
 
-    def export(self) -> bool:
+    def export(self) -> None:
         if not self.expressions:
             print(
                 'Nothing found to write to your .htsl file. \x1b[38;2;255;0;0mPyHTSL will not do anything.\x1b[0m'
             )
-            return False
+            return
+
+        if self.name in self.exported_names:
+            raise RuntimeError(
+                f'Container with name "{self.name}" has already been exported.'
+                + (
+                    ' This is the global export, it is possible to disable the global export with "pyhtsl.disable_global_export()".'
+                    if self.is_global
+                    else ''
+                )
+            )
+        self.exported_names.add(self.name)
 
         if self.is_global:
             print(
@@ -93,7 +115,19 @@ class Container:
         if 'code' in args:
             os.system(f'code "{path.absolute()}"')
 
-        return True
+        if DISPLAY_HTSL:
+            print(content)
+
+        self.logger.publish()
+
+        print(
+            (
+                '\n\x1b[38;2;0;255;0mAll done! Your .htsl file is written to the following location:\x1b[0m'
+                f'\n{path.absolute()}'
+                f'\nExecute it with HTSL by using the following name: \x1b[38;2;255;0;0m{self.name}\x1b[0m'
+                '\n'
+            )
+        )
 
 
 global_name = os.path.basename(sys.argv[0]).rsplit('.', 1)[0]

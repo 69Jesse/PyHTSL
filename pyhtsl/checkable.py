@@ -1,4 +1,3 @@
-from .expression.compound_expression import CompoundExpression
 from .expression.condition.comparison_condition import (
     ComparisonCondition,
     ComparisonOperator,
@@ -17,6 +16,7 @@ from abc import abstractmethod
 from typing import TYPE_CHECKING, Literal, Self, overload, final
 
 if TYPE_CHECKING:
+    from .expression.compound_expression import CompoundExpression
     from .expression.binary_expression import BinaryExpression
 
 
@@ -85,7 +85,7 @@ class Checkable(BaseObject):
         raise NotImplementedError
 
     @abstractmethod
-    def equals_raw(self, other: 'Checkable | HousingType') -> bool:
+    def equals_raw(self, other: object) -> bool:
         raise NotImplementedError
 
     @final
