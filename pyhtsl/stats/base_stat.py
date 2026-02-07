@@ -1,11 +1,13 @@
 from abc import abstractmethod
 
-from ..public.no_fallback_values import no_fallback_values
-from ..checkable import Checkable
-from ..editable import Editable
-from ..expression.handler import ExpressionHandler
+from expression.housing_type import HousingType
+from expression.unset_expression import UnsetExpression
+from internal_type import InternalType
 
-from typing import TYPE_CHECKING, Self
+from ..public.no_fallback_values import no_fallback_values
+from ..editable import Editable
+
+from typing import Self
 
 
 __all__ = ('BaseStat',)
@@ -20,8 +22,14 @@ class BaseStat(Editable):
         name: str,
         /,
         *,
+        internal_type: InternalType = InternalType.ANY,
+        fallback_value: HousingType | None = None,
         auto_unset: bool = True,
     ) -> None:
+        super().__init__(
+            internal_type=internal_type,
+            fallback_value=fallback_value,
+        )
         self.name = name
         self.auto_unset = auto_unset
 
@@ -43,20 +51,20 @@ class BaseStat(Editable):
         """
         raise NotImplementedError
 
-    def _in_assignment_left_side(self) -> str:
+    def into_assignment_left_side(self) -> str:
         return f'{self._left_side_keyword()} "{self.name}"'
 
-    def _in_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
-        name = self._as_string()
+    def into_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
+        name = self.into_string()
         return self._formatted_with_internal_type(
             name, include_internal_type=include_internal_type
         )
 
-    def _in_comparison_left_side(self) -> str:
-        return self._in_assignment_left_side()
+    def into_comparison_left_side(self) -> str:
+        return self.into_assignment_left_side()
 
-    def _in_comparison_right_side(self) -> str:
-        return self._in_assignment_right_side()
+    def into_comparison_right_side(self) -> str:
+        return self.into_assignment_right_side()
 
     def _as_string_first(self) -> str:
         return f'%var.{self._right_side_keyword()}/{self.name}'
@@ -64,7 +72,7 @@ class BaseStat(Editable):
     def _as_string_second(self, include_fallback_value: bool = True) -> str:
         if not include_fallback_value or no_fallback_values():
             return ''
-        fallback_value = self._get_formatted_fallback_value()
+        fallback_value = self.get_formatted_fallback_value()
 
         if (
             isinstance(fallback_value, str)
@@ -88,7 +96,7 @@ class BaseStat(Editable):
     def _as_string_third(self) -> str:
         return '%'
 
-    def _as_string(self, include_fallback_value: bool = True) -> str:
+    def into_string(self, include_fallback_value: bool = True) -> str:
         return (
             self._as_string_first()
             + self._as_string_second(include_fallback_value=include_fallback_value)
@@ -99,19 +107,22 @@ class BaseStat(Editable):
         """
         Creates a copy of the current object, with the automatic unset flag set to True.
         """
-        copied = self.copied()
-        copied.auto_unset = True
-        return copied
+        clone = self.cloned()
+        clone.auto_unset = True
+        return clone
 
     def without_automatic_unset(self) -> Self:
         """
         Creates a copy of the current object, with the automatic unset flag set to False.
         """
-        copied = self.copied()
-        copied.auto_unset = False
-        return copied
+        clone = self.cloned()
+        clone.auto_unset = False
+        return clone
 
-    def copied(self) -> Self:
-        copied = super().copied()
-        copied.auto_unset = self.auto_unset
-        return copied
+    def cloned(self) -> Self:
+        clone = super().cloned()
+        clone.auto_unset = self.auto_unset
+        return clone
+
+    def unset(self) -> UnsetExpression:
+        return UnsetExpression(self).execute()

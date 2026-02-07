@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from typing import Self
 
 from ..base_object import BaseObject
 
@@ -10,3 +11,7 @@ class Expression(BaseObject):
     @abstractmethod
     def into_htsl(self) -> str:
         raise NotImplementedError()
+
+    def execute(self) -> Self:
+        # TODO write htsl
+        return self

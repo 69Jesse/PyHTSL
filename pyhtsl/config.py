@@ -26,6 +26,8 @@ CACHED_HTSL_IMPORTS_FOLDER_PATH: Path = HERE / 'cached_htsl_imports_folder.txt'
 
 INDENT: str = ' ' * 4
 
+DISABLE_GLOBAL_EXPORT: bool = False
+
 
 def set_htsl_imports_folder(htsl_folder: Path | str) -> None:
     if isinstance(htsl_folder, str):
@@ -43,6 +45,7 @@ def set_htsl_imports_folder(htsl_folder: Path | str) -> None:
     if content is not None and content == new_content:
         return
     CACHED_HTSL_IMPORTS_FOLDER_PATH.write_text(new_content)
+
     print(
         f'Saved your HTSL imports folder \x1b[38;2;0;255;0m{htsl_folder.as_posix()}\x1b[0m for future use at\n\x1b[38;2;0;255;0m{CACHED_HTSL_IMPORTS_FOLDER_PATH}\x1b[0m'
     )
@@ -100,78 +103,12 @@ def get_htsl_import_folder() -> Path:
             continue
 
 
-HTSL_IMPORTS_FOLDER: Path = get_htsl_import_folder()
-if not HTSL_IMPORTS_FOLDER.exists():
-    raise FileNotFoundError(
-        f'Could not find your HTSL imports folder at\n{HTSL_IMPORTS_FOLDER}'
-    )
+DISABLE_GLOBAL_EXPORT: bool = False
 
 
-type ExpressionsCallbackType = Callable[[list['Expression']], None] | None
-
-
-class ExportContainer:
-    name: str
-    is_global: bool
-    lines: list[tuple[str, LineType]]
-    registered_functions: list['Function']
-    in_front_index: int
-    indent: int
-    logger: AntiSpamLogger
-    expressions_callback: ExpressionsCallbackType | None
-
-    def __init__(
-        self,
-        name: str,
-        *,
-        is_global: bool = False,
-        lines_callback: ExpressionsCallbackType | None = None,
-    ) -> None:
-        self.name = name
-        self.is_global = is_global
-        self.expressions_callback = lines_callback
-        self.lines = []
-        self.registered_functions = []
-        self.in_front_index = 0
-        self.indent = 0
-        self.logger = AntiSpamLogger()
-
-    def htsl_path(self) -> Path:
-        return HTSL_IMPORTS_FOLDER / f'{self.name}.htsl'
-
-
-class TemporaryContainerContextManager:
-    writer: 'Writer'
-    name: str
-    lines_callback: ExpressionsCallbackType | None
-
-    def __init__(
-        self,
-        writer: 'Writer',
-        name: str,
-        lines_callback: ExpressionsCallbackType | None = None,
-    ) -> None:
-        self.writer = writer
-        self.name = name
-        self.lines_callback = lines_callback
-
-    def __enter__(self) -> ExportContainer:
-        container = ExportContainer(self.name, lines_callback=self.lines_callback)
-        self.writer.containers.append(container)
-        return container
-
-    def __exit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc_value: BaseException | None,
-        traceback: TracebackType | None,
-    ) -> None:
-        container = self.writer.get_container()
-        if container.name != self.name:
-            raise RuntimeError(
-                f'Container "{self.name}" was not the last one created. This should never happen.'
-            )
-        self.writer.containers.pop()
+def disable_global_export(value: bool = True) -> None:
+    global DISABLE_GLOBAL_EXPORT
+    DISABLE_GLOBAL_EXPORT = value
 
 
 class Writer:

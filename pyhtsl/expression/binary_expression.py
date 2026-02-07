@@ -1,7 +1,7 @@
 from ..base_object import BaseObject
 from ..checkable import Checkable
 from ..editable import Editable
-from .housing_type import HousingType
+from .housing_type import HousingType, housing_type_as_right_side
 from .expression import Expression
 from ..stats.base_stat import BaseStat
 
@@ -31,20 +31,32 @@ class BinaryOperator(Enum):
 class BinaryExpression[
     LeftT: 'BinaryExpression | Checkable | HousingType',
     RightT: 'BinaryExpression | Checkable | HousingType',
-](Expression):
+](Expression, Editable):
     left: LeftT
     right: RightT
     operator: BinaryOperator
+    allow_self_assignment: bool
 
     def __init__(
         self,
         left: LeftT,
         right: RightT,
         operator: BinaryOperator,
+        *,
+        allow_self_assignment: bool = False,
     ) -> None:
         self.left = left
         self.right = right
         self.operator = operator
+        self.allow_self_assignment = allow_self_assignment
+
+        if (
+            self.allow_self_assignment
+            or not isinstance(self.left, BaseStat)
+            or not self.left.equals_raw(self.right)
+            or operator is not BinaryOperator.Set
+        ):
+            pass
 
     def into_assignment_expressions(
         self,
@@ -55,14 +67,21 @@ class BinaryExpression[
         def into_line(
             expr: 'BinaryExpression[Editable, Checkable | HousingType]',
         ) -> str:
-            line = f'{expr.left._in_assignment_left_side()} {expr.operator.value} {Checkable._to_assignment_right_side(expr.right)}'
+            def format_rhs(value: Checkable | HousingType) -> str:
+                if isinstance(value, Checkable):
+                    return value.into_assignment_right_side()
+                return housing_type_as_right_side(value)
+
+            line = f'{expr.left.into_assignment_left_side()} {expr.operator.value} {format_rhs(expr.right)}'
+
             if isinstance(expr.left, BaseStat):
                 line += f' {str(expr.left.auto_unset).lower()}'
+
             return line
 
         return '\n'.join(map(into_line, self.into_assignment_expressions()))
 
-    def cloned(self) -> Self:
+    def cloned_raw(self) -> Self:
         return self.__class__(
             left=(
                 self.left.cloned() if isinstance(self.left, BaseObject) else self.left
@@ -75,7 +94,7 @@ class BinaryExpression[
             operator=self.operator,
         )
 
-    def equals(self, other: object) -> bool:
+    def equals_raw(self, other: object) -> bool:
         if not isinstance(other, BinaryExpression):
             return False
         return (

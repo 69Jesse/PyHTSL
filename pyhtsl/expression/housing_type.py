@@ -1,11 +1,13 @@
 import numpy as np
 from typing import TypeAlias
 
+from internal_type import InternalType
+
 
 __all__ = (
     'NumericHousingType',
     'HousingType',
-    '_housing_type_as_right_side',
+    'housing_type_as_right_side',
 )
 
 
@@ -13,7 +15,7 @@ NumericHousingType: TypeAlias = int | float
 HousingType: TypeAlias = NumericHousingType | str
 
 
-def _housing_type_as_right_side(value: HousingType) -> str:
+def housing_type_as_right_side(value: HousingType) -> str:
     if isinstance(value, NumericHousingType):
         if isinstance(value, int):
             return str(value)

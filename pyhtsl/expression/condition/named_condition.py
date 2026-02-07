@@ -1,4 +1,4 @@
-from .base_condition import BaseCondition
+from .condition import Condition
 
 from typing import Self, final
 
@@ -7,7 +7,7 @@ __all__ = ('NamedCondition',)
 
 
 @final
-class NamedCondition(BaseCondition):
+class NamedCondition(Condition):
     name: str
 
     def __init__(

@@ -1,4 +1,4 @@
-from ..expression.handler import EXPR_HANDLER, ExpressionHandler
+from ..expression.handler import EXPR_HANDLER
 from ..expression.housing_type import HousingType
 from .player_stat import PlayerStat
 from .base_stat import BaseStat
@@ -26,7 +26,7 @@ class TemporaryStat(BaseStat):
         self,
         internal_type: InternalType,
     ) -> None:
-        super().__init__(None, set_name=False, auto_unset=False)  # type: ignore
+        super().__init__('', auto_unset=False)
         self.internal_type = internal_type
         self._number = Number(id(self) + 1_000_000)
 
@@ -55,22 +55,18 @@ class TemporaryStat(BaseStat):
             return self.number == other.number
         return False
 
-    def _copied(self) -> 'TemporaryStat':
+    def cloned_raw(self) -> 'TemporaryStat':
         stat = TemporaryStat(self.internal_type)
         stat._number = self._number
         return stat
 
-    def _as_string(self, include_fallback_value: bool = True) -> str:
+    def into_string(self, include_fallback_value: bool = True) -> str:
         """Pushing here so we can do something like
         foo = PlayerStat('foo')
         chat(f'Hello World! {foo + 1}')
         """
         EXPR_HANDLER.push()
-        return super()._as_string(include_fallback_value=include_fallback_value)
+        return super().into_string(include_fallback_value=include_fallback_value)
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.number} {self.internal_type.name}>'
-
-
-ExpressionHandler._import_temporary_stat(TemporaryStat)
-Checkable._import_temporary_stat(TemporaryStat)

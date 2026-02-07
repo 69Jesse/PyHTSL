@@ -23,7 +23,7 @@ class PlayerStat(Stat):
             return self.name == other.name
         return False
 
-    def _copied(self) -> 'PlayerStat':
+    def cloned_raw(self) -> 'PlayerStat':
         return PlayerStat(self.name)
 
     def __repr__(self) -> str:

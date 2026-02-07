@@ -21,7 +21,7 @@ class GlobalStat(Stat):
             return self.name == other.name
         return False
 
-    def _copied(self) -> 'GlobalStat':
+    def cloned_raw(self) -> 'GlobalStat':
         return GlobalStat(self.name)
 
     def __repr__(self) -> str:

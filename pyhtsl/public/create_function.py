@@ -44,46 +44,27 @@ def rename(**names: str) -> Callable[[F], F]:
 def create_function(
     name: str,
     *,
-    create: bool | None = None,
+    force_create: bool | None = None,
     run_right_now: bool = False,
-) -> Callable[[F], Function]:
-    def decorator(func: F) -> Function:
-        parameters: list[StatParameter] = []
-        renamed_parameters: dict[str, str] = getattr(
-            func, '__pyhtsl_renamed_stats__', {}
-        )
-        signature = inspect.signature(func)
-        for param_name, raw_param in signature.parameters.items():
-            annotation = raw_param.annotation
-            if annotation is inspect.Parameter.empty:
-                raise TypeError(
-                    f'Parameter "{param_name}" must have an annotation. '
-                    + ANNOTATION_EXAMPLE
-                )
-            if annotation not in (PlayerStat, GlobalStat, TeamStat):
-                raise TypeError(
-                    f'Parameter "{param_name}" must be either "{PlayerStat.__name__}", "{GlobalStat.__name__}", or "{TeamStat.__name__}", not "{annotation.__name__}". '
-                    + ANNOTATION_EXAMPLE
-                )
-            param = StatParameter(
-                name=renamed_parameters.get(param_name, param_name), cls=annotation
-            )
-            parameters.append(param)
-
+) -> Callable[[F], Function[F]]:
+    def decorator(func: F) -> Function[F]:
         def callback() -> None:
-            goto(container='function', name=name, add_to_front=True)  # type: ignore
-            force = not WRITER.get_container().is_global
-            if force or (
-                create if create is not None else (func.__module__ == '__main__')
-            ):
+            goto(container='function', name=name, add_to_front=True)  # pyright: ignore[reportCallIssue]
+            create = (
+                force_create
+                if force_create is not None
+                else (func.__module__ == '__main__')
+            ) or (not WRITER.get_container().is_global)
+            if create:
                 goto(container='function', name=name)
-                func(*(param.cls(name=param.name) for param in parameters))  # type: ignore
+                func()
 
-        function = Function(name=name, parameters=parameters, callback=callback)
+        function = Function(name=name, callback=callback)
         if run_right_now:
             callback()
         else:
             WRITER.get_container().registered_functions.append(function)
+
         return function
 
     return decorator

@@ -31,31 +31,31 @@ class PlaceholderCheckable(Checkable):
         self.comparison_right_side = comparison_right_side
         self.inside_of_string = in_string
 
-    def _in_assignment_left_side(self) -> str:
+    def into_assignment_left_side(self) -> str:
         raise RuntimeError(
             f'Cannot use {self.__class__.__name__} as left side of assignment.'
         )
 
-    def _in_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
+    def into_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
         return self._formatted_with_internal_type(
             self.assignment_right_side, include_internal_type=include_internal_type
         )
 
-    def _in_comparison_left_side(self) -> str:
+    def into_comparison_left_side(self) -> str:
         return self.comparison_left_side
 
-    def _in_comparison_right_side(self) -> str:
+    def into_comparison_right_side(self) -> str:
         return self._formatted_with_internal_type(
             self.comparison_right_side, include_internal_type=True
         )
 
-    def _as_string(self, include_fallback_value: bool = True) -> str:
+    def into_string(self, include_fallback_value: bool = True) -> str:
         return self.inside_of_string
 
     def equals_raw(self, other: Checkable | HousingType) -> bool:
         return self is other
 
-    def _copied(self) -> 'PlaceholderCheckable':
+    def cloned_raw(self) -> 'PlaceholderCheckable':
         return PlaceholderCheckable(
             assignment_right_side=self.assignment_right_side,
             comparison_left_side=self.comparison_left_side,
@@ -90,29 +90,29 @@ class PlaceholderEditable(Editable):
         self.comparison_right_side = comparison_right_side
         self.inside_of_string = in_string
 
-    def _in_assignment_left_side(self) -> str:
+    def into_assignment_left_side(self) -> str:
         return self.assignment_left_side
 
-    def _in_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
+    def into_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
         return self._formatted_with_internal_type(
             self.assignment_right_side, include_internal_type=include_internal_type
         )
 
-    def _in_comparison_left_side(self) -> str:
+    def into_comparison_left_side(self) -> str:
         return self.comparison_left_side
 
-    def _in_comparison_right_side(self) -> str:
+    def into_comparison_right_side(self) -> str:
         return self._formatted_with_internal_type(
             self.comparison_right_side, include_internal_type=True
         )
 
-    def _as_string(self, include_fallback_value: bool = True) -> str:
+    def into_string(self, include_fallback_value: bool = True) -> str:
         return self.inside_of_string
 
     def equals_raw(self, other: Checkable | HousingType) -> bool:
         return self is other
 
-    def _copied(self) -> 'PlaceholderEditable':
+    def cloned_raw(self) -> 'PlaceholderEditable':
         return PlaceholderEditable(
             assignment_left_side=self.assignment_left_side,
             assignment_right_side=self.assignment_right_side,

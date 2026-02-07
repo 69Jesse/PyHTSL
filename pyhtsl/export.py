@@ -6,12 +6,12 @@ from typing import Sequence, Any, Callable
 from types import ModuleType
 
 
-type CallableNoArgs = Callable[[], None | Any]
+type CallableNoArgs = Callable[[], Any]
 type Exportable = (
-    Function
+    Function[Callable[[], None]]
     | CallableNoArgs
-    | Sequence[Function | CallableNoArgs]
-    | dict[str, Function | Any]
+    | Sequence[Exportable]
+    | dict[str, Exportable]
     | ModuleType
 )
 
@@ -21,37 +21,33 @@ def export(
     name: str,
 ) -> None:
     callables: list[CallableNoArgs] = []
-    if isinstance(exportable, Function):
-        if exportable.callback is None:
-            raise ValueError(f'Function {exportable} has no callback to export.')
-        callables.append(exportable.callback)
-    elif callable(exportable):
-        callables.append(exportable)
-    elif isinstance(exportable, Sequence):
-        for item in exportable:
-            if isinstance(item, Function):
-                if item.callback is None:
-                    raise ValueError(f'Function {item} has no callback to export.')
-                callables.append(item.callback)
-            elif callable(item):
-                callables.append(item)
-            else:
-                raise TypeError(
-                    f'Item {item} in sequence is not a Function or callable.'
-                )
-    elif isinstance(exportable, dict):
-        for value in exportable.values():
-            if isinstance(value, Function):
-                if value.callback is None:
-                    raise ValueError(f'Function {value} has no callback to export.')
-                callables.append(value.callback)
-    else:
-        for attr in dir(exportable):
-            value = getattr(exportable, attr)
-            if isinstance(value, Function):
-                if value.callback is None:
-                    raise ValueError(f'Function {value} has no callback to export.')
-                callables.append(value.callback)
+
+    def extract_function(exp: Any) -> None:
+        if not isinstance(exp, Function):
+            return
+        if exp.callback is None:
+            return
+        callables.append(exp.callback)
+
+    def extract_recursive(exp: Exportable) -> None:
+        if isinstance(exp, Function):
+            if exp.callback is None:
+                return
+            callables.append(exp.callback)
+        elif callable(exp):
+            callables.append(exp)
+        elif isinstance(exp, Sequence):
+            for item in exp:
+                extract_recursive(item)
+        elif isinstance(exp, dict):
+            for value in exp.values():
+                extract_function(value)
+        else:
+            for attr in dir(exp):
+                value = getattr(exp, attr)
+                extract_function(value)
+
+    extract_recursive(exportable)
 
     if not callables:
         raise ValueError(

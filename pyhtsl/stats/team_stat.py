@@ -27,8 +27,8 @@ class TeamStat(Stat):
     def _right_side_keyword() -> str:
         return 'team'
 
-    def _in_assignment_left_side(self) -> str:
-        value = super()._in_assignment_left_side()
+    def into_assignment_left_side(self) -> str:
+        value = super().into_assignment_left_side()
         if self.team is not None:
             return f'{value} "{self.team.name}"'
         return value
@@ -47,11 +47,8 @@ class TeamStat(Stat):
             return self.name == other.name and self.team == other.team
         return False
 
-    def _copied(self) -> 'TeamStat':
+    def cloned_raw(self) -> 'TeamStat':
         return TeamStat(self.name, self.team)
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.name}, {repr(self.team)} {self.internal_type.name}>'
-
-
-Team._import_team_stat(TeamStat)

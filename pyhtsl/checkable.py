@@ -1,71 +1,31 @@
-from .condition.conditional_statements import IfStatement
+from .expression.compound_expression import CompoundExpression
+from .expression.condition.comparison_condition import (
+    ComparisonCondition,
+    ComparisonOperator,
+)
 from .internal_type import InternalType
-from .expression.handler import ExpressionHandler, EXPR_HANDLER
-from .condition.base_condition import BaseCondition
-from .condition.comparison_condition import ComparisonOperator, ComparisonCondition
 from .expression.housing_type import (
     NumericHousingType,
     HousingType,
-    _housing_type_as_right_side,
+    housing_type_as_right_side,
 )
 from .public.no_type_casting import no_type_casting
 from .base_object import BaseObject
 
 from abc import abstractmethod
-import math
 
-from typing import TYPE_CHECKING, Self, overload, final
+from typing import TYPE_CHECKING, Literal, Self, overload, final
 
 if TYPE_CHECKING:
-    from .editable import Editable
-    from .expression.binary_expression import (
-        BinaryExpression,
-        BinaryOperator,
-    )
-    from .expression.condition.conditional_expressions import (
-        ConditionalExpression,
-    )
-    from .stats.base_stat import BaseStat
-    from .stats.temporary_stat import TemporaryStat
-    from .placeholders import PlaceholderCheckable, PlaceholderEditable
+    from .expression.binary_expression import BinaryExpression
 
 
 __all__ = ('Checkable',)
 
 
-def _transformed_to_long(
-    value: 'Checkable | NumericHousingType',
-) -> 'Checkable | NumericHousingType':
-    if isinstance(value, Checkable):
-        return value.as_long()
-    if isinstance(value, NumericHousingType):
-        return int(value)
-    raise TypeError(f'Cannot transform {repr(value)} to long.')
-
-
-def _transformed_to_double(
-    value: 'Checkable | NumericHousingType',
-) -> 'Checkable | NumericHousingType':
-    if isinstance(value, Checkable):
-        return value.as_double()
-    if isinstance(value, NumericHousingType):
-        return float(value)
-    raise TypeError(f'Cannot transform {repr(value)} to double.')
-
-
-def _transformed_to_string(
-    value: 'Checkable | HousingType',
-) -> 'Checkable | HousingType':
-    if isinstance(value, Checkable):
-        return value.as_string()
-    if isinstance(value, HousingType):
-        return str(value)
-    raise TypeError(f'Cannot transform {repr(value)} to string.')
-
-
 class Checkable(BaseObject):
-    internal_type: InternalType
-    fallback_value: HousingType | None
+    internal_type: InternalType = InternalType.ANY
+    fallback_value: HousingType | None = None
 
     def __init__(
         self,
@@ -89,40 +49,35 @@ class Checkable(BaseObject):
                 text += 'D'
         return f'"{text}"' if ' ' in text else text  # ugly hack until htsw
 
-    @abstractmethod
-    def _in_assignment_left_side(self) -> str:
+    def into_assignment_left_side(self) -> str:
         """
         var foo = %var.player/bar%
         ^^^^^^^
         """
         raise NotImplementedError
 
-    @abstractmethod
-    def _in_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
+    def into_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
         """
         var foo = %var.player/bar%
                   ^^^^^^^^^^^^^^^^
         """
         raise NotImplementedError
 
-    @abstractmethod
-    def _in_comparison_left_side(self) -> str:
+    def into_comparison_left_side(self) -> str:
         """
         if and (var "foo" > "%var.player/bar%") {
                 ^^^^^^^^^
         """
         raise NotImplementedError
 
-    @abstractmethod
-    def _in_comparison_right_side(self) -> str:
+    def into_comparison_right_side(self) -> str:
         """
         if and (var "foo" > "%var.player/bar%") {
                             ^^^^^^^^^^^^^^^^^^
         """
         raise NotImplementedError
 
-    @abstractmethod
-    def _as_string(self, include_fallback_value: bool = True) -> str:
+    def into_string(self, include_fallback_value: bool = True) -> str:
         """
         chat "hello %player.name%"
                     ^^^^^^^^^^^^^
@@ -146,145 +101,30 @@ class Checkable(BaseObject):
             return False
         return self.equals_raw(other)
 
-    @staticmethod
-    def _to_assignment_right_side(
-        value: 'Checkable | HousingType',
-    ) -> str:
-        if isinstance(value, Checkable):
-            return value._in_assignment_right_side()
-        return _housing_type_as_right_side(value)
-
-    @staticmethod
-    def _to_comparison_right_side(
-        value: 'Checkable | HousingType',
-    ) -> str:
-        if isinstance(value, Checkable):
-            return value._in_comparison_right_side()
-        return _housing_type_as_right_side(value)
-
     def __str__(self) -> str:
-        return self._as_string()
-
-    @overload
-    def _other_as_type_compatible(
-        self, other: 'Editable', internal_type: InternalType | None = None
-    ) -> 'Editable': ...
-
-    @overload
-    def _other_as_type_compatible(
-        self, other: 'Checkable', internal_type: InternalType | None = None
-    ) -> 'Checkable': ...
-
-    @overload
-    def _other_as_type_compatible(
-        self, other: HousingType, internal_type: InternalType | None = None
-    ) -> HousingType: ...
-
-    @overload
-    def _other_as_type_compatible(
-        self,
-        other: 'Checkable | HousingType',
-        internal_type: InternalType | None = None,
-    ) -> 'Checkable | HousingType': ...
-
-    def _other_as_type_compatible(
-        self,
-        other: 'Checkable | HousingType',
-        internal_type: InternalType | None = None,
-    ) -> 'Checkable | HousingType':
-        internal_type = internal_type or self.internal_type
-        if internal_type is InternalType.ANY:
-            return other
-
-        if isinstance(other, BaseStat) and self.equals(
-            other, check_internal_type=False
-        ):
-            return other
-
-        if isinstance(other, Checkable):
-            if internal_type is InternalType.LONG:
-                other = other.as_long()
-            elif internal_type is InternalType.DOUBLE:
-                other = other.as_double()
-            elif internal_type is InternalType.STRING:
-                other = other.as_string()
-
-        if isinstance(other, BinaryExpression):
-            other._left = self._other_as_type_compatible(other._left)
-            other._right = self._other_as_type_compatible(other._right)
-            return other
-
-        if isinstance(other, Checkable):
-            if internal_type is InternalType.LONG and (
-                other.internal_type is InternalType.ANY
-                or other.internal_type is InternalType.LONG
-            ):
-                return _transformed_to_long(other)
-            if internal_type is InternalType.DOUBLE and (
-                other.internal_type is InternalType.ANY
-                or other.internal_type is InternalType.DOUBLE
-            ):
-                return _transformed_to_double(other)
-            if internal_type is InternalType.STRING and (
-                other.internal_type is InternalType.ANY
-                or other.internal_type is InternalType.STRING
-            ):
-                return _transformed_to_string(other)
-        if isinstance(other, NumericHousingType):
-            if internal_type is InternalType.LONG:
-                return _transformed_to_long(other)
-            if internal_type is InternalType.DOUBLE:
-                return _transformed_to_double(other)
-            if internal_type is InternalType.STRING:
-                return _transformed_to_string(other)
-        if internal_type is InternalType.STRING:
-            return _transformed_to_string(other)
-        raise TypeError(
-            f'{repr(self)} with internal type {internal_type} '
-            + f'is incompatible with {repr(other)}'
-            + (
-                f' with internal type {other.internal_type.name}'
-                if isinstance(other, Checkable)
-                else ''
-            )
-        )
-
-    def is_type_compatible(self, other: 'Checkable | HousingType') -> bool:
-        try:
-            self._other_as_type_compatible(other)
-        except TypeError:
-            return False
-        return True
+        return self.into_string()
 
     @abstractmethod
-    def _copied(self) -> Self:
+    def cloned_raw(self) -> Self:
         raise NotImplementedError
 
-    def copied(self) -> Self:
-        """
-        Returns a copy of the current object.
-        """
-        copy = self._copied()
-        copy.internal_type = self.internal_type
-        copy.fallback_value = self.fallback_value
-        return copy
+    def cloned(self) -> Self:
+        clone = self.cloned_raw()
+        clone.internal_type = self.internal_type
+        clone.fallback_value = self.fallback_value
+        return clone
 
-    def as_type(self, type_: InternalType) -> Self:
+    def as_type(self, internal_type: InternalType, /) -> Self:
         """
         Creates a copy of the current object, with the internal type set to the specified type.
         """
-        copy = self.copied()
-        copy.internal_type = type_
-        if copy.fallback_value is not None:
-            try:
-                copy.fallback_value = copy._other_as_type_compatible(
-                    copy.fallback_value
-                )
-            except TypeError as exc:
-                raise TypeError(
-                    f'Cannot transform fallback value {repr(copy.fallback_value)} to internal type {type_.name}.'
-                ) from exc
-        return copy
+        clone = self.cloned()
+        clone.internal_type = internal_type
+        if clone.fallback_value is not None:
+            clone.fallback_value = internal_type.type_compatible_housing_type(
+                clone.fallback_value,
+            )
+        return clone
 
     def as_long(self) -> Self:
         """
@@ -314,320 +154,222 @@ class Checkable(BaseObject):
         """
         Creates a copy of the current object, with the fallback value set to the specified value.
         """
-        copy = self.copied()
-        copy.fallback_value = copy._other_as_type_compatible(fallback_value)
-        return copy
+        clone = self.cloned()
+        clone.fallback_value = self.internal_type.type_compatible_housing_type(
+            fallback_value,
+        )
+        return clone
 
-    def _get_formatted_fallback_value(self) -> str | None:
-        value: HousingType | None = self.fallback_value
-        if value is None:
-            if self.internal_type is InternalType.LONG:
-                value = 0
-            elif self.internal_type is InternalType.DOUBLE:
-                value = 0.0
-            elif self.internal_type is InternalType.STRING:
-                value = ''
+    def get_formatted_fallback_value(self) -> str | None:
+        value = self.fallback_value or self.internal_type.default_housing_type()
+        return housing_type_as_right_side(value) if value is not None else None
 
-        return _housing_type_as_right_side(value) if value is not None else None
+    def __add__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[Self, T]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
 
-    def __add__(self, other: 'Checkable | NumericHousingType') -> 'TemporaryStat':
-        temp_stat = TemporaryStat(self.internal_type)
-        expr = BinaryExpression(temp_stat, self, BinaryOperator.Set)
-        EXPR_HANDLER.add(expr)
-        expr = BinaryExpression(
-            temp_stat,
-            self._other_as_type_compatible(other),
+        return BinaryExpression(
+            self,
+            other,
             BinaryOperator.Increment,
         )
-        EXPR_HANDLER.add(expr)
-        return temp_stat
 
-    def __radd__(self, other: 'Checkable | NumericHousingType') -> 'TemporaryStat':
-        return self.__add__(other)
+    def __radd__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[T, Self]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
 
-    def __sub__(self, other: 'Checkable | NumericHousingType') -> 'TemporaryStat':
-        temp_stat = TemporaryStat(self.internal_type)
-        expr = BinaryExpression(temp_stat, self, BinaryOperator.Set)
-        EXPR_HANDLER.add(expr)
-        expr = BinaryExpression(
-            temp_stat,
-            self._other_as_type_compatible(other),
-            BinaryOperator.Decrement,
-        )
-        EXPR_HANDLER.add(expr)
-        return temp_stat
-
-    def __rsub__(self, other: 'Checkable | NumericHousingType') -> 'TemporaryStat':
-        temp_stat = TemporaryStat(self.internal_type)
-        expr = BinaryExpression(
-            temp_stat,
-            self._other_as_type_compatible(other),
-            BinaryOperator.Set,
-        )
-        EXPR_HANDLER.add(expr)
-        expr = BinaryExpression(temp_stat, self, BinaryOperator.Decrement)
-        EXPR_HANDLER.add(expr)
-        return temp_stat
-
-    def __mul__(self, other: 'Checkable | NumericHousingType') -> 'TemporaryStat':
-        temp_stat = TemporaryStat(self.internal_type)
-        expr = BinaryExpression(temp_stat, self, BinaryOperator.Set)
-        EXPR_HANDLER.add(expr)
-        expr = BinaryExpression(
-            temp_stat,
-            self._other_as_type_compatible(other),
-            BinaryOperator.Multiply,
-        )
-        EXPR_HANDLER.add(expr)
-        return temp_stat
-
-    def __rmul__(self, other: 'Checkable | NumericHousingType') -> 'TemporaryStat':
-        return self.__mul__(other)
-
-    def __truediv__(self, other: 'Checkable | NumericHousingType') -> 'TemporaryStat':
-        temp_stat = TemporaryStat(self.internal_type)
-        expr = BinaryExpression(temp_stat, self, BinaryOperator.Set)
-        EXPR_HANDLER.add(expr)
-        expr = BinaryExpression(
-            temp_stat,
-            self._other_as_type_compatible(other),
-            BinaryOperator.Divide,
-        )
-        EXPR_HANDLER.add(expr)
-        return temp_stat
-
-    def __rtruediv__(self, other: 'Checkable | NumericHousingType') -> 'TemporaryStat':
-        temp_stat = TemporaryStat(self.internal_type)
-        expr = BinaryExpression(
-            temp_stat,
-            self._other_as_type_compatible(other),
-            BinaryOperator.Set,
-        )
-        EXPR_HANDLER.add(expr)
-        expr = BinaryExpression(temp_stat, self, BinaryOperator.Divide)
-        EXPR_HANDLER.add(expr)
-        return temp_stat
-
-    def __floordiv__(self, other: 'Checkable | NumericHousingType') -> 'TemporaryStat':
-        return self.__truediv__(other)
-
-    def __rfloordiv__(self, other: 'Checkable | NumericHousingType') -> 'TemporaryStat':
-        return self.__truediv__(other)
-
-    def _pow_multiply_strat(self, other: int) -> 'TemporaryStat | int':
-        if other == 0:
-            return 1
-        temp_stat = TemporaryStat(self.internal_type)
-        expr = BinaryExpression(temp_stat, self, BinaryOperator.Set)
-        EXPR_HANDLER.add(expr)
-        log2 = int(math.log2(other))
-        for _ in range(log2):
-            expr = BinaryExpression(
-                temp_stat, temp_stat, BinaryOperator.Multiply
-            )
-            EXPR_HANDLER.add(expr)
-        remaining = other - 2**log2
-        if remaining == 0:
-            return temp_stat
-        if remaining == 1:
-            expr = BinaryExpression(temp_stat, self, BinaryOperator.Multiply)
-            EXPR_HANDLER.add(expr)
-            return temp_stat
-        expr = BinaryExpression(
-            temp_stat, self.__pow__(remaining), BinaryOperator.Multiply
-        )
-        EXPR_HANDLER.add(expr)
-        return temp_stat
-
-    def _pow_divide_strat(self, other: int) -> 'TemporaryStat | int':
-        if other == 0:
-            return 1
-        temp_stat = TemporaryStat(self.internal_type)
-        expr = BinaryExpression(temp_stat, self, BinaryOperator.Set)
-        EXPR_HANDLER.add(expr)
-        log2 = int(math.log2(other))
-        for _ in range(log2 + 1):
-            expr = BinaryExpression(
-                temp_stat, temp_stat, BinaryOperator.Multiply
-            )
-            EXPR_HANDLER.add(expr)
-        remaining = 2 ** (log2 + 1) - other
-        assert remaining > 0
-        if remaining == 1:
-            expr = BinaryExpression(temp_stat, self, BinaryOperator.Divide)
-            EXPR_HANDLER.add(expr)
-            return temp_stat
-        if remaining == 2:
-            expr = BinaryExpression(temp_stat, self, BinaryOperator.Divide)
-            EXPR_HANDLER.add(expr)
-            expr = BinaryExpression(temp_stat, self, BinaryOperator.Divide)
-            EXPR_HANDLER.add(expr)
-            return temp_stat
-        if remaining & (remaining - 1) == 0:
-            expr = BinaryExpression(
-                temp_stat,
-                Checkable._pow_multiply_strat(self, remaining),
-                BinaryOperator.Divide,
-            )
-            EXPR_HANDLER.add(expr)
-            return temp_stat
-        expr = BinaryExpression(
-            temp_stat, self.__pow__(remaining), BinaryOperator.Divide
-        )
-        EXPR_HANDLER.add(expr)
-        return temp_stat
-
-    def __pow__(self, other: int) -> 'TemporaryStat | int':
-        other = self._other_as_type_compatible(other)  # type: ignore
-        if other < 0:
-            raise ValueError('Power must be greater than or equal to 0')
-
-        before_length = len(EXPR_HANDLER._expressions)
-        multiply_strat_temp_stat = Checkable._pow_multiply_strat(self, other)
-        multiply_strat_after_length = len(EXPR_HANDLER._expressions)
-        if multiply_strat_after_length - before_length <= 1:
-            return multiply_strat_temp_stat
-
-        multiply_expressions: list['BinaryExpression'] = []
-        for _ in range(multiply_strat_after_length - before_length):
-            multiply_expressions.append(EXPR_HANDLER._expressions.pop(before_length))  # type: ignore
-
-        assert len(EXPR_HANDLER._expressions) == before_length
-        divide_strat_temp_stat = Checkable._pow_divide_strat(self, other)
-        divide_strat_after_length = len(EXPR_HANDLER._expressions)
-
-        if divide_strat_after_length < multiply_strat_after_length:
-            return divide_strat_temp_stat
-
-        for _ in range(divide_strat_after_length - before_length):
-            EXPR_HANDLER._expressions.pop()
-        assert len(EXPR_HANDLER._expressions) == before_length
-        EXPR_HANDLER._expressions.extend(multiply_expressions)
-        return multiply_strat_temp_stat
-
-    def remainder(self, other: 'Checkable | NumericHousingType') -> 'TemporaryStat':
-        temp_stat_1 = TemporaryStat(self.internal_type)
-        expr = BinaryExpression(temp_stat_1, self, BinaryOperator.Set)
-        EXPR_HANDLER.add(expr)
-
-        internal_type = (
-            self.internal_type
-            if not (isinstance(other, (int, float)) and other.is_integer())
-            else InternalType.LONG
-        )
-
-        temp_stat_2 = TemporaryStat(internal_type)
-        expr = BinaryExpression(
-            temp_stat_2, self.as_type(internal_type), BinaryOperator.Set
-        )
-        EXPR_HANDLER.add(expr)
-        expr = BinaryExpression(
-            temp_stat_2,
-            self._other_as_type_compatible(other, internal_type=internal_type),
-            BinaryOperator.Divide,
-        )
-        EXPR_HANDLER.add(expr)
-        if internal_type is InternalType.DOUBLE:
-            expr = BinaryExpression(
-                temp_stat_2,
-                temp_stat_2.as_long(),
-                BinaryOperator.Set,
-                is_self_cast=True,
-            )
-            EXPR_HANDLER.add(expr)
-            expr = BinaryExpression(
-                temp_stat_2,
-                temp_stat_2.as_double(),
-                BinaryOperator.Set,
-                is_self_cast=True,
-            )
-            EXPR_HANDLER.add(expr)
-        expr = BinaryExpression(
-            temp_stat_2,
-            self._other_as_type_compatible(other, internal_type=internal_type),
-            BinaryOperator.Multiply,
-        )
-        EXPR_HANDLER.add(expr)
-
-        expr = BinaryExpression(
-            temp_stat_1,
-            temp_stat_2.as_type(self.internal_type),
-            BinaryOperator.Decrement,
-        )
-        EXPR_HANDLER.add(expr)
-        return temp_stat_1
-
-    def __mod__(self, other: 'Checkable | NumericHousingType') -> 'TemporaryStat':
-        temp_stat = self.remainder(other)
-
-        statement = IfStatement(conditions=[temp_stat < 0])
-        expr = ConditionalExpression(statement)
-        EXPR_HANDLER.add(expr)
-        expr = BinaryExpression(
-            temp_stat,
-            self._other_as_type_compatible(other),
+        return BinaryExpression(
+            other,
+            self,
             BinaryOperator.Increment,
         )
-        EXPR_HANDLER.add(expr)
-        expr = ConditionalExitExpression(statement)
-        EXPR_HANDLER.add(expr)
 
-        return temp_stat
+    def __sub__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[Self, T]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
 
-    def __neg__(self) -> 'TemporaryStat':
+        return BinaryExpression(
+            self,
+            other,
+            BinaryOperator.Decrement,
+        )
+
+    def __rsub__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[T, Self]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+
+        return BinaryExpression(
+            other,
+            self,
+            BinaryOperator.Decrement,
+        )
+
+    def __mul__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[Self, T]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+
+        return BinaryExpression(
+            self,
+            other,
+            BinaryOperator.Multiply,
+        )
+
+    def __rmul__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[T, Self]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+
+        return BinaryExpression(
+            other,
+            self,
+            BinaryOperator.Multiply,
+        )
+
+    def __truediv__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[Self, T]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+
+        return BinaryExpression(
+            self,
+            other,
+            BinaryOperator.Divide,
+        )
+
+    def __rtruediv__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[T, Self]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+
+        return BinaryExpression(
+            other,
+            self,
+            BinaryOperator.Divide,
+        )
+
+    def __floordiv__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[Self, T]':
+        return self.__truediv__(other)
+
+    def __rfloordiv__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[T, Self]':
+        return self.__rtruediv__(other)
+
+    @overload
+    def __pow__(
+        self,
+        other: Literal[0],
+    ) -> Literal[1]: ...
+
+    @overload
+    def __pow__(
+        self,
+        other: Literal[1],
+    ) -> Self: ...
+
+    @overload
+    def __pow__(
+        self,
+        other: int,  # TODO type guard with >= 2 for only expression array
+    ) -> 'CompoundExpression | Self | Literal[1]': ...
+
+    def __pow__(
+        self,
+        other: int,
+    ) -> 'CompoundExpression | Self | Literal[1]':
+        raise NotImplementedError  # TODO
+
+    def remainder(
+        self,
+        other: 'Checkable | NumericHousingType',
+    ) -> 'CompoundExpression':
+        raise NotImplementedError  # TODO
+
+    def __mod__(
+        self,
+        other: 'Checkable | NumericHousingType',
+    ) -> 'CompoundExpression':
+        raise NotImplementedError  # TODO
+
+    def __neg__(self) -> 'BinaryExpression[Self, Literal[-1]]':
         return self.__mul__(-1)
 
-    def abs(self) -> 'TemporaryStat':
-        temp_stat = TemporaryStat(self.internal_type)
-        expr = BinaryExpression(temp_stat, self, BinaryOperator.Set)
-        EXPR_HANDLER.add(expr)
+    def abs(self) -> 'CompoundExpression':
+        raise NotImplementedError  # TODO
 
-        statement = IfStatement(conditions=[self < 0])
-        expr = ConditionalExpression(statement)
-        EXPR_HANDLER.add(expr)
-        expr = BinaryExpression(temp_stat, -1, BinaryOperator.Multiply)
-        EXPR_HANDLER.add(expr)
-        expr = ConditionalExitExpression(statement)
-        EXPR_HANDLER.add(expr)
-
-        return temp_stat
-
-    def __abs__(self) -> 'TemporaryStat':
+    def __abs__(self) -> 'CompoundExpression':
         return self.abs()
 
-    def __eq__(self, other: 'Checkable | HousingType') -> BaseCondition:
-        return ComparisonCondition(
-            self, self._other_as_type_compatible(other), ComparisonOperator.Equal
-        )
-
-    def __ne__(self, other: 'Checkable | HousingType') -> BaseCondition:
-        return ~self.__eq__(other)
-
-    def __gt__(self, other: 'Checkable | HousingType') -> BaseCondition:
+    def __eq__[T: 'Checkable | HousingType'](
+        self,
+        other: T,
+    ) -> ComparisonCondition[Self, T]:
         return ComparisonCondition(
             self,
-            self._other_as_type_compatible(other),
+            other,
+            ComparisonOperator.Equal,
+        )
+
+    def __ne__[T: 'Checkable | HousingType'](
+        self,
+        other: T,
+    ) -> ComparisonCondition[Self, T]:
+        return ~self.__eq__(other)
+
+    def __gt__[T: 'Checkable | HousingType'](
+        self,
+        other: T,
+    ) -> ComparisonCondition[Self, T]:
+        return ComparisonCondition(
+            self,
+            other,
             ComparisonOperator.GreaterThan,
         )
 
-    def __lt__(self, other: 'Checkable | HousingType') -> BaseCondition:
+    def __lt__[T: 'Checkable | HousingType'](
+        self,
+        other: T,
+    ) -> ComparisonCondition[Self, T]:
         return ComparisonCondition(
             self,
-            self._other_as_type_compatible(other),
+            other,
             ComparisonOperator.LessThan,
         )
 
-    def __ge__(self, other: 'Checkable | HousingType') -> BaseCondition:
+    def __ge__[T: 'Checkable | HousingType'](
+        self,
+        other: T,
+    ) -> ComparisonCondition[Self, T]:
         return ComparisonCondition(
             self,
-            self._other_as_type_compatible(other),
+            other,
             ComparisonOperator.GreaterThanOrEqual,
         )
 
-    def __le__(self, other: 'Checkable | HousingType') -> BaseCondition:
+    def __le__[T: 'Checkable | HousingType'](
+        self,
+        other: T,
+    ) -> ComparisonCondition[Self, T]:
         return ComparisonCondition(
             self,
-            self._other_as_type_compatible(other),
+            other,
             ComparisonOperator.LessThanOrEqual,
         )
 
@@ -638,7 +380,3 @@ class Checkable(BaseObject):
     @abstractmethod
     def __repr__(self) -> str:
         raise NotImplementedError
-
-
-ExpressionHandler._import_checkable(Checkable)
-ComparisonCondition._import_checkable(Checkable)

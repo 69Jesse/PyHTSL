@@ -1,4 +1,5 @@
-from .base_condition import BaseCondition
+from expression.housing_type import housing_type_as_right_side
+from .condition import Condition
 
 from enum import Enum
 
@@ -24,15 +25,17 @@ class ComparisonOperator(Enum):
 
 
 @final
-class ComparisonCondition(BaseCondition):
-    left: 'Checkable'
-    right: 'Checkable | HousingType'
+class ComparisonCondition[LeftT: 'Checkable', RightT: 'Checkable | HousingType'](
+    Condition
+):
+    left: LeftT
+    right: RightT
     operator: ComparisonOperator
 
     def __init__(
         self,
-        left: 'Checkable',
-        right: 'Checkable | HousingType',
+        left: LeftT,
+        right: RightT,
         operator: ComparisonOperator,
     ) -> None:
         self.left = left
@@ -40,10 +43,17 @@ class ComparisonCondition(BaseCondition):
         self.operator = operator
 
     def into_htsl_raw(self) -> str:
-        line = f'{self.left._in_comparison_left_side()} {self.operator.value} {Checkable._to_comparison_right_side(self.right)}'
-        fallback_value = self.left._get_formatted_fallback_value()
+        def format_rhs(value: Checkable | HousingType) -> str:
+            if isinstance(value, Checkable):
+                return value.into_comparison_right_side()
+            return housing_type_as_right_side(value)
+
+        line = f'{self.left.into_comparison_left_side()} {self.operator.value} {format_rhs(self.right)}'
+
+        fallback_value = self.left.get_formatted_fallback_value()
         if fallback_value is not None:
             line += f' {fallback_value}'
+
         return line
 
     def cloned(self) -> Self:

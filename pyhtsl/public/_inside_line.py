@@ -10,4 +10,4 @@ def _inside_line(value: Checkable | HousingType) -> str:
     EXPR_HANDLER.push()
     if isinstance(value, HousingType):
         return str(value)
-    return value._in_assignment_right_side(include_internal_type=False)
+    return value.into_assignment_right_side(include_internal_type=False)

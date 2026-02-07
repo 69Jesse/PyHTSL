@@ -5,7 +5,7 @@ from ...writer import INDENT
 from typing import TYPE_CHECKING, Self, final
 
 if TYPE_CHECKING:
-    from ..condition.base_condition import BaseCondition
+    from .condition import Condition
 
 
 __all__ = ('ConditionalExpression',)
@@ -18,7 +18,7 @@ class ConditionalMode(Enum):
 
 @final
 class ConditionalExpression(Expression):
-    conditions: list['BaseCondition']
+    conditions: list['Condition']
     mode: ConditionalMode
 
     if_expressions: list[Expression]
@@ -26,7 +26,7 @@ class ConditionalExpression(Expression):
 
     def __init__(
         self,
-        conditions: list['BaseCondition'],
+        conditions: list['Condition'],
         mode: ConditionalMode,
         *,
         if_expressions: list[Expression] | None = None,
