@@ -1,5 +1,4 @@
-from .smaller import remove_formatting, get_placeholder_parts
-
+from .smaller import get_placeholder_parts, remove_formatting
 
 __all__ = ('compute_best_layout',)
 
@@ -83,7 +82,7 @@ def add_formatting_codes(unformatted_text: str, formatting: list[list[str]]) -> 
     result = []
     prev_codes: list[str] = []
 
-    for ch, codes in zip(unformatted_text, formatting):
+    for ch, codes in zip(unformatted_text, formatting, strict=False):
         if ch == '\n':
             result.append(ch)
             prev_codes = []

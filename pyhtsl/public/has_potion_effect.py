@@ -1,8 +1,7 @@
-from ..condition.base_condition import BaseCondition
-from ..types import ALL_POTION_EFFECTS
-
 from typing import final
 
+from ..condition.base_condition import BaseCondition
+from ..types import ALL_POTION_EFFECTS
 
 __all__ = ('HasPotionEffect',)
 

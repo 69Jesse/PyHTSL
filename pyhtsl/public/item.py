@@ -1,24 +1,22 @@
-from ..writer import HERE, HTSL_IMPORTS_FOLDER
-from ..types import (
-    NON_SPECIAL_ITEM_KEYS,
-    DAMAGEABLE_ITEM_KEYS,
-    LEATHER_ARMOR_KEYS,
-    COOKIE_ITEM_KEY,
-    PLAYER_SKULL_ITEM_KEY,
-    ALL_ITEM_KEYS,
-    ENCHANTMENT_TO_ID,
-)
-from .enchantment import Enchantment
-from ..nbt import NBTByte, NBTCompound, NBTInt, NBTList, NBTShort, NBTString
-from ..utils import replace_formatting, formatting_to_ansi
-
+import difflib
+import hashlib
 import json
 import re
-import hashlib
-import difflib
+from typing import Any, TypedDict, overload
 
-from typing import TypedDict, overload, Any
-
+from ..nbt import NBTByte, NBTCompound, NBTInt, NBTList, NBTShort, NBTString
+from ..types import (
+    ALL_ITEM_KEYS,
+    COOKIE_ITEM_KEY,
+    DAMAGEABLE_ITEM_KEYS,
+    ENCHANTMENT_TO_ID,
+    LEATHER_ARMOR_KEYS,
+    NON_SPECIAL_ITEM_KEYS,
+    PLAYER_SKULL_ITEM_KEY,
+)
+from ..utils import formatting_to_ansi, replace_formatting
+from ..writer import HERE, HTSL_IMPORTS_FOLDER
+from .enchantment import Enchantment
 
 __all__ = ('Item',)
 

@@ -1,6 +1,5 @@
 from typing import ClassVar
 
-
 __all__ = (
     'no_fallback_values',
     'NoFallbackValues',

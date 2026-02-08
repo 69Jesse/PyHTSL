@@ -1,9 +1,8 @@
+from enum import Enum
+from typing import TYPE_CHECKING, Self, final
+
 from ..housing_type import housing_type_as_right_side
 from .condition import Condition
-
-from enum import Enum
-
-from typing import TYPE_CHECKING, Self, final
 
 if TYPE_CHECKING:
     from ...checkable import Checkable

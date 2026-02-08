@@ -10,8 +10,22 @@ requires-python = ">=3.12"
 authors = [{ name = "Jesse Janssen" }]
 urls = { Homepage = "https://github.com/69Jesse/PyHTSL" }
 readme = "README.md"
-dependencies = [
-    "numpy>=2.4.2",
+dependencies = ["numpy>=2.4.2"]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "UP",     # pyupgrade
+    "ARG001", # unused arguments in functions
+]
+ignore = [
+    "E501",  # line too long
+    "B008",  # do not perform function calls in argument defaults
 ]
 
 [tool.setuptools]

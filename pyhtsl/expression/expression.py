@@ -1,9 +1,9 @@
 from abc import abstractmethod
+from collections.abc import Generator
+from typing import TYPE_CHECKING, Any, Self
 
-from ..container import get_current_container
 from ..base_object import BaseObject
-
-from typing import TYPE_CHECKING, Any, Generator, Self
+from ..container import get_current_container
 
 if TYPE_CHECKING:
     from ..stats.stat import Stat

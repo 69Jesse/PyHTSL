@@ -1,7 +1,6 @@
+from typing import Literal, final
+
 from ..condition.base_condition import BaseCondition
-
-from typing import final, Literal
-
 
 __all__ = ('FishingEnvironment',)
 

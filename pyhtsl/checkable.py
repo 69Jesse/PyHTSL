@@ -1,23 +1,22 @@
+from abc import abstractmethod
+from typing import TYPE_CHECKING, Literal, Self, final, overload
+
+from .base_object import BaseObject
 from .expression.condition.comparison_condition import (
     ComparisonCondition,
     ComparisonOperator,
 )
-from .internal_type import InternalType
 from .expression.housing_type import (
-    NumericHousingType,
     HousingType,
+    NumericHousingType,
     housing_type_as_right_side,
 )
+from .internal_type import InternalType
 from .public.no_type_casting import no_type_casting
-from .base_object import BaseObject
-
-from abc import abstractmethod
-
-from typing import TYPE_CHECKING, Literal, Self, overload, final
 
 if TYPE_CHECKING:
-    from .expression.compound_expression import CompoundExpression
     from .expression.binary_expression import BinaryExpression
+    from .expression.compound_expression import CompoundExpression
 
 
 __all__ = ('Checkable',)

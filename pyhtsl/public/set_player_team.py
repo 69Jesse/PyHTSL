@@ -1,7 +1,6 @@
 from ..writer import WRITER, LineType
 from .team import Team
 
-
 __all__ = ('set_player_team',)
 
 

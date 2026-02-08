@@ -1,6 +1,5 @@
 from ..placeholders import PlaceholderEditable
 
-
 __all__ = ('PlayerHunger',)
 
 

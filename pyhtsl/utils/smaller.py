@@ -1,7 +1,6 @@
-from ..editable import Editable
-
 import re
 
+from ..editable import Editable
 
 __all__ = (
     'replace_formatting',

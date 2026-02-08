@@ -1,8 +1,7 @@
 from ..checkable import Checkable
 from ..expression.housing_type import HousingType
-from ..writer import WRITER, LineType
 from ..types import ALL_LOCATIONS
-
+from ..writer import WRITER, LineType
 
 __all__ = ('teleport_player',)
 

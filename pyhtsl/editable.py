@@ -1,12 +1,12 @@
-from .expression.expression import Expression
-from .checkable import Checkable
-from .expression.housing_type import NumericHousingType, HousingType
-
 from typing import TYPE_CHECKING, Literal, Self
 
+from .checkable import Checkable
+from .expression.expression import Expression
+from .expression.housing_type import HousingType, NumericHousingType
+
 if TYPE_CHECKING:
-    from .expression.compound_expression import CompoundExpression
     from .expression.binary_expression import BinaryExpression, BinaryOperator
+    from .expression.compound_expression import CompoundExpression
 
 
 __all__ = ('Editable',)

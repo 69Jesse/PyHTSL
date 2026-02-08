@@ -1,16 +1,14 @@
 import atexit
-from pathlib import Path
-
-from .public.function import Function
-
-from .logger import AntiSpamLogger
-from .config import DISABLE_GLOBAL_EXPORT, DISPLAY_HTSL, get_htsl_import_folder
-
 import os
 import sys
-
-from typing import TYPE_CHECKING, Callable, ClassVar, Protocol, Self
+from collections.abc import Callable
+from pathlib import Path
 from types import TracebackType
+from typing import TYPE_CHECKING, ClassVar, Protocol, Self
+
+from .config import DISABLE_GLOBAL_EXPORT, DISPLAY_HTSL, get_htsl_import_folder
+from .logger import AntiSpamLogger
+from .public.function import Function
 
 if TYPE_CHECKING:
     from .expression.expression import Expression
@@ -121,12 +119,12 @@ class Container:
         self.logger.publish()
 
         print(
-            (
+
                 '\n\x1b[38;2;0;255;0mAll done! Your .htsl file is written to the following location:\x1b[0m'
                 f'\n{path.absolute()}'
                 f'\nExecute it with HTSL by using the following name: \x1b[38;2;255;0;0m{self.name}\x1b[0m'
                 '\n'
-            )
+
         )
 
 

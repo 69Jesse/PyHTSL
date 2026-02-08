@@ -1,7 +1,6 @@
-from ..writer import WRITER, LineType
-
 from types import TracebackType
 
+from ..writer import WRITER, LineType
 
 __all__ = ('Random',)
 

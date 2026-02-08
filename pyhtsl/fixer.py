@@ -1,9 +1,9 @@
-from abc import ABC, abstractmethod
 import re
+from abc import ABC, abstractmethod
+from collections.abc import Generator
+from typing import TYPE_CHECKING, final
 
 from .line_type import LineType
-
-from typing import TYPE_CHECKING, Generator, final
 
 if TYPE_CHECKING:
     from .writer import ExportContainer

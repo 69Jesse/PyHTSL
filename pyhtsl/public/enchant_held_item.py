@@ -1,7 +1,6 @@
-from ..writer import WRITER, LineType
 from ..types import ALL_ENCHANTMENTS
+from ..writer import WRITER, LineType
 from .enchantment import Enchantment
-
 
 __all__ = ('enchant_held_item',)
 

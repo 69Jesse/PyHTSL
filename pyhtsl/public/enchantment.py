@@ -1,6 +1,5 @@
 from ..types import ALL_ENCHANTMENTS
 
-
 __all__ = ('Enchantment',)
 
 

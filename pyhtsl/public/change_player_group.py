@@ -1,6 +1,5 @@
-from .group import Group
 from ..writer import WRITER, LineType
-
+from .group import Group
 
 __all__ = ('change_player_group',)
 

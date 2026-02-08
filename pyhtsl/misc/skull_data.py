@@ -1,10 +1,8 @@
-from ..nbt import NBTCompound, NBTInt, NBTList, NBTString
-
 import json
 from pathlib import Path
+from typing import Literal, TypedDict
 
-from typing import TypedDict, Literal
-
+from ..nbt import NBTCompound, NBTInt, NBTList, NBTString
 
 HERE = Path(__file__).parent.resolve()
 

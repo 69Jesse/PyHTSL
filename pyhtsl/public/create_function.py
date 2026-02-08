@@ -1,9 +1,9 @@
+from collections.abc import Callable
+from typing import ParamSpec
+
 from ..container import get_current_container
-from .goto import goto
 from .function import Function
-
-from typing import Callable, ParamSpec
-
+from .goto import goto
 
 __all__ = (
     'rename',

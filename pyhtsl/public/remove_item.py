@@ -1,7 +1,6 @@
 from ..writer import WRITER, LineType
 from .item import Item
 
-
 __all__ = ('remove_item',)
 
 

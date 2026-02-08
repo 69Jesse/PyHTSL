@@ -1,9 +1,8 @@
-from .player_stat import PlayerStat
-from .stat import Stat
-from ..internal_type import InternalType
-
 from typing import final
 
+from ..internal_type import InternalType
+from .player_stat import PlayerStat
+from .stat import Stat
 
 __all__ = ('TemporaryStat',)
 

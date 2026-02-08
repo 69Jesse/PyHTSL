@@ -1,8 +1,7 @@
-from ..condition.base_condition import BaseCondition
-from .team import Team
-
 from typing import final
 
+from ..condition.base_condition import BaseCondition
+from .team import Team
 
 __all__ = ('RequiredTeam',)
 

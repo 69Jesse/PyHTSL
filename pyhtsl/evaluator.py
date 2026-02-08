@@ -1,9 +1,9 @@
-from .writer import WRITER, TemporaryContainerContextManager, ExportContainer
-from .expression.expression import Expression
-from .expression.binary_expression import BinaryExpression
-
 from types import TracebackType  # type: ignore
 from typing import Self
+
+from .expression.binary_expression import BinaryExpression
+from .expression.expression import Expression
+from .writer import WRITER, ExportContainer, TemporaryContainerContextManager
 
 
 class Evaluator:

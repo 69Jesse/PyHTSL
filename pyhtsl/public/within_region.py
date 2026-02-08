@@ -1,7 +1,7 @@
+from typing import final
+
 from ..condition.base_condition import BaseCondition
 from .region import Region
-
-from typing import final
 
 
 @final

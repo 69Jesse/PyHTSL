@@ -1,9 +1,9 @@
-from .public.function import Function
-from .container import Container
-
-from typing import Sequence, Any, Callable
+from collections.abc import Callable, Sequence
 from types import ModuleType
+from typing import Any
 
+from .container import Container
+from .public.function import Function
 
 type CallableNoArgs = Callable[[], Any]
 type Exportable = (

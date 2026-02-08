@@ -1,6 +1,5 @@
 from ..writer import WRITER, LineType
 
-
 __all__ = ('full_heal',)
 
 

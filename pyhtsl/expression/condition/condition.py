@@ -1,9 +1,7 @@
 from abc import abstractmethod
-
-from ...base_object import BaseObject
-
 from typing import Self, final
 
+from ...base_object import BaseObject
 
 __all__ = ('Condition',)
 

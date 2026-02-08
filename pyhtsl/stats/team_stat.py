@@ -1,8 +1,7 @@
-from .stat import Stat
-from ..public.team import Team
-
 from typing import final
 
+from ..public.team import Team
+from .stat import Stat
 
 __all__ = ('TeamStat',)
 

@@ -1,7 +1,6 @@
-from .stat import Stat
-
 from typing import final
 
+from .stat import Stat
 
 __all__ = ('PlayerStat',)
 

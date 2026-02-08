@@ -1,6 +1,5 @@
 from ..placeholders import PlaceholderCheckable
 
-
 __all__ = ('PlayerVersion',)
 
 

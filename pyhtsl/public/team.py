@@ -1,6 +1,6 @@
-from ..placeholders import PlaceholderCheckable
-
 from typing import TYPE_CHECKING
+
+from ..placeholders import PlaceholderCheckable
 
 if TYPE_CHECKING:
     from ..stats.team_stat import TeamStat

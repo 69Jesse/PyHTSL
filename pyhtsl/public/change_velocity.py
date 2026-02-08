@@ -1,8 +1,7 @@
-from ..writer import WRITER, LineType
 from ..checkable import Checkable
 from ..expression.housing_type import NumericHousingType
+from ..writer import WRITER, LineType
 from ._inside_line import _inside_line
-
 
 __all__ = ('change_velocity',)
 

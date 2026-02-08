@@ -1,7 +1,6 @@
-from ..writer import WRITER, LineType
-
 from typing import Literal
 
+from ..writer import WRITER, LineType
 
 __all__ = ('set_gamemode',)
 

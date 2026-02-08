@@ -1,10 +1,9 @@
-from ..stats.player_stat import PlayerStat
-from ..public.if_and import IfAnd
-from ..public._else import Else
-from ..types import Editable, Checkable, Stat
-
 from typing import Literal, overload
 
+from ..public._else import Else
+from ..public.if_and import IfAnd
+from ..stats.player_stat import PlayerStat
+from ..types import Checkable, Editable, Stat
 
 __all__ = (
     'approximate_sqrt',

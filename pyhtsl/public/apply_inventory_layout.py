@@ -1,7 +1,6 @@
 from ..writer import WRITER, LineType
 from .layout import Layout
 
-
 __all__ = ('apply_inventory_layout',)
 
 

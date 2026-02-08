@@ -1,11 +1,10 @@
+from collections.abc import Iterable
+
+from ..stats.global_stat import GlobalStat
+from ..stats.player_stat import PlayerStat
+from ..stats.team_stat import TeamStat
 from ..writer import WRITER, LineType
 from .function import Function
-from ..stats.player_stat import PlayerStat
-from ..stats.global_stat import GlobalStat
-from ..stats.team_stat import TeamStat
-
-from typing import Iterable
-
 
 __all__ = ('trigger_function',)
 
@@ -24,7 +23,7 @@ def trigger_function(
                 f'Expected {len(function.parameters)} parameters, got {len(parameters)}.'
             )
         for i, (param, expected_param) in enumerate(
-            zip(parameters, function.parameters)
+            zip(parameters, function.parameters, strict=False)
         ):
             if type(param) not in (PlayerStat, GlobalStat, TeamStat, int):
                 raise TypeError(

@@ -1,8 +1,9 @@
+from collections.abc import Generator
 from enum import Enum
-from ..expression import Expression
-from ...config import INDENT
+from typing import TYPE_CHECKING, Self, final
 
-from typing import TYPE_CHECKING, Generator, Self, final
+from ...config import INDENT
+from ..expression import Expression
 
 if TYPE_CHECKING:
     from .condition import Condition
@@ -65,19 +66,32 @@ class ConditionalExpression(Expression):
         if not isinstance(other, ConditionalExpression):
             return False
         return (
-            all(
+            len(self.conditions) == len(other.conditions)
+            and all(
                 cond.equals(other_cond)
-                for cond, other_cond in zip(self.conditions, other.conditions)
+                for cond, other_cond in zip(
+                    self.conditions,
+                    other.conditions,
+                    strict=False,
+                )
             )
             and self.mode == other.mode
-            and all(
-                expr.equals(other_expr)
-                for expr, other_expr in zip(self.if_expressions, other.if_expressions)
-            )
+            and len(self.if_expressions) == len(other.if_expressions)
             and all(
                 expr.equals(other_expr)
                 for expr, other_expr in zip(
-                    self.else_expressions, other.else_expressions
+                    self.if_expressions,
+                    other.if_expressions,
+                    strict=False,
+                )
+            )
+            and len(self.else_expressions) == len(other.else_expressions)
+            and all(
+                expr.equals(other_expr)
+                for expr, other_expr in zip(
+                    self.else_expressions,
+                    other.else_expressions,
+                    strict=False,
                 )
             )
         )

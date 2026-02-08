@@ -1,7 +1,8 @@
+from collections.abc import Generator
+from typing import Self, final
+
 from ..editable import Editable
 from .expression import Expression
-
-from typing import Generator, Self, final
 
 
 @final
@@ -19,7 +20,7 @@ class CompoundExpression[T: Expression](Expression, Editable):
             return False
         return all(
             expr.equals(other_expr)
-            for expr, other_expr in zip(self.expressions, other.expressions)
+            for expr, other_expr in zip(self.expressions, other.expressions, strict=False)
         )
 
     def into_htsl(self) -> str:

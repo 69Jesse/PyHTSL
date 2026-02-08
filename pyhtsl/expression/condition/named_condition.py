@@ -1,7 +1,6 @@
-from .condition import Condition
-
 from typing import Self, final
 
+from .condition import Condition
 
 __all__ = ('NamedCondition',)
 

@@ -1,8 +1,8 @@
-import numpy as np
-from abc import ABC, abstractmethod
 import re
-
+from abc import ABC, abstractmethod
 from typing import Any, Self
+
+import numpy as np
 
 
 class NBT[T](ABC):

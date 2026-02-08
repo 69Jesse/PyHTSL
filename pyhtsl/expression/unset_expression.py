@@ -1,6 +1,6 @@
-from .expression import Expression
-
 from typing import TYPE_CHECKING, Self, final
+
+from .expression import Expression
 
 if TYPE_CHECKING:
     from ..stats.stat import Stat

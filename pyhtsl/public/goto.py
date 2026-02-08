@@ -1,7 +1,6 @@
-from ..writer import WRITER, LineType
-
 from typing import TYPE_CHECKING, Literal
 
+from ..writer import WRITER, LineType
 
 __all__ = ('goto',)
 

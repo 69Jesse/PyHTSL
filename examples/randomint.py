@@ -4,7 +4,6 @@ from pyhtsl import (
     chat,
 )
 
-
 RANDOM_1_100 = RandomWhole(1, 101)
 
 

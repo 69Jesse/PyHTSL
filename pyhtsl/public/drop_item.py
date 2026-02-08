@@ -1,9 +1,8 @@
-from .no_fallback_values import NoFallbackValues
 from ..checkable import Checkable
 from ..expression.housing_type import HousingType
 from ..writer import WRITER, LineType
 from .item import Item
-
+from .no_fallback_values import NoFallbackValues
 
 __all__ = ('drop_item',)
 

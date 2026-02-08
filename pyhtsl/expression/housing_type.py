@@ -1,6 +1,6 @@
-import numpy as np
 from typing import TypeAlias
 
+import numpy as np
 
 __all__ = (
     'NumericHousingType',

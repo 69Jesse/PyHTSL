@@ -1,11 +1,10 @@
 # can be replaced with `from pyhtsl import *`
 from pyhtsl import (
-    PlayerStat,
-    IfAnd,
     Else,
+    IfAnd,
+    PlayerStat,
     chat,
 )
-
 
 chat('&aChecking for empty teams..')
 # This remains Python, so you can do things like this:

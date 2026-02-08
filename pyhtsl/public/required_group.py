@@ -1,8 +1,7 @@
-from ..condition.base_condition import BaseCondition
-from .group import Group
-
 from typing import final
 
+from ..condition.base_condition import BaseCondition
+from .group import Group
 
 __all__ = ('RequiredGroup',)
 

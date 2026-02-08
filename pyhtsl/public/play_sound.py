@@ -1,6 +1,5 @@
+from ..types import ALL_LOCATIONS, ALL_SOUNDS, ALL_SOUNDS_PRETTY_TO_RAW
 from ..writer import WRITER, LineType
-from ..types import ALL_SOUNDS, ALL_SOUNDS_PRETTY_TO_RAW, ALL_LOCATIONS
-
 
 __all__ = ('play_sound',)
 

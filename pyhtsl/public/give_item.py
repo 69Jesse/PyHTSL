@@ -1,7 +1,6 @@
+from ..types import _INVENTORY_SLOTS_PRETTY_NAME_MAPPING, INVENTORY_SLOTS
 from ..writer import WRITER, LineType
-from ..types import INVENTORY_SLOTS, _INVENTORY_SLOTS_PRETTY_NAME_MAPPING
 from .item import Item
-
 
 __all__ = ('give_item',)
 

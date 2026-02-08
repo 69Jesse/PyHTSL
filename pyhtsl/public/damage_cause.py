@@ -1,8 +1,7 @@
-from ..condition.base_condition import BaseCondition
-from ..types import ALL_DAMAGE_CAUSES
-
 from typing import final
 
+from ..condition.base_condition import BaseCondition
+from ..types import ALL_DAMAGE_CAUSES
 
 __all__ = ('DamageCause',)
 

@@ -1,7 +1,6 @@
 from ..checkable import Checkable
-from ..expression.housing_type import HousingType
 from ..expression.handler import EXPR_HANDLER
-
+from ..expression.housing_type import HousingType
 
 __all__ = ('_inside_line',)
 

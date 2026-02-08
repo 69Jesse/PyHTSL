@@ -1,15 +1,14 @@
-from ..internal_type import InternalType
-from ..stats.temporary_stat import TemporaryStat
+from collections.abc import Generator
+from enum import Enum
+from typing import Any, Self, final
+
 from ..checkable import Checkable
 from ..editable import Editable
-from .housing_type import HousingType, housing_type_as_right_side
-from .expression import Expression
+from ..internal_type import InternalType
 from ..stats.stat import Stat
-
-from enum import Enum
-
-from typing import Any, Generator, Self, final
-
+from ..stats.temporary_stat import TemporaryStat
+from .expression import Expression
+from .housing_type import HousingType, housing_type_as_right_side
 
 __all__ = (
     'BinaryOperator',

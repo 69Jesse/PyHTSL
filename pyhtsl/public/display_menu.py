@@ -1,7 +1,6 @@
 from ..writer import WRITER, LineType
 from .menu import Menu
 
-
 __all__ = ('display_menu',)
 
 

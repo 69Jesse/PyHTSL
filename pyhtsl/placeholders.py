@@ -1,8 +1,7 @@
-from .checkable import Checkable
-from .editable import Editable
-
 from typing import final
 
+from .checkable import Checkable
+from .editable import Editable
 
 __all__ = (
     'PlaceholderCheckable',

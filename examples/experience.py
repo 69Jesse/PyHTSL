@@ -1,12 +1,11 @@
 # can be replaced with `from pyhtsl import *`
 from pyhtsl import (
-    PlayerStat,
-    GlobalStat,
-    chat,
-    IfAnd,
     Else,
+    GlobalStat,
+    IfAnd,
+    PlayerStat,
+    chat,
 )
-
 
 experience = PlayerStat('experience')
 reward = PlayerStat('reward')
