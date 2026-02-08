@@ -1,6 +1,5 @@
 from ..internal_type import InternalType
 from ..stats.temporary_stat import TemporaryStat
-from ..base_object import BaseObject
 from ..checkable import Checkable
 from ..editable import Editable
 from .housing_type import HousingType, housing_type_as_right_side
@@ -9,7 +8,7 @@ from ..stats.stat import Stat
 
 from enum import Enum
 
-from typing import Self, final
+from typing import Any, Self, final
 
 
 __all__ = (
@@ -27,6 +26,9 @@ class BinaryOperator(Enum):
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.name}, {self.value}>'
+
+
+type AssignmentExpression = BinaryExpression[Editable, Checkable | HousingType]
 
 
 @final
@@ -61,14 +63,15 @@ class BinaryExpression[
         ):
             pass
 
-    def into_assignment_expressions(
-        self,
-    ) -> list['BinaryExpression[Editable, Checkable | HousingType]']:
-        assignment_expressions: list[
-            BinaryExpression[Editable, Checkable | HousingType]
-        ] = []
+    def into_assignment_expressions(self) -> list[AssignmentExpression]:
+        assignment_expressions: list[AssignmentExpression] = []
 
-        def minimize(expr: BinaryExpression) -> Checkable | HousingType:
+        def minimize(
+            expr: BinaryExpression[Any, Any] | Checkable | HousingType,
+        ) -> Checkable | HousingType:
+            if not isinstance(expr, BinaryExpression):
+                return expr
+
             if isinstance(expr.left, BinaryExpression):
                 expr.left = minimize(expr.left)
             if isinstance(expr.right, BinaryExpression):
@@ -96,15 +99,14 @@ class BinaryExpression[
             )
             return stat
 
-        # minimize(self)
+        left = minimize(self.left)
+        assert isinstance(left, Editable)
+        right = minimize(self.right)
+
         assignment_expressions.append(
             BinaryExpression(
-                left=self.left
-                if not isinstance(self.left, BinaryExpression)
-                else minimize(self.left),
-                right=self.right
-                if not isinstance(self.right, BinaryExpression)
-                else minimize(self.right),
+                left=left,
+                right=right,
                 operator=self.operator,
             ),
         )
@@ -112,14 +114,12 @@ class BinaryExpression[
         return assignment_expressions
 
     def into_htsl(self) -> str:
-        def into_line(
-            expr: 'BinaryExpression[Editable, Checkable | HousingType]',
-        ) -> str:
-            def format_rhs(value: Checkable | HousingType) -> str:
-                if isinstance(value, Checkable):
-                    return value.into_assignment_right_side()
-                return housing_type_as_right_side(value)
+        def format_rhs(value: Checkable | HousingType) -> str:
+            if isinstance(value, Checkable):
+                return value.into_assignment_right_side()
+            return housing_type_as_right_side(value)
 
+        def into_line(expr: AssignmentExpression) -> str:
             line = f'{expr.left.into_assignment_left_side()} {expr.operator.value} {format_rhs(expr.right)}'
 
             if isinstance(expr.left, Stat):
@@ -131,14 +131,8 @@ class BinaryExpression[
 
     def cloned_raw(self) -> Self:
         return self.__class__(
-            left=(
-                self.left.cloned() if isinstance(self.left, BaseObject) else self.left
-            ),
-            right=(
-                self.right.cloned()
-                if isinstance(self.right, BaseObject)
-                else self.right
-            ),
+            left=self.cloned_or_same(self.left),
+            right=self.cloned_or_same(self.right),
             operator=self.operator,
         )
 
@@ -146,24 +140,8 @@ class BinaryExpression[
         if not isinstance(other, BinaryExpression):
             return False
         return (
-            (
-                self.left.equals(other.left)
-                if isinstance(self.left, BaseObject)
-                and isinstance(other.left, BaseObject)
-                else (self.left == other.left)
-                if not isinstance(self.left, BaseObject)
-                and not isinstance(other.left, BaseObject)
-                else False
-            )
-            and (
-                self.right.equals(other.right)
-                if isinstance(self.right, BaseObject)
-                and isinstance(other.right, BaseObject)
-                else (self.right == other.right)
-                if not isinstance(self.right, BaseObject)
-                and not isinstance(other.right, BaseObject)
-                else False
-            )
+            self.equals_or_eq(self.left, other.left)
+            and self.equals_or_eq(self.right, other.right)
             and self.operator == other.operator
         )
 

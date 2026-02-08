@@ -16,11 +16,6 @@ class GlobalStat(Stat):
     def _right_side_keyword() -> str:
         return 'global'
 
-    def equals_raw(self, other: object) -> bool:
-        if isinstance(other, GlobalStat):
-            return self.name == other.name
-        return False
-
     def cloned_raw(self) -> 'GlobalStat':
         return GlobalStat(self.name)
 

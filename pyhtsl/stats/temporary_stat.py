@@ -52,9 +52,9 @@ class TemporaryStat(Stat):
         return PlayerStat._right_side_keyword()
 
     def equals_raw(self, other: object) -> bool:
-        if isinstance(other, TemporaryStat):
-            return self.number == other.number
-        return False
+        if not isinstance(other, TemporaryStat):
+            return False
+        return self.number == other.number
 
     def cloned_raw(self) -> 'TemporaryStat':
         stat = TemporaryStat(self.internal_type)

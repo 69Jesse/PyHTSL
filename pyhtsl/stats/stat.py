@@ -102,6 +102,14 @@ class Stat(Editable):
             + self._as_string_third()
         )
 
+    def equals_raw(self, other: object) -> bool:
+        if type(other) is not type(self):
+            return False
+        return self.name == other.name
+
+    def is_same_stat(self, other: 'Stat') -> bool:
+        return self.equals_raw(other)
+
     def with_automatic_unset(self) -> Self:
         """
         Creates a copy of the current object, with the automatic unset flag set to True.

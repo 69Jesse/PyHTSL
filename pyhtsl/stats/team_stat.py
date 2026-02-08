@@ -41,9 +41,11 @@ class TeamStat(Stat):
         return value
 
     def equals_raw(self, other: object) -> bool:
-        if isinstance(other, TeamStat):
-            return self.name == other.name and self.team == other.team
-        return False
+        if not super().equals_raw(other):
+            return False
+        if not isinstance(other, TeamStat):
+            return False
+        return self.team == other.team
 
     def cloned_raw(self) -> 'TeamStat':
         return TeamStat(self.name, self.team)
