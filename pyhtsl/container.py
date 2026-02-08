@@ -119,12 +119,10 @@ class Container:
         self.logger.publish()
 
         print(
-
-                '\n\x1b[38;2;0;255;0mAll done! Your .htsl file is written to the following location:\x1b[0m'
-                f'\n{path.absolute()}'
-                f'\nExecute it with HTSL by using the following name: \x1b[38;2;255;0;0m{self.name}\x1b[0m'
-                '\n'
-
+            '\n\x1b[38;2;0;255;0mAll done! Your .htsl file is written to the following location:\x1b[0m'
+            f'\n{path.absolute()}'
+            f'\nExecute it with HTSL by using the following name: \x1b[38;2;255;0;0m{self.name}\x1b[0m'
+            '\n'
         )
 
 

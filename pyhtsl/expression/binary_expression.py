@@ -151,7 +151,7 @@ class BinaryExpression[
                     expression.operator is BinaryOperator.Increment
                     or expression.operator is BinaryOperator.Decrement
                 )
-                and isinstance(expression.right, (int, float))
+                and isinstance(expression.right, int | float)
                 and (expression.right == 0 or expression.right == 0.0)
             ):
                 # editable += 0
@@ -163,7 +163,7 @@ class BinaryExpression[
                     expression.operator is BinaryOperator.Multiply
                     or expression.operator is BinaryOperator.Divide
                 )
-                and isinstance(expression.right, (int, float))
+                and isinstance(expression.right, int | float)
                 and (expression.right == 1 or expression.right == 1.0)
             ):
                 # editable *= 1
@@ -186,8 +186,6 @@ class BinaryExpression[
 
     @staticmethod
     def optimize_binary_expressions(expressions: list[Expression]) -> None:
-        print('OPTIMIZING\n', '\n'.join(map(repr, expressions)), '\n')
-
         has_changed = True
         while has_changed:
             has_changed = False
@@ -234,12 +232,8 @@ class BinaryExpression[
                     for j in range(i + 1)
                 )
 
-        print('AFTER OPTIMIZATION\n', '\n'.join(map(repr, expressions)), '\n')
-
         BinaryExpression.take_out_useless_expressions(expressions)
-        print('AFTER TAKING OUT USELESS\n', '\n'.join(map(repr, expressions)), '\n')
         BinaryExpression.rename_temporary_stats(expressions)
-        print('AFTER RENAMING TEMP STATS\n', '\n'.join(map(repr, expressions)), '\n')
 
     def into_htsl(self) -> str:
         def format_rhs(value: Checkable | HousingType) -> str:

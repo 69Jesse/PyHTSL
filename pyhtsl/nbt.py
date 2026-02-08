@@ -477,8 +477,10 @@ class NBTCompound[V: NBT](NBT[dict[str, V]]):
             if not cls.KEY_REGEX.match(key):
                 try:
                     key = NBTString._parse_snbt(s[key_start:offset])[0].to_object()
-                except Exception:
-                    raise ValueError(f'Invalid key format in NBTCompound: {repr(key)}')
+                except Exception as exc:
+                    raise ValueError(
+                        f'Invalid key format in NBTCompound: {repr(key)}'
+                    ) from exc
 
             if key in compound:
                 raise ValueError(f'Duplicate key found in NBTCompound: {repr(key)}')

@@ -28,6 +28,9 @@ ignore = [
     "B008",  # do not perform function calls in argument defaults
 ]
 
+[tool.ruff.format]
+quote-style = "single"
+
 [tool.setuptools]
 include-package-data = true
 

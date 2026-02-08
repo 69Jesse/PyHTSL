@@ -27,7 +27,6 @@ with Else:
     chat(f'&eOnly &a{EXP_TO_LEVEL_UP - experience} EXP&e left to level up!')
 
 
-
 """Output:
 
 // Generated with PyHTSL https://github.com/69Jesse/PyHTSL

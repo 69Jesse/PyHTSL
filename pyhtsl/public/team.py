@@ -25,10 +25,12 @@ class Team:
 
     def stat(self, key: str) -> 'TeamStat':
         from ..stats.team_stat import TeamStat
+
         return TeamStat(key, self)
 
     def players(self) -> PlaceholderCheckable:
         from .team_players import TeamPlayers
+
         return TeamPlayers(self)
 
     def __repr__(self) -> str:

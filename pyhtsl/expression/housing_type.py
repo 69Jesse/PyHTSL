@@ -1,5 +1,3 @@
-from typing import TypeAlias
-
 import numpy as np
 
 __all__ = (
@@ -9,8 +7,8 @@ __all__ = (
 )
 
 
-NumericHousingType: TypeAlias = int | float
-HousingType: TypeAlias = NumericHousingType | str
+NumericHousingType = int | float
+HousingType = NumericHousingType | str
 
 
 def housing_type_as_right_side(value: HousingType) -> str:

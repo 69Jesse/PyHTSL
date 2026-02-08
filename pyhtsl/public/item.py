@@ -244,7 +244,7 @@ class Item:
 
         color: int | str | tuple[int, int, int] | None = extras_copy.pop('color', None)
         if color is not None:
-            if not isinstance(color, (int, str, tuple)):
+            if not isinstance(color, int | str | tuple):
                 raise ValueError(f'Invalid color type: {type(color)}')
             if isinstance(color, str):
                 color = int(color.removeprefix('#'), 16)
