@@ -107,7 +107,7 @@ class Stat(Editable):
             return False
         return self.name == other.name
 
-    def is_same_stat(self, other: 'Stat') -> bool:
+    def is_same_stat(self, other: object) -> bool:
         return self.equals_raw(other)
 
     def with_automatic_unset(self) -> Self:

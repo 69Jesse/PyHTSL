@@ -1,8 +1,8 @@
 from enum import Enum
 from ..expression import Expression
-from ...writer import INDENT
+from ...config import INDENT
 
-from typing import TYPE_CHECKING, Self, final
+from typing import TYPE_CHECKING, Generator, Self, final
 
 if TYPE_CHECKING:
     from .condition import Condition
@@ -81,6 +81,13 @@ class ConditionalExpression(Expression):
                 )
             )
         )
+
+    def walk_expressions(self) -> Generator[Expression, None, None]:
+        yield from super().walk_expressions()
+        for expr in self.if_expressions:
+            yield from expr.walk_expressions()
+        for expr in self.else_expressions:
+            yield from expr.walk_expressions()
 
     def __repr__(self) -> str:
         return f'If<{self.mode.name}, conditions={len(self.conditions)}, if_exprs={len(self.if_expressions)}, else_exprs={len(self.else_expressions)}>'

@@ -65,7 +65,7 @@ class Editable(Checkable):
             right=value,
             operator=BinaryOperator.Set,
             allow_self_assignment=allow_self_assignment,
-        )
+        ).execute()
 
     def inc[T: Checkable | NumericHousingType](
         self, other: T

@@ -1,7 +1,7 @@
 from ..editable import Editable
 from .expression import Expression
 
-from typing import Self, final
+from typing import Generator, Self, final
 
 
 @final
@@ -32,3 +32,8 @@ class CompoundExpression[T: Expression](Expression, Editable):
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{", ".join(repr(expr) for expr in self.expressions)}>'
+
+    def walk_expressions(self) -> Generator[Expression, None, None]:
+        yield from super().walk_expressions()
+        for expr in self.expressions:
+            yield from expr.walk_expressions()
