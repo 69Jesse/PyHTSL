@@ -10,7 +10,6 @@ type Exportable = (
     Function[Callable[[], None]]
     | CallableNoArgs
     | Sequence[Exportable]
-    | dict[str, Exportable]
     | ModuleType
 )
 
@@ -38,9 +37,6 @@ def export(
         elif isinstance(exp, Sequence):
             for item in exp:
                 extract_recursive(item)
-        elif isinstance(exp, dict):
-            for value in exp.values():
-                extract_function(value)
         else:
             for attr in dir(exp):
                 value = getattr(exp, attr)
