@@ -3,7 +3,7 @@ from types import ModuleType
 from typing import Any
 
 from .container import Container
-from .public.function import Function
+from .actions.function import Function
 
 type CallableNoArgs = Callable[[], Any]
 type Exportable = (

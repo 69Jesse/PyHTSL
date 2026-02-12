@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, ClassVar, Protocol, Self
 
 from .config import DISABLE_GLOBAL_EXPORT, DISPLAY_HTSL, get_htsl_import_folder
 from .logger import AntiSpamLogger
-from .public.function import Function
+from .actions.function import Function
 
 if TYPE_CHECKING:
     from .expression.expression import Expression

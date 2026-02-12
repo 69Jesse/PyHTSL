@@ -1,7 +1,7 @@
 from typing import Literal, overload
 
-from ..public._else import Else
-from ..public.if_and import IfAnd
+from ..actions._else import Else
+from ..actions.if_and import IfAnd
 from ..stats.player_stat import PlayerStat
 from ..types import Checkable, Editable, Stat
 

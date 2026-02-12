@@ -12,7 +12,7 @@ from .expression.housing_type import (
     housing_type_as_right_side,
 )
 from .internal_type import InternalType
-from .public.no_type_casting import no_type_casting
+from .actions.no_type_casting import no_type_casting
 
 if TYPE_CHECKING:
     from .expression.binary_expression import BinaryExpression
