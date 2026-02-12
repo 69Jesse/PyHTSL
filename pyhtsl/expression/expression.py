@@ -18,7 +18,7 @@ class Expression(BaseObject):
         raise NotImplementedError()
 
     def execute(self) -> Self:
-        get_current_container().expressions.append(self.cloned())
+        get_current_container().add_expression(self.cloned())
         return self
 
     def _get_all_values(self) -> dict[str, Any]:

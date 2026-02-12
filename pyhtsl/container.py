@@ -20,8 +20,7 @@ __all__ = (
 )
 
 
-class ContextEntry(Protocol):
-    expressions: list['Expression']
+type ExpressionContext = Callable[['Expression'], None]
 
 
 class Container:
@@ -30,7 +29,7 @@ class Container:
     logger: AntiSpamLogger
     registered_functions: list[Function[Callable[[], None]]]
     expressions: list['Expression']
-    contexts: list[ContextEntry]
+    contexts: list[ExpressionContext]
 
     exported_names: ClassVar[set[str]] = set()
 
@@ -48,11 +47,17 @@ class Container:
     def is_global(self) -> bool:
         return self is CONTAINERS[0]
 
-    def add_context(self, context: ContextEntry) -> None:
+    def add_expression(self, expression: 'Expression') -> None:
+        if len(self.contexts) > 0:
+            self.contexts[-1](expression)
+            return
+        self.expressions.append(expression)
+
+    def add_context(self, context: ExpressionContext) -> None:
         self.contexts.append(context)
 
-    def remove_context(self, context: ContextEntry) -> None:
-        assert self.contexts[-1] is context, 'Context stack is corrupted'
+    def pop_context(self) -> None:
+        assert len(self.contexts) > 0, 'Context stack is empty'
         self.contexts.pop()
 
     def __enter__(self) -> Self:
