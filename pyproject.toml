@@ -25,7 +25,6 @@ select = [
 ]
 ignore = [
     "E501",  # line too long
-    "B008",  # do not perform function calls in argument defaults
 ]
 
 [tool.ruff.format]
