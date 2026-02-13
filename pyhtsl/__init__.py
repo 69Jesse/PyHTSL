@@ -1,3 +1,10 @@
+from .actions.conditional.statements import Else as Else
+from .actions.conditional.statements import IfAnd as IfAnd
+from .actions.conditional.statements import IfOr as IfOr
+from .config import disable_global_export as disable_global_export
+from .config import display_htsl as display_htsl
+from .config import get_htsl_import_folder as get_htsl_import_folder
+from .config import set_htsl_imports_folder as set_htsl_imports_folder
 from .container import Container as Container
 from .stats.global_stat import GlobalStat as GlobalStat
 from .stats.player_stat import PlayerStat as PlayerStat

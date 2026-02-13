@@ -5,7 +5,9 @@ __all__ = (
     'set_htsl_imports_folder',
     'get_htsl_import_folder',
     'disable_global_export',
+    'should_disable_global_export',
     'display_htsl',
+    'should_display_htsl',
 )
 
 
@@ -13,10 +15,6 @@ HERE: Path = Path(__file__).parent
 CACHED_HTSL_IMPORTS_FOLDER_PATH: Path = HERE / 'cached_htsl_imports_folder.txt'
 
 INDENT: str = ' ' * 4
-
-DISABLE_GLOBAL_EXPORT: bool = False
-
-DISPLAY_HTSL: bool = False
 
 
 def set_htsl_imports_folder(htsl_folder: Path | str) -> None:
@@ -93,11 +91,25 @@ def get_htsl_import_folder() -> Path:
             continue
 
 
+DISABLE_GLOBAL_EXPORT: bool = False
+
+
 def disable_global_export(value: bool = True) -> None:
     global DISABLE_GLOBAL_EXPORT
     DISABLE_GLOBAL_EXPORT = value
 
 
+def should_disable_global_export() -> bool:
+    return DISABLE_GLOBAL_EXPORT
+
+
+DISPLAY_HTSL: bool = False
+
+
 def display_htsl(value: bool = True) -> None:
     global DISPLAY_HTSL
     DISPLAY_HTSL = value
+
+
+def should_display_htsl() -> bool:
+    return DISPLAY_HTSL

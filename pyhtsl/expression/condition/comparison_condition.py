@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING, Self, final
 from ..housing_type import housing_type_as_right_side
 from .condition import Condition
 
+from ...expression.housing_type import HousingType
 if TYPE_CHECKING:
     from ...checkable import Checkable
-    from ...expression.housing_type import HousingType
 
 
 __all__ = (
@@ -42,6 +42,8 @@ class ComparisonCondition[LeftT: 'Checkable', RightT: 'Checkable | HousingType']
         self.operator = operator
 
     def into_htsl_raw(self) -> str:
+        from ...checkable import Checkable
+
         def format_rhs(value: Checkable | HousingType) -> str:
             if isinstance(value, Checkable):
                 return value.into_comparison_right_side()

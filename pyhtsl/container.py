@@ -1,14 +1,19 @@
 import atexit
 import os
 import sys
+from abc import ABC, abstractmethod
 from collections.abc import Callable
 from pathlib import Path
 from types import TracebackType
-from typing import TYPE_CHECKING, ClassVar, Protocol, Self
+from typing import TYPE_CHECKING, ClassVar, NamedTuple, Self
 
-from .config import DISABLE_GLOBAL_EXPORT, DISPLAY_HTSL, get_htsl_import_folder
-from .logger import AntiSpamLogger
 from .actions.function import Function
+from .config import (
+    get_htsl_import_folder,
+    should_disable_global_export,
+    should_display_htsl,
+)
+from .logger import AntiSpamLogger
 
 if TYPE_CHECKING:
     from .expression.expression import Expression
@@ -20,7 +25,10 @@ __all__ = (
 )
 
 
-type ExpressionContext = Callable[['Expression'], None]
+class ExpressionContext(NamedTuple):
+    parent_expression: 'Expression'
+    expressions_ref: list['Expression']
+    add_expression_to_container: bool = True
 
 
 class Container:
@@ -47,18 +55,20 @@ class Container:
     def is_global(self) -> bool:
         return self is CONTAINERS[0]
 
+    def get_expressions_ref_in_context(self, *, go_back: int = 0) -> list['Expression']:
+        if go_back >= len(self.contexts):
+            return self.expressions
+        return self.contexts[-1 - go_back].expressions_ref
+
     def add_expression(self, expression: 'Expression') -> None:
-        if len(self.contexts) > 0:
-            self.contexts[-1](expression)
-            return
-        self.expressions.append(expression)
+        self.get_expressions_ref_in_context().append(expression)
 
     def add_context(self, context: ExpressionContext) -> None:
         self.contexts.append(context)
 
-    def pop_context(self) -> None:
+    def pop_context(self) -> ExpressionContext:
         assert len(self.contexts) > 0, 'Context stack is empty'
-        self.contexts.pop()
+        return self.contexts.pop()
 
     def __enter__(self) -> Self:
         CONTAINERS.append(self)
@@ -118,7 +128,7 @@ class Container:
         if 'code' in args:
             os.system(f'code "{path.absolute()}"')
 
-        if DISPLAY_HTSL:
+        if should_display_htsl():
             print(content)
 
         self.logger.publish()
@@ -129,6 +139,28 @@ class Container:
             f'\nExecute it with HTSL by using the following name: \x1b[38;2;255;0;0m{self.name}\x1b[0m'
             '\n'
         )
+
+
+class ContainerContextManager(ABC):
+    @abstractmethod
+    def create_context(self) -> ExpressionContext:
+        raise NotImplementedError()
+
+    def __enter__(self) -> None:
+        context = self.create_context()
+        container = get_current_container()
+        if context.add_expression_to_container:
+            container.add_expression(context.parent_expression)
+        container.add_context(context)
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> None:
+        container = get_current_container()
+        container.pop_context()
 
 
 global_name = os.path.basename(sys.argv[0]).rsplit('.', 1)[0]
@@ -161,7 +193,7 @@ def on_program_exit() -> None:
             'Program exited without exporting a non-global container. This should never happen.'
         )
 
-    if DISABLE_GLOBAL_EXPORT:
+    if should_disable_global_export():
         print(
             '\x1b[38;2;255;0;0mGlobal export is disabled. No .htsl file will be written.\x1b[0m'
         )
