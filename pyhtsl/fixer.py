@@ -50,7 +50,7 @@ class Counter:
         self.mapping[line_type] -= 1
         return possible
 
-    IF_ENTER_LIMIT: int = 15
+    IF_ENTER_LIMIT: int = 25
 
     def if_enters(self) -> int:
         return self.mapping.get(LineType.if_and_enter, 0) + self.mapping.get(
