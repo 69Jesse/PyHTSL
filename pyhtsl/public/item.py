@@ -1,5 +1,3 @@
-from numpy import isin
-
 from ..writer import HERE, HTSL_IMPORTS_FOLDER
 from ..types import (
     NON_SPECIAL_ITEM_KEYS,
@@ -11,7 +9,7 @@ from ..types import (
     ENCHANTMENT_TO_ID,
     ColorType,
 )
-from .enchantment import Enchantment    
+from .enchantment import Enchantment
 from ..nbt import NBTByte, NBTCompound, NBTInt, NBTList, NBTShort, NBTString
 from ..utils import replace_formatting, formatting_to_ansi
 
@@ -20,7 +18,7 @@ import re
 import hashlib
 import difflib
 
-from typing import TypedDict, overload, Any
+from typing import TypedDict, overload, Any, get_args
 
 
 __all__ = ('Item',)
@@ -248,8 +246,12 @@ class Item:
             display.put('Name', NBTString(name))
 
         color: int | str | tuple[int, int, int] | None = extras_copy.pop('color', None)
-        if color is None and isinstance(self._key, tuple):
-            color = self._key[1]
+        if (
+            color is None
+            and isinstance(self._key, tuple)
+            and self._key[0] in get_args(LEATHER_ARMOR_KEYS)
+        ):
+            color = self._key[1]  # type: ignore
         if color is not None:
             if not isinstance(color, (int, str, tuple)):
                 raise ValueError(f'Invalid color type: {type(color)}')
@@ -260,6 +262,12 @@ class Item:
             display.put('color', NBTInt(color))
 
         skull_data: NBTCompound | None = extras_copy.pop('skull_data', None)
+        if (
+            skull_data is None
+            and isinstance(self._key, tuple)
+            and self._key[0] in get_args(PLAYER_SKULL_ITEM_KEY)
+        ):
+            skull_data = self._key[1]  # type: ignore
         if skull_data is not None:
             tags.put('SkullOwner', skull_data)
 

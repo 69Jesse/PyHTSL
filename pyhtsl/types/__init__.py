@@ -6,6 +6,7 @@ from ..expression.binary_expression import BinaryExpression
 from ..stats.base_stat import BaseStat
 from ..checkable import Checkable
 from ..editable import Editable
+from ..nbt import NBTCompound
 
 from typing import Literal
 
@@ -369,7 +370,7 @@ PLAYER_SKULL_ITEM_KEY = Literal['player_head']
 ColorType = int | str | tuple[int, int, int] | None
 
 
-ALL_ITEM_KEYS = NON_SPECIAL_ITEM_KEYS | DAMAGEABLE_ITEM_KEYS | LEATHER_ARMOR_KEYS | COOKIE_ITEM_KEY | PLAYER_SKULL_ITEM_KEY | tuple[LEATHER_ARMOR_KEYS, ColorType]
+ALL_ITEM_KEYS = NON_SPECIAL_ITEM_KEYS | DAMAGEABLE_ITEM_KEYS | LEATHER_ARMOR_KEYS | COOKIE_ITEM_KEY | PLAYER_SKULL_ITEM_KEY | tuple[LEATHER_ARMOR_KEYS, ColorType] | tuple[PLAYER_SKULL_ITEM_KEY, NBTCompound | None]
 
 
 ALL_LOCATIONS = Literal[
