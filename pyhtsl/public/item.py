@@ -1,3 +1,5 @@
+from numpy import isin
+
 from ..writer import HERE, HTSL_IMPORTS_FOLDER
 from ..types import (
     NON_SPECIAL_ITEM_KEYS,
@@ -7,8 +9,9 @@ from ..types import (
     PLAYER_SKULL_ITEM_KEY,
     ALL_ITEM_KEYS,
     ENCHANTMENT_TO_ID,
+    ColorType,
 )
-from .enchantment import Enchantment
+from .enchantment import Enchantment    
 from ..nbt import NBTByte, NBTCompound, NBTInt, NBTList, NBTShort, NBTString
 from ..utils import replace_formatting, formatting_to_ansi
 
@@ -103,7 +106,7 @@ class Item:
         interaction_data_key: str | None = None,
         unbreakable: bool = False,
         damage: int = 0,
-        color: int | str | tuple[int, int, int] | None = None,
+        color: ColorType = None,
         hide_all_flags: bool = False,
         hide_enchantments_flag: bool = False,
         hide_modifiers_flag: bool = False,
@@ -245,6 +248,8 @@ class Item:
             display.put('Name', NBTString(name))
 
         color: int | str | tuple[int, int, int] | None = extras_copy.pop('color', None)
+        if color is None and isinstance(self._key, tuple):
+            color = self._key[1]
         if color is not None:
             if not isinstance(color, (int, str, tuple)):
                 raise ValueError(f'Invalid color type: {type(color)}')
@@ -293,11 +298,17 @@ class Item:
             }
         )
 
+    @property
+    def _raw_key(self) -> str:
+        if isinstance(self._key, tuple):
+            return self._key[0]
+        return self._key
+
     def _get_item_data(self) -> ItemJsonData:
-        item = ITEMS.get(self._key, None)
+        item = ITEMS.get(self._raw_key, None)
         if item is None:
             closest = difflib.get_close_matches(
-                self._key.lower(), ITEMS.keys(), n=1, cutoff=0.0
+                self._raw_key.lower(), ITEMS.keys(), n=1, cutoff=0.0
             )[0]
             raise ValueError(
                 f'Invalid item key: \x1b[38;2;255;0;0m{self._key}\x1b[0m. Did you mean \x1b[38;2;0;255;0m{closest}\x1b[0m?\nHave you already saved this in your imports folder? Do not create an Item, use the string "{self._key}" instead.'
@@ -314,7 +325,7 @@ class Item:
             prefix = prefix.lower().replace(' ', '_')
             prefix = re.sub(r'[^a-z0-9_]', '', prefix)
         if not prefix:
-            prefix = self._key
+            prefix = self._raw_key
         suffix = hashlib.md5(json_data.encode()).hexdigest()[:8]
         return f'_{len(SAVED_CACHE) % 1000:03}_{prefix}_{suffix}'
 
