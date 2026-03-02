@@ -17,40 +17,40 @@ class Editable(Checkable):
         self,
         other: T,
     ) -> 'BinaryExpression[Self, T]':
-        return self.__add__(other).execute()
+        return self.__add__(other).write()
 
     def __isub__[T: Checkable | NumericHousingType](
         self,
         other: T,
     ) -> 'BinaryExpression[Self, T]':
-        return self.__sub__(other).execute()
+        return self.__sub__(other).write()
 
     def __imul__[T: Checkable | NumericHousingType](
         self,
         other: T,
     ) -> 'BinaryExpression[Self, T]':
-        return self.__mul__(other).execute()
+        return self.__mul__(other).write()
 
     def __itruediv__[T: Checkable | NumericHousingType](
         self,
         other: T,
     ) -> 'BinaryExpression[Self, T]':
-        return self.__truediv__(other).execute()
+        return self.__truediv__(other).write()
 
     def __ifloordiv__[T: Checkable | NumericHousingType](
         self,
         other: T,
     ) -> 'BinaryExpression[Self, T]':
-        return self.__floordiv__(other).execute()
+        return self.__floordiv__(other).write()
 
     def __ipow__(self, other: int) -> 'CompoundExpression | Self | Literal[1]':
         result = self.__pow__(other)
         if isinstance(result, Expression):
-            return result.execute()
+            return result.write()
         return result
 
     def __imod__(self, other: Checkable | NumericHousingType) -> 'CompoundExpression':
-        return self.__mod__(other).execute()
+        return self.__mod__(other).write()
 
     def set[T: Checkable | HousingType](
         self,
@@ -65,7 +65,7 @@ class Editable(Checkable):
             right=value,
             operator=BinaryOperator.Set,
             allow_self_assignment=allow_self_assignment,
-        ).execute()
+        ).write()
 
     def inc[T: Checkable | NumericHousingType](
         self, other: T
@@ -87,7 +87,7 @@ class Editable(Checkable):
     ) -> 'BinaryExpression[Self, T]':
         return self.__itruediv__(other)
 
-    def execute[T: Checkable | HousingType](
+    def write[T: Checkable | HousingType](
         self,
         operator: 'BinaryOperator',
         other: T,

@@ -28,9 +28,9 @@ class CompoundExpression[T: Expression](Expression, Editable):
     def into_htsl(self) -> str:
         return '\n'.join(expr.into_htsl() for expr in self.expressions)
 
-    def execute(self) -> Self:
+    def write(self) -> Self:
         for expr in self.expressions:
-            expr.execute()
+            expr.write()
         return self
 
     def __repr__(self) -> str:

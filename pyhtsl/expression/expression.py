@@ -6,6 +6,7 @@ from ..base_object import BaseObject
 from ..container import get_current_container
 
 if TYPE_CHECKING:
+    from ..execute import ExecutionContext
     from ..stats.stat import Stat
 
 
@@ -17,9 +18,15 @@ class Expression(BaseObject):
     def into_htsl(self) -> str:
         raise NotImplementedError()
 
-    def execute(self) -> Self:
-        get_current_container().add_expression(self.cloned())
+    def write(self) -> Self:
+        get_current_container().write_expression(self.cloned())
         return self
+
+    def execute(self, context: 'ExecutionContext') -> None:
+        if context.expression_callback is not None:
+            context.expression_callback(self)
+        if context.verbose:
+            print(f'Executing "{self!r}"')
 
     def _get_all_values(self) -> dict[str, Any]:
         return vars(self)

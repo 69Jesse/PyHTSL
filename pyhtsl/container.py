@@ -60,7 +60,7 @@ class Container:
             return self.expressions
         return self.contexts[-1 - go_back].expressions_ref
 
-    def add_expression(self, expression: 'Expression') -> None:
+    def write_expression(self, expression: 'Expression') -> None:
         self.get_expressions_ref_in_context().append(expression)
 
     def add_context(self, context: ExpressionContext) -> None:
@@ -150,7 +150,7 @@ class ContainerContextManager(ABC):
         context = self.create_context()
         container = get_current_container()
         if context.add_expression_to_container:
-            container.add_expression(context.parent_expression)
+            container.write_expression(context.parent_expression)
         container.add_context(context)
 
     def __exit__(

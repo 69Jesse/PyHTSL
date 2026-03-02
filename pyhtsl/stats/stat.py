@@ -130,4 +130,4 @@ class Stat(Editable):
         return clone
 
     def unset(self) -> UnsetExpression:
-        return UnsetExpression(self).execute()
+        return UnsetExpression(self).write()
