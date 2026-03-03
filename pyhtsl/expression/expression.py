@@ -14,6 +14,9 @@ __all__ = ('Expression',)
 
 
 class Expression(BaseObject):
+    def into_executable_expressions(self) -> Generator['Expression', None, None]:
+        yield self
+
     @abstractmethod
     def into_htsl(self) -> str:
         raise NotImplementedError()

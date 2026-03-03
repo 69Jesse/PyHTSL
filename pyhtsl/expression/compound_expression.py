@@ -25,6 +25,10 @@ class CompoundExpression[T: Expression](Expression, Editable):
             )
         )
 
+    def into_executable_expressions(self) -> Generator[Expression, None, None]:
+        for expr in self.expressions:
+            yield from expr.into_executable_expressions()
+
     def into_htsl(self) -> str:
         return '\n'.join(expr.into_htsl() for expr in self.expressions)
 

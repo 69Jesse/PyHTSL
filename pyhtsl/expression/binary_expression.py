@@ -235,6 +235,12 @@ class BinaryExpression[
         BinaryExpression.take_out_useless_expressions(expressions)
         BinaryExpression.rename_temporary_stats(expressions)
 
+    def into_executable_expressions(self) -> Generator[Expression, None, None]:
+        expressions = self.generate_assignment_expressions()
+        print(expressions)
+        self.optimize_binary_expressions(expressions)  # pyright: ignore[reportArgumentType]
+        yield from expressions
+
     def into_htsl(self) -> str:
         def format_rhs(value: Checkable | HousingType) -> str:
             if isinstance(value, Checkable):
@@ -249,9 +255,7 @@ class BinaryExpression[
 
             return line
 
-        expressions = self.generate_assignment_expressions()
-        self.optimize_binary_expressions(expressions)  # pyright: ignore[reportArgumentType]
-        return '\n'.join(map(into_line, expressions))
+        return '\n'.join(map(into_line, self.into_executable_expressions()))  # type: ignore
 
     def cloned_raw(self) -> Self:
         return self.__class__(

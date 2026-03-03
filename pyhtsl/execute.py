@@ -38,5 +38,7 @@ class ExecutionContext(Container):
         super().__exit__(exc_type, exc_value, traceback)
         if exc_type is not None:
             return
+        print(self.expressions)
         for expression in self.expressions:
-            expression.execute(self)
+            for expr in expression.into_executable_expressions():
+                expr.execute(self)
