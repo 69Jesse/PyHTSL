@@ -1,7 +1,8 @@
-from typing import final
+from typing import Self, final
+
+from pyhtsl.editable import Editable
 
 from .checkable import Checkable
-from .editable import Editable
 
 __all__ = (
     'PlaceholderCheckable',
@@ -28,6 +29,11 @@ class PlaceholderCheckable(Checkable):
         self.comparison_left_side = comparison_left_side
         self.comparison_right_side = comparison_right_side
         self.inside_of_string = in_string
+        if self.inside_of_string in DEFINED_PLACEHOLDERS:
+            raise ValueError(
+                f'Placeholder with inside_of_string "{self.inside_of_string}" is already defined.'
+            )
+        DEFINED_PLACEHOLDERS[self.inside_of_string] = self
 
     def into_assignment_left_side(self) -> str:
         raise RuntimeError(
@@ -53,8 +59,8 @@ class PlaceholderCheckable(Checkable):
     def equals_raw(self, other: object) -> bool:
         return self is other
 
-    def cloned_raw(self) -> 'PlaceholderCheckable':
-        return PlaceholderCheckable(
+    def cloned_raw(self) -> Self:
+        return self.__class__(
             assignment_right_side=self.assignment_right_side,
             comparison_left_side=self.comparison_left_side,
             comparison_right_side=self.comparison_right_side,
@@ -87,6 +93,11 @@ class PlaceholderEditable(Editable):
         self.comparison_left_side = comparison_left_side
         self.comparison_right_side = comparison_right_side
         self.inside_of_string = in_string
+        if self.inside_of_string in DEFINED_PLACEHOLDERS:
+            raise ValueError(
+                f'Placeholder with inside_of_string "{self.inside_of_string}" is already defined.'
+            )
+        DEFINED_PLACEHOLDERS[self.inside_of_string] = self
 
     def into_assignment_left_side(self) -> str:
         return self.assignment_left_side
@@ -110,8 +121,8 @@ class PlaceholderEditable(Editable):
     def equals_raw(self, other: object) -> bool:
         return self is other
 
-    def cloned_raw(self) -> 'PlaceholderEditable':
-        return PlaceholderEditable(
+    def cloned_raw(self) -> Self:
+        return self.__class__(
             assignment_left_side=self.assignment_left_side,
             assignment_right_side=self.assignment_right_side,
             comparison_left_side=self.comparison_left_side,
@@ -121,3 +132,6 @@ class PlaceholderEditable(Editable):
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.inside_of_string}>'
+
+
+DEFINED_PLACEHOLDERS: dict[str, PlaceholderCheckable | PlaceholderEditable] = {}

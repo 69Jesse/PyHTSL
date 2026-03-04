@@ -3,9 +3,15 @@ from collections.abc import Callable
 from types import TracebackType
 from typing import TYPE_CHECKING, NoReturn, Self
 
+import numpy as np
+
+from pyhtsl.checkable import Checkable
+from pyhtsl.expression.housing_type import HousingType
+
 from .container import Container
 from .expression.condition.conditional_expression import ConditionalMode
 from .expression.expression import Expression
+from .placeholders import DEFINED_PLACEHOLDERS
 
 if TYPE_CHECKING:
     from .expression.condition.condition import Condition
@@ -15,10 +21,14 @@ if TYPE_CHECKING:
 __all__ = ('ExecutionContext',)
 
 
+type InternalHousingType = np.int64 | np.float64 | str
+
+
 class ExecutionContext(Container):
     verbose: bool
     expression_callback: Callable[[Expression], None] | None
     started_execution: bool
+    checkable_mapping: dict[Checkable, InternalHousingType]
 
     def __init__(
         self,
@@ -31,6 +41,7 @@ class ExecutionContext(Container):
         self.verbose = verbose
         self.expression_callback = expression_callback
         self.started_execution = False
+        self.checkable_mapping = {}
 
     def __exit__(
         self,
@@ -46,7 +57,18 @@ class ExecutionContext(Container):
             for expr in expression.into_executable_expressions():
                 expr.execute(self)
 
+    def get(
+        self,
+        key: Checkable,
+        *,
+        internal: bool = False,
+        enforce_string: bool = False,
+    ) -> HousingType:
+        return 123
+
     def replace_placeholders(self, text: str) -> str:
+        for key, value in DEFINED_PLACEHOLDERS.items():
+            text = text.replace(f'{{{key}}}', self.get(value, enforce_string=True))
         # TODO
         return text
 
@@ -56,10 +78,10 @@ class ExecutionContext(Container):
         else:
             self.write_expression(expression)
 
-    def print(self, *lines: str) -> None:
+    def print(self, *lines: object) -> None:
         self.write_or_execute(
             PrintExecutionExpression(
-                line=' '.join(lines),
+                line=' '.join(map(str, lines)),
             )
         )
 
@@ -73,8 +95,6 @@ class ExecutionContext(Container):
         )
 
     def assert_any(self, *conditions: 'Condition', message: object = None) -> None:
-        if len(conditions) == 0:
-            raise ValueError('"any" assertion will never hold if there are no conditions')
         self.write_or_execute(
             AssertExecutionExpression(
                 list(conditions),
@@ -157,8 +177,13 @@ class AssertExecutionExpression(ExecutionExpression):
         message = (
             f'"{context.replace_placeholders(self.message)}": ' if self.message else ''
         )
+        if self.mode is ConditionalMode.AND:
+            assert len(false_conditions) == 1
+            middle = 'The following condition did not hold: '
+        else:
+            middle = 'None of the following conditions held: '
         raise AssertionError(
-            f'{message}The following conditions were not met: {", ".join(repr(cond) for cond in false_conditions)}'
+            f'{message}{middle}{", ".join(repr(cond) for cond in false_conditions)}'
         )
 
     def raw_execute(self, context: ExecutionContext) -> None:
