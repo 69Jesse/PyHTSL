@@ -109,6 +109,7 @@ class Checkable(BaseObject):
     def cloned_raw(self) -> Self:
         raise NotImplementedError
 
+    @final
     def cloned(self) -> Self:
         clone = self.cloned_raw()
         clone.internal_type = self.internal_type

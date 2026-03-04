@@ -2,6 +2,7 @@ from abc import abstractmethod
 from typing import Self, final
 
 from ...base_object import BaseObject
+from ...execute import ExecutionContext
 
 __all__ = ('Condition',)
 
@@ -30,3 +31,15 @@ class Condition(BaseObject):
     def __invert__(self) -> Self:
         self.inverted = not self.inverted
         return self
+
+    def raw_execute(self, context: 'ExecutionContext') -> bool:
+        return False
+
+    @final
+    def execute(self, context: 'ExecutionContext') -> bool:
+        if context.verbose:
+            print(f'Executing condition "{self!r}"')
+        value = self.raw_execute(context)
+        if self.inverted:
+            value = not value
+        return value

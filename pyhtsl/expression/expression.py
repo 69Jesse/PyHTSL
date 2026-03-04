@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from collections.abc import Generator
-from typing import TYPE_CHECKING, Any, Self
+from typing import TYPE_CHECKING, Any, Self, final
 
 from ..base_object import BaseObject
 from ..container import get_current_container
@@ -25,11 +25,16 @@ class Expression(BaseObject):
         get_current_container().write_expression(self.cloned())
         return self
 
+    def raw_execute(self, context: 'ExecutionContext') -> None:
+        pass
+
+    @final
     def execute(self, context: 'ExecutionContext') -> None:
         if context.expression_callback is not None:
             context.expression_callback(self)
         if context.verbose:
-            print(f'Executing "{self!r}"')
+            print(f'Executing expression "{self!r}"')
+        self.raw_execute(context)
 
     def _get_all_values(self) -> dict[str, Any]:
         return vars(self)
