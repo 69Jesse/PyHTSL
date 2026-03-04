@@ -12,7 +12,12 @@ from ..expression.expression import Expression
 from ..placeholders import DEFINED_PLACEHOLDERS
 from .expressions.assert_execution_expression import AssertExecutionExpression
 from .expressions.print_execution_expression import PrintExecutionExpression
-from .internal_housing_type import InternalHousingType, internal_into_string, into_housing_type, into_internal_housing_type
+from .internal_housing_type import (
+    InternalHousingType,
+    internal_into_string,
+    into_housing_type,
+    into_internal_housing_type,
+)
 
 if TYPE_CHECKING:
     from ..expression.condition.condition import Condition
@@ -59,6 +64,7 @@ class ExecutionContext(Container):
         self,
         key: Checkable,
         *,
+        default: HousingType | InternalHousingType = ...,
         internal: bool = ...,
         enforce_string: Literal[True],
     ) -> str: ...
@@ -68,6 +74,7 @@ class ExecutionContext(Container):
         self,
         key: Checkable,
         *,
+        default: HousingType | InternalHousingType = ...,
         internal: Literal[True],
         enforce_string: Literal[False] = ...,
     ) -> InternalHousingType: ...
@@ -77,6 +84,7 @@ class ExecutionContext(Container):
         self,
         key: Checkable,
         *,
+        default: HousingType | InternalHousingType = ...,
         internal: Literal[False] = ...,
         enforce_string: Literal[False] = ...,
     ) -> HousingType: ...
@@ -85,10 +93,14 @@ class ExecutionContext(Container):
         self,
         key: Checkable,
         *,
+        default: HousingType | InternalHousingType = '',
         internal: bool = False,
         enforce_string: bool = False,
     ) -> HousingType | InternalHousingType:
-        value = self.checkable_mapping.get(key.into_hashable(), '')
+        value = self.checkable_mapping.get(
+            key.into_hashable(),
+            into_internal_housing_type(default),
+        )
         if enforce_string:
             return internal_into_string(value)
         if internal:
