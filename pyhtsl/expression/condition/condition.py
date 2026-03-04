@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Self, final
 
 from ...base_object import BaseObject
-from ...execute import ExecutionContext
+from ...execute.context import ExecutionContext
 
 __all__ = ('Condition',)
 

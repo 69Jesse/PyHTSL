@@ -6,7 +6,7 @@ from .config import display_htsl as display_htsl
 from .config import get_htsl_import_folder as get_htsl_import_folder
 from .config import set_htsl_imports_folder as set_htsl_imports_folder
 from .container import Container as Container
-from .execute import ExecutionContext as ExecutionContext
+from .execute.context import ExecutionContext as ExecutionContext
 from .stats.global_stat import GlobalStat as GlobalStat
 from .stats.player_stat import PlayerStat as PlayerStat
 from .stats.team_stat import TeamStat as TeamStat

@@ -6,7 +6,7 @@ from ..base_object import BaseObject
 from ..container import get_current_container
 
 if TYPE_CHECKING:
-    from ..execute import ExecutionContext
+    from ..execute.context import ExecutionContext
     from ..stats.stat import Stat
 
 
