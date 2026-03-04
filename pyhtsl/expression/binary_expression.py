@@ -48,7 +48,7 @@ class BinaryExpression[
         *,
         allow_self_assignment: bool = False,
     ) -> None:
-        super().__init__()
+        super().__init__(internal_type=InternalType.from_value(left))
         self.left = left
         self.right = right
         self.operator = operator
@@ -127,6 +127,9 @@ class BinaryExpression[
             ),
         )
 
+        for expr in assignment_expressions:
+            expr.right = expr.left.internal_type.type_compatible(expr.right)
+
         return assignment_expressions
 
     @staticmethod
@@ -187,6 +190,9 @@ class BinaryExpression[
 
     @staticmethod
     def optimize_binary_expressions(expressions: list[Expression]) -> None:
+        print(
+            '\n\n\nBEFORE OPTIMIZATION:\n', '\n'.join(map(repr, expressions)), '\n\n\n'
+        )
         has_changed = True
         while has_changed:
             has_changed = False
@@ -212,9 +218,31 @@ class BinaryExpression[
                 #             the exception being `right = left`
                 #         * right is not used after this line
 
+                def left_and_right_used_together_with_exception(
+                    expr: Expression,
+                    left: Stat,
+                    right: TemporaryStat,
+                ) -> bool:
+                    if not expr.is_using_stats_together(left, right):
+                        return False
+
+                    # This would only get ran if `left = right`
+                    # The exception is: `right = left`, then this is still False
+                    if isinstance(expr, BinaryExpression):
+                        if (
+                            expr.operator is BinaryOperator.Set
+                            and left.is_same_stat(expr.right)
+                            and right.is_same_stat(expr.left)
+                        ):
+                            return False
+
+                    return True
+
                 if any(
-                    expressions[j].is_using_stats_together(
-                        expression.left, expression.right
+                    left_and_right_used_together_with_exception(
+                        expressions[j],
+                        expression.left,
+                        expression.right,
                     )
                     for j in range(i - 1, -1, -1)
                 ):
@@ -236,9 +264,12 @@ class BinaryExpression[
         BinaryExpression.take_out_useless_expressions(expressions)
         BinaryExpression.rename_temporary_stats(expressions)
 
+        print(
+            '\n\n\nAFTER OPTIMIZATION:\n', '\n'.join(map(repr, expressions)), '\n\n\n'
+        )
+
     def into_executable_expressions(self) -> Generator[Expression, None, None]:
         expressions = self.generate_assignment_expressions()
-        print(expressions)
         self.optimize_binary_expressions(expressions)  # pyright: ignore[reportArgumentType]
         yield from expressions
 

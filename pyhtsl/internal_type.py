@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, overload
 
 from .expression.housing_type import HousingType
 
@@ -33,6 +33,13 @@ class InternalType(Enum):
             if self is InternalType.ANY:
                 return value
             elif self is InternalType.LONG:
+                if isinstance(value, str):
+                    value = float(value)
+                if isinstance(value, float):
+                    if not value.is_integer():
+                        raise TypeError(
+                            f'Cannot transform non-integer float {repr(value)} to internal type LONG.'
+                        )
                 return int(value)
             elif self is InternalType.DOUBLE:
                 return float(value)
@@ -44,6 +51,35 @@ class InternalType(Enum):
             raise TypeError(
                 f'Cannot transform value {repr(value)} to internal type {self.name}.'
             ) from exc
+
+    @overload
+    def type_compatible[T: 'Checkable'](
+        self,
+        value: T,
+    ) -> T: ...
+
+    @overload
+    def type_compatible(
+        self,
+        value: HousingType,
+    ) -> HousingType: ...
+
+    @overload
+    def type_compatible(
+        self,
+        value: 'Checkable | HousingType',
+    ) -> 'Checkable | HousingType': ...
+
+    def type_compatible(
+        self,
+        value: 'Checkable | HousingType',
+    ) -> 'Checkable | HousingType':
+        from .checkable import Checkable
+
+        if isinstance(value, Checkable):
+            return value.as_type(self)
+        else:
+            return self.type_compatible_housing_type(value)
 
     @staticmethod
     def from_value(value: 'Checkable | HousingType') -> 'InternalType':
