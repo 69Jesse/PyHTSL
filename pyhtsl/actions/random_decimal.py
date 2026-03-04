@@ -1,3 +1,6 @@
+import numpy as np
+
+from ..internal_type import InternalType
 from ..placeholders import PlaceholderCheckable
 
 __all__ = ('RandomDecimal',)
@@ -13,4 +16,6 @@ def RandomDecimal(
         comparison_left_side=f'placeholder "{key}"',
         comparison_right_side=f'{key}',
         in_string=f'{key}',
+        constant_internal_type=InternalType.DOUBLE,
+        backend_value=np.float64(0),
     )

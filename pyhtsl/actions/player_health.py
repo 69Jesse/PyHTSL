@@ -1,3 +1,6 @@
+import numpy as np
+
+from ..internal_type import InternalType
 from ..placeholders import PlaceholderEditable
 
 __all__ = ('PlayerHealth',)
@@ -9,4 +12,6 @@ PlayerHealth = PlaceholderEditable(
     comparison_left_side='placeholder "%player.health%"',
     comparison_right_side='%player.health%',
     in_string='%player.health%',
+    constant_internal_type=InternalType.DOUBLE,
+    backend_value=np.float64(0),
 )

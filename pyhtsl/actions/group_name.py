@@ -1,3 +1,4 @@
+from ..internal_type import InternalType
 from ..placeholders import PlaceholderCheckable
 
 __all__ = ('GroupName',)
@@ -8,4 +9,6 @@ GroupName = PlaceholderCheckable(
     comparison_left_side='placeholder "%player.group.name%"',
     comparison_right_side='%player.group.name%',
     in_string='%player.group.name%',
+    constant_internal_type=InternalType.STRING,
+    backend_value='',
 )

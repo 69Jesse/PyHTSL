@@ -1,3 +1,4 @@
+from ..internal_type import InternalType
 from ..placeholders import PlaceholderCheckable
 
 __all__ = ('HouseVisitingRules',)
@@ -8,4 +9,6 @@ HouseVisitingRules = PlaceholderCheckable(
     comparison_left_side='placeholder "%house.visitingrules%"',
     comparison_right_side='%house.visitingrules%',
     in_string='%house.visitingrules%',
+    constant_internal_type=InternalType.STRING,
+    backend_value='',
 )

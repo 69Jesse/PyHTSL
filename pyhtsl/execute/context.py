@@ -10,14 +10,14 @@ from ..container import Container
 from ..expression.condition.conditional_expression import ConditionalMode
 from ..expression.expression import Expression
 from ..placeholders import DEFINED_PLACEHOLDERS
+from .backend_type import (
+    BackendType,
+    backend_into_string,
+    into_backend_type,
+    into_housing_type,
+)
 from .expressions.assert_execution_expression import AssertExecutionExpression
 from .expressions.print_execution_expression import PrintExecutionExpression
-from .internal_housing_type import (
-    InternalHousingType,
-    internal_into_string,
-    into_housing_type,
-    into_internal_housing_type,
-)
 
 if TYPE_CHECKING:
     from ..expression.condition.condition import Condition
@@ -30,7 +30,7 @@ class ExecutionContext(Container):
     verbose: bool
     expression_callback: Callable[[Expression], None] | None
     started_execution: bool
-    checkable_mapping: dict[tuple[object, ...], InternalHousingType]
+    checkable_mapping: dict[tuple[object, ...], BackendType]
 
     def __init__(
         self,
@@ -64,7 +64,7 @@ class ExecutionContext(Container):
         self,
         key: Checkable,
         *,
-        default: HousingType | InternalHousingType = ...,
+        default: HousingType | BackendType = ...,
         internal: bool = ...,
         enforce_string: Literal[True],
     ) -> str: ...
@@ -74,17 +74,17 @@ class ExecutionContext(Container):
         self,
         key: Checkable,
         *,
-        default: HousingType | InternalHousingType = ...,
+        default: HousingType | BackendType = ...,
         internal: Literal[True],
         enforce_string: Literal[False] = ...,
-    ) -> InternalHousingType: ...
+    ) -> BackendType: ...
 
     @overload
     def get(
         self,
         key: Checkable,
         *,
-        default: HousingType | InternalHousingType = ...,
+        default: HousingType | BackendType = ...,
         internal: Literal[False] = ...,
         enforce_string: Literal[False] = ...,
     ) -> HousingType: ...
@@ -93,16 +93,16 @@ class ExecutionContext(Container):
         self,
         key: Checkable,
         *,
-        default: HousingType | InternalHousingType = '',
+        default: HousingType | BackendType = '',
         internal: bool = False,
         enforce_string: bool = False,
-    ) -> HousingType | InternalHousingType:
+    ) -> HousingType | BackendType:
         value = self.checkable_mapping.get(
             key.into_hashable(),
-            into_internal_housing_type(default),
+            into_backend_type(default),
         )
         if enforce_string:
-            return internal_into_string(value)
+            return backend_into_string(value)
         if internal:
             return value
         return into_housing_type(value)
@@ -110,13 +110,13 @@ class ExecutionContext(Container):
     def put(
         self,
         key: Checkable,
-        value: HousingType | InternalHousingType,
+        value: HousingType | BackendType,
     ) -> None:
-        self.checkable_mapping[key.into_hashable()] = into_internal_housing_type(value)
+        self.checkable_mapping[key.into_hashable()] = into_backend_type(value)
 
     def replace_placeholders(self, text: str) -> str:
         for key, value in DEFINED_PLACEHOLDERS.items():
-            text = text.replace(f'{{{key}}}', self.get(value, enforce_string=True))
+            text = text.replace(key, self.get(value, enforce_string=True))
         # TODO
         return text
 
