@@ -1,3 +1,4 @@
+import stat
 from typing import TYPE_CHECKING, Literal, Self
 
 from .checkable import Checkable
@@ -13,44 +14,49 @@ __all__ = ('Editable',)
 
 
 class Editable(Checkable):
+    def _maybe_write[T: Expression](self, result: T) -> T:
+        if not self.is_gotten_from_value_property:
+            return result.write()
+        return result
+
     def __iadd__[T: Checkable | NumericHousingType](
         self,
         other: T,
     ) -> 'BinaryExpression[Self, T]':
-        return self.__add__(other).write()
+        return self._maybe_write(self.__add__(other))
 
     def __isub__[T: Checkable | NumericHousingType](
         self,
         other: T,
     ) -> 'BinaryExpression[Self, T]':
-        return self.__sub__(other).write()
+        return self._maybe_write(self.__sub__(other))
 
     def __imul__[T: Checkable | NumericHousingType](
         self,
         other: T,
     ) -> 'BinaryExpression[Self, T]':
-        return self.__mul__(other).write()
+        return self._maybe_write(self.__mul__(other))
 
     def __itruediv__[T: Checkable | NumericHousingType](
         self,
         other: T,
     ) -> 'BinaryExpression[Self, T]':
-        return self.__truediv__(other).write()
+        return self._maybe_write(self.__truediv__(other))
 
     def __ifloordiv__[T: Checkable | NumericHousingType](
         self,
         other: T,
     ) -> 'BinaryExpression[Self, T]':
-        return self.__floordiv__(other).write()
+        return self._maybe_write(self.__floordiv__(other))
 
     def __ipow__(self, other: int) -> 'CompoundExpression | Self | Literal[1]':
         result = self.__pow__(other)
         if isinstance(result, Expression):
-            return result.write()
+            return self._maybe_write(result)
         return result
 
     def __imod__(self, other: Checkable | NumericHousingType) -> 'CompoundExpression':
-        return self.__mod__(other).write()
+        return self._maybe_write(self.__mod__(other))
 
     def set[T: Checkable | HousingType](
         self,
@@ -115,7 +121,9 @@ class Editable(Checkable):
 
     @property
     def value(self) -> Self:
-        return self
+        clone = self.cloned()
+        clone.is_gotten_from_value_property = True
+        return clone
 
     @value.setter
     def value(self, value: Checkable | HousingType) -> None:

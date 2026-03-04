@@ -48,6 +48,7 @@ class BinaryExpression[
         *,
         allow_self_assignment: bool = False,
     ) -> None:
+        super().__init__()
         self.left = left
         self.right = right
         self.operator = operator
