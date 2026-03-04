@@ -1,14 +1,14 @@
 import os
 from collections.abc import Callable
 from types import TracebackType
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, NoReturn, Self
 
 from .container import Container
-from .expression.condition.condition import Condition
 from .expression.condition.conditional_expression import ConditionalMode
 from .expression.expression import Expression
 
 if TYPE_CHECKING:
+    from .expression.condition.condition import Condition
     from .expression.expression import Expression
 
 
@@ -63,7 +63,7 @@ class ExecutionContext(Container):
             )
         )
 
-    def assert_all(self, *conditions: Condition, message: object = None) -> None:
+    def assert_all(self, *conditions: 'Condition', message: object = None) -> None:
         self.write_or_execute(
             AssertExecutionExpression(
                 list(conditions),
@@ -72,7 +72,9 @@ class ExecutionContext(Container):
             )
         )
 
-    def assert_any(self, *conditions: Condition, message: object = None) -> None:
+    def assert_any(self, *conditions: 'Condition', message: object = None) -> None:
+        if len(conditions) == 0:
+            raise ValueError('"any" assertion will never hold if there are no conditions')
         self.write_or_execute(
             AssertExecutionExpression(
                 list(conditions),
@@ -109,13 +111,13 @@ class PrintExecutionExpression(ExecutionExpression):
 
 
 class AssertExecutionExpression(ExecutionExpression):
-    conditions: list[Condition]
+    conditions: list['Condition']
     mode: ConditionalMode
     message: str | None
 
     def __init__(
         self,
-        conditions: list[Condition],
+        conditions: list['Condition'],
         *,
         mode: ConditionalMode,
         message: str | None = None,
@@ -146,19 +148,26 @@ class AssertExecutionExpression(ExecutionExpression):
     def __repr__(self) -> str:
         return f'AssertExecutionExpression(conditions={self.conditions!r}, mode={self.mode!r})'
 
+    def throw(
+        self,
+        context: ExecutionContext,
+        *,
+        false_conditions: list['Condition'],
+    ) -> NoReturn:
+        message = (
+            f'"{context.replace_placeholders(self.message)}": ' if self.message else ''
+        )
+        raise AssertionError(
+            f'{message}The following conditions were not met: {", ".join(repr(cond) for cond in false_conditions)}'
+        )
+
     def raw_execute(self, context: ExecutionContext) -> None:
         if self.mode == ConditionalMode.AND:
             for condition in self.conditions:
                 if not condition.execute(context):
-                    raise AssertionError(
-                        context.replace_placeholders(self.message)
-                        if self.message
-                        else None
-                    )
+                    self.throw(context, false_conditions=[condition])
         elif self.mode == ConditionalMode.OR:
             for condition in self.conditions:
                 if condition.execute(context):
                     return
-            raise AssertionError(
-                context.replace_placeholders(self.message) if self.message else None
-            )
+            self.throw(context, false_conditions=self.conditions)
