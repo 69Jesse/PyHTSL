@@ -16,6 +16,9 @@ class TeamStat(Stat):
             team if isinstance(team, Team) else Team(team) if team is not None else None
         )
 
+    def into_hashable(self) -> tuple[object, ...]:
+        return (*super().into_hashable(), self.team.name if self.team is not None else None)
+
     @staticmethod
     def _left_side_keyword() -> str:
         return 'teamvar'

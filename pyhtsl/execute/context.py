@@ -1,7 +1,7 @@
 import os
 from collections.abc import Callable
 from types import TracebackType
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal, overload
 
 from pyhtsl.checkable import Checkable
 from pyhtsl.expression.housing_type import HousingType
@@ -12,7 +12,7 @@ from ..expression.expression import Expression
 from ..placeholders import DEFINED_PLACEHOLDERS
 from .expressions.assert_execution_expression import AssertExecutionExpression
 from .expressions.print_execution_expression import PrintExecutionExpression
-from .internal_housing_type import InternalHousingType
+from .internal_housing_type import InternalHousingType, internal_into_string, into_housing_type, into_internal_housing_type
 
 if TYPE_CHECKING:
     from ..expression.condition.condition import Condition
@@ -25,7 +25,7 @@ class ExecutionContext(Container):
     verbose: bool
     expression_callback: Callable[[Expression], None] | None
     started_execution: bool
-    checkable_mapping: dict[Checkable, InternalHousingType]
+    checkable_mapping: dict[tuple[object, ...], InternalHousingType]
 
     def __init__(
         self,
@@ -54,14 +54,53 @@ class ExecutionContext(Container):
             for expr in expression.into_executable_expressions():
                 expr.execute(self)
 
+    @overload
+    def get(
+        self,
+        key: Checkable,
+        *,
+        internal: bool = ...,
+        enforce_string: Literal[True],
+    ) -> str: ...
+
+    @overload
+    def get(
+        self,
+        key: Checkable,
+        *,
+        internal: Literal[True],
+        enforce_string: Literal[False] = ...,
+    ) -> InternalHousingType: ...
+
+    @overload
+    def get(
+        self,
+        key: Checkable,
+        *,
+        internal: Literal[False] = ...,
+        enforce_string: Literal[False] = ...,
+    ) -> HousingType: ...
+
     def get(
         self,
         key: Checkable,
         *,
         internal: bool = False,
         enforce_string: bool = False,
-    ) -> HousingType:
-        return 123
+    ) -> HousingType | InternalHousingType:
+        value = self.checkable_mapping.get(key.into_hashable(), '')
+        if enforce_string:
+            return internal_into_string(value)
+        if internal:
+            return value
+        return into_housing_type(value)
+
+    def put(
+        self,
+        key: Checkable,
+        value: HousingType | InternalHousingType,
+    ) -> None:
+        self.checkable_mapping[key.into_hashable()] = into_internal_housing_type(value)
 
     def replace_placeholders(self, text: str) -> str:
         for key, value in DEFINED_PLACEHOLDERS.items():

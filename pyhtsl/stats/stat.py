@@ -30,6 +30,9 @@ class Stat(Editable):
         self.name = name
         self.auto_unset = auto_unset
 
+    def into_hashable(self) -> tuple[object, ...]:
+        return (*super().into_hashable(), self.name)
+
     @staticmethod
     @abstractmethod
     def _left_side_keyword() -> str:

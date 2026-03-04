@@ -4,8 +4,8 @@ from ...expression.condition.conditional_expression import ConditionalMode
 from .execution_expression import ExecutionExpression
 
 if TYPE_CHECKING:
-    from ..context import ExecutionContext
     from ...expression.condition.condition import Condition
+    from ..context import ExecutionContext
 
 
 __all__ = ('AssertExecutionExpression',)

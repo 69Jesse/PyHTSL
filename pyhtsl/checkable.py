@@ -37,6 +37,12 @@ class Checkable(BaseObject):
         self.fallback_value = fallback_value
         self.is_gotten_from_value_property = False
 
+    def into_hashable(self) -> tuple[object, ...]:
+        return (
+            self.__class__.__name__,
+            id(self.__class__),
+        )
+
     def _formatted_with_internal_type(
         self,
         text: str,
