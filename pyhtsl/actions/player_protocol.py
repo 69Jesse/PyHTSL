@@ -12,5 +12,5 @@ PlayerProtocol = PlaceholderCheckable(
     comparison_right_side='%player.protocol%',
     in_string='%player.protocol%',
     constant_internal_type=InternalType.LONG,
-    backend_value=np.int64(0),
+    default_backend_value=np.int64(0),
 )

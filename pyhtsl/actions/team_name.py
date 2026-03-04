@@ -10,5 +10,5 @@ TeamName = PlaceholderCheckable(
     comparison_right_side='%player.team.name%',
     in_string='%player.team.name%',
     constant_internal_type=InternalType.STRING,
-    backend_value='',
+    default_backend_value='',
 )

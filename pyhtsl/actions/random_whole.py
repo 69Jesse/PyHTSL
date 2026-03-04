@@ -17,5 +17,5 @@ def RandomWhole(
         comparison_right_side=f'{key}',
         in_string=f'{key}',
         constant_internal_type=InternalType.LONG,
-        backend_value=np.int64(0),
+        default_backend_value=np.int64(0),
     )

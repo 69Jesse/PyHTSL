@@ -12,5 +12,5 @@ PlayerPositionY = PlaceholderCheckable(
     comparison_right_side='%player.pos.y%',
     in_string='%player.pos.y%',
     constant_internal_type=InternalType.DOUBLE,
-    backend_value=np.float64(0),
+    default_backend_value=np.float64(0),
 )

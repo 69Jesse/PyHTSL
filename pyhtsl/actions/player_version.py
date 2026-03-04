@@ -10,5 +10,5 @@ PlayerVersion = PlaceholderCheckable(
     comparison_right_side='%player.version%',
     in_string='%player.version%',
     constant_internal_type=InternalType.STRING,
-    backend_value='',
+    default_backend_value='',
 )

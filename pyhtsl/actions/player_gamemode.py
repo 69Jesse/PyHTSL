@@ -10,5 +10,5 @@ PlayerGamemode = PlaceholderCheckable(
     comparison_right_side='%player.gamemode%',
     in_string='%player.gamemode%',
     constant_internal_type=InternalType.STRING,
-    backend_value='',
+    default_backend_value='',
 )

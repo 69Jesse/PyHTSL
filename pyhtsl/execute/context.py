@@ -43,7 +43,12 @@ class ExecutionContext(Container):
         self.verbose = verbose
         self.expression_callback = expression_callback
         self.started_execution = False
-        self.checkable_mapping = {}
+        self.checkable_mapping = {
+            placeholder.into_hashable(): into_backend_type(
+                placeholder.default_backend_value
+            )
+            for placeholder in DEFINED_PLACEHOLDERS.values()
+        }
 
     def __exit__(
         self,
@@ -99,8 +104,10 @@ class ExecutionContext(Container):
     ) -> HousingType | BackendType:
         value = self.checkable_mapping.get(
             key.into_hashable(),
-            into_backend_type(default),
+            None,
         )
+        if value is None:
+            value = into_backend_type(default)
         if enforce_string:
             return backend_into_string(value)
         if internal:

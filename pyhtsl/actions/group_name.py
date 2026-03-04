@@ -10,5 +10,5 @@ GroupName = PlaceholderCheckable(
     comparison_right_side='%player.group.name%',
     in_string='%player.group.name%',
     constant_internal_type=InternalType.STRING,
-    backend_value='',
+    default_backend_value='',
 )

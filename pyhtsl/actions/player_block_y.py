@@ -12,5 +12,5 @@ PlayerBlockY = PlaceholderCheckable(
     comparison_right_side='%player.block.y%',
     in_string='%player.block.y%',
     constant_internal_type=InternalType.LONG,
-    backend_value=np.int64(0),
+    default_backend_value=np.int64(0),
 )

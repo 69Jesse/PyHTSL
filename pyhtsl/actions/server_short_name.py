@@ -10,5 +10,5 @@ ServerShortName = PlaceholderCheckable(
     comparison_right_side='%server.shortname%',
     in_string='%server.shortname%',
     constant_internal_type=InternalType.STRING,
-    backend_value='',
+    default_backend_value='',
 )

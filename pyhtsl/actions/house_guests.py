@@ -12,5 +12,5 @@ HouseGuests = PlaceholderCheckable(
     comparison_right_side='%house.guests%',
     in_string='%house.guests%',
     constant_internal_type=InternalType.LONG,
-    backend_value=np.int64(0),
+    default_backend_value=np.int64(0),
 )

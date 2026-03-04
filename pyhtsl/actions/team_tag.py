@@ -10,5 +10,5 @@ TeamTag = PlaceholderCheckable(
     comparison_right_side='%player.team.tag%',
     in_string='%player.team.tag%',
     constant_internal_type=InternalType.STRING,
-    backend_value='',
+    default_backend_value='',
 )

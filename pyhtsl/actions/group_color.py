@@ -10,5 +10,5 @@ GroupColor = PlaceholderCheckable(
     comparison_right_side='%player.group.color%',
     in_string='%player.group.color%',
     constant_internal_type=InternalType.STRING,
-    backend_value='',
+    default_backend_value='',
 )

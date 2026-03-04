@@ -10,5 +10,5 @@ TeamColor = PlaceholderCheckable(
     comparison_right_side='%player.team.color%',
     in_string='%player.team.color%',
     constant_internal_type=InternalType.STRING,
-    backend_value='',
+    default_backend_value='',
 )

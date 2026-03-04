@@ -12,5 +12,5 @@ PlayerPing = PlaceholderCheckable(
     comparison_right_side='%player.ping%',
     in_string='%player.ping%',
     constant_internal_type=InternalType.LONG,
-    backend_value=np.int64(0),
+    default_backend_value=np.int64(0),
 )

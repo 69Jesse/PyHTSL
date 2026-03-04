@@ -12,5 +12,5 @@ HouseCookies = PlaceholderCheckable(
     comparison_right_side='%house.cookies%',
     in_string='%house.cookies%',
     constant_internal_type=InternalType.LONG,
-    backend_value=np.int64(0),
+    default_backend_value=np.int64(0),
 )

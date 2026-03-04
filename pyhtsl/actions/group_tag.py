@@ -10,5 +10,5 @@ GroupTag = PlaceholderCheckable(
     comparison_right_side='%player.group.tag%',
     in_string='%player.group.tag%',
     constant_internal_type=InternalType.STRING,
-    backend_value='',
+    default_backend_value='',
 )

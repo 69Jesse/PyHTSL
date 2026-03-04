@@ -1,11 +1,11 @@
 from abc import abstractmethod
 from typing import Self
 
+from ..actions.no_fallback_values import no_fallback_values
 from ..editable import Editable
 from ..expression.housing_type import HousingType
 from ..expression.unset_expression import UnsetExpression
 from ..internal_type import InternalType
-from ..actions.no_fallback_values import no_fallback_values
 
 __all__ = ('Stat',)
 

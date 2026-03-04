@@ -15,7 +15,7 @@ DateUnix = PlaceholderCheckable(
     comparison_right_side='%date.unix%',
     in_string='%date.unix%',
     constant_internal_type=InternalType.LONG,
-    backend_value=np.int64(0),
+    default_backend_value=np.int64(0),
 )
 
 
@@ -25,5 +25,5 @@ DateUnixMS = PlaceholderCheckable(
     comparison_right_side='%date.unix.ms%',
     in_string='%date.unix.ms%',
     constant_internal_type=InternalType.LONG,
-    backend_value=np.int64(0),
+    default_backend_value=np.int64(0),
 )

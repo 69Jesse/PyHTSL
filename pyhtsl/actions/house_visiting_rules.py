@@ -10,5 +10,5 @@ HouseVisitingRules = PlaceholderCheckable(
     comparison_right_side='%house.visitingrules%',
     in_string='%house.visitingrules%',
     constant_internal_type=InternalType.STRING,
-    backend_value='',
+    default_backend_value='',
 )
