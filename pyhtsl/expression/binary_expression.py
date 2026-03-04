@@ -190,9 +190,6 @@ class BinaryExpression[
 
     @staticmethod
     def optimize_binary_expressions(expressions: list[Expression]) -> None:
-        print(
-            '\n\n\nBEFORE OPTIMIZATION:\n', '\n'.join(map(repr, expressions)), '\n\n\n'
-        )
         has_changed = True
         while has_changed:
             has_changed = False
@@ -263,10 +260,6 @@ class BinaryExpression[
 
         BinaryExpression.take_out_useless_expressions(expressions)
         BinaryExpression.rename_temporary_stats(expressions)
-
-        print(
-            '\n\n\nAFTER OPTIMIZATION:\n', '\n'.join(map(repr, expressions)), '\n\n\n'
-        )
 
     def into_executable_expressions(self) -> Generator[Expression, None, None]:
         expressions = self.generate_assignment_expressions()
