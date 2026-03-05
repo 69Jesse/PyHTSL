@@ -3,12 +3,10 @@ from collections.abc import Callable
 from types import TracebackType
 from typing import TYPE_CHECKING, Literal, overload
 
-from pyhtsl.checkable import Checkable
-from pyhtsl.expression.housing_type import HousingType
-
 from ..container import Container
 from ..expression.condition.conditional_expression import ConditionalMode
 from ..expression.expression import Expression
+from ..expression.housing_type import HousingType
 from ..placeholders import DEFINED_PLACEHOLDERS
 from .backend_type import (
     BackendType,
@@ -22,6 +20,7 @@ from .expressions.assert_execution_expression import AssertExecutionExpression
 from .expressions.print_execution_expression import PrintExecutionExpression
 
 if TYPE_CHECKING:
+    from ..checkable import Checkable
     from ..expression.condition.condition import Condition
 
 
@@ -69,41 +68,37 @@ class ExecutionContext(Container):
     @overload
     def get(
         self,
-        key: Checkable,
+        key: 'Checkable',
         *,
         default: HousingType | BackendType = ...,
-        backend: bool = ...,
-        enforce_string: Literal[True],
-    ) -> str: ...
+        output: Literal['regular'] = ...,
+    ) -> HousingType: ...
 
     @overload
     def get(
         self,
-        key: Checkable,
+        key: 'Checkable',
         *,
         default: HousingType | BackendType = ...,
-        backend: Literal[True],
-        enforce_string: Literal[False] = ...,
+        output: Literal['backend'],
     ) -> BackendType: ...
 
     @overload
     def get(
         self,
-        key: Checkable,
+        key: 'Checkable',
         *,
         default: HousingType | BackendType = ...,
-        backend: Literal[False] = ...,
-        enforce_string: Literal[False] = ...,
-    ) -> HousingType: ...
+        output: Literal['string'],
+    ) -> str: ...
 
     def get(
         self,
-        key: Checkable,
+        key: 'Checkable',
         *,
         default: HousingType | BackendType = '',
-        backend: bool = False,
-        enforce_string: bool = False,
-    ) -> str | HousingType | BackendType:
+        output: Literal['regular', 'backend', 'string'] = 'regular',
+    ) -> HousingType | BackendType | str:
         value = self.checkable_mapping.get(
             key.into_hashable(),
             None,
@@ -111,21 +106,21 @@ class ExecutionContext(Container):
         if value is None:
             value = into_backend_type(default)
 
-        if enforce_string:
+        if output == 'string':
             return backend_into_string(value)
-        if backend:
+        if output == 'backend':
             return value
         return into_housing_type(value)
 
     def _substitute_single_placeholder(self, placeholder: str) -> BackendType | None:
         for key, value in DEFINED_PLACEHOLDERS.items():
             if placeholder == key:
-                return self.get(value, backend=True)
+                return self.get(value, output='backend')
         return None
 
     def _substitute_all_placeholders(self, text: str) -> str:
         for key, value in DEFINED_PLACEHOLDERS.items():
-            text = text.replace(key, self.get(value, enforce_string=True))
+            text = text.replace(key, self.get(value, output='string'))
         return text
 
     @overload
@@ -133,17 +128,15 @@ class ExecutionContext(Container):
         self,
         text: str,
         *,
-        backend: bool = ...,
-        enforce_string: Literal[True] = ...,
-    ) -> str: ...
+        output: Literal['regular'],
+    ) -> HousingType: ...
 
     @overload
     def substitute(
         self,
         text: str,
         *,
-        backend: Literal[True],
-        enforce_string: Literal[False] = ...,
+        output: Literal['backend'],
     ) -> BackendType: ...
 
     @overload
@@ -151,16 +144,14 @@ class ExecutionContext(Container):
         self,
         text: str,
         *,
-        backend: Literal[False] = ...,
-        enforce_string: Literal[False] = ...,
-    ) -> HousingType: ...
+        output: Literal['string'] = ...,
+    ) -> str: ...
 
     def substitute(
         self,
         text: str,
         *,
-        backend: bool = False,
-        enforce_string: bool = True,
+        output: Literal['regular', 'backend', 'string'] = 'string',
     ) -> str | HousingType | BackendType:
         value = self._substitute_single_placeholder(text)
         if value is None:
@@ -175,9 +166,9 @@ class ExecutionContext(Container):
             if cast is not None:
                 value = cast
 
-        if enforce_string:
+        if output == 'string':
             return backend_into_string(value)
-        if backend:
+        if output == 'backend':
             return value
         return into_housing_type(value)
 
@@ -189,7 +180,7 @@ class ExecutionContext(Container):
 
     def put(
         self,
-        key: Checkable,
+        key: 'Checkable',
         value: HousingType | BackendType,
     ) -> None:
         self.checkable_mapping[key.into_hashable()] = self.maybe_cast_value(value)

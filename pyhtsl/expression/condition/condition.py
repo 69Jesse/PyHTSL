@@ -1,8 +1,10 @@
 from abc import abstractmethod
-from typing import Self, final
+from typing import TYPE_CHECKING, Self, final
 
 from ...base_object import BaseObject
-from ...execute.context import ExecutionContext
+
+if TYPE_CHECKING:
+    from ...execute.context import ExecutionContext
 
 __all__ = ('Condition',)
 

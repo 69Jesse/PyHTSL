@@ -1,20 +1,22 @@
-from typing import final
+from typing import TYPE_CHECKING, final
 
 from pyhtsl.container import ExpressionContext
 
 from ...container import ContainerContextManager, get_current_container
-from ...expression.condition.condition import Condition
 from ...expression.condition.conditional_expression import (
     ConditionalExpression,
     ConditionalMode,
 )
+
+if TYPE_CHECKING:
+    from ...expression.condition.condition import Condition
 
 
 @final
 class IfContextManager(ContainerContextManager):
     expression: ConditionalExpression
 
-    def __init__(self, conditions: list[Condition], mode: ConditionalMode) -> None:
+    def __init__(self, conditions: list['Condition'], mode: ConditionalMode) -> None:
         self.expression = ConditionalExpression(conditions, mode)
 
     def create_context(self) -> ExpressionContext:
