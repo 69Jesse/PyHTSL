@@ -75,3 +75,20 @@ def backend_matches_internal_type(value: BackendType, internal_type: InternalTyp
     if internal_type is InternalType.STRING:
         return isinstance(value, str)
     return False
+
+
+def cast_to_backend_long(value: str) -> np.int64 | None:
+    try:
+        n = int(value)
+    except (ValueError, ArithmeticError):
+        return None
+    if n < -9223372036854775808 or n > 9223372036854775807:
+        return None
+    return np.int64(n)
+
+
+def cast_to_backend_double(value: str) -> np.float64 | None:
+    try:
+        return np.float64(value)
+    except (ValueError, ArithmeticError):
+        return None

@@ -13,6 +13,8 @@ from ..placeholders import DEFINED_PLACEHOLDERS
 from .backend_type import (
     BackendType,
     backend_into_string,
+    cast_to_backend_double,
+    cast_to_backend_long,
     into_backend_type,
     into_housing_type,
 )
@@ -70,7 +72,7 @@ class ExecutionContext(Container):
         key: Checkable,
         *,
         default: HousingType | BackendType = ...,
-        internal: bool = ...,
+        backend: bool = ...,
         enforce_string: Literal[True],
     ) -> str: ...
 
@@ -80,7 +82,7 @@ class ExecutionContext(Container):
         key: Checkable,
         *,
         default: HousingType | BackendType = ...,
-        internal: Literal[True],
+        backend: Literal[True],
         enforce_string: Literal[False] = ...,
     ) -> BackendType: ...
 
@@ -90,7 +92,7 @@ class ExecutionContext(Container):
         key: Checkable,
         *,
         default: HousingType | BackendType = ...,
-        internal: Literal[False] = ...,
+        backend: Literal[False] = ...,
         enforce_string: Literal[False] = ...,
     ) -> HousingType: ...
 
@@ -99,33 +101,98 @@ class ExecutionContext(Container):
         key: Checkable,
         *,
         default: HousingType | BackendType = '',
-        internal: bool = False,
+        backend: bool = False,
         enforce_string: bool = False,
-    ) -> HousingType | BackendType:
+    ) -> str | HousingType | BackendType:
         value = self.checkable_mapping.get(
             key.into_hashable(),
             None,
         )
         if value is None:
             value = into_backend_type(default)
+
         if enforce_string:
             return backend_into_string(value)
-        if internal:
+        if backend:
             return value
         return into_housing_type(value)
+
+    def _substitute_single_placeholder(self, placeholder: str) -> BackendType | None:
+        for key, value in DEFINED_PLACEHOLDERS.items():
+            if placeholder == key:
+                return self.get(value, backend=True)
+        return None
+
+    def _substitute_all_placeholders(self, text: str) -> str:
+        for key, value in DEFINED_PLACEHOLDERS.items():
+            text = text.replace(key, self.get(value, enforce_string=True))
+        return text
+
+    @overload
+    def substitute(
+        self,
+        text: str,
+        *,
+        backend: bool = ...,
+        enforce_string: Literal[True] = ...,
+    ) -> str: ...
+
+    @overload
+    def substitute(
+        self,
+        text: str,
+        *,
+        backend: Literal[True],
+        enforce_string: Literal[False] = ...,
+    ) -> BackendType: ...
+
+    @overload
+    def substitute(
+        self,
+        text: str,
+        *,
+        backend: Literal[False] = ...,
+        enforce_string: Literal[False] = ...,
+    ) -> HousingType: ...
+
+    def substitute(
+        self,
+        text: str,
+        *,
+        backend: bool = False,
+        enforce_string: bool = True,
+    ) -> str | HousingType | BackendType:
+        value = self._substitute_single_placeholder(text)
+        if value is None:
+            value = self._substitute_all_placeholders(text)
+
+        if isinstance(value, str):
+            cast: BackendType | None = None
+            if value.endswith('L'):
+                cast = cast_to_backend_long(value[:-1])
+            elif value.endswith('D'):
+                cast = cast_to_backend_double(value[:-1])
+            if cast is not None:
+                value = cast
+
+        if enforce_string:
+            return backend_into_string(value)
+        if backend:
+            return value
+        return into_housing_type(value)
+
+    def maybe_cast_value(self, value: HousingType | BackendType) -> BackendType:
+        value = into_backend_type(value)
+        if not isinstance(value, str):
+            return value
+        return value
 
     def put(
         self,
         key: Checkable,
         value: HousingType | BackendType,
     ) -> None:
-        self.checkable_mapping[key.into_hashable()] = into_backend_type(value)
-
-    def replace_placeholders(self, text: str) -> str:
-        for key, value in DEFINED_PLACEHOLDERS.items():
-            text = text.replace(key, self.get(value, enforce_string=True))
-        # TODO
-        return text
+        self.checkable_mapping[key.into_hashable()] = self.maybe_cast_value(value)
 
     def write_or_execute(self, expression: Expression) -> None:
         if self.started_execution:

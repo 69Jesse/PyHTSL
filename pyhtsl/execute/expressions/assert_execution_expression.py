@@ -56,7 +56,7 @@ class AssertExecutionExpression(ExecutionExpression):
         false_conditions: list['Condition'],
     ) -> NoReturn:
         message = (
-            f'"{context.replace_placeholders(self.message)}": ' if self.message else ''
+            f'"{context.substitute(self.message)}": ' if self.message else ''
         )
         if self.mode is ConditionalMode.AND:
             assert len(false_conditions) == 1

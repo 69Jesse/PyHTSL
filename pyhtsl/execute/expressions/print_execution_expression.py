@@ -27,4 +27,4 @@ class PrintExecutionExpression(ExecutionExpression):
         return f'PrintExecutionExpression(line={self.line!r})'
 
     def raw_execute(self, context: 'ExecutionContext') -> None:
-        print(context.replace_placeholders(self.line))
+        print(context.substitute(self.line))
