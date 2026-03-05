@@ -1,14 +1,28 @@
+import re
+
+from ..execute.backend_type import BackendType
 from ..internal_type import InternalType
 from ..placeholders import PlaceholderCheckable
 
 __all__ = ('PlayerName',)
 
 
-PlayerName = PlaceholderCheckable(
-    assignment_right_side='%player.name%',
-    comparison_left_side='placeholder "%player.name%"',
-    comparison_right_side='%player.name%',
-    in_string='%player.name%',
-    constant_internal_type=InternalType.STRING,
-    default_backend_value='',
-)
+class PlayerNamePlaceholder(
+    PlaceholderCheckable,
+    pattern=re.compile(re.escape('%player.name%')),
+    pattern_factory=lambda _: PlayerName,
+):
+    def __init__(self) -> None:
+        super().__init__(
+            assignment_right_side='%player.name%',
+            comparison_left_side='placeholder "%player.name%"',
+            comparison_right_side='%player.name%',
+            in_string='%player.name%',
+            constant_internal_type=InternalType.STRING,
+        )
+
+    def get_backend_value(self) -> BackendType:
+        return 'Rfind'
+
+
+PlayerName = PlayerNamePlaceholder()

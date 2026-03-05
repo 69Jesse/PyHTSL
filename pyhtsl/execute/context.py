@@ -1,13 +1,16 @@
 import os
+import re
 from collections.abc import Callable
+from functools import cached_property
 from types import TracebackType
-from typing import TYPE_CHECKING, Literal, overload
+from typing import Literal, overload
 
+from ..checkable import Checkable
 from ..container import Container
+from ..expression.condition.condition import Condition
 from ..expression.condition.conditional_expression import ConditionalMode
 from ..expression.expression import Expression
 from ..expression.housing_type import HousingType
-from ..placeholders import DEFINED_PLACEHOLDERS
 from .backend_type import (
     BackendType,
     backend_into_string,
@@ -18,11 +21,6 @@ from .backend_type import (
 )
 from .expressions.assert_execution_expression import AssertExecutionExpression
 from .expressions.print_execution_expression import PrintExecutionExpression
-
-if TYPE_CHECKING:
-    from ..checkable import Checkable
-    from ..expression.condition.condition import Condition
-
 
 __all__ = ('ExecutionContext',)
 
@@ -44,12 +42,7 @@ class ExecutionContext(Container):
         self.verbose = verbose
         self.expression_callback = expression_callback
         self.started_execution = False
-        self.checkable_mapping = {
-            placeholder.into_hashable(): into_backend_type(
-                placeholder.default_backend_value
-            )
-            for placeholder in DEFINED_PLACEHOLDERS.values()
-        }
+        self.checkable_mapping = {}
 
     def __exit__(
         self,
@@ -68,7 +61,7 @@ class ExecutionContext(Container):
     @overload
     def get(
         self,
-        key: 'Checkable',
+        key: Checkable,
         *,
         default: HousingType | BackendType = ...,
         output: Literal['regular'] = ...,
@@ -77,7 +70,7 @@ class ExecutionContext(Container):
     @overload
     def get(
         self,
-        key: 'Checkable',
+        key: Checkable,
         *,
         default: HousingType | BackendType = ...,
         output: Literal['backend'],
@@ -86,7 +79,7 @@ class ExecutionContext(Container):
     @overload
     def get(
         self,
-        key: 'Checkable',
+        key: Checkable,
         *,
         default: HousingType | BackendType = ...,
         output: Literal['string'],
@@ -94,7 +87,7 @@ class ExecutionContext(Container):
 
     def get(
         self,
-        key: 'Checkable',
+        key: Checkable,
         *,
         default: HousingType | BackendType = '',
         output: Literal['regular', 'backend', 'string'] = 'regular',
@@ -112,15 +105,29 @@ class ExecutionContext(Container):
             return value
         return into_housing_type(value)
 
+    @cached_property
+    def _placeholders_and_factories(
+        self,
+    ) -> list[tuple[re.Pattern[str], Callable[[re.Match[str]], Checkable]]]:
+        result: list[tuple[re.Pattern[str], Callable[[re.Match[str]], Checkable]]] = []
+        for cls in Checkable.__subclasses__():
+            if cls.pattern is not None and cls.pattern_factory is not None:
+                result.append((cls.pattern, cls.pattern_factory))
+        return result
+
     def _substitute_single_placeholder(self, placeholder: str) -> BackendType | None:
-        for key, value in DEFINED_PLACEHOLDERS.items():
-            if placeholder == key:
-                return self.get(value, output='backend')
+        for pattern, factory in self._placeholders_and_factories:
+            match = pattern.fullmatch(placeholder)
+            if match is not None:
+                return self.get(factory(match), output='backend')
         return None
 
     def _substitute_all_placeholders(self, text: str) -> str:
-        for key, value in DEFINED_PLACEHOLDERS.items():
-            text = text.replace(key, self.get(value, output='string'))
+        for pattern, factory in self._placeholders_and_factories:
+            text = pattern.sub(
+                lambda match: self.get(factory(match), output='string'),  # noqa: B023
+                text,
+            )
         return text
 
     @overload
@@ -180,7 +187,7 @@ class ExecutionContext(Container):
 
     def put(
         self,
-        key: 'Checkable',
+        key: Checkable,
         value: HousingType | BackendType,
     ) -> None:
         self.checkable_mapping[key.into_hashable()] = self.maybe_cast_value(value)
@@ -198,7 +205,7 @@ class ExecutionContext(Container):
             )
         )
 
-    def assert_all(self, *conditions: 'Condition', message: object = None) -> None:
+    def assert_all(self, *conditions: Condition, message: object = None) -> None:
         self.write_or_execute(
             AssertExecutionExpression(
                 list(conditions),
@@ -207,7 +214,7 @@ class ExecutionContext(Container):
             )
         )
 
-    def assert_any(self, *conditions: 'Condition', message: object = None) -> None:
+    def assert_any(self, *conditions: Condition, message: object = None) -> None:
         self.write_or_execute(
             AssertExecutionExpression(
                 list(conditions),

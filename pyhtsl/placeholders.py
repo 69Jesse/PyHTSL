@@ -1,4 +1,5 @@
-from typing import Self, final
+from abc import ABC, abstractmethod
+from typing import Self
 
 from pyhtsl.editable import Editable
 
@@ -12,8 +13,7 @@ __all__ = (
 )
 
 
-@final
-class PlaceholderCheckable(Checkable):
+class PlaceholderCheckable(Checkable, ABC):
     assignment_right_side: str
     comparison_left_side: str
     comparison_right_side: str
@@ -29,7 +29,6 @@ class PlaceholderCheckable(Checkable):
         comparison_right_side: str,
         in_string: str,
         constant_internal_type: InternalType,
-        default_backend_value: BackendType,
     ) -> None:
         super().__init__(internal_type=constant_internal_type)
         self.assignment_right_side = assignment_right_side
@@ -37,12 +36,10 @@ class PlaceholderCheckable(Checkable):
         self.comparison_right_side = comparison_right_side
         self.inside_of_string = in_string
         self.constant_internal_type = constant_internal_type
-        self.default_backend_value = default_backend_value
-        if self.inside_of_string in DEFINED_PLACEHOLDERS:
-            raise ValueError(
-                f'Placeholder with inside_of_string "{self.inside_of_string}" is already defined.'
-            )
-        DEFINED_PLACEHOLDERS[self.inside_of_string] = self
+
+    @abstractmethod
+    def get_backend_value(self) -> BackendType:
+        raise NotImplementedError
 
     def into_assignment_left_side(self) -> str:
         raise RuntimeError(
@@ -82,8 +79,7 @@ class PlaceholderCheckable(Checkable):
         return f'{self.__class__.__name__}<{self.inside_of_string}>'
 
 
-@final
-class PlaceholderEditable(Editable):
+class PlaceholderEditable(Editable, ABC):
     assignment_left_side: str
     assignment_right_side: str
     comparison_left_side: str
@@ -101,7 +97,6 @@ class PlaceholderEditable(Editable):
         comparison_right_side: str,
         in_string: str,
         constant_internal_type: InternalType,
-        default_backend_value: BackendType,
     ) -> None:
         super().__init__(internal_type=constant_internal_type)
         self.assignment_left_side = assignment_left_side
@@ -110,12 +105,10 @@ class PlaceholderEditable(Editable):
         self.comparison_right_side = comparison_right_side
         self.inside_of_string = in_string
         self.constant_internal_type = constant_internal_type
-        self.default_backend_value = default_backend_value
-        if self.inside_of_string in DEFINED_PLACEHOLDERS:
-            raise ValueError(
-                f'Placeholder with inside_of_string "{self.inside_of_string}" is already defined.'
-            )
-        DEFINED_PLACEHOLDERS[self.inside_of_string] = self
+
+    @abstractmethod
+    def get_backend_value(self) -> BackendType:
+        raise NotImplementedError
 
     def into_assignment_left_side(self) -> str:
         return self.assignment_left_side
@@ -147,11 +140,7 @@ class PlaceholderEditable(Editable):
             comparison_right_side=self.comparison_right_side,
             in_string=self.inside_of_string,
             constant_internal_type=self.constant_internal_type,
-            default_backend_value=self.default_backend_value,
         )
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.inside_of_string}>'
-
-
-DEFINED_PLACEHOLDERS: dict[str, PlaceholderCheckable | PlaceholderEditable] = {}

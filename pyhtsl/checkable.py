@@ -1,5 +1,7 @@
+import re
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Literal, Self, final, overload
+from collections.abc import Callable
+from typing import TYPE_CHECKING, ClassVar, Literal, Self, final, overload
 
 from .actions.no_type_casting import no_type_casting
 from .base_object import BaseObject
@@ -23,6 +25,23 @@ __all__ = ('Checkable',)
 
 
 class Checkable(BaseObject):
+    pattern: ClassVar[re.Pattern[str] | None] = None
+    pattern_factory: ClassVar[Callable[[re.Match[str]], 'Checkable'] | None] = None
+
+    def __init_subclass__(
+        cls,
+        *,
+        pattern: re.Pattern[str] | None = None,
+        pattern_factory: Callable[[re.Match[str]], 'Checkable'] | None = None,
+    ) -> None:
+        super().__init_subclass__()
+        if pattern is not None:
+            assert pattern_factory is not None, (
+                'pattern_factory must be provided if pattern is provided'
+            )
+        cls.pattern = pattern
+        cls.pattern_factory = pattern_factory
+
     internal_type: InternalType = InternalType.ANY
     fallback_value: HousingType | None
     is_gotten_from_value_property: bool

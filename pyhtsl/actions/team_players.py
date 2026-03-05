@@ -1,5 +1,8 @@
+import re
+
 import numpy as np
 
+from ..execute.backend_type import BackendType
 from ..internal_type import InternalType
 from ..placeholders import PlaceholderCheckable
 from .team import Team
@@ -7,22 +10,35 @@ from .team import Team
 __all__ = ('TeamPlayers',)
 
 
+def _team_players_factory(match: re.Match[str]) -> 'TeamPlayersPlaceholder':
+    team = match.group(1)
+    return TeamPlayersPlaceholder(team if team else None)
+
+
+class TeamPlayersPlaceholder(
+    PlaceholderCheckable,
+    pattern=re.compile(r'%player\.team\.players(?:/([^%]*))?%'),
+    pattern_factory=_team_players_factory,
+):
+    def __init__(self, team: Team | str | None = None) -> None:
+        if team is None:
+            key = '%player.team.players%'
+        else:
+            team = team if isinstance(team, Team) else Team(team)
+            key = f'%player.team.players/{team.name}%'
+        super().__init__(
+            assignment_right_side=key,
+            comparison_left_side=f'placeholder "{key}"',
+            comparison_right_side=key,
+            in_string=key,
+            constant_internal_type=InternalType.LONG,
+        )
+
+    def get_backend_value(self) -> BackendType:
+        return np.int64(0)
+
+
 def TeamPlayers(
     team: Team | str | None,
-) -> PlaceholderCheckable:
-    if team is None:
-        key = '%player.team.players%'
-    else:
-        team = team if isinstance(team, Team) else Team(team)
-        key = f'%player.team.players/{team.name}%'
-    return PlaceholderCheckable(
-        assignment_right_side=key,
-        comparison_left_side=f'placeholder "{key}"',
-        comparison_right_side=key,
-        in_string=key,
-        constant_internal_type=InternalType.LONG,
-        default_backend_value=np.int64(0),
-    )
-
-
-Team._import_team_players(TeamPlayers)
+) -> TeamPlayersPlaceholder:
+    return TeamPlayersPlaceholder(team)

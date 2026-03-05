@@ -1,16 +1,30 @@
+import re
+
 import numpy as np
 
+from ..execute.backend_type import BackendType
 from ..internal_type import InternalType
 from ..placeholders import PlaceholderCheckable
 
 __all__ = ('PlayerPositionPitch',)
 
 
-PlayerPositionPitch = PlaceholderCheckable(
-    assignment_right_side='%player.pos.pitch%',
-    comparison_left_side='placeholder "%player.pos.pitch%"',
-    comparison_right_side='%player.pos.pitch%',
-    in_string='%player.pos.pitch%',
-    constant_internal_type=InternalType.DOUBLE,
-    default_backend_value=np.float64(0),
-)
+class PlayerPositionPitchPlaceholder(
+    PlaceholderCheckable,
+    pattern=re.compile(re.escape('%player.pos.pitch%')),
+    pattern_factory=lambda _: PlayerPositionPitch,
+):
+    def __init__(self) -> None:
+        super().__init__(
+            assignment_right_side='%player.pos.pitch%',
+            comparison_left_side='placeholder "%player.pos.pitch%"',
+            comparison_right_side='%player.pos.pitch%',
+            in_string='%player.pos.pitch%',
+            constant_internal_type=InternalType.DOUBLE,
+        )
+
+    def get_backend_value(self) -> BackendType:
+        return np.float64(0)
+
+
+PlayerPositionPitch = PlayerPositionPitchPlaceholder()

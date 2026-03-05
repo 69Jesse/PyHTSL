@@ -1,10 +1,8 @@
-import re
 from abc import abstractmethod
-from collections.abc import Callable, Generator
+from collections.abc import Generator
 from typing import TYPE_CHECKING, Any, Self, final
 
 from ..base_object import BaseObject
-from ..checkable import Checkable
 from ..container import get_current_container
 
 if TYPE_CHECKING:
@@ -16,19 +14,6 @@ __all__ = ('Expression',)
 
 
 class Expression(BaseObject):
-    def __init_subclass__(
-        cls,
-        *,
-        pattern: re.Pattern[str] | None = None,
-        pattern_factory: Callable[[re.Pattern[str]], Checkable] | None = None,
-    ) -> None:
-        super().__init_subclass__()
-        if pattern is not None:
-            assert pattern_factory is not None, (
-                'pattern_factory must be provided if pattern is provided'
-            )
-            EXPRESSION_PATTERNS[pattern] = pattern_factory
-
     def into_executable_expressions(self) -> Generator['Expression', None, None]:
         yield self
 
@@ -88,6 +73,3 @@ class Expression(BaseObject):
 
     def walk_expressions(self) -> Generator['Expression', None, None]:
         yield self
-
-
-EXPRESSION_PATTERNS: dict[re.Pattern[str], Callable[[re.Pattern[str]], Checkable]] = {}

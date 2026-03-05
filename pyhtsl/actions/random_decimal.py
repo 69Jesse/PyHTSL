@@ -1,21 +1,45 @@
+import random
+import re
+
 import numpy as np
 
+from ..execute.backend_type import BackendType
 from ..internal_type import InternalType
 from ..placeholders import PlaceholderCheckable
 
 __all__ = ('RandomDecimal',)
 
 
+def _random_decimal_factory(match: re.Match[str]) -> 'RandomDecimalPlaceholder':
+    return RandomDecimalPlaceholder(float(match.group(1)), float(match.group(2)))
+
+
+class RandomDecimalPlaceholder(
+    PlaceholderCheckable,
+    pattern=re.compile(r'%random\.decimal/([\d.\-]+) ([\d.\-]+)%'),
+    pattern_factory=_random_decimal_factory,
+):
+    lower_bound: float
+    exclusive_upper_bound: float
+
+    def __init__(self, lower_bound: float, exclusive_upper_bound: float) -> None:
+        self.lower_bound = lower_bound
+        self.exclusive_upper_bound = exclusive_upper_bound
+        key = f'%random.decimal/{lower_bound} {exclusive_upper_bound}%'
+        super().__init__(
+            assignment_right_side=key,
+            comparison_left_side=f'placeholder "{key}"',
+            comparison_right_side=key,
+            in_string=key,
+            constant_internal_type=InternalType.DOUBLE,
+        )
+
+    def get_backend_value(self) -> BackendType:
+        return np.float64(random.uniform(self.lower_bound, self.exclusive_upper_bound))
+
+
 def RandomDecimal(
     lower_bound: float,
     exclusive_upper_bound: float,
-) -> PlaceholderCheckable:
-    key = f'%random.decimal/{lower_bound} {exclusive_upper_bound}%'
-    return PlaceholderCheckable(
-        assignment_right_side=f'{key}',
-        comparison_left_side=f'placeholder "{key}"',
-        comparison_right_side=f'{key}',
-        in_string=f'{key}',
-        constant_internal_type=InternalType.DOUBLE,
-        default_backend_value=np.float64(0),
-    )
+) -> RandomDecimalPlaceholder:
+    return RandomDecimalPlaceholder(lower_bound, exclusive_upper_bound)
