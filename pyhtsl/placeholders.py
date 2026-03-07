@@ -72,7 +72,6 @@ class PlaceholderCheckable(Checkable, ABC):
             comparison_right_side=self.comparison_right_side,
             in_string=self.inside_of_string,
             constant_internal_type=self.constant_internal_type,
-            default_backend_value=self.default_backend_value,
         )
 
     def __repr__(self) -> str:

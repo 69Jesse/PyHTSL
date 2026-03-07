@@ -1,7 +1,6 @@
 import os
 import re
-from collections.abc import Callable
-from functools import cached_property
+from collections.abc import Callable, Generator
 from types import TracebackType
 from typing import Literal, overload
 
@@ -11,6 +10,7 @@ from ..expression.condition.condition import Condition
 from ..expression.condition.conditional_expression import ConditionalMode
 from ..expression.expression import Expression
 from ..expression.housing_type import HousingType
+from ..placeholders import PlaceholderCheckable, PlaceholderEditable
 from .backend_type import (
     BackendType,
     backend_into_string,
@@ -97,6 +97,9 @@ class ExecutionContext(Container):
             None,
         )
         if value is None:
+            if isinstance(key, PlaceholderCheckable | PlaceholderEditable):
+                value = key.get_backend_value()
+        if value is None:
             value = into_backend_type(default)
 
         if output == 'string':
@@ -105,25 +108,29 @@ class ExecutionContext(Container):
             return value
         return into_housing_type(value)
 
-    @cached_property
+    def _walk_subclasses(self, cls: type) -> Generator[type, None, None]:
+        yield cls
+        for subclass in cls.__subclasses__():
+            yield from self._walk_subclasses(subclass)
+
     def _placeholders_and_factories(
         self,
     ) -> list[tuple[re.Pattern[str], Callable[[re.Match[str]], Checkable]]]:
         result: list[tuple[re.Pattern[str], Callable[[re.Match[str]], Checkable]]] = []
-        for cls in Checkable.__subclasses__():
+        for cls in self._walk_subclasses(Checkable):
             if cls.pattern is not None and cls.pattern_factory is not None:
                 result.append((cls.pattern, cls.pattern_factory))
         return result
 
     def _substitute_single_placeholder(self, placeholder: str) -> BackendType | None:
-        for pattern, factory in self._placeholders_and_factories:
+        for pattern, factory in self._placeholders_and_factories():
             match = pattern.fullmatch(placeholder)
             if match is not None:
                 return self.get(factory(match), output='backend')
         return None
 
     def _substitute_all_placeholders(self, text: str) -> str:
-        for pattern, factory in self._placeholders_and_factories:
+        for pattern, factory in self._placeholders_and_factories():
             text = pattern.sub(
                 lambda match: self.get(factory(match), output='string'),  # noqa: B023
                 text,

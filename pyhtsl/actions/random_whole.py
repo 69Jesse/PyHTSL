@@ -25,6 +25,8 @@ class RandomWholePlaceholder(
     def __init__(self, lower_bound: int, exclusive_upper_bound: int) -> None:
         self.lower_bound = lower_bound
         self.exclusive_upper_bound = exclusive_upper_bound
+        if self.exclusive_upper_bound <= self.lower_bound:
+            raise ValueError('exclusive_upper_bound must be greater than lower_bound')
         key = f'%random.whole/{lower_bound} {exclusive_upper_bound}%'
         super().__init__(
             assignment_right_side=key,
