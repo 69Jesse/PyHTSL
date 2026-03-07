@@ -142,6 +142,7 @@ class ExecutionContext(Container):
         self,
         text: str,
         *,
+        cast: bool = True,
         output: Literal['regular'],
     ) -> HousingType: ...
 
@@ -150,6 +151,7 @@ class ExecutionContext(Container):
         self,
         text: str,
         *,
+        cast: bool = True,
         output: Literal['backend'],
     ) -> BackendType: ...
 
@@ -158,6 +160,7 @@ class ExecutionContext(Container):
         self,
         text: str,
         *,
+        cast: bool = True,
         output: Literal['string'] = ...,
     ) -> str: ...
 
@@ -165,20 +168,24 @@ class ExecutionContext(Container):
         self,
         text: str,
         *,
+        cast: bool = True,
         output: Literal['regular', 'backend', 'string'] = 'string',
     ) -> str | HousingType | BackendType:
         value = self._substitute_single_placeholder(text)
         if value is None:
             value = self._substitute_all_placeholders(text)
 
-        if isinstance(value, str):
-            cast: BackendType | None = None
+        if cast and isinstance(value, str):
+            new_value: BackendType | None = None
             if value.endswith('L'):
-                cast = cast_to_backend_long(value[:-1])
+                new_value = cast_to_backend_long(value[:-1])
             elif value.endswith('D'):
-                cast = cast_to_backend_double(value[:-1])
-            if cast is not None:
-                value = cast
+                new_value = cast_to_backend_double(value[:-1])
+            if new_value is None:
+                new_value = cast_to_backend_long(value) or cast_to_backend_double(value)
+
+            if new_value is not None:
+                value = new_value
 
         if output == 'string':
             return backend_into_string(value)
@@ -186,18 +193,15 @@ class ExecutionContext(Container):
             return value
         return into_housing_type(value)
 
-    def maybe_cast_value(self, value: HousingType | BackendType) -> BackendType:
-        value = into_backend_type(value)
-        if not isinstance(value, str):
-            return value
-        return value
-
     def put(
         self,
         key: Checkable,
         value: HousingType | BackendType,
     ) -> None:
-        self.checkable_mapping[key.into_hashable()] = self.maybe_cast_value(value)
+        value = into_backend_type(value)
+        if isinstance(value, str):
+            value = self.substitute(value)
+        self.checkable_mapping[key.into_hashable()] = value
 
     def write_or_execute(self, expression: Expression) -> None:
         if self.started_execution:
@@ -205,10 +209,11 @@ class ExecutionContext(Container):
         else:
             self.write_expression(expression)
 
-    def print(self, *lines: object) -> None:
+    def print(self, *lines: object, cast: bool = False) -> None:
         self.write_or_execute(
             PrintExecutionExpression(
                 line=' '.join(map(str, lines)),
+                cast=cast,
             )
         )
 

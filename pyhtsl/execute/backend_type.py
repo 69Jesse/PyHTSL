@@ -43,7 +43,9 @@ def backend_into_string(value: BackendType) -> str:
         rep = repr(d)
         if 'e' in rep or 'E' in rep:
             return _java_double_tostring(d)
-        return rep.rstrip('0').rstrip('.')
+        rounded = round(d, 3)
+        result = f'{rounded:.3f}'.rstrip('0').rstrip('.')
+        return result
     return value
 
 
