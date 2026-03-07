@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Self
+from typing import Self, final
 
 from pyhtsl.editable import Editable
 
@@ -40,6 +40,10 @@ class PlaceholderCheckable(Checkable, ABC):
     @abstractmethod
     def get_backend_value(self) -> BackendType:
         raise NotImplementedError
+
+    @final
+    def get_backend_fallback_value(self) -> BackendType | None:
+        return super().get_backend_fallback_value() or self.get_backend_value()
 
     def into_assignment_left_side(self) -> str:
         raise RuntimeError(

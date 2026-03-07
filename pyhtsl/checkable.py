@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, ClassVar, Literal, Self, final, overload
 
 from .actions.no_type_casting import no_type_casting
 from .base_object import BaseObject
+from .execute.backend_type import BackendType, into_backend_type
 from .expression.condition.comparison_condition import (
     ComparisonCondition,
     ComparisonOperator,
@@ -61,6 +62,11 @@ class Checkable(BaseObject):
             self.__class__.__name__,
             id(self.__class__),
         )
+
+    def get_backend_fallback_value(self) -> BackendType | None:
+        if self.fallback_value is None:
+            return None
+        return into_backend_type(self.fallback_value)
 
     def _formatted_with_internal_type(
         self,

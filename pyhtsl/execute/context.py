@@ -61,7 +61,7 @@ class ExecutionContext(Container):
     @overload
     def get(
         self,
-        key: Checkable,
+        key: Checkable | str,
         *,
         default: HousingType | BackendType = ...,
         output: Literal['regular'] = ...,
@@ -70,7 +70,7 @@ class ExecutionContext(Container):
     @overload
     def get(
         self,
-        key: Checkable,
+        key: Checkable | str,
         *,
         default: HousingType | BackendType = ...,
         output: Literal['backend'],
@@ -79,7 +79,7 @@ class ExecutionContext(Container):
     @overload
     def get(
         self,
-        key: Checkable,
+        key: Checkable | str,
         *,
         default: HousingType | BackendType = ...,
         output: Literal['string'],
@@ -87,20 +87,22 @@ class ExecutionContext(Container):
 
     def get(
         self,
-        key: Checkable,
+        key: Checkable | str,
         *,
         default: HousingType | BackendType = '',
         output: Literal['regular', 'backend', 'string'] = 'regular',
     ) -> HousingType | BackendType | str:
-        value = self.checkable_mapping.get(
-            key.into_hashable(),
-            None,
+        if isinstance(key, str):
+            return self.substitute(key, output=output)
+
+        value = (
+            self.checkable_mapping.get(
+                key.into_hashable(),
+                None,
+            )
+            or key.get_backend_fallback_value()
+            or into_backend_type(default)
         )
-        if value is None:
-            if isinstance(key, PlaceholderCheckable | PlaceholderEditable):
-                value = key.get_backend_value()
-        if value is None:
-            value = into_backend_type(default)
 
         if output == 'string':
             return backend_into_string(value)

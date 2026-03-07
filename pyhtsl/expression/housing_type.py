@@ -4,6 +4,7 @@ __all__ = (
     'NumericHousingType',
     'HousingType',
     'housing_type_as_right_side',
+    'housing_type_from_string',
 )
 
 
@@ -21,3 +22,15 @@ def housing_type_as_right_side(value: HousingType) -> str:
                 formatted += '.0'
             return formatted
     return f'"{value}"'
+
+
+def housing_type_from_string(value: str) -> HousingType:
+    try:
+        return int(value)
+    except ValueError:
+        pass
+    try:
+        return float(value)
+    except ValueError:
+        pass
+    return value
