@@ -22,6 +22,12 @@ class BinaryOperator(Enum):
     Decrement = '-='
     Multiply = '*='
     Divide = '/='
+    BitwiseAnd = '&='
+    BitwiseOr = '|='
+    BitwiseXor = '^='
+    LeftShift = '<<='
+    RightShift = '>>='
+    LogicalRightShift = '>>>='
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.name}, {self.value}>'

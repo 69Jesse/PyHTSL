@@ -57,6 +57,36 @@ class Editable(Checkable):
     def __imod__(self, other: Checkable | NumericHousingType) -> 'CompoundExpression':
         return self._maybe_write(self.__mod__(other))
 
+    def __iand__[T: Checkable | NumericHousingType](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[Self, T]':
+        return self._maybe_write(self.__and__(other))
+
+    def __ior__[T: Checkable | NumericHousingType](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[Self, T]':
+        return self._maybe_write(self.__or__(other))
+
+    def __ixor__[T: Checkable | NumericHousingType](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[Self, T]':
+        return self._maybe_write(self.__xor__(other))
+
+    def __ilshift__[T: Checkable | NumericHousingType](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[Self, T]':
+        return self._maybe_write(self.__lshift__(other))
+
+    def __irshift__[T: Checkable | NumericHousingType](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[Self, T]':
+        return self._maybe_write(self.__rshift__(other))
+
     def set[T: Checkable | HousingType](
         self,
         value: T,

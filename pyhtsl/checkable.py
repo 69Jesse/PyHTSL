@@ -342,6 +342,138 @@ class Checkable(BaseObject):
     ) -> 'CompoundExpression':
         raise NotImplementedError  # TODO
 
+    def __and__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[Self, T]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+
+        return BinaryExpression(
+            self,
+            other,
+            BinaryOperator.BitwiseAnd,
+        )
+
+    def __rand__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[T, Self]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+
+        return BinaryExpression(
+            other,
+            self,
+            BinaryOperator.BitwiseAnd,
+        )
+
+    def __or__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[Self, T]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+
+        return BinaryExpression(
+            self,
+            other,
+            BinaryOperator.BitwiseOr,
+        )
+
+    def __ror__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[T, Self]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+
+        return BinaryExpression(
+            other,
+            self,
+            BinaryOperator.BitwiseOr,
+        )
+
+    def __xor__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[Self, T]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+
+        return BinaryExpression(
+            self,
+            other,
+            BinaryOperator.BitwiseXor,
+        )
+
+    def __rxor__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[T, Self]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+
+        return BinaryExpression(
+            other,
+            self,
+            BinaryOperator.BitwiseXor,
+        )
+
+    def __lshift__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[Self, T]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+
+        return BinaryExpression(
+            self,
+            other,
+            BinaryOperator.LeftShift,
+        )
+
+    def __rlshift__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[T, Self]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+
+        return BinaryExpression(
+            other,
+            self,
+            BinaryOperator.LeftShift,
+        )
+
+    def __rshift__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[Self, T]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+
+        return BinaryExpression(
+            self,
+            other,
+            BinaryOperator.RightShift,
+        )
+
+    def __rrshift__[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[T, Self]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+
+        return BinaryExpression(
+            other,
+            self,
+            BinaryOperator.RightShift,
+        )
+
+    def logical_rshift[T: 'Checkable | NumericHousingType'](
+        self,
+        other: T,
+    ) -> 'BinaryExpression[Self, T]':
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+
+        return BinaryExpression(
+            self,
+            other,
+            BinaryOperator.LogicalRightShift,
+        )
+
     def __neg__(self) -> 'BinaryExpression[Self, Literal[-1]]':
         return self.__mul__(-1)
 
