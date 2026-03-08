@@ -10,7 +10,6 @@ from ..stats.stat import Stat
 from ..stats.temporary_stat import TemporaryStat
 from .expression import Expression
 from .housing_type import HousingType, housing_type_as_right_side
-from pyhtsl import internal_type
 
 __all__ = (
     'BinaryOperator',
