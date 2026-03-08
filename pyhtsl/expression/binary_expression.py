@@ -8,9 +8,7 @@ import numpy as np
 from ..checkable import Checkable
 from ..editable import Editable
 from ..execute.backend_type import (
-    BackendType,
     backend_to_default_backend,
-    into_backend_type,
 )
 from ..execute.context import ExecutionContext
 from ..execute.exception import MismatchedTypeException, NotANumberException

@@ -150,7 +150,7 @@ class Editable(Checkable):
         return self
 
     @value.setter
-    def value(self, value: Checkable | HousingType) -> None:
+    def value(self, value: Checkable | HousingType | None) -> None:
         if value is None:
             # `x.value += 1` gets replaced with `x.value = x.value.__iadd__(1)`, `x.value.__iadd__(1)` returns `None`
             return

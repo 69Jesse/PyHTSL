@@ -5,7 +5,6 @@ from ..exception import descriptive_backend_type
 from .execution_expression import ExecutionExpression
 
 if TYPE_CHECKING:
-    from ...checkable import Checkable
     from ...expression.condition.condition import Condition
     from ..context import ExecutionContext
 

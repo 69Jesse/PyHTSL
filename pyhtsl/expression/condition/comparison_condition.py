@@ -87,7 +87,7 @@ class ComparisonCondition[LeftT: 'Checkable', RightT: 'Checkable | HousingType']
         )
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}<{repr(self.left)} {self.operator.value} {repr(self.right)}>'
+        return f'{self.__class__.__name__}<{repr(self.left)} {self.operator.value} {repr(self.right)}, inverted={self.inverted}>'
 
     def raw_execute(self, context: 'ExecutionContext') -> bool:
         left_value = context.get_backend(self.left)
