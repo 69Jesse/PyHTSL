@@ -82,10 +82,10 @@ class AssertExecutionExpression(ExecutionExpression):
     def raw_execute(self, context: 'ExecutionContext') -> None:
         if self.mode == ConditionalMode.AND:
             for condition in self.conditions:
-                if not condition.execute(context):
+                if not condition.evaluate(context):
                     self.throw(context, failed_conditions=[condition])
         elif self.mode == ConditionalMode.OR:
             for condition in self.conditions:
-                if condition.execute(context):
+                if condition.evaluate(context):
                     return
             self.throw(context, failed_conditions=self.conditions)

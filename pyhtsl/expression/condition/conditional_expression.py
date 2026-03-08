@@ -2,6 +2,8 @@ from collections.abc import Generator
 from enum import Enum
 from typing import TYPE_CHECKING, Self, final
 
+from pyhtsl.execute.context import ExecutionContext
+
 from ...config import INDENT
 from ..expression import Expression
 
@@ -105,3 +107,13 @@ class ConditionalExpression(Expression):
 
     def __repr__(self) -> str:
         return f'If<{self.mode.name}, conditions={len(self.conditions)}, if_exprs={len(self.if_expressions)}, else_exprs={len(self.else_expressions)}>'
+
+    def raw_execute(self, context: ExecutionContext) -> None:
+        holds = (
+            all(cond.evaluate(context) for cond in self.conditions)
+            if self.mode == ConditionalMode.AND
+            else any(cond.evaluate(context) for cond in self.conditions)
+        )
+        expressions = self.if_expressions if holds else self.else_expressions
+        for expr in expressions:
+            expr.execute(context)

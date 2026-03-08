@@ -36,15 +36,15 @@ class Condition(BaseObject):
         self.inverted = not self.inverted
         return self
 
-    def raw_execute(self, context: 'ExecutionContext') -> bool:
+    def raw_evaluate(self, context: 'ExecutionContext') -> bool:
         print(f'No execution defined for condition "{self!r}", returning False')
         return False
 
     @final
-    def execute(self, context: 'ExecutionContext') -> bool:
+    def evaluate(self, context: 'ExecutionContext') -> bool:
         if context.verbose:
             print(f'Executing condition "{self!r}"')
-        value = self.raw_execute(context)
+        value = self.raw_evaluate(context)
         if self.inverted:
             value = not value
         return value
