@@ -42,25 +42,6 @@ class BinaryOperator(Enum):
             BinaryOperator.Decrement,
             BinaryOperator.Multiply,
             BinaryOperator.Divide,
-            BinaryOperator.BitwiseAnd,
-            BinaryOperator.BitwiseOr,
-            BinaryOperator.BitwiseXor,
-            BinaryOperator.LeftShift,
-            BinaryOperator.RightShift,
-            BinaryOperator.LogicalRightShift,
-        ):
-            return InternalType.numeric_types()
-        raise ValueError(f'Unknown operator: {self}')
-
-    @cached_property
-    def allowed_right_side_types(self) -> set[InternalType]:
-        if self is BinaryOperator.Set:
-            return InternalType.all_types()
-        if self in (
-            BinaryOperator.Increment,
-            BinaryOperator.Decrement,
-            BinaryOperator.Multiply,
-            BinaryOperator.Divide,
         ):
             return InternalType.numeric_types()
         if self in (
@@ -73,6 +54,10 @@ class BinaryOperator(Enum):
         ):
             return {InternalType.LONG}
         raise ValueError(f'Unknown operator: {self}')
+
+    @cached_property
+    def allowed_right_side_types(self) -> set[InternalType]:
+        return self.allowed_left_side_types  # Will this ever not be the same? Am not sure
 
     @cached_property
     def forced_right_side_type(self) -> InternalType | None:
