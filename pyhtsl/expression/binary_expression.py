@@ -1,7 +1,7 @@
 from collections.abc import Generator
 from enum import Enum
 from functools import cached_property
-from typing import Any, Self, final
+from typing import Any, NoReturn, Self, final
 
 from ..checkable import Checkable
 from ..editable import Editable
@@ -50,6 +50,28 @@ class BinaryOperator(Enum):
             BinaryOperator.LogicalRightShift,
         ):
             return InternalType.numeric_types()
+        raise ValueError(f'Unknown operator: {self}')
+
+    @cached_property
+    def allowed_right_side_types(self) -> list[InternalType]:
+        if self is BinaryOperator.Set:
+            return InternalType.all_types()
+        if self in (
+            BinaryOperator.Increment,
+            BinaryOperator.Decrement,
+            BinaryOperator.Multiply,
+            BinaryOperator.Divide,
+        ):
+            return InternalType.numeric_types()
+        if self in (
+            BinaryOperator.BitwiseAnd,
+            BinaryOperator.BitwiseOr,
+            BinaryOperator.BitwiseXor,
+            BinaryOperator.LeftShift,
+            BinaryOperator.RightShift,
+            BinaryOperator.LogicalRightShift,
+        ):
+            return [InternalType.LONG]
         raise ValueError(f'Unknown operator: {self}')
 
     @cached_property
@@ -122,17 +144,44 @@ class BinaryExpression[
         self,
         expression: AssignmentExpression,
     ) -> None:
+        def raise_type_error(
+            side: str,
+            value: Checkable | HousingType,
+            actual: InternalType,
+            allowed: list[InternalType],
+        ) -> NoReturn:
+            raise TypeError(
+                f'{side} side of operator "{expression.operator.name}" ({value!r}) must be one of the following types: {", ".join(t.name for t in allowed)}. Got {actual.name}.'
+            )
+
         if (
             expression.left.internal_type is not InternalType.ANY
             and expression.left.internal_type
             not in expression.operator.allowed_left_side_types
         ):
-            raise TypeError(
-                f'Left side of operator {expression.operator} must be one of the following types: {", ".join(t.name for t in expression.operator.allowed_left_side_types)}. Got {expression.left.internal_type.name}.'
+            raise_type_error(
+                'Left',
+                expression.left,
+                expression.left.internal_type,
+                expression.operator.allowed_left_side_types,
             )
 
-        right_side_type = expression.operator.forced_right_side_type or expression.left.internal_type
+        right_side_type = (
+            expression.operator.forced_right_side_type or expression.left.internal_type
+        )
         expression.right = right_side_type.type_compatible(expression.right)
+
+        right_internal_type = InternalType.from_value(expression.right)
+        if (
+            right_internal_type is not InternalType.ANY
+            and right_internal_type not in expression.operator.allowed_right_side_types
+        ):
+            raise_type_error(
+                'Right',
+                expression.right,
+                right_internal_type,
+                expression.operator.allowed_right_side_types,
+            )
 
     def generate_assignment_expressions(self) -> list[AssignmentExpression]:
         assignment_expressions: list[AssignmentExpression] = []
