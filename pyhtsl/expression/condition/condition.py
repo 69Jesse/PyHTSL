@@ -35,6 +35,7 @@ class Condition(BaseObject):
         return self
 
     def raw_execute(self, context: 'ExecutionContext') -> bool:
+        print(f'No execution defined for condition "{self!r}", returning False')
         return False
 
     @final

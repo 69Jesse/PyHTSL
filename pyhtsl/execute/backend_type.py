@@ -11,6 +11,9 @@ __all__ = (
     'into_housing_type',
     'backend_into_string',
     'backend_matches_internal_type',
+    'cast_to_backend_long',
+    'cast_to_backend_double',
+    'backend_to_default_backend',
 )
 
 
@@ -94,3 +97,11 @@ def cast_to_backend_double(value: str) -> np.float64 | None:
         return np.float64(value)
     except (ValueError, ArithmeticError):
         return None
+
+
+def backend_to_default_backend(value: BackendType) -> BackendType:
+    if isinstance(value, np.integer):
+        return np.int64(0)
+    if isinstance(value, np.floating):
+        return np.float64(0.0)
+    return ''

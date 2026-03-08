@@ -11,7 +11,6 @@ from ..expression.condition.condition import Condition
 from ..expression.condition.conditional_expression import ConditionalMode
 from ..expression.expression import Expression
 from ..expression.housing_type import HousingType
-from ..placeholders import PlaceholderCheckable, PlaceholderEditable
 from .backend_type import (
     BackendType,
     backend_into_string,
@@ -208,6 +207,7 @@ class ExecutionContext(Container):
                 "Putting values into the context should be done BEFORE writing any expressions, since this line is ALWAYS ran, even, for example, if it looks like it is behind a condition that may not hold.",
                 stacklevel=2,
             )
+
         value = into_backend_type(value)
         if isinstance(value, str):
             value = self.substitute(value)

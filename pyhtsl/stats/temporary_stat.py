@@ -26,6 +26,12 @@ class TemporaryStat(Stat):
         self.internal_type = internal_type
         self._number = Number(id(self) + 1_000_000)
 
+    def into_player_stat(self) -> PlayerStat:
+        return PlayerStat(self.name, internal_type=self.internal_type)
+
+    def into_hashable(self) -> tuple[object, ...]:
+        return self.into_player_stat().into_hashable()
+
     @property
     def number(self) -> int:
         return self._number.value

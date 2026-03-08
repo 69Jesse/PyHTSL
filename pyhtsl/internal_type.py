@@ -1,9 +1,12 @@
 from enum import Enum
 from typing import TYPE_CHECKING, overload
 
+import numpy as np
+
 from .expression.housing_type import HousingType
 
 if TYPE_CHECKING:
+    from .execute.backend_type import BackendType
     from .checkable import Checkable
 
 
@@ -90,12 +93,12 @@ class InternalType(Enum):
             return self.type_compatible_housing_type(value)
 
     @staticmethod
-    def from_value(value: 'Checkable | HousingType') -> 'InternalType':
+    def from_value(value: 'Checkable | HousingType | BackendType') -> 'InternalType':
         if isinstance(value, str):
             return InternalType.STRING
-        elif isinstance(value, int):
+        elif isinstance(value, (int, np.integer)):
             return InternalType.LONG
-        elif isinstance(value, float):
+        elif isinstance(value, (float, np.floating)):
             return InternalType.DOUBLE
 
         return value.internal_type

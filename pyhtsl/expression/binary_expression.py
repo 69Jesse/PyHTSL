@@ -5,6 +5,13 @@ from typing import Any, NoReturn, Self, final
 
 from ..checkable import Checkable
 from ..editable import Editable
+from ..execute.backend_type import (
+    BackendType,
+    backend_to_default_backend,
+    into_backend_type,
+)
+from ..execute.context import ExecutionContext
+from ..execute.exception import MismatchedTypeException
 from ..internal_type import InternalType
 from ..stats.stat import Stat
 from ..stats.temporary_stat import TemporaryStat
@@ -57,7 +64,9 @@ class BinaryOperator(Enum):
 
     @cached_property
     def allowed_right_side_types(self) -> set[InternalType]:
-        return self.allowed_left_side_types  # Will this ever not be the same? Am not sure
+        return (
+            self.allowed_left_side_types
+        )  # Will this ever not be the same? Am not sure
 
     @cached_property
     def forced_right_side_type(self) -> InternalType | None:
@@ -408,3 +417,37 @@ class BinaryExpression[
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{repr(self.left)} {self.operator.value} {repr(self.right)}>'
+
+    def execute_assignment_expression(
+        self,
+        expression: AssignmentExpression,
+        context: 'ExecutionContext',
+    ) -> None:
+        def get_right_value(default: BackendType | HousingType = '') -> BackendType:
+            if isinstance(expression.right, Checkable):
+                return context.get(
+                    expression.right,
+                    default=default,
+                    output='backend',
+                )
+            return into_backend_type(expression.right)
+
+        if expression.operator is BinaryOperator.Set:
+            context.put(expression.left, get_right_value(), ignore_warning=True)
+            return
+
+        left_value = context.get(expression.left, output='backend')
+        right_value = get_right_value(default=backend_to_default_backend(left_value))
+
+        if type(left_value) is not type(right_value):
+            MismatchedTypeException.throw(
+                left=(expression.left, left_value),
+                right=(expression.right, right_value),
+                operator=expression.operator,
+            )
+
+    def raw_execute(self, context: 'ExecutionContext') -> None:
+        for expr in self.into_executable_expressions():
+            assert isinstance(expr, BinaryExpression)
+            expr = expr.into_assignment_expression()
+            self.execute_assignment_expression(expr, context)
