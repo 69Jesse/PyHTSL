@@ -189,6 +189,8 @@ class Checkable(BaseObject):
         clone.fallback_value = self.internal_type.type_compatible_housing_type(
             fallback_value,
         )
+        if clone.internal_type is InternalType.ANY:
+            clone.internal_type = InternalType.from_value(fallback_value)
         return clone
 
     def get_formatted_fallback_value(self) -> str | None:

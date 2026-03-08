@@ -1,6 +1,7 @@
 __all__ = (
     'ExecutionException',
     'MismatchedTypeException',
+    'NotANumberException',
 )
 
 
@@ -77,3 +78,20 @@ class MismatchedTypeException(ExecutionException):
 class NotANumberException(ExecutionException):
     def __init__(self) -> None:
         super().__init__('The value provided is not a number')
+
+    @staticmethod
+    def throw(
+        *,
+        left: tuple[Editable, BackendType],
+        right: tuple[Checkable | HousingType, BackendType],
+        operator: 'BinaryOperator',
+    ) -> NoReturn:
+        left_string = f'{descriptive_backend_type(left[1])} ({left[0].into_assignment_left_side()})'
+        right_string = descriptive_backend_type(right[1]) + (
+            f' ({right[0].into_assignment_right_side()})'
+            if isinstance(right[0], Checkable)
+            else ''
+        )
+        raise NotANumberException() from TypeError(
+            f'Housing arithmetic operators expect numeric values: {left_string} {operator.value} {right_string}'
+        )

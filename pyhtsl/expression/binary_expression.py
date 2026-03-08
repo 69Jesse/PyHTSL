@@ -11,7 +11,7 @@ from ..execute.backend_type import (
     into_backend_type,
 )
 from ..execute.context import ExecutionContext
-from ..execute.exception import MismatchedTypeException
+from ..execute.exception import MismatchedTypeException, NotANumberException
 from ..internal_type import InternalType
 from ..stats.stat import Stat
 from ..stats.temporary_stat import TemporaryStat
@@ -44,42 +44,14 @@ class BinaryOperator(Enum):
     def allowed_left_side_types(self) -> set[InternalType]:
         if self is BinaryOperator.Set:
             return InternalType.all_types()
-        if self in (
-            BinaryOperator.Increment,
-            BinaryOperator.Decrement,
-            BinaryOperator.Multiply,
-            BinaryOperator.Divide,
-        ):
+        else:
             return InternalType.numeric_types()
-        if self in (
-            BinaryOperator.BitwiseAnd,
-            BinaryOperator.BitwiseOr,
-            BinaryOperator.BitwiseXor,
-            BinaryOperator.LeftShift,
-            BinaryOperator.RightShift,
-            BinaryOperator.LogicalRightShift,
-        ):
-            return {InternalType.LONG}
-        raise ValueError(f'Unknown operator: {self}')
 
     @cached_property
     def allowed_right_side_types(self) -> set[InternalType]:
         return (
             self.allowed_left_side_types
         )  # Will this ever not be the same? Am not sure
-
-    @cached_property
-    def forced_right_side_type(self) -> InternalType | None:
-        if self in (
-            BinaryOperator.BitwiseAnd,
-            BinaryOperator.BitwiseOr,
-            BinaryOperator.BitwiseXor,
-            BinaryOperator.LeftShift,
-            BinaryOperator.RightShift,
-            BinaryOperator.LogicalRightShift,
-        ):
-            return InternalType.LONG
-        return None
 
 
 type AssignmentExpression = BinaryExpression[Editable, Checkable | HousingType]
@@ -161,10 +133,9 @@ class BinaryExpression[
                 expression.operator.allowed_left_side_types,
             )
 
-        right_side_type = (
-            expression.operator.forced_right_side_type or expression.left.internal_type
+        expression.right = expression.left.internal_type.type_compatible(
+            expression.right
         )
-        expression.right = right_side_type.type_compatible(expression.right)
 
         right_internal_type = InternalType.from_value(expression.right)
         if (
@@ -423,6 +394,8 @@ class BinaryExpression[
         expression: AssignmentExpression,
         context: 'ExecutionContext',
     ) -> None:
+        import numpy as np
+
         def get_right_value(default: BackendType | HousingType = '') -> BackendType:
             if isinstance(expression.right, Checkable):
                 return context.get(
@@ -436,7 +409,15 @@ class BinaryExpression[
             context.put(expression.left, get_right_value(), ignore_warning=True)
             return
 
-        left_value = context.get(expression.left, output='backend')
+        left_value = context.get(
+            expression.left,
+            default=backend_to_default_backend(
+                context.get(expression.right, output='backend')
+                if isinstance(expression.right, Checkable)
+                else into_backend_type(expression.right)
+            ),
+            output='backend',
+        )
         right_value = get_right_value(default=backend_to_default_backend(left_value))
 
         if type(left_value) is not type(right_value):
@@ -445,6 +426,90 @@ class BinaryExpression[
                 right=(expression.right, right_value),
                 operator=expression.operator,
             )
+
+        # String operations are not supported
+        if isinstance(left_value, str):
+            NotANumberException.throw(
+                left=(expression.left, left_value),
+                right=(expression.right, right_value),
+                operator=expression.operator,
+            )
+
+        # Verify we have numbers
+        if not isinstance(left_value, np.integer | np.floating):
+            NotANumberException.throw(
+                left=(expression.left, left_value),
+                right=(expression.right, right_value),
+                operator=expression.operator,
+            )
+        if not isinstance(right_value, np.integer | np.floating):
+            NotANumberException.throw(
+                left=(expression.left, left_value),
+                right=(expression.right, right_value),
+                operator=expression.operator,
+            )
+
+        # Logical (bitwise) operators
+        if expression.operator in (
+            BinaryOperator.BitwiseAnd,
+            BinaryOperator.BitwiseOr,
+            BinaryOperator.BitwiseXor,
+            BinaryOperator.LeftShift,
+            BinaryOperator.RightShift,
+            BinaryOperator.LogicalRightShift,
+        ):
+            # For logical operators, convert to longs
+            left_long = np.int64(np.floor(left_value))
+            right_long = np.int64(np.floor(right_value))
+
+            if expression.operator is BinaryOperator.BitwiseAnd:
+                result_long = left_long & right_long
+            elif expression.operator is BinaryOperator.BitwiseOr:
+                result_long = left_long | right_long
+            elif expression.operator is BinaryOperator.BitwiseXor:
+                result_long = left_long ^ right_long
+            elif expression.operator is BinaryOperator.LeftShift:
+                result_long = left_long << right_long
+            elif expression.operator is BinaryOperator.RightShift:
+                result_long = left_long >> right_long
+            elif expression.operator is BinaryOperator.LogicalRightShift:
+                # Logical right shift (unsigned)
+                if left_long < 0:
+                    result_long = (left_long % (1 << 64)) >> right_long
+                else:
+                    result_long = left_long >> right_long
+            else:
+                raise ValueError(f'Unexpected operator: {expression.operator}')
+
+            # If original was double, convert back to double
+            if isinstance(left_value, np.floating):
+                result = np.float64(result_long)
+            else:
+                result = result_long
+
+            context.put(expression.left, result, ignore_warning=True)
+            return
+
+        # Arithmetic operators
+        if expression.operator is BinaryOperator.Increment:
+            result = left_value + right_value
+        elif expression.operator is BinaryOperator.Decrement:
+            result = left_value - right_value
+        elif expression.operator is BinaryOperator.Multiply:
+            result = left_value * right_value
+        elif expression.operator is BinaryOperator.Divide:
+            if right_value == 0:
+                return
+            if isinstance(left_value, np.integer) and isinstance(
+                right_value, np.integer
+            ):
+                result = left_value // right_value
+            else:
+                result = left_value / right_value
+        else:
+            raise ValueError(f'Unexpected operator: {expression.operator}')
+
+        context.put(expression.left, result, ignore_warning=True)
 
     def raw_execute(self, context: 'ExecutionContext') -> None:
         for expr in self.into_executable_expressions():
