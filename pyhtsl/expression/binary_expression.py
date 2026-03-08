@@ -1,5 +1,6 @@
 from collections.abc import Generator
 from enum import Enum
+from functools import cached_property
 from typing import Any, Self, final
 
 from ..checkable import Checkable
@@ -9,6 +10,7 @@ from ..stats.stat import Stat
 from ..stats.temporary_stat import TemporaryStat
 from .expression import Expression
 from .housing_type import HousingType, housing_type_as_right_side
+from pyhtsl import internal_type
 
 __all__ = (
     'BinaryOperator',
@@ -31,6 +33,47 @@ class BinaryOperator(Enum):
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.name}, {self.value}>'
+
+    @cached_property
+    def allowed_left_side_types(self) -> list[InternalType]:
+        if self is BinaryOperator.Set:
+            return InternalType.all_types()
+        if self in (
+            BinaryOperator.Increment,
+            BinaryOperator.Decrement,
+            BinaryOperator.Multiply,
+            BinaryOperator.Divide,
+            BinaryOperator.BitwiseAnd,
+            BinaryOperator.BitwiseOr,
+            BinaryOperator.BitwiseXor,
+            BinaryOperator.LeftShift,
+            BinaryOperator.RightShift,
+            BinaryOperator.LogicalRightShift,
+        ):
+            return InternalType.numeric_types()
+        raise ValueError(f'Unknown operator: {self}')
+
+    @cached_property
+    def allowed_right_side_types(self) -> list[InternalType]:
+        if self is BinaryOperator.Set:
+            return InternalType.all_types()
+        if self in (
+            BinaryOperator.Increment,
+            BinaryOperator.Decrement,
+            BinaryOperator.Multiply,
+            BinaryOperator.Divide,
+        ):
+            return InternalType.numeric_types()
+        if self in (
+            BinaryOperator.BitwiseAnd,
+            BinaryOperator.BitwiseOr,
+            BinaryOperator.BitwiseXor,
+            BinaryOperator.LeftShift,
+            BinaryOperator.RightShift,
+            BinaryOperator.LogicalRightShift,
+        ):
+            return [InternalType.LONG]
+        raise ValueError(f'Unknown operator: {self}')
 
 
 type AssignmentExpression = BinaryExpression[Editable, Checkable | HousingType]
@@ -85,6 +128,37 @@ class BinaryExpression[
             )
         return self  # type: ignore
 
+    def make_type_compatible(
+        self,
+        expression: AssignmentExpression,
+    ) -> None:
+        if (
+            expression.left.internal_type is not InternalType.ANY
+            and expression.left.internal_type
+            not in expression.operator.allowed_left_side_types
+        ):
+            raise TypeError(
+                f'Left side of operator {expression.operator} must be one of the following types: {", ".join(t.name for t in expression.operator.allowed_left_side_types)}. Got {expression.left.internal_type.name}.'
+            )
+
+        checking_order = expression.operator.allowed_right_side_types.copy()
+        if expression.left.internal_type in checking_order:
+            checking_order.remove(expression.left.internal_type)
+            checking_order.insert(0, expression.left.internal_type)
+
+        type_errors: list[TypeError] = []
+        for allowed_type in checking_order:
+            try:
+                new_right = allowed_type.type_compatible(expression.right)
+                expression.right = new_right
+                return
+            except TypeError as exc:
+                type_errors.append(exc)
+
+        raise TypeError(
+            f'Right side of operator {expression.operator} must be one of the following types: {", ".join(t.name for t in expression.operator.allowed_right_side_types)}. Got {InternalType.from_value(expression.right).name}. Errors encountered while trying to make the right side compatible with allowed types: {"; ".join(str(e) for e in type_errors)}'
+        ) from None
+
     def generate_assignment_expressions(self) -> list[AssignmentExpression]:
         assignment_expressions: list[AssignmentExpression] = []
 
@@ -134,7 +208,7 @@ class BinaryExpression[
         )
 
         for expr in assignment_expressions:
-            expr.right = expr.left.internal_type.type_compatible(expr.right)
+            self.make_type_compatible(expr)
 
         return assignment_expressions
 
@@ -178,6 +252,24 @@ class BinaryExpression[
             ):
                 # editable *= 1
                 # editable /= 1
+                del expressions[i]
+
+            elif (
+                (
+                    expression.operator is BinaryOperator.BitwiseOr
+                    or expression.operator is BinaryOperator.BitwiseXor
+                    or expression.operator is BinaryOperator.LeftShift
+                    or expression.operator is BinaryOperator.RightShift
+                    or expression.operator is BinaryOperator.LogicalRightShift
+                )
+                and isinstance(expression.right, int)
+                and expression.right == 0
+            ):
+                # editable |= 0
+                # editable ^= 0
+                # editable <<= 0
+                # editable >>= 0
+                # editable >>>= 0
                 del expressions[i]
 
     @staticmethod

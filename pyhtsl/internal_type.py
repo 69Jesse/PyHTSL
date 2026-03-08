@@ -16,6 +16,14 @@ class InternalType(Enum):
     DOUBLE = 2
     STRING = 3
 
+    @classmethod
+    def all_types(cls) -> list['InternalType']:
+        return [cls.LONG, cls.DOUBLE, cls.STRING]
+
+    @classmethod
+    def numeric_types(cls) -> list['InternalType']:
+        return [cls.LONG, cls.DOUBLE]
+
     def default_housing_type(self) -> HousingType | None:
         if self is InternalType.ANY:
             return None
