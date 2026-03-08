@@ -53,16 +53,7 @@ class BinaryOperator(Enum):
         raise ValueError(f'Unknown operator: {self}')
 
     @cached_property
-    def allowed_right_side_types(self) -> list[InternalType]:
-        if self is BinaryOperator.Set:
-            return InternalType.all_types()
-        if self in (
-            BinaryOperator.Increment,
-            BinaryOperator.Decrement,
-            BinaryOperator.Multiply,
-            BinaryOperator.Divide,
-        ):
-            return InternalType.numeric_types()
+    def forced_right_side_type(self) -> InternalType | None:
         if self in (
             BinaryOperator.BitwiseAnd,
             BinaryOperator.BitwiseOr,
@@ -71,8 +62,8 @@ class BinaryOperator(Enum):
             BinaryOperator.RightShift,
             BinaryOperator.LogicalRightShift,
         ):
-            return [InternalType.LONG]
-        raise ValueError(f'Unknown operator: {self}')
+            return InternalType.LONG
+        return None
 
 
 type AssignmentExpression = BinaryExpression[Editable, Checkable | HousingType]
@@ -140,23 +131,8 @@ class BinaryExpression[
                 f'Left side of operator {expression.operator} must be one of the following types: {", ".join(t.name for t in expression.operator.allowed_left_side_types)}. Got {expression.left.internal_type.name}.'
             )
 
-        checking_order = expression.operator.allowed_right_side_types.copy()
-        if expression.left.internal_type in checking_order:
-            checking_order.remove(expression.left.internal_type)
-            checking_order.insert(0, expression.left.internal_type)
-
-        type_errors: list[TypeError] = []
-        for allowed_type in checking_order:
-            try:
-                new_right = allowed_type.type_compatible(expression.right)
-                expression.right = new_right
-                return
-            except TypeError as exc:
-                type_errors.append(exc)
-
-        raise TypeError(
-            f'Right side of operator {expression.operator} must be one of the following types: {", ".join(t.name for t in expression.operator.allowed_right_side_types)}. Got {InternalType.from_value(expression.right).name}. Errors encountered while trying to make the right side compatible with allowed types: {"; ".join(str(e) for e in type_errors)}'
-        ) from None
+        right_side_type = expression.operator.forced_right_side_type or expression.left.internal_type
+        expression.right = right_side_type.type_compatible(expression.right)
 
     def generate_assignment_expressions(self) -> list[AssignmentExpression]:
         assignment_expressions: list[AssignmentExpression] = []
