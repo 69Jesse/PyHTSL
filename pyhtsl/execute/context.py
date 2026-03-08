@@ -3,6 +3,7 @@ import re
 from collections.abc import Callable, Generator
 from types import TracebackType
 from typing import Literal, overload
+from warnings import warn
 
 from ..checkable import Checkable
 from ..container import Container
@@ -199,7 +200,14 @@ class ExecutionContext(Container):
         self,
         key: Checkable,
         value: HousingType | BackendType,
+        *,
+        ignore_warning: bool = False,
     ) -> None:
+        if not ignore_warning and len(self.expressions) > 0:
+            warn(
+                "Putting values into the context should be done BEFORE writing any expressions, since this line is ALWAYS ran, even, for example, if it looks like it is behind a condition that may not hold.",
+                stacklevel=2,
+            )
         value = into_backend_type(value)
         if isinstance(value, str):
             value = self.substitute(value)
