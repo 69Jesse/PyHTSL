@@ -1,132 +1,129 @@
-from typing import TYPE_CHECKING, Literal, Self
+from typing import TYPE_CHECKING, Self
 
 from .checkable import Checkable
 from .expression.expression import Expression
 from .expression.housing_type import HousingType, NumericHousingType
 
 if TYPE_CHECKING:
-    from .expression.binary_expression import BinaryExpression, BinaryOperator
-    from .expression.compound_expression import CompoundExpression
+    from .expression.binary_expression import BinaryOperator
 
 
 __all__ = ('Editable',)
 
 
 class Editable(Checkable):
-    def _maybe_write[T: Expression](self, result: T) -> T:
-        if not self.is_gotten_from_value_property:
-            return result.write()
-        return result
-
-    def __iadd__[T: Checkable | NumericHousingType](
+    def __iadd__(
         self,
-        other: T,
-    ) -> 'BinaryExpression[Self, T]':
-        return self._maybe_write(self.__add__(other))
+        other: Checkable | NumericHousingType,
+    ) -> None:
+        self.__add__(other).write()
 
-    def __isub__[T: Checkable | NumericHousingType](
+    def __isub__(
         self,
-        other: T,
-    ) -> 'BinaryExpression[Self, T]':
-        return self._maybe_write(self.__sub__(other))
+        other: Checkable | NumericHousingType,
+    ) -> None:
+        self.__sub__(other).write()
 
-    def __imul__[T: Checkable | NumericHousingType](
+    def __imul__(
         self,
-        other: T,
-    ) -> 'BinaryExpression[Self, T]':
-        return self._maybe_write(self.__mul__(other))
+        other: Checkable | NumericHousingType,
+    ) -> None:
+        self.__mul__(other).write()
 
-    def __itruediv__[T: Checkable | NumericHousingType](
+    def __itruediv__(
         self,
-        other: T,
-    ) -> 'BinaryExpression[Self, T]':
-        return self._maybe_write(self.__truediv__(other))
+        other: Checkable | NumericHousingType,
+    ) -> None:
+        self.__truediv__(other).write()
 
-    def __ifloordiv__[T: Checkable | NumericHousingType](
+    def __ifloordiv__(
         self,
-        other: T,
-    ) -> 'BinaryExpression[Self, T]':
-        return self._maybe_write(self.__floordiv__(other))
+        other: Checkable | NumericHousingType,
+    ) -> None:
+        self.__floordiv__(other).write()
 
-    def __ipow__(self, other: int) -> 'CompoundExpression | Self | Literal[1]':
+    def __ipow__(self, other: int) -> None:
         result = self.__pow__(other)
         if isinstance(result, Expression):
-            return self._maybe_write(result)
-        return result
+            result.write()
 
-    def __imod__(self, other: Checkable | NumericHousingType) -> 'CompoundExpression':
-        return self._maybe_write(self.__mod__(other))
+    def __imod__(self, other: Checkable | NumericHousingType) -> None:
+        self.__mod__(other).write()
 
-    def __iand__[T: Checkable | NumericHousingType](
+    def __iand__(
         self,
-        other: T,
-    ) -> 'BinaryExpression[Self, T]':
-        return self._maybe_write(self.__and__(other))
+        other: Checkable | NumericHousingType,
+    ) -> None:
+        self.__and__(other).write()
 
-    def __ior__[T: Checkable | NumericHousingType](
+    def __ior__(
         self,
-        other: T,
-    ) -> 'BinaryExpression[Self, T]':
-        return self._maybe_write(self.__or__(other))
+        other: Checkable | NumericHousingType,
+    ) -> None:
+        self.__or__(other).write()
 
-    def __ixor__[T: Checkable | NumericHousingType](
+    def __ixor__(
         self,
-        other: T,
-    ) -> 'BinaryExpression[Self, T]':
-        return self._maybe_write(self.__xor__(other))
+        other: Checkable | NumericHousingType,
+    ) -> None:
+        self.__xor__(other).write()
 
-    def __ilshift__[T: Checkable | NumericHousingType](
+    def __ilshift__(
         self,
-        other: T,
-    ) -> 'BinaryExpression[Self, T]':
-        return self._maybe_write(self.__lshift__(other))
+        other: Checkable | NumericHousingType,
+    ) -> None:
+        self.__lshift__(other).write()
 
-    def __irshift__[T: Checkable | NumericHousingType](
+    def __irshift__(
         self,
-        other: T,
-    ) -> 'BinaryExpression[Self, T]':
-        return self._maybe_write(self.__rshift__(other))
+        other: Checkable | NumericHousingType,
+    ) -> None:
+        self.__rshift__(other).write()
 
-    def set[T: Checkable | HousingType](
+    def set(
         self,
-        value: T,
+        value: Checkable | HousingType,
         *,
         allow_self_assignment: bool = False,
-    ) -> 'BinaryExpression[Self, T]':
+    ) -> None:
         from .expression.binary_expression import BinaryExpression, BinaryOperator
 
-        return BinaryExpression(
+        BinaryExpression(
             left=self,
             right=value,
             operator=BinaryOperator.Set,
             allow_self_assignment=allow_self_assignment,
         ).write()
 
-    def inc[T: Checkable | NumericHousingType](
-        self, other: T
-    ) -> 'BinaryExpression[Self, T]':
+    def inc(
+        self,
+        other: Checkable | NumericHousingType,
+    ) -> None:
         return self.__iadd__(other)
 
-    def dec[T: Checkable | NumericHousingType](
-        self, other: T
-    ) -> 'BinaryExpression[Self, T]':
+    def dec(
+        self,
+        other: Checkable | NumericHousingType,
+    ) -> None:
         return self.__isub__(other)
 
-    def mul[T: Checkable | NumericHousingType](
-        self, other: T
-    ) -> 'BinaryExpression[Self, T]':
+    def mul(
+        self,
+        other: Checkable | NumericHousingType,
+    ) -> None:
         return self.__imul__(other)
 
-    def div[T: Checkable | NumericHousingType](
-        self, other: T
-    ) -> 'BinaryExpression[Self, T]':
+    def div(
+        self,
+        other: Checkable | NumericHousingType,
+    ) -> None:
         return self.__itruediv__(other)
 
-    def write[T: Checkable | HousingType](
+    def write(
         self,
         operator: 'BinaryOperator',
-        other: T,
-    ) -> 'BinaryExpression[Self, T]':
+        other: Checkable | HousingType,
+    ) -> None:
         from .expression.binary_expression import BinaryOperator
 
         if operator is BinaryOperator.Set:
@@ -150,12 +147,13 @@ class Editable(Checkable):
 
     @property
     def value(self) -> Self:
-        clone = self.cloned()
-        clone.is_gotten_from_value_property = True
-        return clone
+        return self
 
     @value.setter
     def value(self, value: Checkable | HousingType) -> None:
+        if value is None:
+            # `x.value += 1` gets replaced with `x.value = x.value.__iadd__(1)`, `x.value.__iadd__(1)` returns `None`
+            return
         self.set(value)
 
     def with_value(self, value: Checkable | HousingType) -> Self:

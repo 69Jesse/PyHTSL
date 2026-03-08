@@ -21,12 +21,11 @@ class Expression(BaseObject):
     def into_htsl(self) -> str:
         raise NotImplementedError()
 
-    def write(self) -> Self:
+    def write(self) -> None:
         get_current_container().write_expression(self.cloned())
-        return self
 
     def raw_execute(self, context: 'ExecutionContext') -> None:
-        pass
+        print(f'No execution defined for expression "{self!r}"')
 
     @final
     def execute(self, context: 'ExecutionContext') -> None:

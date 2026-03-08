@@ -45,7 +45,6 @@ class Checkable(BaseObject):
 
     internal_type: InternalType = InternalType.ANY
     fallback_value: HousingType | None
-    is_gotten_from_value_property: bool
 
     def __init__(
         self,
@@ -55,7 +54,6 @@ class Checkable(BaseObject):
     ) -> None:
         self.internal_type = internal_type
         self.fallback_value = fallback_value
-        self.is_gotten_from_value_property = False
 
     def into_hashable(self) -> tuple[object, ...]:
         return (
@@ -145,7 +143,6 @@ class Checkable(BaseObject):
         clone = self.cloned_raw()
         clone.internal_type = self.internal_type
         clone.fallback_value = self.fallback_value
-        clone.is_gotten_from_value_property = self.is_gotten_from_value_property
         return clone
 
     def as_type(self, internal_type: InternalType, /) -> Self:
@@ -542,7 +539,6 @@ class Checkable(BaseObject):
     @property
     def value(self) -> Self:
         clone = self.cloned()
-        clone.is_gotten_from_value_property = True
         return clone
 
     @abstractmethod
