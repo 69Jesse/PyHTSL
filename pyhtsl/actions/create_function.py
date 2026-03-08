@@ -5,34 +5,7 @@ from ..container import get_current_container
 from .function import Function
 from .goto import goto
 
-__all__ = (
-    'rename',
-    'create_function',
-)
-
-
-ANNOTATION_EXAMPLE: str = (
-    'Example:'
-    "\n\n@create_function('My Function')"
-    "\n@rename(p='player', g='global', t='team')"
-    '\ndef my_function(p: PlayerStat, g: GlobalStat, t: TeamStat) -> None:'
-    '\n    ...'
-    '\n'
-)
-
-
-P = ParamSpec('P')
-F = Callable[P, None]
-
-
-def rename(**names: str) -> Callable[[F], F]:
-    def decorator(func: F) -> F:
-        renamed_stats: dict[str, str] = getattr(func, '__pyhtsl_renamed_stats__', {})
-        renamed_stats |= names
-        func.__pyhtsl_renamed_stats__ = renamed_stats  # type: ignore
-        return func
-
-    return decorator
+__all__ = ('create_function',)
 
 
 def create_function(
@@ -40,10 +13,10 @@ def create_function(
     *,
     force_create: bool | None = None,
     run_right_now: bool = False,
-) -> Callable[[F], Function[F]]:
-    def decorator(func: F) -> Function[F]:
+) -> Callable[[Callable[[], None]], Function[Callable[[], None]]]:
+    def decorator(func: Callable[[], None]) -> Function[Callable[[], None]]:
         def callback() -> None:
-            goto(container='function', name=name, add_to_front=True)  # pyright: ignore[reportCallIssue]
+            goto(container='function', name=name, add_to_front=True)
             create = (
                 force_create
                 if force_create is not None

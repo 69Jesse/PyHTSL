@@ -2,15 +2,12 @@ from collections.abc import Callable, Sequence
 from types import ModuleType
 from typing import Any
 
-from .container import Container
 from .actions.function import Function
+from .container import Container
 
 type CallableNoArgs = Callable[[], Any]
 type Exportable = (
-    Function[Callable[[], None]]
-    | CallableNoArgs
-    | Sequence[Exportable]
-    | ModuleType
+    Function[Callable[[], None]] | CallableNoArgs | Sequence[Exportable] | ModuleType
 )
 
 
