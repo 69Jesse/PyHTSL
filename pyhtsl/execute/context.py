@@ -110,6 +110,14 @@ class ExecutionContext(Container):
             return value
         return into_housing_type(value)
 
+    def get_backend(self, key: Checkable | HousingType, default: BackendType | HousingType = '') -> BackendType:
+        if not isinstance(key, Checkable):
+            value = into_backend_type(key)
+            if isinstance(value, str):
+                value = self.substitute(value)
+            return value
+        return self.get(key, default=default, output='backend')
+
     def _walk_subclasses(self, cls: type) -> Generator[type, None, None]:
         yield cls
         for subclass in cls.__subclasses__():

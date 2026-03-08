@@ -8,6 +8,7 @@ from .condition import Condition
 
 if TYPE_CHECKING:
     from ...checkable import Checkable
+    from ...execute.context import ExecutionContext
 
 
 __all__ = (
@@ -87,3 +88,13 @@ class ComparisonCondition[LeftT: 'Checkable', RightT: 'Checkable | HousingType']
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{repr(self.left)} {self.operator.value} {repr(self.right)}>'
+
+    def raw_execute(self, context: 'ExecutionContext') -> bool:
+        left_value = context.get_backend(self.left)
+        right_value = context.get_backend(self.right)
+        if type(left_value) is not type(right_value):
+            return False
+        return left_value == right_value
+
+    def related_debug_parts(self) -> list['Checkable | HousingType']:
+        return [self.left, self.right]

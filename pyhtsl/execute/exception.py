@@ -95,3 +95,7 @@ class NotANumberException(ExecutionException):
         raise NotANumberException() from TypeError(
             f'Housing arithmetic operators expect numeric values: {left_string} {operator.value} {right_string}'
         )
+
+
+class ConditionFailedExtraInfoException(ExecutionException):
+    pass

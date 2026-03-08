@@ -1,9 +1,11 @@
 from typing import TYPE_CHECKING, NoReturn, Self
 
 from ...expression.condition.conditional_expression import ConditionalMode
+from ..exception import descriptive_backend_type
 from .execution_expression import ExecutionExpression
 
 if TYPE_CHECKING:
+    from ...checkable import Checkable
     from ...expression.condition.condition import Condition
     from ..context import ExecutionContext
 
@@ -53,27 +55,38 @@ class AssertExecutionExpression(ExecutionExpression):
         self,
         context: 'ExecutionContext',
         *,
-        false_conditions: list['Condition'],
+        failed_conditions: list['Condition'],
     ) -> NoReturn:
-        message = (
-            f'"{context.substitute(self.message)}": ' if self.message else ''
-        )
+        from ...checkable import Checkable
+
+        assert len(failed_conditions) > 0
+
+        message = f'"{context.substitute(self.message)}": ' if self.message else ''
         if self.mode is ConditionalMode.AND:
-            assert len(false_conditions) == 1
+            assert len(failed_conditions) == 1
             middle = 'The following condition did not hold: '
         else:
             middle = 'None of the following conditions held: '
+
+        def descriptive_condition(cond: 'Condition') -> str:
+            return f'{" " * 4}{cond!r}\n' + '\n'.join(
+                f'{" " * 8}{part!r}: {descriptive_backend_type(context.get_backend(part))}'
+                for part in cond.related_debug_parts()
+                if isinstance(part, Checkable)
+            )
+
         raise AssertionError(
-            f'{message}{middle}{", ".join(repr(cond) for cond in false_conditions)}'
+            f'{message}{middle}\n'
+            + '\n'.join(map(descriptive_condition, failed_conditions))
         )
 
     def raw_execute(self, context: 'ExecutionContext') -> None:
         if self.mode == ConditionalMode.AND:
             for condition in self.conditions:
                 if not condition.execute(context):
-                    self.throw(context, false_conditions=[condition])
+                    self.throw(context, failed_conditions=[condition])
         elif self.mode == ConditionalMode.OR:
             for condition in self.conditions:
                 if condition.execute(context):
                     return
-            self.throw(context, false_conditions=self.conditions)
+            self.throw(context, failed_conditions=self.conditions)

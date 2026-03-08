@@ -3,6 +3,8 @@ from enum import Enum
 from functools import cached_property
 from typing import Any, NoReturn, Self, final
 
+import numpy as np
+
 from ..checkable import Checkable
 from ..editable import Editable
 from ..execute.backend_type import (
@@ -394,31 +396,22 @@ class BinaryExpression[
         expression: AssignmentExpression,
         context: 'ExecutionContext',
     ) -> None:
-        import numpy as np
-
-        def get_right_value(default: BackendType | HousingType = '') -> BackendType:
-            if isinstance(expression.right, Checkable):
-                return context.get(
-                    expression.right,
-                    default=default,
-                    output='backend',
-                )
-            return into_backend_type(expression.right)
-
         if expression.operator is BinaryOperator.Set:
-            context.put(expression.left, get_right_value(), ignore_warning=True)
+            context.put(
+                expression.left,
+                context.get_backend(expression.right),
+                ignore_warning=True,
+            )
             return
 
-        left_value = context.get(
+        left_value = context.get_backend(
             expression.left,
-            default=backend_to_default_backend(
-                context.get(expression.right, output='backend')
-                if isinstance(expression.right, Checkable)
-                else into_backend_type(expression.right)
-            ),
-            output='backend',
+            default=backend_to_default_backend(context.get_backend(expression.right)),
         )
-        right_value = get_right_value(default=backend_to_default_backend(left_value))
+        right_value = context.get_backend(
+            expression.right,
+            default=backend_to_default_backend(left_value),
+        )
 
         if type(left_value) is not type(right_value):
             MismatchedTypeException.throw(
@@ -435,21 +428,13 @@ class BinaryExpression[
                 operator=expression.operator,
             )
 
-        # Verify we have numbers
-        if not isinstance(left_value, np.integer | np.floating):
-            NotANumberException.throw(
-                left=(expression.left, left_value),
-                right=(expression.right, right_value),
-                operator=expression.operator,
-            )
-        if not isinstance(right_value, np.integer | np.floating):
-            NotANumberException.throw(
-                left=(expression.left, left_value),
-                right=(expression.right, right_value),
-                operator=expression.operator,
+        if not isinstance(left_value, np.integer | np.floating) or not isinstance(
+            right_value, np.integer | np.floating
+        ):
+            raise RuntimeError(
+                'Expected numeric values for binary expression execution'
             )
 
-        # Logical (bitwise) operators
         if expression.operator in (
             BinaryOperator.BitwiseAnd,
             BinaryOperator.BitwiseOr,

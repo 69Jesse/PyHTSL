@@ -4,7 +4,9 @@ from typing import TYPE_CHECKING, Self, final
 from ...base_object import BaseObject
 
 if TYPE_CHECKING:
+    from ...checkable import Checkable
     from ...execute.context import ExecutionContext
+    from ...expression.housing_type import HousingType
 
 __all__ = ('Condition',)
 
@@ -46,3 +48,6 @@ class Condition(BaseObject):
         if self.inverted:
             value = not value
         return value
+
+    def related_debug_parts(self) -> list['Checkable | HousingType']:
+        return []
