@@ -119,7 +119,7 @@ class Editable(Checkable):
     ) -> None:
         return self.__itruediv__(other)
 
-    def write(
+    def apply(
         self,
         operator: 'BinaryOperator',
         other: Checkable | HousingType,
