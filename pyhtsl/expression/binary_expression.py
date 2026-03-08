@@ -73,13 +73,13 @@ class BinaryExpression[
         right: RightT,
         operator: BinaryOperator,
         *,
-        allow_self_assignment: bool = False,
+        is_intentional_self_assignment: bool = False,
     ) -> None:
         super().__init__(internal_type=InternalType.from_value(left))
         self.left = left
         self.right = right
         self.operator = operator
-        self.is_intentional_self_assignment = allow_self_assignment
+        self.is_intentional_self_assignment = is_intentional_self_assignment
 
         if self.is_intentional_self_assignment and (
             not isinstance(self.left, Stat)

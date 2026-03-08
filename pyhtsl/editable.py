@@ -84,7 +84,7 @@ class Editable(Checkable):
         self,
         value: Checkable | HousingType,
         *,
-        allow_self_assignment: bool = False,
+        is_intentional_self_assignment: bool = False,
     ) -> None:
         from .expression.binary_expression import BinaryExpression, BinaryOperator
 
@@ -92,7 +92,7 @@ class Editable(Checkable):
             left=self,
             right=value,
             operator=BinaryOperator.Set,
-            allow_self_assignment=allow_self_assignment,
+            is_intentional_self_assignment=is_intentional_self_assignment,
         ).write()
 
     def inc(
@@ -161,10 +161,10 @@ class Editable(Checkable):
         return self
 
     def cast_to_long(self) -> None:
-        self.set(self.as_long(), allow_self_assignment=True)
+        self.set(self.as_long(), is_intentional_self_assignment=True)
 
     def cast_to_double(self) -> None:
-        self.set(self.as_double(), allow_self_assignment=True)
+        self.set(self.as_double(), is_intentional_self_assignment=True)
 
     def cast_to_string(self) -> None:
-        self.set(self.as_string(), allow_self_assignment=True)
+        self.set(self.as_string(), is_intentional_self_assignment=True)
