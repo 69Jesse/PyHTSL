@@ -1,10 +1,11 @@
 from enum import Enum
 from typing import TYPE_CHECKING, Self, final
 
+from ...base_object import BaseObject
+from ...expression.housing_type import HousingType
 from ..housing_type import housing_type_as_right_side
 from .condition import Condition
 
-from ...expression.housing_type import HousingType
 if TYPE_CHECKING:
     from ...checkable import Checkable
 
@@ -60,9 +61,7 @@ class ComparisonCondition[LeftT: 'Checkable', RightT: 'Checkable | HousingType']
     def cloned(self) -> Self:
         return self.__class__(
             left=self.left.cloned(),
-            right=self.right.cloned()
-            if isinstance(self.right, Checkable)
-            else self.right,
+            right=BaseObject.cloned_or_same(self.right),
             operator=self.operator,
         )
 

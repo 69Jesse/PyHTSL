@@ -34,7 +34,7 @@ class BinaryOperator(Enum):
         return f'{self.__class__.__name__}<{self.name}, {self.value}>'
 
     @cached_property
-    def allowed_left_side_types(self) -> list[InternalType]:
+    def allowed_left_side_types(self) -> set[InternalType]:
         if self is BinaryOperator.Set:
             return InternalType.all_types()
         if self in (
@@ -53,7 +53,7 @@ class BinaryOperator(Enum):
         raise ValueError(f'Unknown operator: {self}')
 
     @cached_property
-    def allowed_right_side_types(self) -> list[InternalType]:
+    def allowed_right_side_types(self) -> set[InternalType]:
         if self is BinaryOperator.Set:
             return InternalType.all_types()
         if self in (
@@ -71,7 +71,7 @@ class BinaryOperator(Enum):
             BinaryOperator.RightShift,
             BinaryOperator.LogicalRightShift,
         ):
-            return [InternalType.LONG]
+            return {InternalType.LONG}
         raise ValueError(f'Unknown operator: {self}')
 
     @cached_property
@@ -148,10 +148,11 @@ class BinaryExpression[
             side: str,
             value: Checkable | HousingType,
             actual: InternalType,
-            allowed: list[InternalType],
+            allowed: set[InternalType],
         ) -> NoReturn:
             raise TypeError(
-                f'{side} side of operator "{expression.operator.name}" ({value!r}) must be one of the following types: {", ".join(t.name for t in allowed)}. Got {actual.name}.'
+                f'{side} side of operator "{expression.operator.name}" ({value!r}) must be one of the following types: '
+                f'{", ".join(t.name for t in sorted(allowed, key=lambda t: t.value))}. Got {actual.name}.'
             )
 
         if (
