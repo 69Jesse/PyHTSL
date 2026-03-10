@@ -51,16 +51,18 @@ class PlaceholderCheckable(Checkable, ABC):
         )
 
     def into_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
-        return self._formatted_with_internal_type(
-            self.assignment_right_side, include_internal_type=include_internal_type
+        return self.format_with_internal_type(
+            self.assignment_right_side,
+            include_internal_type=include_internal_type,
         )
 
     def into_comparison_left_side(self) -> str:
         return self.comparison_left_side
 
     def into_comparison_right_side(self) -> str:
-        return self._formatted_with_internal_type(
-            self.comparison_right_side, include_internal_type=True
+        return self.format_with_internal_type(
+            self.comparison_right_side,
+            include_internal_type=True,
         )
 
     def into_string(self, include_fallback_value: bool = True) -> str:
@@ -117,16 +119,18 @@ class PlaceholderEditable(Editable, ABC):
         return self.assignment_left_side
 
     def into_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
-        return self._formatted_with_internal_type(
-            self.assignment_right_side, include_internal_type=include_internal_type
+        return self.format_with_internal_type(
+            self.assignment_right_side,
+            include_internal_type=include_internal_type,
         )
 
     def into_comparison_left_side(self) -> str:
         return self.comparison_left_side
 
     def into_comparison_right_side(self) -> str:
-        return self._formatted_with_internal_type(
-            self.comparison_right_side, include_internal_type=True
+        return self.format_with_internal_type(
+            self.comparison_right_side,
+            include_internal_type=True,
         )
 
     def into_string(self, include_fallback_value: bool = True) -> str:

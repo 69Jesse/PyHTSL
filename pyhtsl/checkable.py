@@ -66,7 +66,7 @@ class Checkable(BaseObject):
             return None
         return into_backend_type(self.fallback_value)
 
-    def _formatted_with_internal_type(
+    def format_with_internal_type(
         self,
         text: str,
         *,
@@ -77,7 +77,7 @@ class Checkable(BaseObject):
                 text += 'L'
             elif self.internal_type is InternalType.DOUBLE:
                 text += 'D'
-        return f'"{text}"' if ' ' in text else text  # ugly hack until htsw
+        return f'"{text.replace('"', '\\"')}"'
 
     def into_assignment_left_side(self) -> str:
         """
@@ -95,15 +95,15 @@ class Checkable(BaseObject):
 
     def into_comparison_left_side(self) -> str:
         """
-        if and (var "foo" > "%var.player/bar%") {
+        if and (var "foo" > %var.player/bar%) {
                 ^^^^^^^^^
         """
         raise NotImplementedError
 
     def into_comparison_right_side(self) -> str:
         """
-        if and (var "foo" > "%var.player/bar%") {
-                            ^^^^^^^^^^^^^^^^^^
+        if and (var "foo" > %var.player/bar%) {
+                            ^^^^^^^^^^^^^^^^
         """
         raise NotImplementedError
 

@@ -55,11 +55,11 @@ class TeamStat(
         )
 
     @staticmethod
-    def _left_side_keyword() -> str:
+    def left_side_keyword() -> str:
         return 'teamvar'
 
     @staticmethod
-    def _right_side_keyword() -> str:
+    def right_side_keyword() -> str:
         return 'team'
 
     def into_assignment_left_side(self) -> str:
@@ -68,12 +68,12 @@ class TeamStat(
             return f'{value} "{self.team.name}"'
         return value
 
-    def _as_string_second(self, include_fallback_value: bool = True) -> str:
-        value = super()._as_string_second(include_fallback_value=include_fallback_value)
+    def into_string_middle(self, include_fallback_value: bool = True) -> str:
+        value = super().into_string_middle(include_fallback_value=include_fallback_value)
         if self.team is not None or value:
             name = self.team.name if isinstance(self.team, Team) else 'None'
             if ' ' in name:
-                name = f'"{name}"'  # this will break htsl :( waiting on htsw :D
+                name = f'"{name}"'
             return f' {name}{value}'
         return value
 

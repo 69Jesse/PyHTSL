@@ -35,7 +35,7 @@ class Stat(Editable):
 
     @staticmethod
     @abstractmethod
-    def _left_side_keyword() -> str:
+    def left_side_keyword() -> str:
         """
         var foo = %var.player/bar%
         ^^^
@@ -44,7 +44,7 @@ class Stat(Editable):
 
     @staticmethod
     @abstractmethod
-    def _right_side_keyword() -> str:
+    def right_side_keyword() -> str:
         """
         var foo = %var.player/bar%
                        ^^^^^^
@@ -52,12 +52,13 @@ class Stat(Editable):
         raise NotImplementedError
 
     def into_assignment_left_side(self) -> str:
-        return f'{self._left_side_keyword()} "{self.name}"'
+        return f'{self.left_side_keyword()} "{self.name}"'
 
     def into_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
         name = self.into_string()
-        return self._formatted_with_internal_type(
-            name, include_internal_type=include_internal_type
+        return self.format_with_internal_type(
+            name,
+            include_internal_type=include_internal_type,
         )
 
     def into_comparison_left_side(self) -> str:
@@ -66,10 +67,10 @@ class Stat(Editable):
     def into_comparison_right_side(self) -> str:
         return self.into_assignment_right_side()
 
-    def _as_string_first(self) -> str:
-        return f'%var.{self._right_side_keyword()}/{self.name}'
+    def into_string_prefix(self) -> str:
+        return f'%var.{self.right_side_keyword()}/{self.name}'
 
-    def _as_string_second(self, include_fallback_value: bool = True) -> str:
+    def into_string_middle(self, include_fallback_value: bool = True) -> str:
         if not include_fallback_value or no_fallback_values():
             return ''
         fallback_value = self.get_formatted_fallback_value()
@@ -93,14 +94,14 @@ class Stat(Editable):
             return ''
         return f' {fallback_value}'
 
-    def _as_string_third(self) -> str:
+    def into_string_suffix(self) -> str:
         return '%'
 
     def into_string(self, include_fallback_value: bool = True) -> str:
         return (
-            self._as_string_first()
-            + self._as_string_second(include_fallback_value=include_fallback_value)
-            + self._as_string_third()
+            self.into_string_prefix()
+            + self.into_string_middle(include_fallback_value=include_fallback_value)
+            + self.into_string_suffix()
         )
 
     def equals_raw(self, other: object) -> bool:

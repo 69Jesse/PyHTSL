@@ -49,12 +49,12 @@ class TemporaryStat(Stat):
         pass  # ignore on purpose
 
     @staticmethod
-    def _left_side_keyword() -> str:
-        return PlayerStat._left_side_keyword()
+    def left_side_keyword() -> str:
+        return PlayerStat.left_side_keyword()
 
     @staticmethod
-    def _right_side_keyword() -> str:
-        return PlayerStat._right_side_keyword()
+    def right_side_keyword() -> str:
+        return PlayerStat.right_side_keyword()
 
     def equals_raw(self, other: object) -> bool:
         if not isinstance(other, TemporaryStat):

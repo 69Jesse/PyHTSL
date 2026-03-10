@@ -25,11 +25,11 @@ class GlobalStat(
     pattern_factory=_global_stat_factory,
 ):
     @staticmethod
-    def _left_side_keyword() -> str:
+    def left_side_keyword() -> str:
         return 'globalvar'
 
     @staticmethod
-    def _right_side_keyword() -> str:
+    def right_side_keyword() -> str:
         return 'global'
 
     def cloned_raw(self) -> 'GlobalStat':
