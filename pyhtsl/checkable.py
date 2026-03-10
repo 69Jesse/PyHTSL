@@ -56,10 +56,7 @@ class Checkable(BaseObject):
         self.fallback_value = fallback_value
 
     def into_hashable(self) -> tuple[object, ...]:
-        return (
-            self.__class__.__name__,
-            id(self.__class__),
-        )
+        return (self.__class__,)
 
     def get_backend_fallback_value(self) -> BackendType | None:
         if self.fallback_value is None:

@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from collections.abc import Generator
-from typing import TYPE_CHECKING, Any, Self, final
+from typing import TYPE_CHECKING, Any, final
 
 from ..base_object import BaseObject
 from ..container import get_current_container

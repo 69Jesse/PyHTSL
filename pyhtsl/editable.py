@@ -15,77 +15,89 @@ class Editable(Checkable):
     def __iadd__(
         self,
         other: Checkable | NumericHousingType,
-    ) -> None:
+    ) -> Self:
         self.__add__(other).write()
+        return self
 
     def __isub__(
         self,
         other: Checkable | NumericHousingType,
-    ) -> None:
+    ) -> Self:
         self.__sub__(other).write()
+        return self
 
     def __imul__(
         self,
         other: Checkable | NumericHousingType,
-    ) -> None:
+    ) -> Self:
         self.__mul__(other).write()
+        return self
 
     def __itruediv__(
         self,
         other: Checkable | NumericHousingType,
-    ) -> None:
+    ) -> Self:
         self.__truediv__(other).write()
+        return self
 
     def __ifloordiv__(
         self,
         other: Checkable | NumericHousingType,
-    ) -> None:
+    ) -> Self:
         self.__floordiv__(other).write()
+        return self
 
-    def __ipow__(self, other: int) -> None:
+    def __ipow__(self, other: int) -> Self:
         result = self.__pow__(other)
         if isinstance(result, Expression):
             result.write()
+        return self
 
-    def __imod__(self, other: Checkable | NumericHousingType) -> None:
+    def __imod__(self, other: Checkable | NumericHousingType) -> Self:
         self.__mod__(other).write()
+        return self
 
     def __iand__(
         self,
         other: Checkable | NumericHousingType,
-    ) -> None:
+    ) -> Self:
         self.__and__(other).write()
+        return self
 
     def __ior__(
         self,
         other: Checkable | NumericHousingType,
-    ) -> None:
+    ) -> Self:
         self.__or__(other).write()
+        return self
 
     def __ixor__(
         self,
         other: Checkable | NumericHousingType,
-    ) -> None:
+    ) -> Self:
         self.__xor__(other).write()
+        return self
 
     def __ilshift__(
         self,
         other: Checkable | NumericHousingType,
-    ) -> None:
+    ) -> Self:
         self.__lshift__(other).write()
+        return self
 
     def __irshift__(
         self,
         other: Checkable | NumericHousingType,
-    ) -> None:
+    ) -> Self:
         self.__rshift__(other).write()
+        return self
 
     def set(
         self,
         value: Checkable | HousingType,
         *,
         is_intentional_self_assignment: bool = False,
-    ) -> None:
+    ) -> Self:
         from .expression.binary_expression import BinaryExpression, BinaryOperator
 
         BinaryExpression(
@@ -94,36 +106,37 @@ class Editable(Checkable):
             operator=BinaryOperator.Set,
             is_intentional_self_assignment=is_intentional_self_assignment,
         ).write()
+        return self
 
     def inc(
         self,
         other: Checkable | NumericHousingType,
-    ) -> None:
+    ) -> Self:
         return self.__iadd__(other)
 
     def dec(
         self,
         other: Checkable | NumericHousingType,
-    ) -> None:
+    ) -> Self:
         return self.__isub__(other)
 
     def mul(
         self,
         other: Checkable | NumericHousingType,
-    ) -> None:
+    ) -> Self:
         return self.__imul__(other)
 
     def div(
         self,
         other: Checkable | NumericHousingType,
-    ) -> None:
+    ) -> Self:
         return self.__itruediv__(other)
 
     def apply(
         self,
         operator: 'BinaryOperator',
         other: Checkable | HousingType,
-    ) -> None:
+    ) -> Self:
         from .expression.binary_expression import BinaryOperator
 
         if operator is BinaryOperator.Set:
@@ -150,10 +163,9 @@ class Editable(Checkable):
         return self
 
     @value.setter
-    def value(self, value: Checkable | HousingType | None) -> None:
-        if value is None:
-            # `x.value += 1` gets replaced with `x.value = x.value.__iadd__(1)`, `x.value.__iadd__(1)` returns `None`
-            return
+    def value(self, value: Checkable | HousingType) -> None:
+        if self is value:
+            return  # `foo.value += 123` -> `foo.value = foo.value.__iadd__(123)` -> `foo.value = foo`
         self.set(value)
 
     def with_value(self, value: Checkable | HousingType) -> Self:

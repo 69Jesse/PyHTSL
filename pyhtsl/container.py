@@ -84,7 +84,11 @@ class Container:
         CONTAINERS.pop()
 
     def into_htsl(self) -> str:
-        return '\n'.join(expr.into_htsl() for expr in self.expressions)
+        lines = ('\n'.join(expr.into_htsl() for expr in self.expressions)).split('\n')
+        for i in range(len(lines) - 1, -1, -1):
+            if lines[i].lstrip().startswith('// @ignore'):
+                lines.pop(i)
+        return '\n'.join(lines)
 
     def htsl_path(self) -> Path:
         return get_htsl_import_folder() / f'{self.name}.htsl'

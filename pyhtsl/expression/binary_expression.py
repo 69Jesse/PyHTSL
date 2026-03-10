@@ -402,12 +402,17 @@ class BinaryExpression[
             )
             return
 
+        right_identifier = (
+            expression.right
+            if not isinstance(expression.right, Checkable)
+            else expression.right.into_comparison_right_side()
+        )
         left_value = context.get_backend(
             expression.left,
-            default=backend_to_default_backend(context.get_backend(expression.right)),
+            default=backend_to_default_backend(context.get_backend(right_identifier)),
         )
         right_value = context.get_backend(
-            expression.right,
+            right_identifier,
             default=backend_to_default_backend(left_value),
         )
 

@@ -6,4 +6,4 @@ __all__ = ('ExecutionExpression',)
 
 class ExecutionExpression(Expression):
     def into_htsl(self) -> str:
-        return f'// {self!r}'
+        return f'// @ignore {self!r}'

@@ -58,6 +58,17 @@ class ExecutionContext(Container):
             for expr in expression.into_executable_expressions():
                 expr.execute(self)
 
+    def _yield(
+        self,
+        result: BackendType,
+        output: Literal['regular', 'backend', 'string'],
+    ) -> HousingType | BackendType | str:
+        if output == 'string':
+            return backend_into_string(result)
+        if output == 'backend':
+            return result
+        return into_housing_type(result)
+
     @overload
     def get(
         self,
@@ -104,17 +115,15 @@ class ExecutionContext(Container):
             or into_backend_type(default)
         )
 
-        if output == 'string':
-            return backend_into_string(value)
-        if output == 'backend':
-            return value
-        return into_housing_type(value)
+        return self._yield(value, output=output)
 
-    def get_backend(self, key: Checkable | HousingType, default: BackendType | HousingType = '') -> BackendType:
+    def get_backend(
+        self, key: Checkable | HousingType, default: BackendType | HousingType = ''
+    ) -> BackendType:
         if not isinstance(key, Checkable):
             value = into_backend_type(key)
             if isinstance(value, str):
-                value = self.substitute(value)
+                value = self.substitute(value, output='backend')
             return value
         return self.get(key, default=default, output='backend')
 
@@ -145,6 +154,20 @@ class ExecutionContext(Container):
                 lambda match: self.get(factory(match), output='string'),  # noqa: B023
                 text,
             )
+        return text
+
+    def _has_any_placeholders(self, text: str) -> bool:
+        for pattern, _ in self._placeholders_and_factories():
+            if pattern.search(text) is not None:
+                return True
+        return False
+
+    def _is_in_quotes(self, text: str) -> bool:
+        return text.startswith('"') and text.endswith('"')
+
+    def _remove_quotes(self, text: str) -> str:
+        if self._is_in_quotes(text):
+            return text[1:-1]
         return text
 
     @overload
@@ -181,11 +204,19 @@ class ExecutionContext(Container):
         cast: bool = True,
         output: Literal['regular', 'backend', 'string'] = 'string',
     ) -> str | HousingType | BackendType:
-        value = self._substitute_single_placeholder(text)
-        if value is None:
-            value = self._substitute_all_placeholders(text)
+        if not self._is_in_quotes(text):
+            if (new_value := self._substitute_single_placeholder(text)) is not None:
+                return self._yield(new_value, output=output)
+            if (new_value := (cast_to_backend_long(text) or cast_to_backend_double(text))) is not None:
+                return self._yield(new_value, output=output)
 
-        if cast and isinstance(value, str):
+        value = self._remove_quotes(text)
+        if not self._has_any_placeholders(value):
+            return self._yield(value, output=output)
+
+        value = self._substitute_all_placeholders(value)
+
+        if cast:
             new_value: BackendType | None = None
             if value.endswith('L'):
                 new_value = cast_to_backend_long(value[:-1])
@@ -197,11 +228,7 @@ class ExecutionContext(Container):
             if new_value is not None:
                 value = new_value
 
-        if output == 'string':
-            return backend_into_string(value)
-        if output == 'backend':
-            return value
-        return into_housing_type(value)
+        return self._yield(value, output=output)
 
     def put(
         self,
@@ -212,7 +239,7 @@ class ExecutionContext(Container):
     ) -> None:
         if not ignore_warning and len(self.expressions) > 0:
             warn(
-                "Putting values into the context should be done BEFORE writing any expressions, since this line is ALWAYS ran, even, for example, if it looks like it is behind a condition that may not hold.",
+                'Putting values into the context should be done BEFORE writing any expressions, since this line is ALWAYS ran, even, for example, if it looks like it is behind a condition that may not hold.',
                 stacklevel=2,
             )
 
