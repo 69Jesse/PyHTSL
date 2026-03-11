@@ -14,10 +14,7 @@ class PlayerNamePlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%player.name%',
-            comparison_left_side='placeholder "%player.name%"',
-            comparison_right_side='%player.name%',
-            in_string='%player.name%',
+            as_string='%player.name%',
             constant_internal_type=InternalType.STRING,
         )
 

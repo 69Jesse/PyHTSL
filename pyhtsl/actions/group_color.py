@@ -14,10 +14,7 @@ class GroupColorPlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%player.group.color%',
-            comparison_left_side='placeholder "%player.group.color%"',
-            comparison_right_side='%player.group.color%',
-            in_string='%player.group.color%',
+            as_string='%player.group.color%',
             constant_internal_type=InternalType.STRING,
         )
 

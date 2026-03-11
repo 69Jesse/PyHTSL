@@ -14,10 +14,7 @@ class GroupTagPlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%player.group.tag%',
-            comparison_left_side='placeholder "%player.group.tag%"',
-            comparison_right_side='%player.group.tag%',
-            in_string='%player.group.tag%',
+            as_string='%player.group.tag%',
             constant_internal_type=InternalType.STRING,
         )
 

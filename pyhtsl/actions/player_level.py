@@ -16,10 +16,7 @@ class PlayerLevelPlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%player.level%',
-            comparison_left_side='placeholder "%player.level%"',
-            comparison_right_side='%player.level%',
-            in_string='%player.level%',
+            as_string='%player.level%',
             constant_internal_type=InternalType.LONG,
         )
 

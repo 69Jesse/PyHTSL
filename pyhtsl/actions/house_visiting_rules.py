@@ -14,10 +14,7 @@ class HouseVisitingRulesPlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%house.visitingrules%',
-            comparison_left_side='placeholder "%house.visitingrules%"',
-            comparison_right_side='%house.visitingrules%',
-            in_string='%house.visitingrules%',
+            as_string='%house.visitingrules%',
             constant_internal_type=InternalType.STRING,
         )
 

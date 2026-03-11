@@ -14,10 +14,7 @@ class PlayerVersionPlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%player.version%',
-            comparison_left_side='placeholder "%player.version%"',
-            comparison_right_side='%player.version%',
-            in_string='%player.version%',
+            as_string='%player.version%',
             constant_internal_type=InternalType.STRING,
         )
 

@@ -16,10 +16,7 @@ class PlayerPingPlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%player.ping%',
-            comparison_left_side='placeholder "%player.ping%"',
-            comparison_right_side='%player.ping%',
-            in_string='%player.ping%',
+            as_string='%player.ping%',
             constant_internal_type=InternalType.LONG,
         )
 

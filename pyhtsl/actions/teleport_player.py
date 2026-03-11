@@ -34,7 +34,7 @@ def teleport_player(
             )
         if isinstance(coordinates, tuple):
             coordinates = ' '.join(
-                x.into_string(include_fallback_value=False)
+                x.into_inside_string(include_fallback_value=False)
                 if isinstance(x, Checkable)
                 else str(x)
                 for x in coordinates

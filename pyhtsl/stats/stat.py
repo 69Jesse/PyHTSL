@@ -51,21 +51,21 @@ class Stat(Editable):
         """
         raise NotImplementedError
 
-    def into_assignment_left_side(self) -> str:
+    def into_string_lhs(self) -> str:
         return f'{self.left_side_keyword()} "{self.name}"'
 
-    def into_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
-        name = self.into_string()
+    def into_string_rhs(self, *, include_internal_type: bool = True) -> str:
+        name = self.into_inside_string()
         return self.format_with_internal_type(
             name,
             include_internal_type=include_internal_type,
         )
 
     def into_comparison_left_side(self) -> str:
-        return self.into_assignment_left_side()
+        return self.into_string_lhs()
 
     def into_comparison_right_side(self) -> str:
-        return self.into_assignment_right_side()
+        return self.into_string_rhs()
 
     def into_string_prefix(self) -> str:
         return f'%var.{self.right_side_keyword()}/{self.name}'
@@ -97,7 +97,7 @@ class Stat(Editable):
     def into_string_suffix(self) -> str:
         return '%'
 
-    def into_string(self, include_fallback_value: bool = True) -> str:
+    def into_inside_string(self, include_fallback_value: bool = True) -> str:
         return (
             self.into_string_prefix()
             + self.into_string_middle(include_fallback_value=include_fallback_value)

@@ -16,10 +16,7 @@ class PlayerPositionZPlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%player.pos.z%',
-            comparison_left_side='placeholder "%player.pos.z%"',
-            comparison_right_side='%player.pos.z%',
-            in_string='%player.pos.z%',
+            as_string='%player.pos.z%',
             constant_internal_type=InternalType.DOUBLE,
         )
 

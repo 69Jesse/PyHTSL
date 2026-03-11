@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Self, final
 
 from ...base_object import BaseObject
 from ...expression.housing_type import HousingType
-from ..housing_type import housing_type_as_right_side
+from ..housing_type import housing_type_as_rhs
 from .condition import Condition
 
 if TYPE_CHECKING:
@@ -48,10 +48,10 @@ class ComparisonCondition[LeftT: 'Checkable', RightT: 'Checkable | HousingType']
 
         def format_rhs(value: Checkable | HousingType) -> str:
             if isinstance(value, Checkable):
-                return value.into_comparison_right_side()
-            return housing_type_as_right_side(value)
+                return value.into_string_rhs()
+            return housing_type_as_rhs(value)
 
-        line = f'{self.left.into_comparison_left_side()} {self.operator.value} {format_rhs(self.right)}'
+        line = f'{self.left.into_string_rhs()} {self.operator.value} {format_rhs(self.right)}'
 
         fallback_value = self.left.get_formatted_fallback_value()
         if fallback_value is not None:

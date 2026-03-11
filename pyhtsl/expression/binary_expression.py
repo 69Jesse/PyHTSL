@@ -16,7 +16,7 @@ from ..internal_type import InternalType
 from ..stats.stat import Stat
 from ..stats.temporary_stat import TemporaryStat
 from .expression import Expression
-from .housing_type import HousingType, housing_type_as_right_side
+from .housing_type import HousingType, housing_type_as_rhs
 
 __all__ = (
     'BinaryOperator',
@@ -357,11 +357,11 @@ class BinaryExpression[
     def into_htsl(self) -> str:
         def format_rhs(value: Checkable | HousingType) -> str:
             if isinstance(value, Checkable):
-                return value.into_assignment_right_side()
-            return housing_type_as_right_side(value)
+                return value.into_string_rhs()
+            return housing_type_as_rhs(value)
 
         def into_line(expr: AssignmentExpression) -> str:
-            line = f'{expr.left.into_assignment_left_side()} {expr.operator.value} {format_rhs(expr.right)}'
+            line = f'{expr.left.into_string_lhs()} {expr.operator.value} {format_rhs(expr.right)}'
 
             if isinstance(expr.left, Stat):
                 line += f' {str(expr.left.auto_unset).lower()}'
@@ -405,7 +405,7 @@ class BinaryExpression[
         right_identifier = (
             expression.right
             if not isinstance(expression.right, Checkable)
-            else expression.right.into_comparison_right_side()
+            else expression.right.into_string_rhs()
         )
         left_value = context.get_backend(
             expression.left,

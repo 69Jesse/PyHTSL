@@ -29,10 +29,7 @@ class RandomWholePlaceholder(
             raise ValueError('exclusive_upper_bound must be greater than lower_bound')
         key = f'%random.whole/{lower_bound} {exclusive_upper_bound}%'
         super().__init__(
-            assignment_right_side=key,
-            comparison_left_side=f'placeholder "{key}"',
-            comparison_right_side=key,
-            in_string=key,
+            as_string=key,
             constant_internal_type=InternalType.LONG,
         )
 

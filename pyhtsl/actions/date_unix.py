@@ -20,10 +20,7 @@ class DateUnixPlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%date.unix%',
-            comparison_left_side='placeholder "%date.unix%"',
-            comparison_right_side='%date.unix%',
-            in_string='%date.unix%',
+            as_string='%date.unix%',
             constant_internal_type=InternalType.LONG,
         )
 
@@ -41,10 +38,7 @@ class DateUnixMSPlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%date.unix.ms%',
-            comparison_left_side='placeholder "%date.unix.ms%"',
-            comparison_right_side='%date.unix.ms%',
-            in_string='%date.unix.ms%',
+            as_string='%date.unix.ms%',
             constant_internal_type=InternalType.LONG,
         )
 

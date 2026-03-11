@@ -16,10 +16,7 @@ class PlayerBlockYPlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%player.block.y%',
-            comparison_left_side='placeholder "%player.block.y%"',
-            comparison_right_side='%player.block.y%',
-            in_string='%player.block.y%',
+            as_string='%player.block.y%',
             constant_internal_type=InternalType.LONG,
         )
 

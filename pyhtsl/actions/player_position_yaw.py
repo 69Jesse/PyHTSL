@@ -16,10 +16,7 @@ class PlayerPositionYawPlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%player.pos.yaw%',
-            comparison_left_side='placeholder "%player.pos.yaw%"',
-            comparison_right_side='%player.pos.yaw%',
-            in_string='%player.pos.yaw%',
+            as_string='%player.pos.yaw%',
             constant_internal_type=InternalType.DOUBLE,
         )
 

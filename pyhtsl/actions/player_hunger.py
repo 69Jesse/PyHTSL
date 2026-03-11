@@ -16,11 +16,8 @@ class PlayerHungerPlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_left_side='hunger',
-            assignment_right_side='%player.hunger%',
-            comparison_left_side='placeholder "%player.hunger%"',
-            comparison_right_side='%player.hunger%',
-            in_string='%player.hunger%',
+            assignment_lhs='hunger',
+            as_string='%player.hunger%',
             constant_internal_type=InternalType.LONG,
         )
 

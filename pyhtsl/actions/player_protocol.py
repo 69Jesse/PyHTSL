@@ -16,10 +16,7 @@ class PlayerProtocolPlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%player.protocol%',
-            comparison_left_side='placeholder "%player.protocol%"',
-            comparison_right_side='%player.protocol%',
-            in_string='%player.protocol%',
+            as_string='%player.protocol%',
             constant_internal_type=InternalType.LONG,
         )
 

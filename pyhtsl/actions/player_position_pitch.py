@@ -16,10 +16,7 @@ class PlayerPositionPitchPlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%player.pos.pitch%',
-            comparison_left_side='placeholder "%player.pos.pitch%"',
-            comparison_right_side='%player.pos.pitch%',
-            in_string='%player.pos.pitch%',
+            as_string='%player.pos.pitch%',
             constant_internal_type=InternalType.DOUBLE,
         )
 

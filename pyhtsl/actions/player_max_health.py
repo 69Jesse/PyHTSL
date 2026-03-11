@@ -16,11 +16,8 @@ class PlayerMaxHealthPlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_left_side='maxHealth',
-            assignment_right_side='%player.maxhealth%',
-            comparison_left_side='placeholder "%player.maxhealth%"',
-            comparison_right_side='%player.maxhealth%',
-            in_string='%player.maxhealth%',
+            assignment_lhs='maxHealth',
+            as_string='%player.maxhealth%',
             constant_internal_type=InternalType.DOUBLE,
         )
 

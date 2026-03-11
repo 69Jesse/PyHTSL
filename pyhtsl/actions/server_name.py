@@ -14,10 +14,7 @@ class ServerNamePlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%server.name%',
-            comparison_left_side='placeholder "%server.name%"',
-            comparison_right_side='%server.name%',
-            in_string='%server.name%',
+            as_string='%server.name%',
             constant_internal_type=InternalType.STRING,
         )
 

@@ -62,8 +62,8 @@ class TeamStat(
     def right_side_keyword() -> str:
         return 'team'
 
-    def into_assignment_left_side(self) -> str:
-        value = super().into_assignment_left_side()
+    def into_string_lhs(self) -> str:
+        value = super().into_string_lhs()
         if self.team is not None:
             return f'{value} "{self.team.name}"'
         return value

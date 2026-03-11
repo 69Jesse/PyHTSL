@@ -16,10 +16,7 @@ class PlayerExperiencePlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%player.experience%',
-            comparison_left_side='placeholder "%player.experience%"',
-            comparison_right_side='%player.experience%',
-            in_string='%player.experience%',
+            as_string='%player.experience%',
             constant_internal_type=InternalType.LONG,
         )
 

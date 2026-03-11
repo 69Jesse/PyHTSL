@@ -13,7 +13,7 @@ from .expression.condition.comparison_condition import (
 from .expression.housing_type import (
     HousingType,
     NumericHousingType,
-    housing_type_as_right_side,
+    housing_type_as_rhs,
 )
 from .internal_type import InternalType
 
@@ -76,35 +76,21 @@ class Checkable(BaseObject):
                 text += 'D'
         return f'"{text.replace('"', '\\"')}"'
 
-    def into_assignment_left_side(self) -> str:
+    def into_string_lhs(self) -> str:
         """
         var foo = %var.player/bar%
         ^^^^^^^
         """
         raise NotImplementedError
 
-    def into_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
+    def into_string_rhs(self, *, include_internal_type: bool = True) -> str:
         """
         var foo = %var.player/bar%
                   ^^^^^^^^^^^^^^^^
         """
         raise NotImplementedError
 
-    def into_comparison_left_side(self) -> str:
-        """
-        if and (var "foo" > %var.player/bar%) {
-                ^^^^^^^^^
-        """
-        raise NotImplementedError
-
-    def into_comparison_right_side(self) -> str:
-        """
-        if and (var "foo" > %var.player/bar%) {
-                            ^^^^^^^^^^^^^^^^
-        """
-        raise NotImplementedError
-
-    def into_string(self, include_fallback_value: bool = True) -> str:
+    def into_inside_string(self, include_fallback_value: bool = True) -> str:
         """
         chat "hello %player.name%"
                     ^^^^^^^^^^^^^
@@ -129,7 +115,7 @@ class Checkable(BaseObject):
         return self.equals_raw(other)
 
     def __str__(self) -> str:
-        return self.into_string()
+        return self.into_inside_string()
 
     @abstractmethod
     def cloned_raw(self) -> Self:
@@ -192,7 +178,7 @@ class Checkable(BaseObject):
 
     def get_formatted_fallback_value(self) -> str | None:
         value = self.fallback_value or self.internal_type.default_housing_type()
-        return housing_type_as_right_side(value) if value is not None else None
+        return housing_type_as_rhs(value) if value is not None else None
 
     def __add__[T: 'Checkable | NumericHousingType'](
         self,

@@ -16,10 +16,7 @@ class GroupPriorityPlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%player.group.priority%',
-            comparison_left_side='placeholder "%player.group.priority%"',
-            comparison_right_side='%player.group.priority%',
-            in_string='%player.group.priority%',
+            as_string='%player.group.priority%',
             constant_internal_type=InternalType.LONG,
         )
 

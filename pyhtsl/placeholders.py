@@ -14,27 +14,18 @@ __all__ = (
 
 
 class PlaceholderCheckable(Checkable, ABC):
-    assignment_right_side: str
-    comparison_left_side: str
-    comparison_right_side: str
-    inside_of_string: str
+    as_string: str
     constant_internal_type: InternalType
     default_backend_value: BackendType
 
     def __init__(
         self,
         *,
-        assignment_right_side: str,
-        comparison_left_side: str,
-        comparison_right_side: str,
-        in_string: str,
+        as_string: str,
         constant_internal_type: InternalType,
     ) -> None:
         super().__init__(internal_type=constant_internal_type)
-        self.assignment_right_side = assignment_right_side
-        self.comparison_left_side = comparison_left_side
-        self.comparison_right_side = comparison_right_side
-        self.inside_of_string = in_string
+        self.as_string = as_string
         self.constant_internal_type = constant_internal_type
 
     @abstractmethod
@@ -45,109 +36,53 @@ class PlaceholderCheckable(Checkable, ABC):
     def get_backend_fallback_value(self) -> BackendType | None:
         return super().get_backend_fallback_value() or self.get_backend_value()
 
-    def into_assignment_left_side(self) -> str:
-        raise RuntimeError(
-            f'Cannot use {self.__class__.__name__} as left side of assignment.'
-        )
+    def into_string_lhs(self) -> str:
+        return f'placeholder "{self.as_string}"'
 
-    def into_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
+    def into_string_rhs(self, *, include_internal_type: bool = True) -> str:
         return self.format_with_internal_type(
-            self.assignment_right_side,
+            self.as_string,
             include_internal_type=include_internal_type,
         )
 
-    def into_comparison_left_side(self) -> str:
-        return self.comparison_left_side
-
-    def into_comparison_right_side(self) -> str:
-        return self.format_with_internal_type(
-            self.comparison_right_side,
-            include_internal_type=True,
-        )
-
-    def into_string(self, include_fallback_value: bool = True) -> str:
-        return self.inside_of_string
+    def into_inside_string(self, include_fallback_value: bool = True) -> str:
+        return self.as_string
 
     def equals_raw(self, other: object) -> bool:
         return self is other
 
     def cloned_raw(self) -> Self:
         return self.__class__(
-            assignment_right_side=self.assignment_right_side,
-            comparison_left_side=self.comparison_left_side,
-            comparison_right_side=self.comparison_right_side,
-            in_string=self.inside_of_string,
+            as_string=self.as_string,
             constant_internal_type=self.constant_internal_type,
         )
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}<{self.inside_of_string}>'
+        return f'{self.__class__.__name__}<{self.as_string}>'
 
 
-class PlaceholderEditable(Editable, ABC):
-    assignment_left_side: str
-    assignment_right_side: str
-    comparison_left_side: str
-    comparison_right_side: str
-    inside_of_string: str
-    constant_internal_type: InternalType
-    default_backend_value: BackendType
+class PlaceholderEditable(PlaceholderCheckable, Editable, ABC):
+    assignment_lhs: str
 
     def __init__(
         self,
         *,
-        assignment_left_side: str,
-        assignment_right_side: str,
-        comparison_left_side: str,
-        comparison_right_side: str,
-        in_string: str,
+        assignment_lhs: str,
+        as_string: str,
         constant_internal_type: InternalType,
     ) -> None:
-        super().__init__(internal_type=constant_internal_type)
-        self.assignment_left_side = assignment_left_side
-        self.assignment_right_side = assignment_right_side
-        self.comparison_left_side = comparison_left_side
-        self.comparison_right_side = comparison_right_side
-        self.inside_of_string = in_string
-        self.constant_internal_type = constant_internal_type
-
-    @abstractmethod
-    def get_backend_value(self) -> BackendType:
-        raise NotImplementedError
-
-    def into_assignment_left_side(self) -> str:
-        return self.assignment_left_side
-
-    def into_assignment_right_side(self, *, include_internal_type: bool = True) -> str:
-        return self.format_with_internal_type(
-            self.assignment_right_side,
-            include_internal_type=include_internal_type,
+        super().__init__(
+            as_string=as_string,
+            constant_internal_type=constant_internal_type,
         )
+        self.assignment_lhs = assignment_lhs
 
-    def into_comparison_left_side(self) -> str:
-        return self.comparison_left_side
-
-    def into_comparison_right_side(self) -> str:
-        return self.format_with_internal_type(
-            self.comparison_right_side,
-            include_internal_type=True,
-        )
-
-    def into_string(self, include_fallback_value: bool = True) -> str:
-        return self.inside_of_string
-
-    def equals_raw(self, other: object) -> bool:
-        return self is other
+    def into_string_lhs(self) -> str:
+        return self.assignment_lhs
 
     def cloned_raw(self) -> Self:
         return self.__class__(
-            assignment_left_side=self.assignment_left_side,
-            assignment_right_side=self.assignment_right_side,
-            comparison_left_side=self.comparison_left_side,
-            comparison_right_side=self.comparison_right_side,
-            in_string=self.inside_of_string,
+            assignment_lhs=self.assignment_lhs,
+            as_string=self.as_string,
             constant_internal_type=self.constant_internal_type,
         )
-
-    def __repr__(self) -> str:
-        return f'{self.__class__.__name__}<{self.inside_of_string}>'

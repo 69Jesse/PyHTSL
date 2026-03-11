@@ -14,10 +14,7 @@ class TeamColorPlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%player.team.color%',
-            comparison_left_side='placeholder "%player.team.color%"',
-            comparison_right_side='%player.team.color%',
-            in_string='%player.team.color%',
+            as_string='%player.team.color%',
             constant_internal_type=InternalType.STRING,
         )
 

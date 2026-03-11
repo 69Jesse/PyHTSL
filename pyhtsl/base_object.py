@@ -1,5 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Self
+from typing import TYPE_CHECKING, Self
+
+if TYPE_CHECKING:
+    from .checkable import Checkable
+    from .expression.housing_type import HousingType
 
 
 class BaseObject(ABC):
@@ -28,3 +32,10 @@ class BaseObject(ABC):
     @abstractmethod
     def __repr__(self) -> str:
         raise NotImplementedError()
+
+    def inline(self, value: 'Checkable | HousingType') -> str:
+        from .expression.expression import Expression
+
+        if isinstance(value, Expression):
+            value.write()
+            value = value.

@@ -3,7 +3,7 @@ import numpy as np
 __all__ = (
     'NumericHousingType',
     'HousingType',
-    'housing_type_as_right_side',
+    'housing_type_as_rhs',
     'housing_type_from_string',
 )
 
@@ -12,7 +12,7 @@ NumericHousingType = int | float
 HousingType = NumericHousingType | str
 
 
-def housing_type_as_right_side(value: HousingType) -> str:
+def housing_type_as_rhs(value: HousingType) -> str:
     if isinstance(value, NumericHousingType):
         if isinstance(value, int):
             return str(value)

@@ -14,10 +14,7 @@ class TeamTagPlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%player.team.tag%',
-            comparison_left_side='placeholder "%player.team.tag%"',
-            comparison_right_side='%player.team.tag%',
-            in_string='%player.team.tag%',
+            as_string='%player.team.tag%',
             constant_internal_type=InternalType.STRING,
         )
 

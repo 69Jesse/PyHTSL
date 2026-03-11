@@ -14,10 +14,7 @@ class GroupNamePlaceholder(
 ):
     def __init__(self) -> None:
         super().__init__(
-            assignment_right_side='%player.group.name%',
-            comparison_left_side='placeholder "%player.group.name%"',
-            comparison_right_side='%player.group.name%',
-            in_string='%player.group.name%',
+            as_string='%player.group.name%',
             constant_internal_type=InternalType.STRING,
         )
 
