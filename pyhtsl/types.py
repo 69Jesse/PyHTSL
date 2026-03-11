@@ -1,21 +1,7 @@
 # fmt: off
-# pyright: ignore[reportShadowedImports]
 from typing import Literal
 
-from ..checkable import Checkable
-from ..condition.base_condition import BaseCondition
-from ..condition.conditional_statements import IfStatement
-from ..editable import Editable
-from ..expression.binary_expression import BinaryExpression
-from ..stats.stat import Stat
-
 __all__ = (
-    'Checkable',
-    'Editable',
-    'BaseCondition',
-    'IfStatement',
-    'BinaryExpression',
-    'Stat',
     'ALL_POTION_EFFECTS',
     'ALL_DAMAGE_CAUSES',
     'ALL_ENCHANTMENTS',
