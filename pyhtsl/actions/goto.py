@@ -1,19 +1,13 @@
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING
 
+from ..types import GOTO_CONTAINER
 from ..writer import WRITER, LineType
 
 __all__ = ('goto',)
 
 
 def _goto(
-    container: Literal[
-        'function',
-        'event',
-        'command',
-        'npc',
-        'button',
-        'pad',
-    ],
+    container: GOTO_CONTAINER,
     name: str,
     *,
     add_to_front: bool = False,
@@ -28,14 +22,7 @@ def _goto(
 if TYPE_CHECKING:
 
     def goto(
-        container: Literal[
-            'function',
-            'event',
-            'command',
-            'npc',
-            'button',
-            'pad',
-        ],
+        container: GOTO_CONTAINER,
         name: str,
     ) -> None: ...
 else:

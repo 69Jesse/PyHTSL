@@ -1,17 +1,18 @@
-from typing import Literal, Self, final
+from typing import Self, final
 
 from ..expression.condition.condition import Condition
+from ..types import FISHING_ENVIRONMENTS
 
 __all__ = ('FishingEnvironment',)
 
 
 @final
 class FishingEnvironment(Condition):
-    environment: str
+    environment: FISHING_ENVIRONMENTS
 
     def __init__(
         self,
-        environment: Literal['water', 'lava'],
+        environment: FISHING_ENVIRONMENTS,
     ) -> None:
         self.environment = environment
 

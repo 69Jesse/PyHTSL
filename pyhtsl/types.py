@@ -16,7 +16,12 @@ __all__ = (
     'ALL_SOUNDS_PRETTY',
     'ALL_SOUNDS_RAW',
     'ALL_SOUNDS_PRETTY_TO_RAW',
-    'ALL_LOCATIONS',
+    'ALL_GAMEMODES',
+    'FISHING_ENVIRONMENTS',
+    'ITEM_CHECK_WHAT',
+    'ITEM_CHECK_WHERE',
+    'ITEM_REQUIRED_AMOUNT',
+    'GOTO_CONTAINER',
 )
 
 
@@ -467,3 +472,31 @@ ALL_SOUNDS_PRETTY_TO_RAW = {
 
 
 ALL_SOUNDS = ALL_SOUNDS_PRETTY | ALL_SOUNDS_RAW
+
+
+ALL_GAMEMODES = Literal['adventure', 'survival', 'creative']
+
+FISHING_ENVIRONMENTS = Literal['water', 'lava']
+
+ITEM_CHECK_WHAT = Literal['item_type', 'metadata']
+
+ITEM_CHECK_WHERE = Literal[
+    'hand',
+    'armor',
+    'hotbar',
+    'inventory',
+    'cursor',
+    'crafting_grid',
+    'anywhere',
+]
+
+ITEM_REQUIRED_AMOUNT = Literal['any_amount', 'equal_or_greater_amount']
+
+GOTO_CONTAINER = Literal[
+    'function',
+    'event',
+    'command',
+    'npc',
+    'button',
+    'pad',
+]

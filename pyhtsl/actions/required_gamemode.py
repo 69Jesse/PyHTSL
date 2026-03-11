@@ -1,17 +1,18 @@
-from typing import Literal, Self, final
+from typing import Self, final
 
 from ..expression.condition.condition import Condition
+from ..types import ALL_GAMEMODES
 
 __all__ = ('RequiredGamemode',)
 
 
 @final
 class RequiredGamemode(Condition):
-    gamemode: Literal['adventure', 'survival', 'creative']
+    gamemode: ALL_GAMEMODES
 
     def __init__(
         self,
-        gamemode: Literal['adventure', 'survival', 'creative'],
+        gamemode: ALL_GAMEMODES,
     ) -> None:
         self.gamemode = gamemode
 

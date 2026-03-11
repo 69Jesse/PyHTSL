@@ -1,6 +1,7 @@
-from typing import Literal, Self, final
+from typing import Self, final
 
 from ..expression.condition.condition import Condition
+from ..types import ITEM_CHECK_WHAT, ITEM_CHECK_WHERE, ITEM_REQUIRED_AMOUNT
 from .item import Item
 
 __all__ = ('HasItem',)
@@ -9,26 +10,16 @@ __all__ = ('HasItem',)
 @final
 class HasItem(Condition):
     item: Item | str
-    what_to_check: str
-    where_to_check: str
-    required_amount: str
+    what_to_check: ITEM_CHECK_WHAT
+    where_to_check: ITEM_CHECK_WHERE
+    required_amount: ITEM_REQUIRED_AMOUNT
 
     def __init__(
         self,
         item: Item | str,
-        what_to_check: Literal['item_type', 'metadata'] = 'metadata',
-        where_to_check: Literal[
-            'hand',
-            'armor',
-            'hotbar',
-            'inventory',
-            'cursor',
-            'crafting_grid',
-            'anywhere',
-        ] = 'anywhere',
-        required_amount: Literal[
-            'any_amount', 'equal_or_greater_amount'
-        ] = 'any_amount',
+        what_to_check: ITEM_CHECK_WHAT = 'metadata',
+        where_to_check: ITEM_CHECK_WHERE = 'anywhere',
+        required_amount: ITEM_REQUIRED_AMOUNT = 'any_amount',
     ) -> None:
         self.item = item
         self.what_to_check = what_to_check
