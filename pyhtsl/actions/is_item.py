@@ -1,13 +1,13 @@
-from typing import Literal, final
+from typing import Literal, Self, final
 
-from ..condition.base_condition import BaseCondition
+from ..expression.condition.condition import Condition
 from .item import Item
 
 __all__ = ('IsItem',)
 
 
 @final
-class IsItem(BaseCondition):
+class IsItem(Condition):
     item: Item | str
     what_to_check: str
     where_to_check: str
@@ -40,4 +40,36 @@ class IsItem(BaseCondition):
             name = self.item.save()
         else:
             name = self.item
-        return f'isItem "{name}" {self.what_to_check} {self.where_to_check} {self.required_amount}'
+        return (
+            f'isItem {self.inline_quoted(name)} '
+            f'{self.inline(self.what_to_check)} '
+            f'{self.inline(self.where_to_check)} '
+            f'{self.inline(self.required_amount)}'
+        )
+
+    def cloned_raw(self) -> Self:
+        return self.__class__(
+            item=self.cloned_or_same(self.item),
+            what_to_check=self.what_to_check,
+            where_to_check=self.where_to_check,
+            required_amount=self.required_amount,
+        )
+
+    def equals_raw(self, other: object) -> bool:
+        if not isinstance(other, IsItem):
+            return False
+        return (
+            self.equals_or_eq(self.item, other.item)
+            and self.what_to_check == other.what_to_check
+            and self.where_to_check == other.where_to_check
+            and self.required_amount == other.required_amount
+        )
+
+    def __repr__(self) -> str:
+        return (
+            f'{self.__class__.__name__}<item={self.item!r} '
+            f'what_to_check={self.what_to_check} '
+            f'where_to_check={self.where_to_check} '
+            f'required_amount={self.required_amount} '
+            f'inverted={self.inverted}>'
+        )

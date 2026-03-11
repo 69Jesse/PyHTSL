@@ -1,12 +1,12 @@
-from typing import Literal, final
+from typing import Literal, Self, final
 
-from ..condition.base_condition import BaseCondition
+from ..expression.condition.condition import Condition
 
 __all__ = ('FishingEnvironment',)
 
 
 @final
-class FishingEnvironment(BaseCondition):
+class FishingEnvironment(Condition):
     environment: str
 
     def __init__(
@@ -16,4 +16,15 @@ class FishingEnvironment(BaseCondition):
         self.environment = environment
 
     def into_htsl_raw(self) -> str:
-        return f'fishingEnv "{self.environment}"'
+        return f'fishingEnv {self.inline_quoted(self.environment)}'
+
+    def cloned_raw(self) -> Self:
+        return self.__class__(environment=self.environment)
+
+    def equals_raw(self, other: object) -> bool:
+        if not isinstance(other, FishingEnvironment):
+            return False
+        return self.environment == other.environment
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}<{self.environment} inverted={self.inverted}>'

@@ -4,6 +4,8 @@ from typing import Any, Self
 
 import numpy as np
 
+from .base_object import BaseObject
+
 
 class NBT[T](ABC):
     value: T
@@ -315,7 +317,7 @@ class NBTString(NBT[str]):
         super().__init__(value)
 
     def to_snbt(self) -> str:
-        return f'"{self.to_object().replace('"', '\\"')}"'
+        return BaseObject.inline_quoted(self.to_object())
 
     def to_object(self) -> str:
         return self.value
@@ -444,7 +446,7 @@ class NBTCompound[V: NBT](NBT[dict[str, V]]):
     def to_snbt(self) -> str:
         def format_key(key: str) -> str:
             if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', key):
-                return f'"{key.replace('"', '\\"')}"'
+                return BaseObject.inline_quoted(key)
             return key
 
         return (

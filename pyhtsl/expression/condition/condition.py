@@ -23,6 +23,16 @@ class Condition(BaseObject):
         return ('!' * self.inverted) + self.into_htsl_raw()
 
     @abstractmethod
+    def cloned_raw(self) -> Self:
+        raise NotImplementedError
+
+    @final
+    def cloned(self) -> Self:
+        clone = self.cloned_raw()
+        clone.inverted = self.inverted
+        return clone
+
+    @abstractmethod
     def equals_raw(self, other: object) -> bool:
         raise NotImplementedError
 

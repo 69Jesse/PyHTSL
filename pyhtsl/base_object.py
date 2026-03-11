@@ -35,7 +35,8 @@ class BaseObject(ABC):
     def __repr__(self) -> str:
         raise NotImplementedError()
 
-    def inline(self, value: 'Checkable | HousingType | bool') -> str:
+    @staticmethod
+    def inline(value: 'Checkable | HousingType | bool') -> str:
         from .checkable import Checkable
 
         if isinstance(value, bool):
@@ -43,3 +44,7 @@ class BaseObject(ABC):
         if isinstance(value, Checkable):
             return str(value)
         return housing_type_as_rhs(value)
+
+    @staticmethod
+    def inline_quoted(value: str) -> str:
+        return f'"{value.replace('"', '\\"')}"'

@@ -17,7 +17,7 @@ class NamedCondition(Condition):
     def into_htsl_raw(self) -> str:
         return self.name
 
-    def cloned(self) -> Self:
+    def cloned_raw(self) -> Self:
         return self.__class__(
             name=self.name,
         )

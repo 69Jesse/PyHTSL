@@ -59,7 +59,7 @@ class ComparisonCondition[LeftT: 'Checkable', RightT: 'Checkable | HousingType']
 
         return line
 
-    def cloned(self) -> Self:
+    def cloned_raw(self) -> Self:
         return self.__class__(
             left=self.left.cloned(),
             right=BaseObject.cloned_or_same(self.right),

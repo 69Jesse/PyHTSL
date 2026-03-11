@@ -1,13 +1,13 @@
-from typing import final
+from typing import Self, final
 
-from ..condition.base_condition import BaseCondition
+from ..expression.condition.condition import Condition
 from .group import Group
 
 __all__ = ('RequiredGroup',)
 
 
 @final
-class RequiredGroup(BaseCondition):
+class RequiredGroup(Condition):
     group: Group
     include_higher_groups: bool
 
@@ -20,4 +20,18 @@ class RequiredGroup(BaseCondition):
         self.include_higher_groups = include_higher_groups
 
     def into_htsl_raw(self) -> str:
-        return f'hasGroup "{self.group.name}" {str(self.include_higher_groups).lower()}'
+        return f'hasGroup {self.inline_quoted(self.group.name)} {self.inline(self.include_higher_groups)}'
+
+    def cloned_raw(self) -> Self:
+        return self.__class__(
+            group=self.group.cloned(),
+            include_higher_groups=self.include_higher_groups,
+        )
+
+    def equals_raw(self, other: object) -> bool:
+        if not isinstance(other, RequiredGroup):
+            return False
+        return self.group.equals(other.group) and self.include_higher_groups == other.include_higher_groups
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}<group={self.group!r} include_higher_groups={self.include_higher_groups} inverted={self.inverted}>'

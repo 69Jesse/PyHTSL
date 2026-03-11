@@ -74,7 +74,7 @@ class Checkable(BaseObject):
                 text += 'L'
             elif self.internal_type is InternalType.DOUBLE:
                 text += 'D'
-        return f'"{text.replace('"', '\\"')}"'
+        return self.inline_quoted(text)
 
     def into_string_lhs(self) -> str:
         """
