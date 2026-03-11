@@ -50,8 +50,6 @@ if TYPE_CHECKING:
     def goto(
         container: GOTO_CONTAINER,
         name: str,
-        *,
-        add_to_front: bool = False,
     ) -> None: ...
 else:
     goto = _goto
