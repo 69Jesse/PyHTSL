@@ -1,12 +1,31 @@
-from ..writer import WRITER, LineType
+from typing import Self, final
+
+from ..expression.expression import Expression
 
 __all__ = ('pause_execution',)
 
 
-def pause_execution(
-    ticks: int = 20,
-) -> None:
-    WRITER.write(
-        f'pause {ticks}',
-        LineType.pause_execution,
-    )
+@final
+class PauseExecutionExpression(Expression):
+    ticks: int
+
+    def __init__(self, ticks: int = 20) -> None:
+        self.ticks = ticks
+
+    def into_htsl(self) -> str:
+        return f'pause {self.ticks}'
+
+    def cloned(self) -> Self:
+        return self.__class__(ticks=self.ticks)
+
+    def equals(self, other: object) -> bool:
+        if not isinstance(other, PauseExecutionExpression):
+            return False
+        return self.ticks == other.ticks
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}<{self.ticks}>'
+
+
+def pause_execution(ticks: int = 20) -> None:
+    PauseExecutionExpression(ticks=ticks).write()
