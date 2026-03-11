@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from typing import ParamSpec
 
 from ..container import get_current_container
 from .function import Function

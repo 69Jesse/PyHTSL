@@ -6,8 +6,8 @@ import numpy as np
 from .expression.housing_type import HousingType
 
 if TYPE_CHECKING:
-    from .execute.backend_type import BackendType
     from .checkable import Checkable
+    from .execute.backend_type import BackendType
 
 
 __all__ = ('InternalType',)
@@ -96,9 +96,9 @@ class InternalType(Enum):
     def from_value(value: 'Checkable | HousingType | BackendType') -> 'InternalType':
         if isinstance(value, str):
             return InternalType.STRING
-        elif isinstance(value, (int, np.integer)):
+        elif isinstance(value, int | np.integer):
             return InternalType.LONG
-        elif isinstance(value, (float, np.floating)):
+        elif isinstance(value, float | np.floating):
             return InternalType.DOUBLE
 
         return value.internal_type
