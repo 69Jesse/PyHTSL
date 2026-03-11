@@ -1,6 +1,11 @@
-from ..condition.named_condition import NamedCondition
+from ..expression.condition.named_condition import NamedCondition
 
 __all__ = ('PlayerFlying',)
 
 
-PlayerFlying = NamedCondition('isFlying')
+class PlayerFlyingCondition(NamedCondition):
+	def __init__(self) -> None:
+		super().__init__('isFlying')
+
+
+PlayerFlying = PlayerFlyingCondition()

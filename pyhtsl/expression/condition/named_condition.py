@@ -1,11 +1,10 @@
-from typing import Self, final
+from typing import Self
 
 from .condition import Condition
 
 __all__ = ('NamedCondition',)
 
 
-@final
 class NamedCondition(Condition):
     name: str
 

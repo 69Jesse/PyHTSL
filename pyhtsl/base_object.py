@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Self
 
+from .expression.housing_type import housing_type_as_rhs
+
 if TYPE_CHECKING:
     from .checkable import Checkable
     from .expression.housing_type import HousingType
@@ -33,9 +35,11 @@ class BaseObject(ABC):
     def __repr__(self) -> str:
         raise NotImplementedError()
 
-    def inline(self, value: 'Checkable | HousingType') -> str:
-        from .expression.expression import Expression
+    def inline(self, value: 'Checkable | HousingType | bool') -> str:
+        from .checkable import Checkable
 
-        if isinstance(value, Expression):
-            value.write()
-            value = value.
+        if isinstance(value, bool):
+            return str(value).lower()
+        if isinstance(value, Checkable):
+            return str(value)
+        return housing_type_as_rhs(value)
