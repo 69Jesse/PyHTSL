@@ -4,8 +4,8 @@ __all__ = ('PlayerFlying',)
 
 
 class PlayerFlyingCondition(NamedCondition):
-	def __init__(self) -> None:
-		super().__init__('isFlying')
+    def __init__(self) -> None:
+        super().__init__('isFlying')
 
 
 PlayerFlying = PlayerFlyingCondition()

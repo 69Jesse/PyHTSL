@@ -61,7 +61,9 @@ class MismatchedTypeException(ExecutionException):
         right: tuple[Checkable | HousingType, BackendType],
         operator: 'BinaryOperator',
     ) -> NoReturn:
-        left_string = f'{descriptive_backend_type(left[1])} ({left[0].into_string_lhs()})'
+        left_string = (
+            f'{descriptive_backend_type(left[1])} ({left[0].into_string_lhs()})'
+        )
         right_string = descriptive_backend_type(right[1]) + (
             f' ({right[0].into_string_rhs()})'
             if isinstance(right[0], Checkable)
@@ -86,7 +88,9 @@ class NotANumberException(ExecutionException):
         right: tuple[Checkable | HousingType, BackendType],
         operator: 'BinaryOperator',
     ) -> NoReturn:
-        left_string = f'{descriptive_backend_type(left[1])} ({left[0].into_string_lhs()})'
+        left_string = (
+            f'{descriptive_backend_type(left[1])} ({left[0].into_string_lhs()})'
+        )
         right_string = descriptive_backend_type(right[1]) + (
             f' ({right[0].into_string_rhs()})'
             if isinstance(right[0], Checkable)

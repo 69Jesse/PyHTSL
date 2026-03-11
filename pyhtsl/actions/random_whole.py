@@ -34,7 +34,9 @@ class RandomWholePlaceholder(
         )
 
     def get_backend_value(self) -> BackendType:
-        return np.int64(random.randint(self.lower_bound, self.exclusive_upper_bound - 1))
+        return np.int64(
+            random.randint(self.lower_bound, self.exclusive_upper_bound - 1)
+        )
 
 
 def RandomWhole(

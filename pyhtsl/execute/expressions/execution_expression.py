@@ -1,4 +1,3 @@
-
 from ...expression.expression import Expression
 
 __all__ = ('ExecutionExpression',)

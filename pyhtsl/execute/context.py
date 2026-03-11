@@ -207,7 +207,11 @@ class ExecutionContext(Container):
         if not self._is_in_quotes(text):
             if (new_value := self._substitute_single_placeholder(text)) is not None:
                 return self._yield(new_value, output=output)
-            if (new_value := (cast_to_backend_long(text) or cast_to_backend_double(text))) is not None:
+            if (
+                new_value := (
+                    cast_to_backend_long(text) or cast_to_backend_double(text)
+                )
+            ) is not None:
                 return self._yield(new_value, output=output)
 
         value = self._remove_quotes(text)

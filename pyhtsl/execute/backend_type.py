@@ -59,7 +59,7 @@ def _java_double_tostring(d: float) -> str:
     negative = d < 0
     d = abs(d)
     exp = math.floor(math.log10(d))
-    mantissa = d / (10.0 ** exp)
+    mantissa = d / (10.0**exp)
     mantissa_str = f'{mantissa:.17g}'
     if '.' not in mantissa_str:
         mantissa_str += '.0'
@@ -70,7 +70,9 @@ def _java_double_tostring(d: float) -> str:
     return f'{sign}{mantissa_str}E{exp}'
 
 
-def backend_matches_internal_type(value: BackendType, internal_type: InternalType) -> bool:
+def backend_matches_internal_type(
+    value: BackendType, internal_type: InternalType
+) -> bool:
     if internal_type is InternalType.ANY:
         return True
     if internal_type is InternalType.LONG:

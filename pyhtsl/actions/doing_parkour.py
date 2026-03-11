@@ -4,8 +4,8 @@ __all__ = ('DoingParkour',)
 
 
 class DoingParkourCondition(NamedCondition):
-	def __init__(self) -> None:
-		super().__init__('doingParkour')
+    def __init__(self) -> None:
+        super().__init__('doingParkour')
 
 
 DoingParkour = DoingParkourCondition()

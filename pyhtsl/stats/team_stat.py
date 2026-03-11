@@ -69,7 +69,9 @@ class TeamStat(
         return value
 
     def into_string_middle(self, include_fallback_value: bool = True) -> str:
-        value = super().into_string_middle(include_fallback_value=include_fallback_value)
+        value = super().into_string_middle(
+            include_fallback_value=include_fallback_value
+        )
         if self.team is not None or value:
             name = self.team.name if isinstance(self.team, Team) else 'None'
             if ' ' in name:

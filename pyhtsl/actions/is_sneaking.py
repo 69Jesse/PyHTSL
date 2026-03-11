@@ -4,8 +4,8 @@ __all__ = ('IsSneaking',)
 
 
 class IsSneakingCondition(NamedCondition):
-	def __init__(self) -> None:
-		super().__init__('isSneaking')
+    def __init__(self) -> None:
+        super().__init__('isSneaking')
 
 
 IsSneaking = IsSneakingCondition()
