@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Self, final
 from .expression import Expression
 
 if TYPE_CHECKING:
+    from ..execute.context import ExecutionContext
     from ..stats.stat import Stat
 
 
@@ -26,3 +27,6 @@ class UnsetExpression(Expression):
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{repr(self.target)}>'
+
+    def raw_execute(self, context: 'ExecutionContext') -> None:
+        context.pop(self.target)
