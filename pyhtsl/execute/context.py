@@ -129,7 +129,7 @@ class ExecutionContext(Container):
             return value
         return self.get(key, default=default, output='backend')
 
-    def _walk_subclasses(self, cls: type) -> Generator[type, None, None]:
+    def _walk_subclasses[T](self, cls: type[T]) -> Generator[type[T], None, None]:
         yield cls
         for subclass in cls.__subclasses__():
             yield from self._walk_subclasses(subclass)
