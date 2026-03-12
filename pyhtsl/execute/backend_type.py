@@ -14,6 +14,7 @@ __all__ = (
     'cast_to_backend_long',
     'cast_to_backend_double',
     'backend_to_default_backend',
+    'is_default_backend',
 )
 
 
@@ -107,3 +108,7 @@ def backend_to_default_backend(value: BackendType) -> BackendType:
     if isinstance(value, np.floating):
         return np.float64(0.0)
     return ''
+
+
+def is_default_backend(value: BackendType) -> bool:
+    return value == backend_to_default_backend(value)

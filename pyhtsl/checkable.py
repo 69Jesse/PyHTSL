@@ -2,10 +2,10 @@ import re
 from abc import abstractmethod
 from collections.abc import Callable
 from typing import TYPE_CHECKING, ClassVar, Literal, Self, final, overload
-
 from .actions.no_type_casting import no_type_casting
 from .base_object import BaseObject
 from .execute.backend_type import BackendType, into_backend_type
+from .utils import warn
 from .expression.condition.comparison_condition import (
     ComparisonCondition,
     ComparisonOperator,
@@ -258,6 +258,11 @@ class Checkable(BaseObject):
     ) -> 'BinaryExpression[Self, T]':
         from .expression.binary_expression import BinaryExpression, BinaryOperator
 
+        if self.internal_type is InternalType.LONG:
+            warn(
+                'Dividing a LONG value will act as a floor division, consider using a floor division operator (//) instead',
+            )
+
         return BinaryExpression(
             self,
             other,
@@ -270,6 +275,11 @@ class Checkable(BaseObject):
     ) -> 'BinaryExpression[T, Self]':
         from .expression.binary_expression import BinaryExpression, BinaryOperator
 
+        if self.internal_type is InternalType.LONG:
+            warn(
+                'Dividing a LONG value will act as a floor division, consider using a floor division operator (//) instead',
+            )
+
         return BinaryExpression(
             other,
             self,
@@ -280,13 +290,35 @@ class Checkable(BaseObject):
         self,
         other: T,
     ) -> 'BinaryExpression[Self, T]':
-        return self.__truediv__(other)
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+
+        if self.internal_type is InternalType.DOUBLE:
+            warn(
+                'Floor dividing a DOUBLE value will act as a true division, consider using a true division operator (/) instead',
+            )
+
+        return BinaryExpression(
+            self,
+            other,
+            BinaryOperator.Divide,
+        )
 
     def __rfloordiv__[T: 'Checkable | NumericHousingType'](
         self,
         other: T,
     ) -> 'BinaryExpression[T, Self]':
-        return self.__rtruediv__(other)
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+
+        if self.internal_type is InternalType.DOUBLE:
+            warn(
+                'Floor dividing a DOUBLE value will act as a true division, consider using a true division operator (/) instead',
+            )
+
+        return BinaryExpression(
+            other,
+            self,
+            BinaryOperator.Divide,
+        )
 
     @overload
     def __pow__(

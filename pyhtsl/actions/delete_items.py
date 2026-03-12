@@ -1,10 +1,10 @@
-from ..writer import HTSL_IMPORTS_FOLDER
+from ..config import get_htsl_import_folder
 
 __all__ = ('delete_all_items_from_imports_folder',)
 
 
 def delete_all_items_from_imports_folder() -> None:
-    for path in HTSL_IMPORTS_FOLDER.iterdir():
+    for path in get_htsl_import_folder().iterdir():
         if not path.is_file():
             continue
         if not path.suffix == '.json':

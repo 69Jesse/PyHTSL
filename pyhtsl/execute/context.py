@@ -3,11 +3,10 @@ import re
 from collections.abc import Callable, Generator
 from types import TracebackType
 from typing import Literal, overload
-from warnings import warn
-
 from ..checkable import Checkable
 from ..container import Container
 from ..expression.condition.condition import Condition
+from ..utils import warn
 from ..expression.condition.conditional_expression import ConditionalMode
 from ..expression.expression import Expression
 from ..expression.housing_type import HousingType
@@ -106,19 +105,21 @@ class ExecutionContext(Container):
         if isinstance(key, str):
             return self.substitute(key, output=output)
 
-        value = (
-            self.checkable_mapping.get(
-                key.into_hashable(),
-                None,
-            )
-            or key.get_backend_fallback_value()
-            or into_backend_type(default)
+        value = self.checkable_mapping.get(
+            key.into_hashable(),
+            None,
         )
+        if value is None:
+            value = key.get_backend_fallback_value()
+        if value is None:
+            value = into_backend_type(default)
 
         return self._yield(value, output=output)
 
     def get_backend(
-        self, key: Checkable | HousingType, default: BackendType | HousingType = ''
+        self,
+        key: Checkable | HousingType,
+        default: BackendType | HousingType = '',
     ) -> BackendType:
         if not isinstance(key, Checkable):
             value = into_backend_type(key)
@@ -170,6 +171,17 @@ class ExecutionContext(Container):
             return text[1:-1]
         return text
 
+    def _maybe_cast_to_backend(self, text: str) -> BackendType | None:
+        if text.endswith('L'):
+            return cast_to_backend_long(text[:-1])
+        elif text.endswith('D'):
+            return cast_to_backend_double(text[:-1])
+        if (new_value := cast_to_backend_long(text)) is not None:
+            return new_value
+        if (new_value := cast_to_backend_double(text)) is not None:
+            return new_value
+        return None
+
     @overload
     def substitute(
         self,
@@ -207,11 +219,7 @@ class ExecutionContext(Container):
         if not self._is_in_quotes(text):
             if (new_value := self._substitute_single_placeholder(text)) is not None:
                 return self._yield(new_value, output=output)
-            if (
-                new_value := (
-                    cast_to_backend_long(text) or cast_to_backend_double(text)
-                )
-            ) is not None:
+            if (new_value := self._maybe_cast_to_backend(text)) is not None:
                 return self._yield(new_value, output=output)
 
         value = self._remove_quotes(text)
@@ -220,17 +228,8 @@ class ExecutionContext(Container):
 
         value = self._substitute_all_placeholders(value)
 
-        if cast:
-            new_value: BackendType | None = None
-            if value.endswith('L'):
-                new_value = cast_to_backend_long(value[:-1])
-            elif value.endswith('D'):
-                new_value = cast_to_backend_double(value[:-1])
-            if new_value is None:
-                new_value = cast_to_backend_long(value) or cast_to_backend_double(value)
-
-            if new_value is not None:
-                value = new_value
+        if cast and (new_value := self._maybe_cast_to_backend(value)) is not None:
+            value = new_value
 
         return self._yield(value, output=output)
 
@@ -244,13 +243,15 @@ class ExecutionContext(Container):
         if not ignore_warning and len(self.expressions) > 0:
             warn(
                 'Putting values into the context should be done BEFORE writing any expressions, since this line is ALWAYS ran, even, for example, if it looks like it is behind a condition that may not hold.',
-                stacklevel=2,
             )
 
         value = into_backend_type(value)
         if isinstance(value, str):
             value = self.substitute(value)
         self.checkable_mapping[key.into_hashable()] = value
+
+    def pop(self, key: Checkable) -> None:
+        self.checkable_mapping.pop(key.into_hashable(), None)
 
     def write_or_execute(self, expression: Expression) -> None:
         if self.started_execution:

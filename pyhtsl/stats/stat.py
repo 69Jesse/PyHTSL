@@ -112,7 +112,7 @@ class Stat(Editable):
     def is_same_stat(self, other: object) -> bool:
         return self.equals_raw(other)
 
-    def with_automatic_unset(self, flag: bool = True) -> Self:
+    def with_auto_unset(self, flag: bool = True) -> Self:
         """
         Creates a copy of the current object, with the automatic unset flag set to the given value.
         """
@@ -120,7 +120,7 @@ class Stat(Editable):
         clone.auto_unset = flag
         return clone
 
-    def without_automatic_unset(self) -> Self:
+    def without_auto_unset(self) -> Self:
         """
         Creates a copy of the current object, with the automatic unset flag set to False.
         """

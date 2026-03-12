@@ -9,6 +9,7 @@ from ..checkable import Checkable
 from ..editable import Editable
 from ..execute.backend_type import (
     backend_to_default_backend,
+    is_default_backend,
 )
 from ..execute.context import ExecutionContext
 from ..execute.exception import MismatchedTypeException, NotANumberException
@@ -496,6 +497,11 @@ class BinaryExpression[
                 result = left_value / right_value
         else:
             raise ValueError(f'Unexpected operator: {expression.operator}')
+
+        if isinstance(expression.left, Stat) and expression.left.auto_unset:
+            if is_default_backend(result):
+                context.pop(expression.left)
+                return
 
         context.put(expression.left, result, ignore_warning=True)
 

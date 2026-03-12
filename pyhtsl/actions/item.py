@@ -4,6 +4,7 @@ import json
 import re
 from typing import Any, TypedDict, overload
 
+from ..config import HERE, get_htsl_import_folder
 from ..nbt import NBTByte, NBTCompound, NBTInt, NBTList, NBTShort, NBTString
 from ..types import (
     ALL_ITEM_KEYS,
@@ -14,8 +15,7 @@ from ..types import (
     NON_SPECIAL_ITEM_KEYS,
     PLAYER_SKULL_ITEM_KEY,
 )
-from ..utils import formatting_to_ansi, replace_formatting
-from ..writer import HERE, HTSL_IMPORTS_FOLDER
+from ..ext import formatting_to_ansi, replace_formatting
 from .enchantment import Enchantment
 
 __all__ = ('Item',)
@@ -333,7 +333,7 @@ class Item:
             return cached
 
         name = self._get_save_name(json_data)
-        path = HTSL_IMPORTS_FOLDER / f'{name}.json'
+        path = get_htsl_import_folder() / f'{name}.json'
         path.write_text(json_data, encoding='utf-8')
 
         SAVED_CACHE[json_data] = name

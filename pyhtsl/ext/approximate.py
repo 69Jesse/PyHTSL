@@ -52,17 +52,17 @@ def approximate_sqrt(
     if x.equals(assign_to):
         raise ValueError('Cannot assign to the same stat as input')
 
-    temp1 = PlayerStat('temp1').as_double().without_automatic_unset()
-    temp2 = PlayerStat('temp2').as_double().without_automatic_unset()
-    temp3 = PlayerStat('temp3').as_double().without_automatic_unset()
-    temp4 = PlayerStat('temp4').as_double().without_automatic_unset()
+    temp1 = PlayerStat('temp1').as_double().without_auto_unset()
+    temp2 = PlayerStat('temp2').as_double().without_auto_unset()
+    temp3 = PlayerStat('temp3').as_double().without_auto_unset()
+    temp4 = PlayerStat('temp4').as_double().without_auto_unset()
     if not can_modify_x:
-        x_or_temp5 = PlayerStat('temp5').as_double().without_automatic_unset()
+        x_or_temp5 = PlayerStat('temp5').as_double().without_auto_unset()
     else:
         assert isinstance(x, Editable)
         x_or_temp5 = x.as_double()
         if isinstance(x_or_temp5, Stat):
-            x_or_temp5 = x_or_temp5.without_automatic_unset()
+            x_or_temp5 = x_or_temp5.without_auto_unset()
 
     assign_to = assign_to.as_double()
 
@@ -169,18 +169,18 @@ def approximate_sin_cos(
     """
 
     x = x.as_double()
-    temp1 = PlayerStat('temp1').as_double().without_automatic_unset()
+    temp1 = PlayerStat('temp1').as_double().without_auto_unset()
     if not can_modify_x:
-        x_or_temp2 = PlayerStat('temp2').as_double().without_automatic_unset()
+        x_or_temp2 = PlayerStat('temp2').as_double().without_auto_unset()
     else:
         assert isinstance(x, Editable)
         x_or_temp2 = x.as_double()
         if isinstance(x_or_temp2, Stat):
-            x_or_temp2 = x_or_temp2.without_automatic_unset()
+            x_or_temp2 = x_or_temp2.without_auto_unset()
     original_x = (
         PlayerStat('temp2' if can_modify_x else 'temp3')
         .as_double()
-        .without_automatic_unset()
+        .without_auto_unset()
     )
 
     if certain_x_in_range != 90:
