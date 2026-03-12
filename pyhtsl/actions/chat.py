@@ -1,6 +1,11 @@
-from typing import Self, final
+from typing import TYPE_CHECKING, Self, final
+
+from pyhtsl.utils.formatting import formatting_to_ansi
 
 from ..expression.expression import Expression
+
+if TYPE_CHECKING:
+    from ..execute.context import ExecutionContext
 
 __all__ = ('chat',)
 
@@ -25,6 +30,9 @@ class ChatExpression(Expression):
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.line}>'
+
+    def raw_execute(self, context: 'ExecutionContext') -> None:
+        print(formatting_to_ansi(f'&7* &f{context.substitute(self.line, cast=False)}'))
 
 
 def chat(line: str) -> None:

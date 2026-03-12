@@ -2,7 +2,7 @@ import inspect
 import os
 import warnings
 
-_PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
+PACKAGE_DIR: str = os.path.dirname(os.path.abspath(__file__))
 
 
 def warn(message: str) -> None:
@@ -11,7 +11,7 @@ def warn(message: str) -> None:
     stacklevel = 1
     while frame is not None:
         filename = os.path.abspath(frame.f_code.co_filename)
-        if not filename.startswith(_PACKAGE_DIR):
+        if not filename.startswith(PACKAGE_DIR):
             break
         stacklevel += 1
         frame = frame.f_back

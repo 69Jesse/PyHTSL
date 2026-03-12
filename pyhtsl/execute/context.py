@@ -3,13 +3,14 @@ import re
 from collections.abc import Callable, Generator
 from types import TracebackType
 from typing import Literal, overload
+
 from ..checkable import Checkable
 from ..container import Container
 from ..expression.condition.condition import Condition
-from ..utils import warn
 from ..expression.condition.conditional_expression import ConditionalMode
 from ..expression.expression import Expression
 from ..expression.housing_type import HousingType
+from ..utils.warn import warn
 from .backend_type import (
     BackendType,
     backend_into_string,

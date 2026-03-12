@@ -2,10 +2,10 @@ import re
 from abc import abstractmethod
 from collections.abc import Callable
 from typing import TYPE_CHECKING, ClassVar, Literal, Self, final, overload
+
 from .actions.no_type_casting import no_type_casting
 from .base_object import BaseObject
 from .execute.backend_type import BackendType, into_backend_type
-from .utils import warn
 from .expression.condition.comparison_condition import (
     ComparisonCondition,
     ComparisonOperator,
@@ -16,6 +16,7 @@ from .expression.housing_type import (
     housing_type_as_rhs,
 )
 from .internal_type import InternalType
+from .utils.warn import warn
 
 if TYPE_CHECKING:
     from .expression.binary_expression import BinaryExpression

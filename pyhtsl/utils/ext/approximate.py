@@ -1,10 +1,10 @@
 from typing import Literal, overload
 
-from ..actions.conditional.statements import Else, IfAnd
-from ..checkable import Checkable
-from ..editable import Editable
-from ..stats.player_stat import PlayerStat
-from ..stats.stat import Stat
+from ...actions.conditional.statements import Else, IfAnd
+from ...checkable import Checkable
+from ...editable import Editable
+from ...stats.player_stat import PlayerStat
+from ...stats.stat import Stat
 
 __all__ = (
     'approximate_sqrt',
