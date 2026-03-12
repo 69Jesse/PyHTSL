@@ -14,14 +14,14 @@ class NBT[T](ABC):
         self.value = value
 
     @abstractmethod
-    def to_snbt(self) -> str:
+    def into_snbt(self) -> str:
         """
         Convert the NBT object to a string in SNBT format.
         """
         raise NotImplementedError
 
     @abstractmethod
-    def to_object(self) -> Any:
+    def into_object(self) -> Any:
         """
         Convert the NBT object to a Python object.
         """
@@ -74,7 +74,7 @@ class NBT[T](ABC):
         raise ValueError(f'Invalid object for NBT: {repr(obj)}')
 
     def __str__(self) -> str:
-        return self.to_snbt()
+        return self.into_snbt()
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{repr(self.value)}>'
@@ -88,10 +88,10 @@ class NBTByte(NBT[int]):
             raise ValueError('Value must be between -128 and 127')
         super().__init__(value)
 
-    def to_snbt(self) -> str:
-        return f'{self.to_object()}b'
+    def into_snbt(self) -> str:
+        return f'{self.into_object()}b'
 
-    def to_object(self) -> int:
+    def into_object(self) -> int:
         return self.value
 
     BYTE_REGEX: re.Pattern[str] = re.compile(r'^-?\d{1,3}[bB]', re.ASCII)
@@ -121,10 +121,10 @@ class NBTBoolean(NBTByte):
             raise TypeError('Value must be a boolean')
         super().__init__(value)
 
-    def to_snbt(self) -> str:
+    def into_snbt(self) -> str:
         return 'true' if self.value else 'false'
 
-    def to_object(self) -> bool:
+    def into_object(self) -> bool:
         return self.value  # type: ignore
 
     BOOLEAN_REGEX: re.Pattern[str] = re.compile(r'^(true|false|[10][bB])', re.ASCII)
@@ -156,10 +156,10 @@ class NBTShort(NBT[int]):
             raise ValueError('Value must be between -32768 and 32767')
         super().__init__(value)
 
-    def to_snbt(self) -> str:
-        return f'{self.to_object()}s'
+    def into_snbt(self) -> str:
+        return f'{self.into_object()}s'
 
-    def to_object(self) -> int:
+    def into_object(self) -> int:
         return self.value
 
     SHORT_REGEX: re.Pattern[str] = re.compile(r'^-?\d{1,5}[sS]', re.ASCII)
@@ -187,10 +187,10 @@ class NBTInt(NBT[int]):
             raise ValueError('Value must be between -2147483648 and 2147483647')
         super().__init__(value)
 
-    def to_snbt(self) -> str:
-        return str(self.to_object())
+    def into_snbt(self) -> str:
+        return str(self.into_object())
 
-    def to_object(self) -> int:
+    def into_object(self) -> int:
         return self.value
 
     INT_REGEX: re.Pattern[str] = re.compile(r'^-?\d{1,10}', re.ASCII)
@@ -220,10 +220,10 @@ class NBTLong(NBT[int]):
             )
         super().__init__(value)
 
-    def to_snbt(self) -> str:
-        return f'{self.to_object()}l'
+    def into_snbt(self) -> str:
+        return f'{self.into_object()}l'
 
-    def to_object(self) -> int:
+    def into_object(self) -> int:
         return self.value
 
     LONG_REGEX: re.Pattern[str] = re.compile(r'^-?\d{1,19}[lL]', re.ASCII)
@@ -249,13 +249,13 @@ class NBTFloat(NBT[float]):
             raise TypeError('Value must be a float')
         super().__init__(value)
 
-    def to_snbt(self) -> str:
-        formatted = np.format_float_positional(self.to_object(), trim='-')
+    def into_snbt(self) -> str:
+        formatted = np.format_float_positional(self.into_object(), trim='-')
         if '.' not in formatted:
             formatted += '.0'
         return f'{formatted}f'
 
-    def to_object(self) -> float:
+    def into_object(self) -> float:
         return self.value
 
     FLOAT_REGEX: re.Pattern[str] = re.compile(r'^-?\d+(\.\d+)?[fF]', re.ASCII)
@@ -281,13 +281,13 @@ class NBTDouble(NBT[float]):
             raise TypeError('Value must be a float')
         super().__init__(value)
 
-    def to_snbt(self) -> str:
-        formatted = np.format_float_positional(self.to_object(), trim='-')
+    def into_snbt(self) -> str:
+        formatted = np.format_float_positional(self.into_object(), trim='-')
         if '.' not in formatted:
             formatted += '.0'
         return formatted
 
-    def to_object(self) -> float:
+    def into_object(self) -> float:
         return self.value
 
     DOUBLE_REGEX: re.Pattern[str] = re.compile(r'^-?\d+(\.\d+)?[dD]?', re.ASCII)
@@ -316,10 +316,10 @@ class NBTString(NBT[str]):
             raise TypeError('Value must be a string')
         super().__init__(value)
 
-    def to_snbt(self) -> str:
-        return BaseObject.inline_quoted(self.to_object())
+    def into_snbt(self) -> str:
+        return BaseObject.inline_quoted(self.into_object())
 
-    def to_object(self) -> str:
+    def into_object(self) -> str:
         return self.value
 
     QUOTES: tuple[tuple[str, str], tuple[str, str]] = (('"', '"'), ("'", "'"))
@@ -363,11 +363,11 @@ class NBTList[T: NBT](NBT[list[T]]):
                     )
         super().__init__(value)
 
-    def to_snbt(self) -> str:
-        return f'[{",".join(item.to_snbt() for item in self.value)}]'
+    def into_snbt(self) -> str:
+        return f'[{",".join(item.into_snbt() for item in self.value)}]'
 
-    def to_object(self) -> list[T]:
-        return [item.to_object() for item in self.value]
+    def into_object(self) -> list[T]:
+        return [item.into_object() for item in self.value]
 
     @classmethod
     def _parse_snbt(cls, s: str) -> tuple[Self, int]:
@@ -394,7 +394,7 @@ class NBTList[T: NBT](NBT[list[T]]):
         return cls(items), offset + 1
 
     @classmethod
-    def from_object(cls, obj: list[T]) -> 'NBTList':
+    def from_object(cls, obj: list[T]) -> 'NBTList[T]':
         if isinstance(obj, NBTList):
             return obj
         return cls(obj)
@@ -443,7 +443,7 @@ class NBTCompound[V: NBT](NBT[dict[str, V]]):
                 raise ValueError('All items must be NBT instances')
         super().__init__(value)
 
-    def to_snbt(self) -> str:
+    def into_snbt(self) -> str:
         def format_key(key: str) -> str:
             if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', key):
                 return BaseObject.inline_quoted(key)
@@ -452,14 +452,14 @@ class NBTCompound[V: NBT](NBT[dict[str, V]]):
         return (
             '{'
             + ','.join(
-                f'{format_key(key)}:{item.to_snbt()}'
+                f'{format_key(key)}:{item.into_snbt()}'
                 for key, item in self.value.items()
             )
             + '}'
         )
 
-    def to_object(self) -> dict[str, Any]:
-        return {key: item.to_object() for key, item in self.value.items()}
+    def into_object(self) -> dict[str, Any]:
+        return {key: item.into_object() for key, item in self.value.items()}
 
     KEY_REGEX: re.Pattern[str] = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_]*$')
 
@@ -478,7 +478,7 @@ class NBTCompound[V: NBT](NBT[dict[str, V]]):
             key = s[key_start:offset].strip()
             if not cls.KEY_REGEX.match(key):
                 try:
-                    key = NBTString._parse_snbt(s[key_start:offset])[0].to_object()
+                    key = NBTString._parse_snbt(s[key_start:offset])[0].into_object()
                 except Exception as exc:
                     raise ValueError(
                         f'Invalid key format in NBTCompound: {repr(key)}'
@@ -560,13 +560,13 @@ class NBTGenericArray[IT: NBT, OT](NBT[list[IT]]):
                 )
         super().__init__(value)
 
-    def to_snbt(self) -> str:
+    def into_snbt(self) -> str:
         return (
-            f'[{self.id_character};{",".join(item.to_snbt() for item in self.value)}]'
+            f'[{self.id_character};{",".join(item.into_snbt() for item in self.value)}]'
         )
 
-    def to_object(self) -> list[OT]:
-        return [item.to_object() for item in self.value]
+    def into_object(self) -> list[OT]:
+        return [item.into_object() for item in self.value]
 
     @classmethod
     def parse_nbt(cls, s: str) -> tuple[Self, int]:

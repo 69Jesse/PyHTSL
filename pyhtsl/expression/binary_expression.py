@@ -265,6 +265,17 @@ class BinaryExpression[
 
     @staticmethod
     def rename_temporary_stats(expressions: list[Expression]) -> None:
+        numbers_already_used: set[int] = set()
+        for expression in expressions:
+            for expr in expression.walk_expressions():
+                for stat in expr.get_all_stats_used().values():
+                    if isinstance(stat, TemporaryStat):
+                        continue
+                    number = TemporaryStat.extract_number_from_name(stat.name)
+                    if number is not None:
+                        numbers_already_used.add(number)
+
+        # TODO does these lists ever have more than 1? idk
         temp_stats: dict[int, list[TemporaryStat]] = {}
         for expression in expressions:
             for expr in expression.walk_expressions():
@@ -273,7 +284,11 @@ class BinaryExpression[
                         continue
                     temp_stats.setdefault(stat.number, []).append(stat)
 
-        for new_number, stats in enumerate(temp_stats.values(), start=1):
+        new_number = 0
+        for stats in temp_stats.values():
+            while new_number in numbers_already_used:
+                new_number += 1
+            numbers_already_used.add(new_number)
             for stat in stats:
                 stat.number = new_number
 

@@ -1,11 +1,12 @@
 import difflib
 import hashlib
 import json
-import re
 from typing import Any, TypedDict, overload
 
+from pyhtsl.utils.slug import into_slug
+
 from ..config import HERE, get_htsl_import_folder
-from ..nbt import NBTByte, NBTCompound, NBTInt, NBTList, NBTShort, NBTString
+from ..nbt import NBT, NBTByte, NBTCompound, NBTInt, NBTList, NBTShort, NBTString
 from ..types import (
     ALL_ITEM_KEYS,
     COOKIE_ITEM_KEY,
@@ -14,8 +15,13 @@ from ..types import (
     LEATHER_ARMOR_KEYS,
     NON_SPECIAL_ITEM_KEYS,
     PLAYER_SKULL_ITEM_KEY,
+    ColorType,
 )
-from ..utils.formatting import formatting_to_ansi, normalize_formatting
+from ..utils.formatting import (
+    formatting_to_ansi,
+    normalize_formatting,
+    remove_formatting,
+)
 from .enchantment import Enchantment
 
 __all__ = ('Item',)
@@ -101,7 +107,7 @@ class Item:
         interaction_data_key: str | None = None,
         unbreakable: bool = False,
         damage: int = 0,
-        color: int | str | tuple[int, int, int] | None = None,
+        color: ColorType = None,
         hide_all_flags: bool = False,
         hide_enchantments_flag: bool = False,
         hide_modifiers_flag: bool = False,
@@ -178,28 +184,21 @@ class Item:
     def get_item_name(self) -> str:
         return self._get_item_data()['title']
 
-    def _as_json(self, data: ItemJsonData) -> str:
+    def into_nbt(self, data: ItemJsonData) -> NBTCompound[NBT]:
         extras_copy = self.extras.copy()
 
-        tags = NBTCompound()
-        compound = (
-            NBTCompound()
-            .put(
-                'id',
-                NBTString(data['name']),
-            )
-            .put(
-                'Count',
-                NBTByte(extras_copy.pop('count', 1)),
-            )
-            .put(
-                'Damage',
-                NBTShort(data['data_value']),
-            )
+        result: NBTCompound[NBT] = NBTCompound(
+            {
+                'id': NBTString(data['name']),
+                'Count': NBTByte(extras_copy.pop('count', 1)),
+                'Damage': NBTShort(data['data_value']),
+            }
         )
 
+        tags = NBTCompound()
+
         if data['can_be_damaged']:
-            compound.put('Damage', NBTShort(extras_copy.pop('damage', 0)))
+            result.put('Damage', NBTShort(extras_copy.pop('damage', 0)))
 
         enchantments: list[Enchantment] | None = extras_copy.pop('enchantments', None)
         if enchantments is not None:
@@ -242,7 +241,7 @@ class Item:
             name = normalize_formatting(name)
             display.put('Name', NBTString(name))
 
-        color: int | str | tuple[int, int, int] | None = extras_copy.pop('color', None)
+        color: ColorType = extras_copy.pop('color', None)
         if color is not None:
             if not isinstance(color, int | str | tuple):
                 raise ValueError(f'Invalid color type: {type(color)}')
@@ -278,48 +277,44 @@ class Item:
             tags.put('ExtraAttributes', extra_attributes)
 
         if not tags.is_empty():
-            compound.put('tag', tags)
+            result.put('tag', tags)
 
         if extras_copy:
             print(
                 f'\x1b[38;2;255;0;0mIgnoring unused keys whilst saving "{self._key}": {", ".join(extras_copy.keys())}\x1b[0m'
             )
 
-        return json.dumps(
-            {
-                'item': compound.to_snbt(),
-            }
-        )
+        return result
 
     def _get_item_data(self) -> ItemJsonData:
-        item = ITEMS.get(self._key, None)
+        item = ITEMS.get(self.normalized_key, None)
         if item is None:
             closest = difflib.get_close_matches(
-                self._key.lower(), ITEMS.keys(), n=1, cutoff=0.0
+                self.normalized_key.lower(),
+                ITEMS.keys(),
+                n=1,
+                cutoff=0.0,
             )[0]
             raise ValueError(
-                f'Invalid item key: \x1b[38;2;255;0;0m{self._key}\x1b[0m. Did you mean \x1b[38;2;0;255;0m{closest}\x1b[0m?\nHave you already saved this in your imports folder? Do not create an Item, use the string "{self._key}" instead.'
+                f'Invalid item key: \x1b[38;2;255;0;0m{self.normalized_key}\x1b[0m. Did you mean \x1b[38;2;0;255;0m{closest}\x1b[0m?\nHave you already saved this in your imports folder? Do not create an Item, use the string "{self.normalized_key}" instead.'
             )
         return item
 
     def copied(self) -> 'Item':
-        return Item(self._key, **self.extras)  # type: ignore
+        return Item(self._key, **self.extras)
 
-    def _get_save_name(self, json_data: str) -> str:
-        prefix: str | None = self.extras.get('name', None)
-        if prefix is not None:
-            prefix = re.sub(r'[&§][0-9a-fk-or]', '', prefix)
-            prefix = prefix.lower().replace(' ', '_')
-            prefix = re.sub(r'[^a-z0-9_]', '', prefix)
-        if not prefix:
-            prefix = self._key
-        suffix = hashlib.md5(json_data.encode()).hexdigest()[:8]
+    def _get_save_name(self, snbt: str) -> str:
+        prefix = into_slug(
+            f'{self.normalized_key}_{remove_formatting(self.extras.get("name", ""))}'
+        )
+
+        suffix = hashlib.md5(snbt.encode()).hexdigest()[:8]
         return f'_{len(SAVED_CACHE) % 1000:03}_{prefix}_{suffix}'
 
     def save(self) -> str:
         data = self._get_item_data()
-        json_data = self._as_json(data)
-        cached = SAVED_CACHE.get(json_data, None)
+        snbt = self.into_nbt(data).into_snbt()
+        cached = SAVED_CACHE.get(snbt, None)
 
         title = f'\033[38;2;0;255;0m{data["title"]}\033[0m'
         if self.count != 1:
@@ -332,11 +327,13 @@ class Item:
             print(f'Using cached {title} as \x1b[38;2;255;0;0m{cached}\x1b[0m.')
             return cached
 
-        name = self._get_save_name(json_data)
+        name = self._get_save_name(snbt)
         path = get_htsl_import_folder() / f'{name}.json'
-        path.write_text(json_data, encoding='utf-8')
 
-        SAVED_CACHE[json_data] = name
+        content = json.dumps({'item': snbt})
+        path.write_text(content, encoding='utf-8')
+
+        SAVED_CACHE[snbt] = name
         print(
             f'Successfully saved {title} as \x1b[38;2;255;0;0m{name}\x1b[0m to be used in your script:'
             f'\n  \033[38;2;0;255;0m+\033[0m {path.absolute()}'
@@ -359,6 +356,12 @@ class Item:
         new_item = self.copied()
         new_item.key = key
         return new_item
+
+    @property
+    def normalized_key(self) -> str:
+        if isinstance(self._key, str):
+            return self._key
+        return self._key[0]
 
     @property
     def name(self) -> str | None:

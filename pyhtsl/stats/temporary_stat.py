@@ -1,4 +1,4 @@
-from typing import final
+from typing import ClassVar, final
 
 from ..internal_type import InternalType
 from .player_stat import PlayerStat
@@ -16,6 +16,8 @@ class Number:
 
 @final
 class TemporaryStat(Stat):
+    name_prefix: ClassVar[str] = 'tmp'
+
     _number: Number
 
     def __init__(
@@ -42,11 +44,20 @@ class TemporaryStat(Stat):
 
     @property
     def name(self) -> str:
-        return f'temp{self.number}'
+        return f'{self.name_prefix}{self.number}'
 
     @name.setter
     def name(self, value: str) -> None:
         pass  # ignore on purpose
+
+    @staticmethod
+    def extract_number_from_name(name: str) -> int | None:
+        if name.startswith(TemporaryStat.name_prefix):
+            try:
+                return int(name.removeprefix(TemporaryStat.name_prefix))
+            except (ValueError, TypeError):
+                pass
+        return None
 
     @staticmethod
     def left_side_keyword() -> str:
