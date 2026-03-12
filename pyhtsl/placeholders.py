@@ -37,7 +37,7 @@ class PlaceholderCheckable(Checkable, ABC):
         return super().get_backend_fallback_value() or self.get_backend_value()
 
     def into_string_lhs(self) -> str:
-        return f'placeholder "{self.as_string}"'
+        return f'placeholder {self.inline_quoted(self.as_string)}'
 
     def into_string_rhs(self, *, include_internal_type: bool = True) -> str:
         return self.format_with_internal_type(
@@ -50,12 +50,6 @@ class PlaceholderCheckable(Checkable, ABC):
 
     def equals_raw(self, other: object) -> bool:
         return self is other
-
-    def cloned_raw(self) -> Self:
-        return self.__class__(
-            as_string=self.as_string,
-            constant_internal_type=self.constant_internal_type,
-        )
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.as_string}>'
@@ -79,10 +73,3 @@ class PlaceholderEditable(PlaceholderCheckable, Editable, ABC):
 
     def into_string_lhs(self) -> str:
         return self.assignment_lhs
-
-    def cloned_raw(self) -> Self:
-        return self.__class__(
-            assignment_lhs=self.assignment_lhs,
-            as_string=self.as_string,
-            constant_internal_type=self.constant_internal_type,
-        )

@@ -1,4 +1,5 @@
 import re
+from typing import Self, final
 
 import numpy as np
 
@@ -9,6 +10,7 @@ from ..placeholders import PlaceholderEditable
 __all__ = ('PlayerHunger',)
 
 
+@final
 class PlayerHungerPlaceholder(
     PlaceholderEditable,
     pattern=re.compile(re.escape('%player.hunger%')),
@@ -23,6 +25,9 @@ class PlayerHungerPlaceholder(
 
     def get_backend_value(self) -> BackendType:
         return np.int64(0)
+
+    def cloned_raw(self) -> Self:
+        return self.__class__()
 
 
 PlayerHunger = PlayerHungerPlaceholder()

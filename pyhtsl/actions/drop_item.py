@@ -90,10 +90,6 @@ def drop_item(
     prioritize_player: bool = False,
     fallback_to_inventory: bool = False,
 ) -> None:
-    if isinstance(item, Item):
-        name = item.save()
-    else:
-        name = item
     if coordinates is None:
         raise ValueError(
             'coordinates must be provided when location is custom_coordinates'

@@ -1,4 +1,5 @@
 import re
+from typing import Self, final
 
 import numpy as np
 
@@ -15,6 +16,7 @@ def _team_players_factory(match: re.Match[str]) -> 'TeamPlayersPlaceholder':
     return TeamPlayersPlaceholder(team if team else None)
 
 
+@final
 class TeamPlayersPlaceholder(
     PlaceholderCheckable,
     pattern=re.compile(r'%player\.team\.players(?:/([^%]*))?%'),
@@ -33,6 +35,9 @@ class TeamPlayersPlaceholder(
 
     def get_backend_value(self) -> BackendType:
         return np.int64(0)
+
+    def cloned_raw(self) -> Self:
+        return self.__class__()
 
 
 def TeamPlayers(

@@ -1,4 +1,5 @@
 import re
+from typing import Self, final
 
 import numpy as np
 
@@ -9,6 +10,7 @@ from ..placeholders import PlaceholderCheckable
 __all__ = ('PlayerPositionY',)
 
 
+@final
 class PlayerPositionYPlaceholder(
     PlaceholderCheckable,
     pattern=re.compile(re.escape('%player.pos.y%')),
@@ -22,6 +24,9 @@ class PlayerPositionYPlaceholder(
 
     def get_backend_value(self) -> BackendType:
         return np.float64(0)
+
+    def cloned_raw(self) -> Self:
+        return self.__class__()
 
 
 PlayerPositionY = PlayerPositionYPlaceholder()

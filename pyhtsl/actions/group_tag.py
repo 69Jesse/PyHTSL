@@ -1,4 +1,5 @@
 import re
+from typing import Self, final
 
 from ..execute.backend_type import BackendType
 from ..internal_type import InternalType
@@ -7,6 +8,7 @@ from ..placeholders import PlaceholderCheckable
 __all__ = ('GroupTag',)
 
 
+@final
 class GroupTagPlaceholder(
     PlaceholderCheckable,
     pattern=re.compile(re.escape('%player.group.tag%')),
@@ -20,6 +22,9 @@ class GroupTagPlaceholder(
 
     def get_backend_value(self) -> BackendType:
         return ''
+
+    def cloned_raw(self) -> Self:
+        return self.__class__()
 
 
 GroupTag = GroupTagPlaceholder()

@@ -1,4 +1,5 @@
 import re
+from typing import Self, final
 
 import numpy as np
 
@@ -9,6 +10,7 @@ from ..placeholders import PlaceholderCheckable
 __all__ = ('GroupPriority',)
 
 
+@final
 class GroupPriorityPlaceholder(
     PlaceholderCheckable,
     pattern=re.compile(re.escape('%player.group.priority%')),
@@ -22,6 +24,9 @@ class GroupPriorityPlaceholder(
 
     def get_backend_value(self) -> BackendType:
         return np.int64(0)
+
+    def cloned_raw(self) -> Self:
+        return self.__class__()
 
 
 GroupPriority = GroupPriorityPlaceholder()
