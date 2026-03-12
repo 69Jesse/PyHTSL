@@ -60,4 +60,6 @@ def set_compass_target(
             resolved_coordinates = ' '.join(map(str, coordinates))
         else:
             resolved_coordinates = coordinates
-    SetCompassTargetExpression(coordinates=resolved_coordinates, location=location).write()
+    SetCompassTargetExpression(
+        coordinates=resolved_coordinates, location=location
+    ).write()

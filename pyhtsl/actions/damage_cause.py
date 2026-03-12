@@ -28,4 +28,6 @@ class DamageCause(Condition):
         return self.damage_cause == other.damage_cause
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}<{self.damage_cause} inverted={self.inverted}>'
+        return (
+            f'{self.__class__.__name__}<{self.damage_cause} inverted={self.inverted}>'
+        )

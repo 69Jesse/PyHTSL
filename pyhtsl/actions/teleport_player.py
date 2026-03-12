@@ -46,7 +46,8 @@ class TeleportPlayerExpression(Expression):
         return (
             self.coordinates == other.coordinates
             and self.location == other.location
-            and self.prevent_teleport_inside_block == other.prevent_teleport_inside_block
+            and self.prevent_teleport_inside_block
+            == other.prevent_teleport_inside_block
         )
 
     def __repr__(self) -> str:

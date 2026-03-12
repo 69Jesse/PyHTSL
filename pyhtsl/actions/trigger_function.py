@@ -15,7 +15,9 @@ class TriggerFunctionExpression(Expression):
     function: Function
     trigger_for_all_players: bool
 
-    def __init__(self, function: Function, trigger_for_all_players: bool = False) -> None:
+    def __init__(
+        self, function: Function, trigger_for_all_players: bool = False
+    ) -> None:
         self.function = function
         self.trigger_for_all_players = trigger_for_all_players
 
@@ -23,12 +25,17 @@ class TriggerFunctionExpression(Expression):
         return f'function {self.inline_quoted(self.function.name)} {self.inline(self.trigger_for_all_players)}'
 
     def cloned(self) -> Self:
-        return self.__class__(function=self.function, trigger_for_all_players=self.trigger_for_all_players)
+        return self.__class__(
+            function=self.function, trigger_for_all_players=self.trigger_for_all_players
+        )
 
     def equals(self, other: object) -> bool:
         if not isinstance(other, TriggerFunctionExpression):
             return False
-        return self.function.name == other.function.name and self.trigger_for_all_players == other.trigger_for_all_players
+        return (
+            self.function.name == other.function.name
+            and self.trigger_for_all_players == other.trigger_for_all_players
+        )
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.function.name} all_players={self.trigger_for_all_players}>'
@@ -58,4 +65,6 @@ def trigger_function(
                 name=expected_param.name
             )  # type: ignore
             stat.value = param
-    TriggerFunctionExpression(function=function, trigger_for_all_players=trigger_for_all_players).write()
+    TriggerFunctionExpression(
+        function=function, trigger_for_all_players=trigger_for_all_players
+    ).write()

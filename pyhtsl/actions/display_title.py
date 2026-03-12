@@ -66,8 +66,10 @@ def display_title(
     stay: int = 5,
     fadeout: int = 1,
 ) -> None:
-    resolved_title: Checkable | HousingType = title if title is not None else '&r'  # type: ignore
-    resolved_subtitle: Checkable | HousingType = subtitle if subtitle is not None else '&r'  # type: ignore
+    resolved_title: Checkable | HousingType = title if title is not None else '&r'
+    resolved_subtitle: Checkable | HousingType = (
+        subtitle if subtitle is not None else '&r'
+    )
     DisplayTitleExpression(
         title=resolved_title,
         subtitle=resolved_subtitle,

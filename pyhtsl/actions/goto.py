@@ -39,6 +39,7 @@ def _goto(
     expression = GotoExpression(container=container, name=name)
     if add_to_front:
         from ..container import get_current_container
+
         expressions = get_current_container().get_expressions_ref_in_context()
         expressions.insert(0, expression.cloned())
     else:

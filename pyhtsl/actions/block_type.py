@@ -24,7 +24,9 @@ class BlockType(Condition):
             name = self.block.save()
         else:
             name = self.block
-        return f'blockType {self.inline_quoted(name)} {self.inline(self.match_type_only)}'
+        return (
+            f'blockType {self.inline_quoted(name)} {self.inline(self.match_type_only)}'
+        )
 
     def cloned_raw(self) -> Self:
         return self.__class__(
@@ -35,7 +37,10 @@ class BlockType(Condition):
     def equals_raw(self, other: object) -> bool:
         if not isinstance(other, BlockType):
             return False
-        return self.equals_or_eq(self.block, other.block) and self.match_type_only == other.match_type_only
+        return (
+            self.equals_or_eq(self.block, other.block)
+            and self.match_type_only == other.match_type_only
+        )
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<block={self.block!r} match_type_only={self.match_type_only} inverted={self.inverted}>'

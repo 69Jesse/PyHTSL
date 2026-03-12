@@ -25,7 +25,10 @@ class EnchantHeldItemExpression(Expression):
     def equals(self, other: object) -> bool:
         if not isinstance(other, EnchantHeldItemExpression):
             return False
-        return self.enchantment_name == other.enchantment_name and self.level == other.level
+        return (
+            self.enchantment_name == other.enchantment_name
+            and self.level == other.level
+        )
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.enchantment_name} level={self.level}>'
