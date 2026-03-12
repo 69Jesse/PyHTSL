@@ -16,7 +16,7 @@ class GotoExpression(Expression):
         self.name = name
 
     def into_htsl(self) -> str:
-        return f'goto {self.container} {self.inline_quoted(self.name)}'
+        return f'goto {self.inline(self.container)} {self.inline_quoted(self.name)}'
 
     def cloned(self) -> Self:
         return self.__class__(container=self.container, name=self.name)

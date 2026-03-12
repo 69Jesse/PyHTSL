@@ -17,7 +17,7 @@ class EnchantHeldItemExpression(Expression):
         self.level = level
 
     def into_htsl(self) -> str:
-        return f'enchant {self.inline_quoted(self.enchantment_name)} {self.level}'
+        return f'enchant {self.inline_quoted(self.enchantment_name)} {self.inline(self.level)}'
 
     def cloned(self) -> Self:
         return self.__class__(enchantment_name=self.enchantment_name, level=self.level)

@@ -30,7 +30,7 @@ class ApplyPotionEffectExpression(Expression):
 
     def into_htsl(self) -> str:
         return (
-            f'applyPotion {self.inline_quoted(self.potion)} {self.duration} {self.level}'
+            f'applyPotion {self.inline_quoted(self.potion)} {self.inline(self.duration)} {self.inline(self.level)}'
             f' {self.inline(self.override_existing_effects)} {self.inline(self.show_potion_icon)}'
         )
 

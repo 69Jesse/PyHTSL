@@ -13,7 +13,7 @@ class PauseExecutionExpression(Expression):
         self.ticks = ticks
 
     def into_htsl(self) -> str:
-        return f'pause {self.ticks}'
+        return f'pause {self.inline(self.ticks)}'
 
     def cloned(self) -> Self:
         return self.__class__(ticks=self.ticks)

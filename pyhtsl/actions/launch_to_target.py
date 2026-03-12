@@ -31,7 +31,7 @@ class LaunchToTargetExpression(Expression):
             line += f' {self.inline_quoted(self.coordinates)}'
         else:
             line += f' {self.inline_quoted("~ ~ ~")}'
-        line += f' {self.strength}'
+        line += f' {self.inline(self.strength)}'
         return line
 
     def cloned(self) -> Self:

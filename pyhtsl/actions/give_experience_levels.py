@@ -13,7 +13,7 @@ class GiveExperienceLevelsExpression(Expression):
         self.levels = levels
 
     def into_htsl(self) -> str:
-        return f'xpLevel {self.levels}'
+        return f'xpLevel {self.inline(self.levels)}'
 
     def cloned(self) -> Self:
         return self.__class__(levels=self.levels)

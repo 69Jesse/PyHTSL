@@ -29,7 +29,7 @@ class PlaySoundExpression(Expression):
         self.location = location
 
     def into_htsl(self) -> str:
-        line = f'sound {self.inline_quoted(self.sound)} {self.volume} {self.pitch} {self.inline_quoted(self.location)}'
+        line = f'sound {self.inline_quoted(self.sound)} {self.inline(self.volume)} {self.inline(self.pitch)} {self.inline_quoted(self.location)}'
         if self.location == 'custom_coordinates' and self.coordinates is not None:
             line += f' {self.inline_quoted(self.coordinates)}'
         return line

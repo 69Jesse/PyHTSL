@@ -15,7 +15,7 @@ class DisplayActionBarExpression(Expression):
         self.text = text
 
     def into_htsl(self) -> str:
-        return f'actionBar "{self.inline(self.text)}"'
+        return f'actionBar {self.inline_quoted(self.text)}'
 
     def cloned(self) -> Self:
         return self.__class__(text=self.cloned_or_same(self.text))

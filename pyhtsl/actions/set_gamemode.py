@@ -14,7 +14,7 @@ class SetGamemodeExpression(Expression):
         self.gamemode = gamemode
 
     def into_htsl(self) -> str:
-        return f'gamemode {self.gamemode}'
+        return f'gamemode {self.inline(self.gamemode)}'
 
     def cloned(self) -> Self:
         return self.__class__(gamemode=self.gamemode)

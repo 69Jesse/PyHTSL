@@ -31,8 +31,8 @@ class DisplayTitleExpression(Expression):
 
     def into_htsl(self) -> str:
         return (
-            f'title "{self.inline(self.title)}" "{self.inline(self.subtitle)}"'
-            f' {self.fadein} {self.stay} {self.fadeout}'
+            f'title {self.inline_quoted(self.title)} {self.inline_quoted(self.subtitle)}'
+            f' {self.inline(self.fadein)} {self.inline(self.stay)} {self.inline(self.fadeout)}'
         )
 
     def cloned(self) -> Self:
