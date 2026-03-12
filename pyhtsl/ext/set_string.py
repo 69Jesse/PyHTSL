@@ -1,6 +1,6 @@
-from ...editable import Editable
-from ...stats.player_stat import PlayerStat
-from ..placeholders import get_placeholder_parts
+from ..editable import Editable
+from ..stats.player_stat import PlayerStat
+from ..utils.placeholders import get_placeholder_parts
 
 __all__ = ('set_string',)
 

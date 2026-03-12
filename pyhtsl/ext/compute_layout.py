@@ -1,5 +1,5 @@
-from ..formatting import remove_formatting
-from ..placeholders import get_placeholder_parts
+from ..utils.formatting import remove_formatting
+from ..utils.placeholders import get_placeholder_parts
 
 __all__ = ('compute_best_layout',)
 

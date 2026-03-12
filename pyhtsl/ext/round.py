@@ -1,4 +1,4 @@
-from ...editable import Editable
+from ..editable import Editable
 
 __all__ = ('round_double',)
 
