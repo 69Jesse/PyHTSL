@@ -7,7 +7,7 @@ __all__ = (
     'formatting_to_ansi',
 )
 
-FORMATTING_REGEX: re.Pattern[str] = re.compile(r'[&§][0-9a-fk-or]')
+FORMATTING_REGEX: re.Pattern[str] = re.compile(r'[&§]([0-9a-fk-or])')
 
 
 def normalize_formatting(text: str, *, symbol: Literal['&', '§'] = '§') -> str:
@@ -54,7 +54,7 @@ def formatting_to_ansi(text: str) -> str:
     text = normalize_formatting(text)
 
     def replace(match: re.Match) -> str:
-        key = match.group()
+        key = match.group(0)
         if key == '§r':
             return '\033[0m'
         color = COLOR_MAPPINGS.get(key, None)

@@ -15,7 +15,7 @@ from ..types import (
     NON_SPECIAL_ITEM_KEYS,
     PLAYER_SKULL_ITEM_KEY,
 )
-from ..ext import formatting_to_ansi, replace_formatting
+from ..utils.formatting import formatting_to_ansi, normalize_formatting
 from .enchantment import Enchantment
 
 __all__ = ('Item',)
@@ -234,12 +234,12 @@ class Item:
 
         lore: str | None = extras_copy.pop('lore', None)
         if lore is not None:
-            lore = replace_formatting(lore)
+            lore = normalize_formatting(lore)
             display.put('Lore', NBTList([NBTString(line) for line in lore.split('\n')]))
 
         name: str | None = extras_copy.pop('name', None)
         if name is not None:
-            name = replace_formatting(name)
+            name = normalize_formatting(name)
             display.put('Name', NBTString(name))
 
         color: int | str | tuple[int, int, int] | None = extras_copy.pop('color', None)
