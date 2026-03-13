@@ -103,8 +103,8 @@ class Container:
         traceback: TracebackType | None,
     ) -> None:
         assert CONTAINERS[-1] is self, 'Container stack is corrupted'
-        CONTAINERS.pop()
         self.finalize()
+        CONTAINERS.pop()
 
     def finalize_expressions(self, expressions: list['Expression']) -> None:
         def on_new_expression(expression: 'Expression') -> None:
@@ -119,11 +119,44 @@ class Container:
                 expression.finalize(self)
                 index -= 1
 
+    def remove_duplicate_gotos(self) -> None:
+        from .actions.goto import GotoExpression
+
+        expressions = self.expressions
+        i = 0
+        while i < len(expressions):
+            if not isinstance(expressions[i], GotoExpression):
+                i += 1
+                continue
+
+            start = i
+            while i < len(expressions) and isinstance(expressions[i], GotoExpression):
+                i += 1
+
+            j = i - 1
+            while j >= start:
+                for k in range(j + 1, i):
+                    if expressions[j].equals(expressions[k]):
+                        expressions.pop(j)
+                        i -= 1
+                        break
+                j -= 1
+
     def finalize(self) -> None:
         if self.is_finalized:
             raise RuntimeError('Container is already finalized')
+        for function in self.registered_functions:
+            function.callback()
         self.finalize_expressions(self.expressions)
+        self.remove_duplicate_gotos()
         self.is_finalized = True
+
+    def add_htsl_formatting(self, lines: list[str]) -> None:
+        for i in range(len(lines)):
+            if lines[i].startswith('goto') and (
+                i == 0 or not lines[i - 1].startswith('goto')
+            ):
+                lines[i] = '\n\n' + lines[i]
 
     def into_htsl(self) -> str:
         if not self.is_finalized:
@@ -140,6 +173,7 @@ class Container:
             if lines[i].lstrip().startswith('// @ignore'):
                 lines.pop(i)
 
+        self.add_htsl_formatting(lines)
         return '\n'.join(lines)
 
     def htsl_path(self, name: str) -> Path:
