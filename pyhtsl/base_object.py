@@ -46,5 +46,5 @@ class BaseObject(ABC):
         return housing_type_as_rhs(value)
 
     @staticmethod
-    def inline_quoted(value: 'Checkable | HousingType | bool') -> str:
-        return f'"{BaseObject.inline(value).replace('"', '\\"')}"'
+    def inline_quoted(value: 'Checkable | str') -> str:
+        return f'"{str(value).replace('"', '\\"')}"'

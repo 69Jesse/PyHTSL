@@ -113,7 +113,9 @@ from .config import disable_global_export as disable_global_export
 from .config import display_htsl as display_htsl
 from .config import get_htsl_import_folder as get_htsl_import_folder
 from .config import set_htsl_imports_folder as set_htsl_imports_folder
+from .container import CONTAINERS as CONTAINERS
 from .container import Container as Container
+from .container import get_current_container as get_current_container
 from .editable import Editable as Editable
 from .execute.context import ExecutionContext as ExecutionContext
 from .expression.condition.condition import Condition as Condition

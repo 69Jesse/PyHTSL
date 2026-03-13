@@ -370,6 +370,34 @@ class BinaryExpression[
         self.optimize_binary_expressions(expressions)  # pyright: ignore[reportArgumentType]
         yield from expressions
 
+    def create_temp_stat_and_write(self) -> TemporaryStat:
+        stat = TemporaryStat(self.internal_type)
+
+        expressions = list(
+            BinaryExpression(
+                left=stat,
+                right=self,
+                operator=BinaryOperator.Set,
+            ).into_executable_expressions()
+        )
+        for expr in expressions:
+            expr.write()
+
+        return stat
+
+    def into_string_lhs(self) -> str:
+        return self.create_temp_stat_and_write().into_string_lhs()
+
+    def into_string_rhs(self, *, include_internal_type: bool = True) -> str:
+        return self.create_temp_stat_and_write().into_string_rhs(
+            include_internal_type=include_internal_type,
+        )
+
+    def into_inside_string(self, include_fallback_value: bool = True) -> str:
+        return self.create_temp_stat_and_write().into_inside_string(
+            include_fallback_value=include_fallback_value,
+        )
+
     def into_htsl(self) -> str:
         def format_rhs(value: Checkable | HousingType) -> str:
             if isinstance(value, Checkable):

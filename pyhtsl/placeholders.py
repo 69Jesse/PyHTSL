@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Self, final
+from typing import final
 
 from pyhtsl.editable import Editable
 

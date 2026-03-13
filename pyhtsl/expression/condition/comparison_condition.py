@@ -51,7 +51,7 @@ class ComparisonCondition[LeftT: 'Checkable', RightT: 'Checkable | HousingType']
                 return value.into_string_rhs()
             return housing_type_as_rhs(value)
 
-        line = f'{self.left.into_string_rhs()} {self.operator.value} {format_rhs(self.right)}'
+        line = f'{self.left.into_string_lhs()} {self.operator.value} {format_rhs(self.right)}'
 
         fallback_value = self.left.get_formatted_fallback_value()
         if fallback_value is not None:

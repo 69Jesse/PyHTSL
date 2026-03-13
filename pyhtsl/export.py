@@ -46,7 +46,7 @@ def export(
             f'No functions to export. Double check {repr(exportable)} of type {exportable.__class__.__name__} is correct.'
         )
 
-    with Container(name=name) as container:
+    with Container() as container:
         for call in callables:
             call()
-        container.export()
+    container.export(name)

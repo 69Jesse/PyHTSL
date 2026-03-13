@@ -3,7 +3,7 @@ from collections.abc import Generator
 from typing import TYPE_CHECKING, Any, final
 
 from ..base_object import BaseObject
-from ..container import get_current_container
+from ..container import Container, get_current_container
 
 if TYPE_CHECKING:
     from ..execute.context import ExecutionContext
@@ -25,7 +25,7 @@ class Expression(BaseObject):
         get_current_container().write_expression(self.cloned())
 
     def raw_execute(self, context: 'ExecutionContext') -> None:
-        print(f'No execution defined for expression "{self!r}"')
+        print(f'No execution implemented for expression "{self!r}"')
 
     @final
     def execute(self, context: 'ExecutionContext') -> None:
@@ -72,3 +72,6 @@ class Expression(BaseObject):
 
     def walk_expressions(self) -> Generator['Expression', None, None]:
         yield self
+
+    def finalize(self, container: Container) -> None:
+        self.into_htsl()

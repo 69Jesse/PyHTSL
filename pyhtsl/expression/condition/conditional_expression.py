@@ -3,6 +3,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, Self, final
 
 from ...config import INDENT
+from ...container import Container
 from ..expression import Expression
 
 if TYPE_CHECKING:
@@ -116,3 +117,9 @@ class ConditionalExpression(Expression):
         expressions = self.if_expressions if holds else self.else_expressions
         for expr in expressions:
             expr.execute(context)
+
+    def finalize(self, container: Container) -> None:
+        for cond in self.conditions:
+            cond.finalize(container)
+        container.finalize_expressions(self.if_expressions)
+        container.finalize_expressions(self.else_expressions)

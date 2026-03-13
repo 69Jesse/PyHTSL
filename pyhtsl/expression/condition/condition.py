@@ -2,6 +2,7 @@ from abc import abstractmethod
 from typing import TYPE_CHECKING, Self, final
 
 from ...base_object import BaseObject
+from ...container import Container
 
 if TYPE_CHECKING:
     from ...checkable import Checkable
@@ -47,7 +48,7 @@ class Condition(BaseObject):
         return self
 
     def raw_evaluate(self, context: 'ExecutionContext') -> bool:
-        print(f'No execution defined for condition "{self!r}", returning False')
+        print(f'No execution implemented for condition "{self!r}", returning False')
         return False
 
     @final
@@ -61,3 +62,6 @@ class Condition(BaseObject):
 
     def related_debug_parts(self) -> list['Checkable | HousingType']:
         return []
+
+    def finalize(self, container: Container) -> None:
+        self.into_htsl()
