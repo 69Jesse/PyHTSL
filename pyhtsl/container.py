@@ -151,17 +151,21 @@ class Container:
         self.remove_duplicate_gotos()
         self.is_finalized = True
 
-    def add_htsl_formatting(self, lines: list[str]) -> None:
+    def prettify_htsl_lines(self, lines: list[str]) -> None:
+        for i in range(len(lines) - 1, -1, -1):
+            if lines[i].lstrip().startswith('// @ignore'):
+                lines.pop(i)
+
         for i in range(len(lines)):
             if lines[i].startswith('goto') and (
-                i == 0 or not lines[i - 1].startswith('goto')
+                i != len(lines) - 1 and not lines[i + 1].startswith('goto')
             ):
                 lines[i] = '\n\n' + lines[i]
 
     def into_htsl(self) -> str:
         if not self.is_finalized:
             raise RuntimeError(
-                'Container is not finalized. Either exit the container context or call "finalize()" manually'
+                'Unable to transform Container into htsl: Container is not finalized. Either exit the container context or call "finalize()" manually'
             )
 
         with override_write_expression(lambda _: None):
@@ -169,11 +173,7 @@ class Container:
                 '\n'
             )
 
-        for i in range(len(lines) - 1, -1, -1):
-            if lines[i].lstrip().startswith('// @ignore'):
-                lines.pop(i)
-
-        self.add_htsl_formatting(lines)
+        self.prettify_htsl_lines(lines)
         return '\n'.join(lines)
 
     def htsl_path(self, name: str) -> Path:
@@ -211,7 +211,7 @@ class Container:
 
         path = self.htsl_path(name)
         path.write_text(
-            f'// Generated with PyHTSL https://github.com/69Jesse/PyHTSL\n{content}',
+            f'// Generated with PyHTSL https://github.com/69Jesse/PyHTSL\n{content}\n',
             encoding='utf-8',
         )
 
