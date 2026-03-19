@@ -2,10 +2,10 @@ from abc import abstractmethod
 from typing import TYPE_CHECKING, Self, final
 
 from ...base_object import BaseObject
+from ...container import Container
 
 if TYPE_CHECKING:
     from ...checkable import Checkable
-    from ...container import Container
     from ...execute.context import ExecutionContext
     from ...expression.housing_type import HousingType
 
@@ -63,5 +63,5 @@ class Condition(BaseObject):
     def related_debug_parts(self) -> list['Checkable | HousingType']:
         return []
 
-    def finalize(self, container: 'Container') -> None:
+    def finalize(self, container: Container) -> None:
         self.into_htsl()
