@@ -1,7 +1,7 @@
 import difflib
 import hashlib
 import json
-from typing import Any, TypedDict, overload
+from typing import Any, TypedDict, get_args, overload
 
 from pyhtsl.utils.slug import into_slug
 
@@ -242,6 +242,12 @@ class Item:
             display.put('Name', NBTString(name))
 
         color: ColorType = extras_copy.pop('color', None)
+        if (
+            color is None
+            and isinstance(self._key, tuple)
+            and self._key[0] in get_args(LEATHER_ARMOR_KEYS)
+        ):
+            color = self._key[1]  # type: ignore
         if color is not None:
             if not isinstance(color, int | str | tuple):
                 raise ValueError(f'Invalid color type: {type(color)}')
@@ -252,6 +258,12 @@ class Item:
             display.put('color', NBTInt(color))
 
         skull_data: NBTCompound | None = extras_copy.pop('skull_data', None)
+        if (
+            skull_data is None
+            and isinstance(self._key, tuple)
+            and self._key[0] in get_args(PLAYER_SKULL_ITEM_KEY)
+        ):
+            skull_data = self._key[1]  # type: ignore
         if skull_data is not None:
             tags.put('SkullOwner', skull_data)
 
