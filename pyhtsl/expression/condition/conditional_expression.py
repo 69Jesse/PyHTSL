@@ -123,3 +123,6 @@ class ConditionalExpression(Expression):
             cond.finalize(container)
         container.finalize_expressions(self.if_expressions)
         container.finalize_expressions(self.else_expressions)
+
+    def nested_expressions_refs(self) -> list[list['Expression']]:
+        return [self.if_expressions, self.else_expressions]

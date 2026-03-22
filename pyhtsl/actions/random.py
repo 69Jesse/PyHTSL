@@ -51,6 +51,9 @@ class RandomExpression(Expression):
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<exprs={len(self.expressions)}>'
 
+    def nested_expressions_refs(self) -> list[list['Expression']]:
+        return [self.expressions]
+
 
 @final
 class RandomContextManager(ContainerContextManager):

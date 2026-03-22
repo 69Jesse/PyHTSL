@@ -75,3 +75,9 @@ class Expression(BaseObject):
 
     def finalize(self, container: Container) -> None:
         self.into_htsl()
+
+    def nested_expressions_refs(self) -> list[list['Expression']]:
+        return []
+
+    def can_be_nested(self) -> bool:
+        return len(self.nested_expressions_refs()) == 0

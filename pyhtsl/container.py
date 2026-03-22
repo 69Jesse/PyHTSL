@@ -122,8 +122,8 @@ class Container:
     def finalize(self) -> None:
         if self.is_finalized:
             raise RuntimeError('Container is already finalized')
-        for block in self.blocks:
-            block.finalize(self)
+        for index, block in enumerate(self.blocks):
+            block.finalize(self, index)
         self.is_finalized = True
 
     @staticmethod
@@ -138,13 +138,12 @@ class Container:
                 'Unable to transform Container into htsl: Container is not finalized. Either exit the container context or call "finalize()" manually'
             )
 
-        for block in self.blocks:
-            block.fix_action_limits()
-
         with override_write_expression(lambda _: None):
-            lines = ('\n\n\n'.join(block.into_htsl() for block in self.blocks)).split(
-                '\n'
-            )
+            lines = (
+                '\n\n\n'.join(
+                    block.into_htsl() for block in self.blocks if not block.is_empty()
+                )
+            ).split('\n')
 
         self.prettify_htsl_lines(lines)
         return '\n'.join(lines)
@@ -152,8 +151,11 @@ class Container:
     def htsl_path(self, name: str) -> Path:
         return get_htsl_import_folder() / f'{name}.htsl'
 
+    def is_empty(self) -> bool:
+        return all(block.is_empty() for block in self.blocks)
+
     def export(self, name: str) -> None:
-        if not self.blocks:
+        if self.is_empty():
             print(
                 'Nothing found to write to your .htsl file. \x1b[38;2;255;0;0mPyHTSL will not do anything.\x1b[0m'
             )

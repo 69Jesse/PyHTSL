@@ -2,11 +2,11 @@ from abc import abstractmethod
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Self, final
 
-from pyhtsl.container import ContainerContextManager, ExpressionContext
-
 from .actions.function import Function
 from .base_object import BaseObject
 from .config import INDENT
+from .container import ContainerContextManager, ExpressionContext
+from .limits import fix_action_limits
 
 if TYPE_CHECKING:
     from .container import Container
@@ -69,6 +69,9 @@ class Block(BaseObject):
     def goto_line(self) -> str | None:
         raise NotImplementedError()
 
+    def is_empty(self) -> bool:
+        return len(self.expressions) == 0
+
     def into_htsl(self) -> str:
         lines: list[str] = []
         line = self.goto_line()
@@ -87,12 +90,27 @@ class Block(BaseObject):
             self.callback()
             self.callback_ran = True
 
-    def finalize(self, container: 'Container') -> None:
+    def fix_action_limits(self, container: 'Container', index: int) -> None:
+        function_name = f'{self.get_name()} (line {index + 1})'
+        fixed, rest = fix_action_limits(
+            self.expressions,
+            nesting_possible=True,
+            function_name_if_exceeds=function_name,
+        )
+        self.expressions = fixed
+        if rest:
+            new_block = FunctionBlock(
+                function=Function(
+                    name=function_name,
+                ),
+                expressions=rest,
+            )
+            container.blocks.insert(index + 1, new_block)
+
+    def finalize(self, container: 'Container', index: int) -> None:
         self.maybe_run_callback()
         container.finalize_expressions(self.expressions)
-
-    def fix_action_limits(self) -> None:
-        pass
+        self.fix_action_limits(container, index)
 
 
 @final
