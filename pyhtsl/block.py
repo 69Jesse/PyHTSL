@@ -59,7 +59,7 @@ class Block(BaseObject):
         return clone
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}({len(self.expressions)} expressions)'
+        return f'{self.__class__.__name__}(expressions={len(self.expressions)})'
 
     @abstractmethod
     def get_name(self) -> str:
