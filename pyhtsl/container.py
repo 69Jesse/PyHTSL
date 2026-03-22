@@ -8,7 +8,6 @@ from pathlib import Path
 from types import TracebackType
 from typing import TYPE_CHECKING, ClassVar, NamedTuple, Self
 
-from .actions.function import Function
 from .config import (
     get_htsl_import_folder,
     should_disable_global_export,
@@ -18,6 +17,7 @@ from .logger import AntiSpamLogger
 from .utils.slug import into_slug
 
 if TYPE_CHECKING:
+    from .block import Block
     from .expression.expression import Expression
 
 
@@ -42,7 +42,7 @@ def override_write_expression(
 
 
 class ExpressionContext(NamedTuple):
-    parent_expression: 'Expression'
+    parent_expression: 'Expression | None'
     expressions_ref: list['Expression']
     add_expression_to_container: bool = True
 
@@ -51,16 +51,16 @@ class Container:
     exported_names: ClassVar[set[str]] = set()
 
     logger: AntiSpamLogger
-    registered_functions: list[Function[Callable[[], None]]]
-    expressions: list['Expression']
+    blocks: list['Block']
     contexts: list[ExpressionContext]
 
     is_finalized: bool
 
     def __init__(self) -> None:
+        from .block import GlobalBlock
+
         self.logger = AntiSpamLogger()
-        self.registered_functions = []
-        self.expressions = []
+        self.blocks = [GlobalBlock()]
         self.contexts = []
         self.is_finalized = False
 
@@ -70,7 +70,7 @@ class Container:
 
     def get_expressions_ref_in_context(self, *, go_back: int = 0) -> list['Expression']:
         if go_back >= len(self.contexts):
-            return self.expressions
+            return self.blocks[0].expressions
         return self.contexts[-1 - go_back].expressions_ref
 
     def write_expression(self, expression: 'Expression') -> None:
@@ -119,48 +119,18 @@ class Container:
                 expression.finalize(self)
                 index -= 1
 
-    def remove_duplicate_gotos(self) -> None:
-        from .actions.goto import GotoExpression
-
-        expressions = self.expressions
-        i = 0
-        while i < len(expressions):
-            if not isinstance(expressions[i], GotoExpression):
-                i += 1
-                continue
-
-            start = i
-            while i < len(expressions) and isinstance(expressions[i], GotoExpression):
-                i += 1
-
-            j = i - 1
-            while j >= start:
-                for k in range(j + 1, i):
-                    if expressions[j].equals(expressions[k]):
-                        expressions.pop(j)
-                        i -= 1
-                        break
-                j -= 1
-
     def finalize(self) -> None:
         if self.is_finalized:
             raise RuntimeError('Container is already finalized')
-        for function in self.registered_functions:
-            function.callback()
-        self.finalize_expressions(self.expressions)
-        self.remove_duplicate_gotos()
+        for block in self.blocks:
+            block.finalize(self)
         self.is_finalized = True
 
-    def prettify_htsl_lines(self, lines: list[str]) -> None:
+    @staticmethod
+    def prettify_htsl_lines(lines: list[str]) -> None:
         for i in range(len(lines) - 1, -1, -1):
             if lines[i].lstrip().startswith('// @ignore'):
                 lines.pop(i)
-
-        for i in range(len(lines)):
-            if lines[i].startswith('goto') and (
-                i != len(lines) - 1 and not lines[i + 1].startswith('goto')
-            ):
-                lines[i] = '\n\n' + lines[i]
 
     def into_htsl(self) -> str:
         if not self.is_finalized:
@@ -168,8 +138,11 @@ class Container:
                 'Unable to transform Container into htsl: Container is not finalized. Either exit the container context or call "finalize()" manually'
             )
 
+        for block in self.blocks:
+            block.fix_action_limits()
+
         with override_write_expression(lambda _: None):
-            lines = ('\n'.join(expr.into_htsl() for expr in self.expressions)).split(
+            lines = ('\n\n\n'.join(block.into_htsl() for block in self.blocks)).split(
                 '\n'
             )
 
@@ -180,7 +153,7 @@ class Container:
         return get_htsl_import_folder() / f'{name}.htsl'
 
     def export(self, name: str) -> None:
-        if not self.expressions:
+        if not self.blocks:
             print(
                 'Nothing found to write to your .htsl file. \x1b[38;2;255;0;0mPyHTSL will not do anything.\x1b[0m'
             )
@@ -240,6 +213,7 @@ class ContainerContextManager(ABC):
         context = self.create_context()
         container = get_current_container()
         if context.add_expression_to_container:
+            assert context.parent_expression is not None
             container.write_expression(context.parent_expression)
         container.add_context(context)
 

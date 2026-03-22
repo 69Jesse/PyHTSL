@@ -1,8 +1,8 @@
 from collections.abc import Callable
 
+from ..block import FunctionBlock
 from ..container import get_current_container
 from .function import Function
-from .goto import goto
 
 __all__ = ('create_function',)
 
@@ -12,24 +12,23 @@ def create_function(
     *,
     force_create: bool | None = None,
     run_right_now: bool = False,
-) -> Callable[[Callable[[], None]], Function[Callable[[], None]]]:
-    def decorator(func: Callable[[], None]) -> Function[Callable[[], None]]:
+) -> Callable[[Callable[[], None]], Function]:
+    def decorator(func: Callable[[], None]) -> Function:
         def callback() -> None:
-            goto(container='function', name=name, add_to_front=True)
             create = (
                 force_create
                 if force_create is not None
                 else (func.__module__ == '__main__')
             ) or (not get_current_container().is_global)
             if create:
-                goto(container='function', name=name)
                 func()
 
-        function = Function(name=name, callback=callback)
+        function = Function(name=name)
+        block = FunctionBlock(function=function, callback=callback)
+
+        get_current_container().blocks.append(block)
         if run_right_now:
-            callback()
-        else:
-            get_current_container().registered_functions.append(function)
+            block.maybe_run_callback()
 
         return function
 

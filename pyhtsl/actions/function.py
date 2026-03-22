@@ -1,22 +1,33 @@
-from collections.abc import Callable
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pyhtsl.block import FunctionBlock
 
 __all__ = ('Function',)
 
 
-class Function[CT: Callable[[], None] | None]:
+class Function:
     name: str
-    callback: CT
+    block: 'FunctionBlock | None'
 
     def __init__(
         self,
         name: str,
-        *,
-        callback: CT = None,
     ) -> None:
         self.name = name
-        self.callback = callback
+        self.block = None
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Function):
             return NotImplemented
         return self.name == other.name
+
+    def full_rerun(self) -> None:
+        from .create_function import create_function
+
+        def run() -> None:
+            assert self.block is not None
+            for expr in self.block.expressions:
+                expr.write()
+
+        create_function(name=self.name, force_create=True)(run)

@@ -54,7 +54,7 @@ class ExecutionContext(Container):
         if exc_type is not None:
             return
         self.started_execution = True
-        for expression in self.expressions:
+        for expression in self.blocks:
             for expr in expression.into_executable_expressions():
                 expr.execute(self)
 
@@ -241,7 +241,7 @@ class ExecutionContext(Container):
         *,
         ignore_warning: bool = False,
     ) -> None:
-        if not ignore_warning and len(self.expressions) > 0:
+        if not ignore_warning and len(self.blocks) > 0:
             warn(
                 'Putting values into the context should be done BEFORE writing any expressions, since this line is ALWAYS ran, even, for example, if it looks like it is behind a condition that may not hold.',
             )

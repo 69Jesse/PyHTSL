@@ -6,9 +6,7 @@ from .actions.function import Function
 from .container import Container
 
 type CallableNoArgs = Callable[[], Any]
-type Exportable = (
-    Function[Callable[[], None]] | CallableNoArgs | Sequence[Exportable] | ModuleType
-)
+type Exportable = Function | CallableNoArgs | Sequence[Exportable] | ModuleType
 
 
 def export(
@@ -20,15 +18,13 @@ def export(
     def extract_function(exp: Any) -> None:
         if not isinstance(exp, Function):
             return
-        if exp.callback is None:
+        if exp.block is None:
             return
-        callables.append(exp.callback)
+        callables.append(exp.full_rerun)
 
     def extract_recursive(exp: Exportable) -> None:
         if isinstance(exp, Function):
-            if exp.callback is None:
-                return
-            callables.append(exp.callback)
+            extract_function(exp)
         elif callable(exp):
             callables.append(exp)
         elif isinstance(exp, Sequence):

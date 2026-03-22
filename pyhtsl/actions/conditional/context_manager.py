@@ -1,8 +1,10 @@
 from typing import TYPE_CHECKING, final
 
-from pyhtsl.container import ExpressionContext
-
-from ...container import ContainerContextManager, get_current_container
+from ...container import (
+    ContainerContextManager,
+    ExpressionContext,
+    get_current_container,
+)
 from ...expression.condition.conditional_expression import (
     ConditionalExpression,
     ConditionalMode,

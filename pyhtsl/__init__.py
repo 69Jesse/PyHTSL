@@ -38,7 +38,6 @@ from .actions.give_experience_levels import (
 )
 from .actions.give_item import give_item as give_item
 from .actions.go_to_house_spawn import go_to_house_spawn as go_to_house_spawn
-from .actions.goto import goto as goto
 from .actions.group import Group as Group
 from .actions.group_color import GroupColor as GroupColor
 from .actions.group_name import GroupName as GroupName
