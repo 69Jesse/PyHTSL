@@ -124,6 +124,15 @@ class Counter:
         return limit is not None and new_count > limit
 
 
+def is_within_limits(expressions: list[Expression]) -> bool:
+    counter = Counter()
+    for expr in expressions:
+        if counter.would_exceed(expr):
+            return False
+        counter.increment(expr)
+    return True
+
+
 def fix_action_limits(
     expressions: list[Expression],
     *,
@@ -245,5 +254,12 @@ def fix_action_limits(
 
             global_counter.increment(trigger)
             result.append(trigger)
+
+    for expr in result:
+        for nested_ref in expr.nested_expressions_refs():
+            if not is_within_limits(nested_ref):
+                raise RuntimeError(
+                    f'Expression {expr} contains nested expressions that exceed limits: {nested_ref}'
+                )
 
     return result, remaining
