@@ -96,6 +96,7 @@ class Block(BaseObject):
             self.expressions,
             nesting_possible=True,
             function_name_if_exceeds=function_name,
+            always_in_conditional=False,
         )
         self.expressions = fixed
         if rest:
