@@ -12,23 +12,98 @@ from ..types import ALL_SOUNDS, ALL_SOUNDS_PRETTY_TO_RAW, ALL_SOUNDS_RAW
 __all__ = ('get_sound_paths', 'play')
 
 
-_active_streams: list[sd.OutputStream] = []
+_SAMPLE_RATE = 44100
+_CHANNELS = 1
 
 
-def _wait_for_sounds() -> None:
-    for stream in _active_streams:
-        if stream.active:
-            stream.stop()
-        stream.close()
-    _active_streams.clear()
+class Mixer:
+    voices: list[tuple[np.ndarray, int]]  # (data, offset)
+    stream: sd.OutputStream | None
+
+    def __init__(self) -> None:
+        self.voices = []
+        self.stream = None
+
+    def _ensure_stream(self) -> None:
+        if self.stream is not None and self.stream.active:
+            return
+        if self.stream is not None:
+            self.stream.close()
+        self.stream = sd.OutputStream(
+            samplerate=_SAMPLE_RATE,
+            channels=_CHANNELS,
+            dtype='float32',
+            callback=self._callback,
+        )
+        self.stream.start()
+
+    def _callback(
+        self,
+        outdata: np.ndarray,
+        frames: int,
+        _time: object,
+        _status: object,
+    ) -> None:
+        outdata[:] = 0
+        still_active: list[tuple[np.ndarray, int]] = []
+        for data, offset in self.voices:
+            remaining = len(data) - offset
+            if remaining <= 0:
+                continue
+            chunk = min(frames, remaining)
+            outdata[:chunk] += data[offset : offset + chunk]
+            if offset + chunk < len(data):
+                still_active.append((data, offset + chunk))
+        self.voices = still_active
+        if not still_active:
+            raise sd.CallbackStop
+
+    def add(self, data: np.ndarray, sample_rate: int) -> None:
+        if sample_rate != _SAMPLE_RATE:
+            ratio = _SAMPLE_RATE / sample_rate
+            new_len = int(len(data) * ratio)
+            old_indices = np.linspace(0, len(data) - 1, new_len)
+            if data.ndim == 1:
+                data = np.interp(old_indices, np.arange(len(data)), data).astype(
+                    np.float32
+                )
+            else:
+                resampled = np.empty((new_len, data.shape[1]), dtype=np.float32)
+                for ch in range(data.shape[1]):
+                    resampled[:, ch] = np.interp(
+                        old_indices, np.arange(len(data)), data[:, ch]
+                    )
+                data = resampled
+
+        if data.ndim > 1:
+            data = data.mean(axis=1)
+        data = data.reshape(-1, _CHANNELS)
+
+        self.voices.append((data, 0))
+        self._ensure_stream()
+
+    def shutdown(self) -> None:
+        if self.stream is not None:
+            if self.stream.active:
+                sd.sleep(
+                    int(
+                        max((len(d) - o) / _SAMPLE_RATE * 1000 for d, o in self.voices)
+                        if self.voices
+                        else 0
+                    )
+                )
+            self.stream.close()
+            self.stream = None
+        self.voices.clear()
 
 
-atexit.register(_wait_for_sounds)
+mixer = Mixer()
+atexit.register(mixer.shutdown)
 
 
 SOUNDS_DIR = Path(__file__).parent / 'sounds' / '1.8.9'
 
-_SOUND_OVERRIDES: dict[str, str] = {
+SOUND_OVERRIDES: dict[ALL_SOUNDS_RAW, str] = {
     'game.player.hurt.fall.big': 'damage/fallbig',
     'game.player.hurt.fall.small': 'damage/fallsmall',
     'game.tnt.primed': 'random/fuse',
@@ -73,8 +148,8 @@ def _find_sound_files(parts: list[str]) -> list[Path]:
 def _build_mapping() -> dict[ALL_SOUNDS_RAW, list[Path]]:
     mapping: dict[ALL_SOUNDS_RAW, list[Path]] = {}
     for sound in get_args(ALL_SOUNDS_RAW):
-        if sound in _SOUND_OVERRIDES:
-            override = _SOUND_OVERRIDES[sound]
+        if sound in SOUND_OVERRIDES:
+            override = SOUND_OVERRIDES[sound]
             parent = SOUNDS_DIR / Path(override).parent
             stem = Path(override).name
             mapping[sound] = _find_files(parent, stem)
@@ -83,25 +158,25 @@ def _build_mapping() -> dict[ALL_SOUNDS_RAW, list[Path]]:
     return mapping
 
 
-_mapping: dict[ALL_SOUNDS_RAW, list[Path]] | None = None
+_MAPPING: dict[ALL_SOUNDS_RAW, list[Path]] | None = None
 
 
 def _get_mapping() -> dict[ALL_SOUNDS_RAW, list[Path]]:
-    global _mapping
-    if _mapping is None:
-        _mapping = _build_mapping()
-    return _mapping
+    global _MAPPING
+    if _MAPPING is None:
+        _MAPPING = _build_mapping()
+    return _MAPPING
 
 
 def get_sound_paths(raw_sound: ALL_SOUNDS_RAW) -> list[Path]:
     return _get_mapping().get(raw_sound, [])
 
 
-_audio_cache: dict[Path, tuple[np.ndarray, int]] = {}
+_AUDIO_CACHE: dict[Path, tuple[np.ndarray, int]] = {}
 
 
 def _load_wav(path: Path) -> tuple[np.ndarray, int]:
-    cached = _audio_cache.get(path)
+    cached = _AUDIO_CACHE.get(path)
     if cached is not None:
         return cached
 
@@ -134,7 +209,7 @@ def _load_wav(path: Path) -> tuple[np.ndarray, int]:
         data = data.reshape(-1, n_channels)
 
     result = (data, sample_rate)
-    _audio_cache[path] = result
+    _AUDIO_CACHE[path] = result
     return result
 
 
@@ -159,7 +234,7 @@ def _resample(data: np.ndarray, pitch: float) -> np.ndarray:
 
 
 def _housing_pitch(pitch: float) -> float:
-    return 0.5 * (2 ** pitch)
+    return 0.5 * (2**pitch)
 
 
 def play(
@@ -183,32 +258,5 @@ def play(
     data = _resample(data, _housing_pitch(pitch))
     data = data * volume
 
-    if data.ndim == 1:
-        data = data.reshape(-1, 1)
-
-    _active_streams[:] = [s for s in _active_streams if s.active]
-
-    offset = 0
-
-    def callback(
-        outdata: np.ndarray, frames: int, _time: object, _status: object
-    ) -> None:
-        nonlocal offset
-        remaining = len(data) - offset
-        if remaining <= 0:
-            raise sd.CallbackStop
-        chunk = min(frames, remaining)
-        outdata[:chunk] = data[offset : offset + chunk]
-        if chunk < frames:
-            outdata[chunk:] = 0
-        offset += chunk
-
-    stream = sd.OutputStream(
-        samplerate=sample_rate,
-        channels=data.shape[1],
-        callback=callback,
-        finished_callback=lambda: None,
-    )
-    stream.start()
-    _active_streams.append(stream)
+    mixer.add(data, sample_rate)
     return True

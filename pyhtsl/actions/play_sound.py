@@ -66,7 +66,7 @@ class PlaySoundExpression(Expression):
 
         found = play(
             self.sound,
-            volume=self.volume * context.volume,
+            volume=self.volume * context.volume_multiplier,
             pitch=self.pitch,
         )
         if not found:

@@ -19,6 +19,12 @@ from .approximate import (
 from .compute_layout import (
     compute_best_layout as compute_best_layout,
 )
+from .music import (
+    expressions_from_midi as expressions_from_midi,
+)
+from .music import (
+    expressions_from_nbs as expressions_from_nbs,
+)
 from .round import (
     round_double as round_double,
 )
