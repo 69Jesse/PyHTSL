@@ -158,10 +158,14 @@ def _resample(data: np.ndarray, pitch: float) -> np.ndarray:
     return result
 
 
+def _housing_pitch(pitch: float) -> float:
+    return 0.5 * (2 ** pitch)
+
+
 def play(
     sound: ALL_SOUNDS,
     *,
-    volume: float = 1.0,
+    volume: float = 0.7,
     pitch: float = 1.0,
 ) -> bool:
     raw_sound: ALL_SOUNDS_RAW = ALL_SOUNDS_PRETTY_TO_RAW.get(sound, sound)  # type: ignore
@@ -176,7 +180,7 @@ def play(
     if pitch == 0.0:
         return True
 
-    data = _resample(data, pitch)
+    data = _resample(data, _housing_pitch(pitch))
     data = data * volume
 
     if data.ndim == 1:
