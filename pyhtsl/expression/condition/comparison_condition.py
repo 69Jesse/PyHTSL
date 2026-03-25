@@ -94,7 +94,19 @@ class ComparisonCondition[LeftT: 'Checkable', RightT: 'Checkable | HousingType']
         right_value = context.get_backend(self.right)
         if type(left_value) is not type(right_value):
             return False
-        return left_value == right_value
+        if self.operator is ComparisonOperator.Equal:
+            return left_value == right_value
+        if isinstance(left_value, str) or isinstance(left_value, bool):
+            return False
+        if self.operator is ComparisonOperator.GreaterThan:
+            return (left_value > right_value).astype(bool)
+        if self.operator is ComparisonOperator.LessThan:
+            return (left_value < right_value).astype(bool)
+        if self.operator is ComparisonOperator.GreaterThanOrEqual:
+            return (left_value >= right_value).astype(bool)
+        if self.operator is ComparisonOperator.LessThanOrEqual:
+            return (left_value <= right_value).astype(bool)
+        raise RuntimeError(f'Unsupported operator {self.operator}')
 
     def related_debug_parts(self) -> list['Checkable | HousingType']:
         return [self.left, self.right]
