@@ -50,8 +50,9 @@ class TriggerFunctionExpression(Expression):
                 f'Function "{self.function.name}" has `trigger_for_all_players` set to True, but this has no effect during execution'
             )
         if self.function.name in context.functions_on_cooldown_for_ticks:
+            ticks = context.functions_on_cooldown_for_ticks[self.function.name]
             log(
-                f'Function "{self.function.name}" is on cooldown for {context.functions_on_cooldown_for_ticks[self.function.name]} more ticks, so it will not be executed'
+                f'Function "{self.function.name}" is on cooldown for {ticks} more tick{"s" * (ticks != 1)}, so it will not be executed'
             )
             return
         if self.function.block is None:

@@ -89,8 +89,11 @@ class ExecutionContext(Container):
             if self.functions_on_cooldown_for_ticks[name] <= 0:
                 del self.functions_on_cooldown_for_ticks[name]
 
+        current_schedulers = self.schedulers
+        self.schedulers = []
+
         next_schedulers: list[ActionScheduler] = []
-        for scheduler in self.schedulers:
+        for scheduler in current_schedulers:
             expressions = scheduler.tick()
             if expressions is not None:
                 try:
@@ -103,7 +106,7 @@ class ExecutionContext(Container):
                     pass
             if scheduler.has_next():
                 next_schedulers.append(scheduler)
-        self.schedulers = next_schedulers
+        self.schedulers = next_schedulers + self.schedulers
 
     def _yield(
         self,
