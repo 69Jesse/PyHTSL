@@ -55,9 +55,7 @@ class ExecutionContext(Container):
         self.started_execution = True
         # TODO block.execute()
         for block in self.blocks:
-            for expression in block.expressions:
-                for expr in expression.into_executable_expressions():
-                    expr.execute(self)
+            block.execute(self)
 
     def _yield(
         self,

@@ -10,6 +10,7 @@ from .limits import fix_action_limits
 
 if TYPE_CHECKING:
     from .container import Container
+    from .execute.context import ExecutionContext
     from .expression.expression import Expression
 
 
@@ -113,6 +114,9 @@ class Block(BaseObject):
         container.finalize_expressions(self.expressions)
         self.fix_action_limits(container, index)
 
+    def execute(self, context: 'ExecutionContext') -> None:
+        pass
+
 
 @final
 class GlobalBlock(Block):
@@ -127,6 +131,11 @@ class GlobalBlock(Block):
 
     def goto_line(self) -> str | None:
         return None
+
+    def execute(self, context: 'ExecutionContext') -> None:
+        for expression in self.expressions:
+            for expr in expression.into_executable_expressions():
+                expr.execute(context)
 
 
 @final
