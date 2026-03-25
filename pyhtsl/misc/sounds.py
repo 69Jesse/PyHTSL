@@ -1,3 +1,4 @@
+import atexit
 import random
 import wave
 from pathlib import Path
@@ -9,6 +10,20 @@ import sounddevice as sd
 from ..types import ALL_SOUNDS, ALL_SOUNDS_PRETTY_TO_RAW, ALL_SOUNDS_RAW
 
 __all__ = ('get_sound_paths', 'play')
+
+
+_active_streams: list[sd.OutputStream] = []
+
+
+def _wait_for_sounds() -> None:
+    for stream in _active_streams:
+        if stream.active:
+            stream.stop()
+        stream.close()
+    _active_streams.clear()
+
+
+atexit.register(_wait_for_sounds)
 
 
 SOUNDS_DIR = Path(__file__).parent / 'sounds' / '1.8.9'
@@ -143,7 +158,12 @@ def _resample(data: np.ndarray, pitch: float) -> np.ndarray:
     return result
 
 
-def play(sound: ALL_SOUNDS, volume: float, pitch: float) -> bool:
+def play(
+    sound: ALL_SOUNDS,
+    *,
+    volume: float = 1.0,
+    pitch: float = 1.0,
+) -> bool:
     raw_sound: ALL_SOUNDS_RAW = ALL_SOUNDS_PRETTY_TO_RAW.get(sound, sound)  # type: ignore
     paths = get_sound_paths(raw_sound)
     if not paths:
@@ -159,6 +179,32 @@ def play(sound: ALL_SOUNDS, volume: float, pitch: float) -> bool:
     data = _resample(data, pitch)
     data = data * volume
 
-    print(list(data))
-    sd.play(data, samplerate=sample_rate)
+    if data.ndim == 1:
+        data = data.reshape(-1, 1)
+
+    _active_streams[:] = [s for s in _active_streams if s.active]
+
+    offset = 0
+
+    def callback(
+        outdata: np.ndarray, frames: int, _time: object, _status: object
+    ) -> None:
+        nonlocal offset
+        remaining = len(data) - offset
+        if remaining <= 0:
+            raise sd.CallbackStop
+        chunk = min(frames, remaining)
+        outdata[:chunk] = data[offset : offset + chunk]
+        if chunk < frames:
+            outdata[chunk:] = 0
+        offset += chunk
+
+    stream = sd.OutputStream(
+        samplerate=sample_rate,
+        channels=data.shape[1],
+        callback=callback,
+        finished_callback=lambda: None,
+    )
+    stream.start()
+    _active_streams.append(stream)
     return True
