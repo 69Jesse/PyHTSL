@@ -26,14 +26,16 @@ class Expression(BaseObject):
         get_current_container().write_expression(self.cloned())
 
     def raw_execute(self, context: 'ExecutionContext') -> None:
-        log(f'No execution implemented for expression "{self!r}"')
+        log(
+            f'No execution implemented for expression \x1b[38;2;255;0;0m"{self!r}"\x1b[0m'
+        )
 
     @final
     def execute(self, context: 'ExecutionContext') -> None:
         if context.expression_callback is not None:
             context.expression_callback(self)
         if context.verbose:
-            log(f'Executing expression "{self!r}"')
+            log(f'Executing expression \x1b[38;2;255;0;0m"{self!r}"\x1b[0m')
         self.raw_execute(context)
 
     def _get_all_values(self) -> dict[str, Any]:

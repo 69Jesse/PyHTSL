@@ -1,5 +1,6 @@
 import atexit
 import random
+import threading
 import wave
 from pathlib import Path
 from typing import get_args
@@ -19,10 +20,12 @@ _CHANNELS = 1
 class Mixer:
     voices: list[tuple[np.ndarray, int]]  # (data, offset)
     stream: sd.OutputStream | None
+    _lock: threading.Lock
 
     def __init__(self) -> None:
         self.voices = []
         self.stream = None
+        self._lock = threading.Lock()
 
     def _ensure_stream(self) -> None:
         if self.stream is not None and self.stream.active:
@@ -45,16 +48,17 @@ class Mixer:
         _status: object,
     ) -> None:
         outdata[:] = 0
-        still_active: list[tuple[np.ndarray, int]] = []
-        for data, offset in self.voices:
-            remaining = len(data) - offset
-            if remaining <= 0:
-                continue
-            chunk = min(frames, remaining)
-            outdata[:chunk] += data[offset : offset + chunk]
-            if offset + chunk < len(data):
-                still_active.append((data, offset + chunk))
-        self.voices = still_active
+        with self._lock:
+            still_active: list[tuple[np.ndarray, int]] = []
+            for data, offset in self.voices:
+                remaining = len(data) - offset
+                if remaining <= 0:
+                    continue
+                chunk = min(frames, remaining)
+                outdata[:chunk] += data[offset : offset + chunk]
+                if offset + chunk < len(data):
+                    still_active.append((data, offset + chunk))
+            self.voices = still_active
         if not still_active:
             raise sd.CallbackStop
 
@@ -79,7 +83,8 @@ class Mixer:
             data = data.mean(axis=1)
         data = data.reshape(-1, _CHANNELS)
 
-        self.voices.append((data, 0))
+        with self._lock:
+            self.voices.append((data, 0))
         self._ensure_stream()
 
     def shutdown(self) -> None:
@@ -252,9 +257,6 @@ def play(
     data, sample_rate = _load_wav(path)
 
     pitch = max(0.0, min(2.0, pitch))
-    if pitch == 0.0:
-        return True
-
     data = _resample(data, _housing_pitch(pitch))
     data = data * volume
 

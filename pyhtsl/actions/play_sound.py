@@ -70,7 +70,9 @@ class PlaySoundExpression(Expression):
             pitch=self.pitch,
         )
         if not found:
-            log(f'No sound found for "{self.sound}", so nothing will be played')
+            log(
+                f'No sound found for \x1b[38;2;255;0;0m"{self.sound}"\x1b[0m, nothing will be played'
+            )
 
 
 # TODO proper overload

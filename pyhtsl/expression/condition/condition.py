@@ -50,13 +50,15 @@ class Condition(BaseObject):
         return self
 
     def raw_evaluate(self, context: 'ExecutionContext') -> bool:
-        log(f'No execution implemented for condition "{self!r}", returning False')
+        log(
+            f'No execution implemented for condition \x1b[38;2;255;0;0m"{self!r}"\x1b[0m, returning False'
+        )
         return False
 
     @final
     def evaluate(self, context: 'ExecutionContext') -> bool:
         if context.verbose:
-            log(f'Executing condition "{self!r}"')
+            log(f'Executing condition \x1b[38;2;255;0;0m"{self!r}"\x1b[0m')
         value = self.raw_evaluate(context)
         if self.inverted:
             value = not value

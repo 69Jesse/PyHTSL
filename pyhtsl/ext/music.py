@@ -73,8 +73,8 @@ def _midi_program_to_sound(program: int) -> ALL_SOUNDS:
     return 'note.harp'
 
 
-def _nbs_key_to_pitch(key: int) -> float:
-    """Convert NBS key (0-87) to Housing pitch (0.0-2.0).
+def _nbs_key_to_pitch(key: float) -> float:
+    """Convert NBS key (0-87, fractional for fine-tuning) to Housing pitch (0.0-2.0).
 
     Key 33 = F#3 -> 0.0, Key 45 = F#4 -> 1.0, Key 57 = F#5 -> 2.0
     """
@@ -131,7 +131,7 @@ def expressions_from_nbs(path: str | Path) -> list[Expression]:
             sound = NBS_INSTRUMENT_TO_SOUND.get(note.instrument, 'note.harp')
             layer_vol = layer_volumes.get(note.layer, 1.0)
             volume = (note.velocity / 100) * layer_vol
-            pitch = _nbs_key_to_pitch(note.key)
+            pitch = _nbs_key_to_pitch(note.key + note.pitch / 100)
             events.append(
                 NoteEvent(
                     housing_tick=housing_tick,
@@ -147,16 +147,14 @@ def expressions_from_nbs(path: str | Path) -> list[Expression]:
 def expressions_from_midi(path: str | Path) -> list[Expression]:
     mid = mido.MidiFile(str(path))
     events: list[NoteEvent] = []
-
     channel_programs: dict[int, int] = {}
-
-    for msg in mid:
-        if msg.type == 'program_change':
-            channel_programs[msg.channel] = msg.program
 
     abs_time = 0.0
     for msg in mid:
         abs_time += msg.time
+        if msg.type == 'program_change':
+            channel_programs[msg.channel] = msg.program
+            continue
         if msg.type != 'note_on' or msg.velocity == 0:
             continue
 

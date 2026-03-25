@@ -7,6 +7,7 @@ from .base_object import BaseObject
 from .config import INDENT
 from .container import ContainerContextManager, ExpressionContext
 from .limits import fix_action_limits
+from .utils.log import log
 
 if TYPE_CHECKING:
     from .container import Container
@@ -18,6 +19,8 @@ class Block(BaseObject):
     expressions: list['Expression']
     callback: Callable[[], None] | None
     callback_ran: bool
+    _overflow_base_name: str | None
+    _overflow_counter: int
 
     def __init__(
         self,
@@ -28,6 +31,8 @@ class Block(BaseObject):
         self.expressions = expressions if expressions is not None else []
         self.callback = callback
         self.callback_ran = False
+        self._overflow_base_name = None
+        self._overflow_counter = 1
 
     @abstractmethod
     def equals_raw(self, other: object) -> bool:
@@ -92,8 +97,10 @@ class Block(BaseObject):
             self.callback_ran = True
 
     def fix_action_limits(self, container: 'Container', index: int) -> None:
+        base_name = self._overflow_base_name or self.get_name()
+        next_counter = self._overflow_counter + 1
         function = Function(
-            name=f'{self.get_name()} (line {index + 1})',
+            name=f'{base_name} {next_counter}',
         )
         fixed, rest = fix_action_limits(
             self.expressions,
@@ -102,12 +109,18 @@ class Block(BaseObject):
             always_in_conditional=False,
         )
         self.expressions = fixed
-        if rest:
-            new_block = FunctionBlock(
-                function=function,
-                expressions=rest,
-            )
-            container.blocks.insert(index + 1, new_block)
+        if not rest:
+            return
+        new_block = FunctionBlock(
+            function=function,
+            expressions=rest,
+        )
+        new_block._overflow_base_name = base_name
+        new_block._overflow_counter = next_counter
+        container.blocks.insert(index + 1, new_block)
+        log(
+            f'Created a new function \x1b[38;2;255;0;0m"{function.name}"\x1b[0m to avoid hitting the action limit in block \x1b[38;2;0;255;0m"{self.get_name()}"\x1b[0m'
+        )
 
     def finalize(self, container: 'Container', index: int) -> None:
         self.maybe_run_callback()

@@ -47,17 +47,17 @@ class TriggerFunctionExpression(Expression):
     def raw_execute(self, context: 'ExecutionContext') -> None:
         if self.trigger_for_all_players:
             log(
-                f'Function "{self.function.name}" has `trigger_for_all_players` set to True, but this has no effect during execution'
+                f'Function \x1b[38;2;255;0;0m"{self.function.name}"\x1b[0m has \x1b[38;2;0;255;0mtrigger_for_all_players\x1b[0m set to True, but this has \x1b[38;2;0;255;0mno effect\x1b[0m during execution'
             )
         if self.function.name in context.functions_on_cooldown_for_ticks:
             ticks = context.functions_on_cooldown_for_ticks[self.function.name]
             log(
-                f'Function "{self.function.name}" is on cooldown for {ticks} more tick{"s" * (ticks != 1)}, so it will not be executed'
+                f'Function \x1b[38;2;255;0;0m"{self.function.name}"\x1b[0m is on cooldown for \x1b[38;2;0;255;0m{ticks} more tick{"s" * (ticks != 1)}\x1b[0m, so it will \x1b[38;2;0;255;0mnot be executed\x1b[0m'
             )
             return
         if self.function.block is None:
             log(
-                f'Function "{self.function.name}" has no expression block attached, so nothing will be executed'
+                f'Function \x1b[38;2;255;0;0m"{self.function.name}"\x1b[0m has no expression block attached, \x1b[38;2;0;255;0mnothing will be executed\x1b[0m'
             )
             return
         context.functions_on_cooldown_for_ticks[self.function.name] = 4
