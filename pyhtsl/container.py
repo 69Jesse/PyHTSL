@@ -172,14 +172,9 @@ class Container:
             )
         self.exported_names.add(name)
 
-        if self.is_global:
-            print(
-                f'\n\x1b[38;2;0;255;0mExporting global container named \x1b[38;2;255;0;0m{name}\x1b[0m'
-            )
-        else:
-            print(
-                f'\n\x1b[38;2;0;255;0mExporting container named \x1b[38;2;255;0;0m{name}\x1b[0m'
-            )
+        print(
+            f'\n\x1b[38;2;0;255;0mExporting {"global " * (self.is_global)}container named \x1b[38;2;255;0;0m{name}\x1b[0m'
+        )
 
         args: list[str] = sys.argv[1:]
         content = self.into_htsl()

@@ -36,9 +36,8 @@ class ExecutionContext(Container):
         *,
         verbose: bool = False,
         expression_callback: Callable[[Expression], None] | None = None,
-        name: str | None = None,
     ) -> None:
-        super().__init__(name=name or f'ExecutionContext-{os.urandom(4).hex()}')
+        super().__init__()
         self.verbose = verbose
         self.expression_callback = expression_callback
         self.started_execution = False
@@ -54,9 +53,11 @@ class ExecutionContext(Container):
         if exc_type is not None:
             return
         self.started_execution = True
-        for expression in self.blocks:
-            for expr in expression.into_executable_expressions():
-                expr.execute(self)
+        # TODO block.execute()
+        for block in self.blocks:
+            for expression in block.expressions:
+                for expr in expression.into_executable_expressions():
+                    expr.execute(self)
 
     def _yield(
         self,
