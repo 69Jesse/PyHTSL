@@ -1,16 +1,15 @@
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from .actions.function import Function
     from .expression.expression import Expression
     from .placeholders import PlaceholderEditable
 
 
-_LIMITS: dict[type[Expression] | type[PlaceholderEditable], int] | None = None
+_LIMITS: dict[type['Expression'] | type['PlaceholderEditable'], int] | None = None
 
 
-def get_limits() -> dict[type[Expression] | type[PlaceholderEditable], int]:
+def get_limits() -> dict[type['Expression'] | type['PlaceholderEditable'], int]:
     global _LIMITS
     if _LIMITS is not None:
         return _LIMITS
@@ -95,15 +94,15 @@ def get_limits() -> dict[type[Expression] | type[PlaceholderEditable], int]:
 
 
 class Counter:
-    count: dict[type[Expression] | type[PlaceholderEditable], int]
+    count: dict[type['Expression'] | type['PlaceholderEditable'], int]
 
     def __init__(self) -> None:
         self.count = {}
 
     @staticmethod
     def expression_into_cls(
-        expression: Expression,
-    ) -> type[Expression] | type[PlaceholderEditable]:
+        expression: 'Expression',
+    ) -> type['Expression'] | type['PlaceholderEditable']:
         from .expression.binary_expression import BinaryExpression
         from .placeholders import PlaceholderEditable
 
@@ -113,18 +112,18 @@ class Counter:
                 return type(expr.left)
         return type(expression)
 
-    def increment(self, expression: Expression) -> None:
+    def increment(self, expression: 'Expression') -> None:
         cls = self.expression_into_cls(expression)
         self.count[cls] = self.count.get(cls, 0) + 1
 
-    def would_exceed(self, expression: Expression) -> bool:
+    def would_exceed(self, expression: 'Expression') -> bool:
         cls = self.expression_into_cls(expression)
         new_count = self.count.get(cls, 0) + 1
         limit = get_limits().get(cls)
         return limit is not None and new_count > limit
 
 
-def is_within_limits(expressions: list[Expression]) -> bool:
+def is_within_limits(expressions: list['Expression']) -> bool:
     counter = Counter()
     for expr in expressions:
         if counter.would_exceed(expr):
@@ -134,18 +133,17 @@ def is_within_limits(expressions: list[Expression]) -> bool:
 
 
 def fix_action_limits(
-    expressions: list[Expression],
+    expressions: list['Expression'],
     *,
     nesting_possible: bool = True,
-    function_name_if_exceeds: str | None = None,
+    function_if_exceeds: 'Function | None' = None,
     always_in_conditional: bool = False,
-) -> tuple[list[Expression], list[Expression]]:
+) -> tuple[list['Expression'], list['Expression']]:
     """Fix action limits for a list of expressions.
 
     Returns a tuple of the fixed expressions that fit within a single block,
     and the remaining expressions that exceed the limits and need to be put in a new block.
     """
-    from .actions.function import Function
     from .actions.trigger_function import TriggerFunctionExpression
     from .expression.condition.conditional_expression import (
         ConditionalExpression,
@@ -202,8 +200,8 @@ def fix_action_limits(
 
     remaining = list(expressions[index:])
 
-    if remaining and function_name_if_exceeds is not None:
-        trigger = TriggerFunctionExpression(Function(name=function_name_if_exceeds))
+    if remaining and function_if_exceeds is not None:
+        trigger = TriggerFunctionExpression(function_if_exceeds)
         placed = False
 
         if not global_counter.would_exceed(trigger):

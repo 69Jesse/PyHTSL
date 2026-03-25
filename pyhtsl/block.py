@@ -92,19 +92,19 @@ class Block(BaseObject):
             self.callback_ran = True
 
     def fix_action_limits(self, container: 'Container', index: int) -> None:
-        function_name = f'{self.get_name()} (line {index + 1})'
+        function = Function(
+            name=f'{self.get_name()} (line {index + 1})',
+        )
         fixed, rest = fix_action_limits(
             self.expressions,
             nesting_possible=True,
-            function_name_if_exceeds=function_name,
+            function_if_exceeds=function,
             always_in_conditional=False,
         )
         self.expressions = fixed
         if rest:
             new_block = FunctionBlock(
-                function=Function(
-                    name=function_name,
-                ),
+                function=function,
                 expressions=rest,
             )
             container.blocks.insert(index + 1, new_block)
