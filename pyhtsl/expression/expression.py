@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any, final
 
 from ..base_object import BaseObject
 from ..container import Container, get_current_container
+from ..utils.log import log
 
 if TYPE_CHECKING:
     from ..execute.context import ExecutionContext
@@ -25,14 +26,14 @@ class Expression(BaseObject):
         get_current_container().write_expression(self.cloned())
 
     def raw_execute(self, context: 'ExecutionContext') -> None:
-        print(f'No execution implemented for expression "{self!r}"')
+        log(f'No execution implemented for expression "{self!r}"')
 
     @final
     def execute(self, context: 'ExecutionContext') -> None:
         if context.expression_callback is not None:
             context.expression_callback(self)
         if context.verbose:
-            print(f'Executing expression "{self!r}"')
+            log(f'Executing expression "{self!r}"')
         self.raw_execute(context)
 
     def _get_all_values(self) -> dict[str, Any]:

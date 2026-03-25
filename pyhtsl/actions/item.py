@@ -22,6 +22,7 @@ from ..utils.formatting import (
     normalize_formatting,
     remove_formatting,
 )
+from ..utils.log import log
 from .enchantment import Enchantment
 
 __all__ = ('Item',)
@@ -292,7 +293,7 @@ class Item:
             result.put('tag', tags)
 
         if extras_copy:
-            print(
+            log(
                 f'\x1b[38;2;255;0;0mIgnoring unused keys whilst saving "{self._key}": {", ".join(extras_copy.keys())}\x1b[0m'
             )
 
@@ -336,7 +337,7 @@ class Item:
             title += f' ({formatting_to_ansi(display_name)})'
 
         if cached is not None:
-            print(f'Using cached {title} as \x1b[38;2;255;0;0m{cached}\x1b[0m.')
+            log(f'Using cached {title} as \x1b[38;2;255;0;0m{cached}\x1b[0m.')
             return cached
 
         name = self._get_save_name(snbt)
@@ -346,7 +347,7 @@ class Item:
         path.write_text(content, encoding='utf-8')
 
         SAVED_CACHE[snbt] = name
-        print(
+        log(
             f'Successfully saved {title} as \x1b[38;2;255;0;0m{name}\x1b[0m to be used in your script:'
             f'\n  \033[38;2;0;255;0m+\033[0m {path.absolute()}'
         )

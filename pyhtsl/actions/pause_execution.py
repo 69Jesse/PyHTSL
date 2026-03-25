@@ -1,4 +1,7 @@
+import time
 from typing import Self, final
+
+from pyhtsl.execute.context import ExecutionContext
 
 from ..expression.expression import Expression
 
@@ -25,6 +28,9 @@ class PauseExecutionExpression(Expression):
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.ticks}>'
+
+    def raw_execute(self, context: ExecutionContext) -> None:
+        time.sleep((self.ticks / 20) * context.pause_multiplier)
 
 
 def pause_execution(ticks: int = 20) -> None:

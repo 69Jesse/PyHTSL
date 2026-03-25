@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 
+from .utils.log import log
+
 __all__ = (
     'set_htsl_imports_folder',
     'get_htsl_import_folder',
@@ -34,7 +36,7 @@ def set_htsl_imports_folder(htsl_folder: Path | str) -> None:
         return
     CACHED_HTSL_IMPORTS_FOLDER_PATH.write_text(new_content)
 
-    print(
+    log(
         f'\nSaved your HTSL imports folder \x1b[38;2;0;255;0m{htsl_folder.as_posix()}\x1b[0m for future use at\n\x1b[38;2;0;255;0m{CACHED_HTSL_IMPORTS_FOLDER_PATH}\x1b[0m'
     )
 
@@ -74,20 +76,20 @@ def get_htsl_import_folder() -> Path:
             set_htsl_imports_folder(maybe_path)
             return maybe_path
 
-    print('\x1b[38;2;255;0;0mCould not find your HTSL imports folder.\x1b[0m')
+    log('\x1b[38;2;255;0;0mCould not find your HTSL imports folder.\x1b[0m')
     while True:
         raw_path = input(
             'Please enter the path to your \x1b[38;2;0;255;0mHTSL imports folder\x1b[0m (relative or absolute): '
         ).strip()
         if not raw_path:
-            print('\x1b[38;2;255;0;0mPlease provide a valid path.\x1b[0m')
+            log('\x1b[38;2;255;0;0mPlease provide a valid path.\x1b[0m')
             continue
         maybe_path = Path(raw_path).resolve()
         try:
             set_htsl_imports_folder(maybe_path)
             return maybe_path
         except (FileNotFoundError, NotADirectoryError) as e:
-            print(f'\x1b[38;2;255;0;0m{e.__class__.__name__}: {e}\x1b[0m')
+            log(f'\x1b[38;2;255;0;0m{e.__class__.__name__}: {e}\x1b[0m')
             continue
 
 

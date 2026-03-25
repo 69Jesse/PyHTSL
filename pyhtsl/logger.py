@@ -1,3 +1,6 @@
+from .utils.log import log
+
+
 class AntiSpamLogger:
     messages: list[tuple[str, int]]
 
@@ -18,4 +21,4 @@ class AntiSpamLogger:
             )
         content += '\n' * (len(self.messages) > 0)
         if content:
-            print(content)
+            log(content)

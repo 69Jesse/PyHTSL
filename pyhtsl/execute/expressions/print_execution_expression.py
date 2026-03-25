@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Self
 
+from ...utils.log import log
 from .execution_expression import ExecutionExpression
 
 if TYPE_CHECKING:
@@ -29,4 +30,4 @@ class PrintExecutionExpression(ExecutionExpression):
         return f'PrintExecutionExpression(line={self.line!r}, cast={self.cast!r})'
 
     def raw_execute(self, context: 'ExecutionContext') -> None:
-        print(context.substitute(self.line, cast=self.cast))
+        log(context.substitute(self.line, cast=self.cast))

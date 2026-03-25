@@ -1,11 +1,12 @@
-from collections.abc import Iterable
-from typing import Self, final
+from typing import TYPE_CHECKING, Self, final
 
 from ..expression.expression import Expression
-from ..stats.global_stat import GlobalStat
-from ..stats.player_stat import PlayerStat
-from ..stats.team_stat import TeamStat
+from ..utils.log import log
 from .function import Function
+
+if TYPE_CHECKING:
+    from ..execute.context import ExecutionContext
+
 
 __all__ = ('trigger_function',)
 
@@ -16,7 +17,9 @@ class TriggerFunctionExpression(Expression):
     trigger_for_all_players: bool
 
     def __init__(
-        self, function: Function, trigger_for_all_players: bool = False
+        self,
+        function: Function,
+        trigger_for_all_players: bool = False,
     ) -> None:
         self.function = function
         self.trigger_for_all_players = trigger_for_all_players
@@ -26,7 +29,8 @@ class TriggerFunctionExpression(Expression):
 
     def cloned(self) -> Self:
         return self.__class__(
-            function=self.function, trigger_for_all_players=self.trigger_for_all_players
+            function=self.function,
+            trigger_for_all_players=self.trigger_for_all_players,
         )
 
     def equals(self, other: object) -> bool:
@@ -40,31 +44,21 @@ class TriggerFunctionExpression(Expression):
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.function.name} all_players={self.trigger_for_all_players}>'
 
+    def raw_execute(self, context: 'ExecutionContext') -> None:
+        if self.trigger_for_all_players:
+            log(f'Function "{self.function.name}" has `trigger_for_all_players` set to True, but this has no effect during execution')
+        if self.function.block is None:
+            log(f'Function "{self.function.name}" has no expression block attached, so nothing will be executed')
+            return
+        self.function.block.execute_all_expressions(context)
+
 
 def trigger_function(
     function: Function | str,
     trigger_for_all_players: bool = False,
-    *,
-    parameters: Iterable[PlayerStat | GlobalStat | TeamStat | int] | None = None,
 ) -> None:
     function = function if isinstance(function, Function) else Function(function)
-    if parameters is not None:
-        parameters = tuple(parameters)
-        if len(parameters) != len(function.parameters):
-            raise TypeError(
-                f'Expected {len(function.parameters)} parameters, got {len(parameters)}.'
-            )
-        for i, (param, expected_param) in enumerate(
-            zip(parameters, function.parameters, strict=False)
-        ):
-            if type(param) not in (PlayerStat, GlobalStat, TeamStat, int):
-                raise TypeError(
-                    f'Parameter {i} must be either "{PlayerStat.__name__}", "{GlobalStat.__name__}", "{TeamStat.__name__}", or "{int.__name__}", not "{type(param).__name__}".'
-                )
-            stat: PlayerStat | GlobalStat | TeamStat = expected_param.cls(
-                name=expected_param.name
-            )  # type: ignore
-            stat.value = param
     TriggerFunctionExpression(
-        function=function, trigger_for_all_players=trigger_for_all_players
+        function=function,
+        trigger_for_all_players=trigger_for_all_players,
     ).write()

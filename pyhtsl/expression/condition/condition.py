@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Self, final
 
 from ...base_object import BaseObject
 from ...container import Container
+from ...utils.log import log
 
 if TYPE_CHECKING:
     from ...checkable import Checkable
@@ -48,13 +49,13 @@ class Condition(BaseObject):
         return self
 
     def raw_evaluate(self, context: 'ExecutionContext') -> bool:
-        print(f'No execution implemented for condition "{self!r}", returning False')
+        log(f'No execution implemented for condition "{self!r}", returning False')
         return False
 
     @final
     def evaluate(self, context: 'ExecutionContext') -> bool:
         if context.verbose:
-            print(f'Executing condition "{self!r}"')
+            log(f'Executing condition "{self!r}"')
         value = self.raw_evaluate(context)
         if self.inverted:
             value = not value

@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Self, final
 
 from pyhtsl.utils.formatting import formatting_to_ansi
+from pyhtsl.utils.log import log
 
 from ..expression.expression import Expression
 
@@ -32,7 +33,7 @@ class ChatExpression(Expression):
         return f'{self.__class__.__name__}<{self.line}>'
 
     def raw_execute(self, context: 'ExecutionContext') -> None:
-        print(formatting_to_ansi(f'&7* &f{context.substitute(self.line, cast=False)}'))
+        log(formatting_to_ansi(f'&7* &f{context.substitute(self.line, cast=False)}'))
 
 
 def chat(line: str) -> None:

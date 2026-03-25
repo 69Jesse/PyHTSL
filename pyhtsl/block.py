@@ -114,8 +114,13 @@ class Block(BaseObject):
         container.finalize_expressions(self.expressions)
         self.fix_action_limits(container, index)
 
+    def execute_all_expressions(self, context: 'ExecutionContext') -> None:
+        for expression in self.expressions:
+            for expr in expression.into_executable_expressions():
+                expr.execute(context)
+
     def execute(self, context: 'ExecutionContext') -> None:
-        pass
+        pass  # Do nothing on purpose, since most of the time this is but a definition
 
 
 @final
@@ -133,9 +138,7 @@ class GlobalBlock(Block):
         return None
 
     def execute(self, context: 'ExecutionContext') -> None:
-        for expression in self.expressions:
-            for expr in expression.into_executable_expressions():
-                expr.execute(context)
+        self.execute_all_expressions(context)
 
 
 @final

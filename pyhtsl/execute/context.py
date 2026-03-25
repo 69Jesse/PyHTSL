@@ -28,6 +28,8 @@ __all__ = ('ExecutionContext',)
 class ExecutionContext(Container):
     verbose: bool
     expression_callback: Callable[[Expression], None] | None
+    pause_multiplier: float
+
     started_execution: bool
     checkable_mapping: dict[tuple[object, ...], BackendType]
 
@@ -36,10 +38,12 @@ class ExecutionContext(Container):
         *,
         verbose: bool = False,
         expression_callback: Callable[[Expression], None] | None = None,
+        pause_multiplier: float = 1,
     ) -> None:
         super().__init__()
         self.verbose = verbose
         self.expression_callback = expression_callback
+        self.pause_multiplier = pause_multiplier
         self.started_execution = False
         self.checkable_mapping = {}
 
@@ -53,7 +57,6 @@ class ExecutionContext(Container):
         if exc_type is not None:
             return
         self.started_execution = True
-        # TODO block.execute()
         for block in self.blocks:
             block.execute(self)
 

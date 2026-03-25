@@ -14,6 +14,7 @@ from .config import (
     should_display_htsl,
 )
 from .logger import AntiSpamLogger
+from .utils.log import log
 from .utils.slug import into_slug
 
 if TYPE_CHECKING:
@@ -156,7 +157,7 @@ class Container:
 
     def export(self, name: str) -> None:
         if self.is_empty():
-            print(
+            log(
                 'Nothing found to write to your .htsl file. \x1b[38;2;255;0;0mPyHTSL will not do anything.\x1b[0m'
             )
             return
@@ -172,7 +173,7 @@ class Container:
             )
         self.exported_names.add(name)
 
-        print(
+        log(
             f'\n\x1b[38;2;0;255;0mExporting {"global " * (self.is_global)}container named \x1b[38;2;255;0;0m{name}\x1b[0m'
         )
 
@@ -189,11 +190,11 @@ class Container:
             os.system(f'code "{path.absolute()}"')
 
         if should_display_htsl():
-            print(content)
+            log(content)
 
         self.logger.publish()
 
-        print(
+        log(
             '\n\x1b[38;2;0;255;0mAll done! Your .htsl file is written to the following location:\x1b[0m'
             f'\n{path.absolute()}'
             f'\nExecute it with HTSL by using the following name: \x1b[38;2;255;0;0m{name}\x1b[0m'
@@ -255,7 +256,7 @@ def on_program_exit() -> None:
         )
 
     if should_disable_global_export():
-        print(
+        log(
             '\x1b[38;2;255;0;0mGlobal export is disabled. No .htsl file will be written.\x1b[0m'
         )
         return
