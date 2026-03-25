@@ -572,9 +572,7 @@ class NBTGenericArray[IT: NBT, OT](NBT[list[IT]]):
     def parse_nbt(cls, s: str) -> tuple[Self, int]:
         assert len(cls.id_character) == 1
         if not s.startswith(f'[{cls.id_character};'):
-            raise ValueError(
-                f'Invalid SNBT format for {cls.__name__}'
-            )
+            raise ValueError(f'Invalid SNBT format for {cls.__name__}')
         offset = 3
         items: list[IT] = []
         while offset < len(s) and s[offset] != ']':

@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pyhtsl.block import FunctionBlock
 
+
 __all__ = ('Function',)
 
 

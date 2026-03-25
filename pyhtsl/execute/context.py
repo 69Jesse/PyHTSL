@@ -75,7 +75,7 @@ class ExecutionContext(Container):
             try:
                 expr.execute(self)
             except PauseSignal as sig:
-                sig.continuation.extend(expressions[i + 1:])
+                sig.continuation.extend(expressions[i + 1 :])
                 raise
 
     def run_tick_loop(self) -> None:
@@ -96,7 +96,9 @@ class ExecutionContext(Container):
                 try:
                     self.run_expressions(expressions)
                 except PauseSignal as sig:
-                    next_schedulers.append(DelayedActionScheduler(sig.continuation, sig.ticks))
+                    next_schedulers.append(
+                        DelayedActionScheduler(sig.continuation, sig.ticks)
+                    )
                 except ExitSignal:
                     pass
             if scheduler.has_next():

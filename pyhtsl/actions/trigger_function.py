@@ -46,12 +46,18 @@ class TriggerFunctionExpression(Expression):
 
     def raw_execute(self, context: 'ExecutionContext') -> None:
         if self.trigger_for_all_players:
-            log(f'Function "{self.function.name}" has `trigger_for_all_players` set to True, but this has no effect during execution')
+            log(
+                f'Function "{self.function.name}" has `trigger_for_all_players` set to True, but this has no effect during execution'
+            )
         if self.function.name in context.functions_on_cooldown_for_ticks:
-            log(f'Function "{self.function.name}" is on cooldown for {context.functions_on_cooldown_for_ticks[self.function.name]} more ticks, so it will not be executed')
+            log(
+                f'Function "{self.function.name}" is on cooldown for {context.functions_on_cooldown_for_ticks[self.function.name]} more ticks, so it will not be executed'
+            )
             return
         if self.function.block is None:
-            log(f'Function "{self.function.name}" has no expression block attached, so nothing will be executed')
+            log(
+                f'Function "{self.function.name}" has no expression block attached, so nothing will be executed'
+            )
             return
         context.functions_on_cooldown_for_ticks[self.function.name] = 4
         self.function.block.execute_all_expressions(context)

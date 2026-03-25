@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from ...execute.context import ExecutionContext
     from ...expression.housing_type import HousingType
 
+
 __all__ = ('Condition',)
 
 

@@ -5,6 +5,7 @@ from ..expression.expression import Expression
 if TYPE_CHECKING:
     from ..execute.context import ExecutionContext
 
+
 __all__ = ('pause_execution',)
 
 
