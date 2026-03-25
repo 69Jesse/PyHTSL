@@ -100,7 +100,7 @@ class NBTByte(NBT[int]):
     def _parse_snbt(cls, s: str) -> tuple[Self, int]:
         match = cls.BYTE_REGEX.match(s)
         if not match:
-            raise ValueError('Invalid SNBT format for NBTByte')
+            raise ValueError(f'Invalid SNBT format for {cls.__name__}')
         value = int(match.group(0)[:-1])
         return cls(value), match.end(0)
 
@@ -133,13 +133,13 @@ class NBTBoolean(NBTByte):
     def _parse_snbt(cls, s: str) -> tuple[Self, int]:
         match = cls.BOOLEAN_REGEX.match(s)
         if not match:
-            raise ValueError('Invalid SNBT format for NBTBoolean')
+            raise ValueError(f'Invalid SNBT format for {cls.__name__}')
         value = match.group(0)
         if value in ('true', '1b', '1B'):
             return cls(True), match.end(0)
         elif value in ('false', '0b', '0B'):
             return cls(False), match.end(0)
-        raise ValueError('Invalid SNBT format for NBTBoolean')
+        raise ValueError(f'Invalid SNBT format for {cls.__name__}')
 
     @classmethod
     def from_object(cls, obj: Any) -> 'NBTBoolean':
@@ -168,7 +168,7 @@ class NBTShort(NBT[int]):
     def _parse_snbt(cls, s: str) -> tuple[Self, int]:
         match = cls.SHORT_REGEX.match(s)
         if not match:
-            raise ValueError('Invalid SNBT format for NBTShort')
+            raise ValueError(f'Invalid SNBT format for {cls.__name__}')
         value = int(match.group(0)[:-1])
         return cls(value), match.end(0)
 
@@ -199,7 +199,7 @@ class NBTInt(NBT[int]):
     def _parse_snbt(cls, s: str) -> tuple[Self, int]:
         match = cls.INT_REGEX.match(s)
         if not match:
-            raise ValueError('Invalid SNBT format for NBTInt')
+            raise ValueError(f'Invalid SNBT format for {cls.__name__}')
         value = int(match.group(0))
         return cls(value), match.end(0)
 
@@ -232,7 +232,7 @@ class NBTLong(NBT[int]):
     def _parse_snbt(cls, s: str) -> tuple[Self, int]:
         match = cls.LONG_REGEX.match(s)
         if not match:
-            raise ValueError('Invalid SNBT format for NBTLong')
+            raise ValueError(f'Invalid SNBT format for {cls.__name__}')
         value = int(match.group(0)[:-1])
         return cls(value), match.end(0)
 
@@ -264,7 +264,7 @@ class NBTFloat(NBT[float]):
     def _parse_snbt(cls, s: str) -> tuple[Self, int]:
         match = cls.FLOAT_REGEX.match(s)
         if not match:
-            raise ValueError('Invalid SNBT format for NBTFloat')
+            raise ValueError(f'Invalid SNBT format for {cls.__name__}')
         value = float(match.group(0)[:-1])
         return cls(value), match.end(0)
 
@@ -296,7 +296,7 @@ class NBTDouble(NBT[float]):
     def _parse_snbt(cls, s: str) -> tuple[Self, int]:
         match = cls.DOUBLE_REGEX.match(s)
         if not match:
-            raise ValueError('Invalid SNBT format for NBTDouble')
+            raise ValueError(f'Invalid SNBT format for {cls.__name__}')
         raw = match.group(0)
         if raw.endswith(('d', 'D')):
             raw = raw[:-1]
@@ -335,10 +335,10 @@ class NBTString(NBT[str]):
             ):
                 offset += 1
             if offset >= len(s) or s[offset] != end:
-                raise ValueError('Invalid SNBT format for NBTString')
+                raise ValueError(f'Invalid SNBT format for {cls.__name__}')
             value = s[1:offset]
             return cls(value), offset + 1
-        raise ValueError('Invalid SNBT format for NBTString')
+        raise ValueError(f'Invalid SNBT format for {cls.__name__}')
 
     @classmethod
     def from_object(cls, obj: Any) -> 'NBTString':
@@ -372,7 +372,7 @@ class NBTList[T: NBT](NBT[list[T]]):
     @classmethod
     def _parse_snbt(cls, s: str) -> tuple[Self, int]:
         if not s.startswith('['):
-            raise ValueError('Invalid SNBT format for NBTList')
+            raise ValueError(f'Invalid SNBT format for {cls.__name__}')
         offset = 1
         items: list[T] = []
         while offset < len(s) and s[offset] != ']':
@@ -389,7 +389,7 @@ class NBTList[T: NBT](NBT[list[T]]):
             if s[offset] == ']':
                 break
             if s[offset] != ',':
-                raise ValueError('Invalid SNBT format for NBTList')
+                raise ValueError(f'Invalid SNBT format for {cls.__name__}')
             offset += 1
         return cls(items), offset + 1
 
@@ -466,7 +466,7 @@ class NBTCompound[V: NBT](NBT[dict[str, V]]):
     @classmethod
     def _parse_snbt(cls, s: str) -> tuple[Self, int]:
         if not s.startswith('{'):
-            raise ValueError('Invalid SNBT format for NBTCompound')
+            raise ValueError(f'Invalid SNBT format for {cls.__name__}')
         offset = 1
         compound: dict[str, V] = {}
         while offset < len(s) and s[offset] != '}':
@@ -474,18 +474,18 @@ class NBTCompound[V: NBT](NBT[dict[str, V]]):
             while offset < len(s) and s[offset] not in (':', ',', '}'):
                 offset += 1
             if offset >= len(s) or s[offset] != ':':
-                raise ValueError('Invalid SNBT format for NBTCompound')
+                raise ValueError(f'Invalid SNBT format for {cls.__name__}')
             key = s[key_start:offset].strip()
             if not cls.KEY_REGEX.match(key):
                 try:
                     key = NBTString._parse_snbt(s[key_start:offset])[0].into_object()
                 except Exception as exc:
                     raise ValueError(
-                        f'Invalid key format in NBTCompound: {repr(key)}'
+                        f'Invalid key format in {cls.__name__}: {repr(key)}'
                     ) from exc
 
             if key in compound:
-                raise ValueError(f'Duplicate key found in NBTCompound: {repr(key)}')
+                raise ValueError(f'Duplicate key found in {cls.__name__}: {repr(key)}')
 
             offset += 1
             value, length = NBT._parse_snbt(s[offset:])
@@ -495,7 +495,7 @@ class NBTCompound[V: NBT](NBT[dict[str, V]]):
             if s[offset] == '}':
                 break
             if s[offset] != ',':
-                raise ValueError('Invalid SNBT format for NBTCompound')
+                raise ValueError(f'Invalid SNBT format for {cls.__name__}')
             offset += 1
 
         return cls(compound), offset + 1
@@ -573,7 +573,7 @@ class NBTGenericArray[IT: NBT, OT](NBT[list[IT]]):
         assert len(cls.id_character) == 1
         if not s.startswith(f'[{cls.id_character};'):
             raise ValueError(
-                f'Invalid SNBT format for NBT{cls.id_character.upper()}Array'
+                f'Invalid SNBT format for {cls.__name__}'
             )
         offset = 3
         items: list[IT] = []

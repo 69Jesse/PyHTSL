@@ -154,24 +154,21 @@ def fix_action_limits(
 
     result: list[Expression] = []
     global_counter = Counter()
-    first_group_used = False
     index = 0
 
     while index < len(expressions):
         expr = expressions[index]
         can_nest = (nesting_possible or always_in_conditional) and expr.can_be_nested()
-        should_wrap = can_nest and (always_in_conditional or first_group_used)
+        should_wrap = can_nest and (
+            always_in_conditional or global_counter.would_exceed(expr)
+        )
 
         if can_nest and not should_wrap:
-            group_counter = Counter()
-            while index < len(expressions) and expressions[index].can_be_nested():
-                if global_counter.would_exceed(expressions[index]):
-                    break
-                global_counter.increment(expressions[index])
-                group_counter.increment(expressions[index])
-                result.append(expressions[index])
-                index += 1
-            first_group_used = True
+            if global_counter.would_exceed(expr):
+                break
+            global_counter.increment(expr)
+            result.append(expr)
+            index += 1
         elif should_wrap:
             dummy = ConditionalExpression([], ConditionalMode.AND)
             if global_counter.would_exceed(dummy):
