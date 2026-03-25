@@ -101,5 +101,6 @@ class NotANumberException(ExecutionException):
         )
 
 
-class ConditionFailedExtraInfoException(ExecutionException):
-    pass
+class ExitExpressionException(ExecutionException):
+    def __init__(self) -> None:
+        super().__init__('Exit expression called')

@@ -1,6 +1,10 @@
-from typing import Self, final
+from typing import TYPE_CHECKING, Self, final
 
 from ..expression.expression import Expression
+
+if TYPE_CHECKING:
+    from ..execute.context import ExecutionContext
+
 
 __all__ = ('exit_function',)
 
@@ -18,6 +22,11 @@ class ExitFunctionExpression(Expression):
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}'
+
+    def raw_execute(self, context: 'ExecutionContext') -> None:
+        from ..execute.exception import ExitExpressionException
+
+        raise ExitExpressionException()
 
 
 def exit_function() -> None:

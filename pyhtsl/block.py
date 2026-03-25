@@ -115,9 +115,16 @@ class Block(BaseObject):
         self.fix_action_limits(container, index)
 
     def execute_all_expressions(self, context: 'ExecutionContext') -> None:
-        for expression in self.expressions:
-            for expr in expression.into_executable_expressions():
-                expr.execute(context)
+        from .execute.exception import ExitExpressionException
+
+        self.maybe_run_callback()
+        context.finalize_expressions(self.expressions)
+        try:
+            for expression in self.expressions:
+                for expr in expression.into_executable_expressions():
+                    expr.execute(context)
+        except ExitExpressionException:
+            pass  # ignore on purpose
 
     def execute(self, context: 'ExecutionContext') -> None:
         pass  # Do nothing on purpose, since most of the time this is but a definition
