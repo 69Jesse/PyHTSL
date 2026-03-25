@@ -2416,29 +2416,32 @@ def read_skull_data() -> SkullData:
     raw = json.loads(SKULL_DATA_FILE.read_text(encoding='utf-8'))
     return {
         key.lower().replace(' ', '_'): {
-            sub_key: NBTCompound()
-            .put('Id', NBTString(sub_value['id']))
-            .put('hypixelPopulated', NBTInt(1))
-            .put(
-                'Properties',
-                NBTCompound().put(
-                    'textures',
-                    NBTList(
-                        [
-                            NBTCompound()
-                            .put(
-                                'Signature',
-                                NBTString('I love https://github.com/69Jesse'),
+            sub_key: NBTCompound(
+                {
+                    'Id': NBTString(sub_value['id']),
+                    'hypixelPopulated': NBTInt(1),
+                    'Properties': NBTCompound(
+                        {
+                            'textures': NBTList(
+                                [
+                                    NBTCompound(
+                                        {
+                                            'Signature': NBTString(
+                                                'I love https://github.com/69Jesse'
+                                            ),
+                                            'Value': NBTString(sub_value['texture']),
+                                        }
+                                    )
+                                ]
                             )
-                            .put('Value', NBTString(sub_value['texture']))
-                        ]
+                        }
                     ),
-                ),
+                }
             )
             for sub_key, sub_value in value.items()
         }
         for key, value in raw.items()
-    }  # type: ignore
+    }  # pyright: ignore[reportReturnType]
 
 
 SKULL_DATA: SkullData = read_skull_data()
