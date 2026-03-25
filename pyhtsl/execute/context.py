@@ -32,6 +32,7 @@ class ExecutionContext(Container):
 
     started_execution: bool
     checkable_mapping: dict[tuple[object, ...], BackendType]
+    functions_on_cooldown_for_ticks: dict[str, int]
 
     def __init__(
         self,
@@ -46,6 +47,7 @@ class ExecutionContext(Container):
         self.pause_multiplier = pause_multiplier
         self.started_execution = False
         self.checkable_mapping = {}
+        self.functions_on_cooldown_for_ticks = {}
 
     def __exit__(
         self,

@@ -31,6 +31,10 @@ class PauseExecutionExpression(Expression):
 
     def raw_execute(self, context: ExecutionContext) -> None:
         time.sleep((self.ticks / 20) * context.pause_multiplier)
+        for function_name in list(context.functions_on_cooldown_for_ticks.keys()):
+            context.functions_on_cooldown_for_ticks[function_name] -= self.ticks
+            if context.functions_on_cooldown_for_ticks[function_name] <= 0:
+                del context.functions_on_cooldown_for_ticks[function_name]
 
 
 def pause_execution(ticks: int = 20) -> None:
