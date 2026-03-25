@@ -1,10 +1,3 @@
-__all__ = (
-    'ExecutionException',
-    'MismatchedTypeException',
-    'NotANumberException',
-)
-
-
 from typing import TYPE_CHECKING, NoReturn
 
 import numpy as np
@@ -17,6 +10,13 @@ from .backend_type import BackendType
 
 if TYPE_CHECKING:
     from ..expression.binary_expression import BinaryOperator
+
+
+__all__ = (
+    'ExecutionException',
+    'MismatchedTypeException',
+    'NotANumberException',
+)
 
 
 class ExecutionException(Exception):
@@ -99,8 +99,3 @@ class NotANumberException(ExecutionException):
         raise NotANumberException() from TypeError(
             f'Housing arithmetic operators expect numeric values: {left_string} {operator.value} {right_string}'
         )
-
-
-class ExitExpressionException(ExecutionException):
-    def __init__(self) -> None:
-        super().__init__('Exit expression called')

@@ -1,9 +1,9 @@
-import time
-from typing import Self, final
-
-from pyhtsl.execute.context import ExecutionContext
+from typing import TYPE_CHECKING, Self, final
 
 from ..expression.expression import Expression
+
+if TYPE_CHECKING:
+    from ..execute.context import ExecutionContext
 
 __all__ = ('pause_execution',)
 
@@ -29,12 +29,10 @@ class PauseExecutionExpression(Expression):
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.ticks}>'
 
-    def raw_execute(self, context: ExecutionContext) -> None:
-        time.sleep((self.ticks / 20) * context.pause_multiplier)
-        for function_name in list(context.functions_on_cooldown_for_ticks.keys()):
-            context.functions_on_cooldown_for_ticks[function_name] -= self.ticks
-            if context.functions_on_cooldown_for_ticks[function_name] <= 0:
-                del context.functions_on_cooldown_for_ticks[function_name]
+    def raw_execute(self, context: 'ExecutionContext') -> None:
+        from ..execute.signal import PauseSignal
+
+        raise PauseSignal(self.ticks)
 
 
 def pause_execution(ticks: int = 20) -> None:

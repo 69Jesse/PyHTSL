@@ -24,9 +24,9 @@ class ExitFunctionExpression(Expression):
         return f'{self.__class__.__name__}'
 
     def raw_execute(self, context: 'ExecutionContext') -> None:
-        from ..execute.exception import ExitExpressionException
+        from ..execute.signal import ExitSignal
 
-        raise ExitExpressionException()
+        raise ExitSignal()
 
 
 def exit_function() -> None:

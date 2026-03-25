@@ -115,8 +115,7 @@ class ConditionalExpression(Expression):
             else any(cond.evaluate(context) for cond in self.conditions)
         )
         expressions = self.if_expressions if holds else self.else_expressions
-        for expr in expressions:
-            expr.execute(context)
+        context.run_expressions(expressions)
 
     def finalize(self, container: Container) -> None:
         for cond in self.conditions:

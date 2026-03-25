@@ -1,5 +1,5 @@
-import os
 import re
+import time
 from collections.abc import Callable, Generator
 from types import TracebackType
 from typing import Literal, overload
@@ -21,6 +21,8 @@ from .backend_type import (
 )
 from .expressions.assert_execution_expression import AssertExecutionExpression
 from .expressions.print_execution_expression import PrintExecutionExpression
+from .schedulers import ActionScheduler, DelayedActionScheduler
+from .signal import ExitSignal, PauseSignal
 
 __all__ = ('ExecutionContext',)
 
@@ -33,6 +35,7 @@ class ExecutionContext(Container):
     started_execution: bool
     checkable_mapping: dict[tuple[object, ...], BackendType]
     functions_on_cooldown_for_ticks: dict[str, int]
+    schedulers: list[ActionScheduler]
 
     def __init__(
         self,
@@ -48,6 +51,7 @@ class ExecutionContext(Container):
         self.started_execution = False
         self.checkable_mapping = {}
         self.functions_on_cooldown_for_ticks = {}
+        self.schedulers = []
 
     def __exit__(
         self,
@@ -61,6 +65,43 @@ class ExecutionContext(Container):
         self.started_execution = True
         for block in self.blocks:
             block.execute(self)
+        self.run_tick_loop()
+
+    def schedule_continuation(self, continuation: list[Expression], ticks: int) -> None:
+        self.schedulers.append(DelayedActionScheduler(continuation, ticks))
+
+    def run_expressions(self, expressions: list[Expression]) -> None:
+        for i, expr in enumerate(expressions):
+            try:
+                expr.execute(self)
+            except PauseSignal as sig:
+                sig.continuation.extend(expressions[i + 1:])
+                raise
+
+    def run_tick_loop(self) -> None:
+        while self.schedulers:
+            time.sleep((1 / 20) * self.pause_multiplier)
+            self.tick()
+
+    def tick(self) -> None:
+        for name in list(self.functions_on_cooldown_for_ticks):
+            self.functions_on_cooldown_for_ticks[name] -= 1
+            if self.functions_on_cooldown_for_ticks[name] <= 0:
+                del self.functions_on_cooldown_for_ticks[name]
+
+        next_schedulers: list[ActionScheduler] = []
+        for scheduler in self.schedulers:
+            expressions = scheduler.tick()
+            if expressions is not None:
+                try:
+                    self.run_expressions(expressions)
+                except PauseSignal as sig:
+                    next_schedulers.append(DelayedActionScheduler(sig.continuation, sig.ticks))
+                except ExitSignal:
+                    pass
+            if scheduler.has_next():
+                next_schedulers.append(scheduler)
+        self.schedulers = next_schedulers
 
     def _yield(
         self,
