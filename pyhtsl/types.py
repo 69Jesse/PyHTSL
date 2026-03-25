@@ -402,7 +402,7 @@ ALL_SOUNDS_RAW = Literal[
 ]
 
 
-ALL_SOUNDS_PRETTY_TO_RAW = {
+ALL_SOUNDS_PRETTY_TO_RAW: dict[ALL_SOUNDS_PRETTY, ALL_SOUNDS_RAW] = {
     'Ambience Cave': 'ambient.cave.cave', 'Ambience Rain': 'ambient.weather.rain', 'Ambience Thunder': 'ambient.weather.thunder', 'Anvil Break': 'random.anvil_break',
     'Anvil Land': 'random.anvil_land', 'Anvil Use': 'random.anvil_use', 'Arrow Hit': 'random.bowhit', 'Burp': 'random.burp',
     'Chest Close': 'random.chestclosed', 'Chest Open': 'random.chestopen', 'Click': 'random.click', 'Door Close': 'random.door_close',

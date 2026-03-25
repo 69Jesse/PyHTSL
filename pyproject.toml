@@ -10,7 +10,10 @@ requires-python = ">=3.12"
 authors = [{ name = "Jesse Janssen" }]
 urls = { Homepage = "https://github.com/69Jesse/PyHTSL" }
 readme = "README.md"
-dependencies = ["numpy>=2.4.2"]
+dependencies = [
+    "numpy>=2.4.2",
+    "sounddevice>=0.5.5",
+]
 
 [tool.ruff.lint]
 select = [
@@ -38,4 +41,4 @@ where = ["."]
 include = ["pyhtsl*"]
 
 [tool.setuptools.package-data]
-"*" = ["*.*"]
+"*" = ["*.*", "misc/**/*"]

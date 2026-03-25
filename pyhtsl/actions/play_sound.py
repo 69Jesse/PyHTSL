@@ -1,14 +1,18 @@
-from typing import Self, final
+from typing import TYPE_CHECKING, Self, final
 
 from ..expression.expression import Expression
-from ..types import ALL_LOCATIONS, ALL_SOUNDS, ALL_SOUNDS_PRETTY_TO_RAW
+from ..types import ALL_LOCATIONS, ALL_SOUNDS
+from ..utils.log import log
+
+if TYPE_CHECKING:
+    from ..execute.context import ExecutionContext
 
 __all__ = ('play_sound',)
 
 
 @final
 class PlaySoundExpression(Expression):
-    sound: str
+    sound: ALL_SOUNDS
     volume: float
     pitch: float
     coordinates: str | None
@@ -16,7 +20,7 @@ class PlaySoundExpression(Expression):
 
     def __init__(
         self,
-        sound: str,
+        sound: ALL_SOUNDS,
         volume: float = 0.7,
         pitch: float = 1.0,
         coordinates: str | None = None,
@@ -57,6 +61,17 @@ class PlaySoundExpression(Expression):
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.sound} vol={self.volume} pitch={self.pitch}>'
 
+    def raw_execute(self, context: 'ExecutionContext') -> None:
+        from ..misc.sounds import play
+
+        found = play(
+            self.sound,
+            volume=self.volume * context.volume,
+            pitch=self.pitch,
+        )
+        if not found:
+            log(f'No sound found for "{self.sound}", so nothing will be played')
+
 
 # TODO proper overload
 def play_sound(
@@ -66,7 +81,6 @@ def play_sound(
     coordinates: tuple[float, float, float] | str | None = None,
     location: ALL_LOCATIONS = 'invokers_location',
 ) -> None:
-    sound = ALL_SOUNDS_PRETTY_TO_RAW.get(sound, sound)  # pyright: ignore[reportAssignmentType]
     if location == 'custom_coordinates':
         if coordinates is None:
             raise ValueError(

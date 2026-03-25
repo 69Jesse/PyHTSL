@@ -31,6 +31,7 @@ class ExecutionContext(Container):
     verbose: bool
     expression_callback: Callable[[Expression], None] | None
     pause_multiplier: float
+    volume: float
 
     started_execution: bool
     checkable_mapping: dict[tuple[object, ...], BackendType]
@@ -43,11 +44,13 @@ class ExecutionContext(Container):
         verbose: bool = False,
         expression_callback: Callable[[Expression], None] | None = None,
         pause_multiplier: float = 1,
+        volume: float = 1.0,
     ) -> None:
         super().__init__()
         self.verbose = verbose
         self.expression_callback = expression_callback
         self.pause_multiplier = pause_multiplier
+        self.volume = volume
         self.started_execution = False
         self.checkable_mapping = {}
         self.functions_on_cooldown_for_ticks = {}
