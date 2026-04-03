@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -115,7 +116,11 @@ class NoteEvent:
 
 def note_events_into_expressions(
     events: list[NoteEvent],
+    *,
     strip_pauses: bool = True,
+    sound_factory: Callable[[NoteEvent], PlaySoundExpression] | None = None,
+    sound_transform: Callable[[PlaySoundExpression], PlaySoundExpression | None] | None = None,
+    sound_filter: Callable[[PlaySoundExpression], bool] | None = None,
 ) -> list[Expression]:
     events.sort(key=lambda e: e.housing_tick)
     result: list[Expression] = []
@@ -123,17 +128,47 @@ def note_events_into_expressions(
     for i, event in enumerate(events):
         delta = event.housing_tick - current_tick
         if delta > 0:
-            if not (strip_pauses and (i == 0 or i == len(events) - 1)):
+            if not (strip_pauses and i == 0):
                 result.append(PauseExecutionExpression(ticks=delta))
             current_tick = event.housing_tick
-        result.append(
-            PlaySoundExpression(
+        if sound_factory is not None:
+            expr = sound_factory(event)
+        else:
+            expr = PlaySoundExpression(
                 sound=event.sound,
                 volume=event.volume,
                 pitch=event.pitch,
                 check_valid=False,
             )
-        )
+        if sound_transform is not None:
+            expr = sound_transform(expr) or expr
+        result.append(expr)
+
+    if sound_filter is not None:
+        filtered: list[Expression] = []
+        for expr in result:
+            if isinstance(expr, PlaySoundExpression) and not sound_filter(expr):
+                if filtered and isinstance(filtered[-1], PauseExecutionExpression):
+                    filtered.pop()
+                continue
+            if (
+                isinstance(expr, PauseExecutionExpression)
+                and filtered
+                and isinstance(filtered[-1], PauseExecutionExpression)
+            ):
+                filtered[-1] = PauseExecutionExpression(
+                    ticks=filtered[-1].ticks + expr.ticks,
+                )
+                continue
+            filtered.append(expr)
+        result = filtered
+
+    if strip_pauses:
+        while result and isinstance(result[-1], PauseExecutionExpression):
+            result.pop()
+        while result and isinstance(result[0], PauseExecutionExpression):
+            result.pop(0)
+
     return result
 
 
@@ -241,10 +276,19 @@ def music_into_expressions(
     clamp_pitch: bool = True,
     time_range: tuple[float, float] | None = None,
     strip_pauses: bool = True,
+    sound_factory: Callable[[NoteEvent], PlaySoundExpression] | None = None,
+    sound_transform: Callable[[PlaySoundExpression], PlaySoundExpression | None] | None = None,
+    sound_filter: Callable[[PlaySoundExpression], bool] | None = None,
 ) -> list[Expression]:
     events = music_into_note_events(
         path,
         clamp_pitch=clamp_pitch,
         time_range=time_range,
     )
-    return note_events_into_expressions(events, strip_pauses=strip_pauses)
+    return note_events_into_expressions(
+        events,
+        strip_pauses=strip_pauses,
+        sound_factory=sound_factory,
+        sound_transform=sound_transform,
+        sound_filter=sound_filter,
+    )
