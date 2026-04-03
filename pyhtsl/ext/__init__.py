@@ -20,7 +20,16 @@ from .compute_layout import (
     compute_best_layout as compute_best_layout,
 )
 from .music import (
+    NoteEvent as NoteEvent,
+)
+from .music import (
     music_into_expressions as music_into_expressions,
+)
+from .music import (
+    music_into_note_events as music_into_note_events,
+)
+from .music import (
+    note_events_into_expressions as note_events_into_expressions,
 )
 from .round import (
     round_double as round_double,
