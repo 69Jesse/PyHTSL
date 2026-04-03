@@ -10,7 +10,12 @@ from ..actions.pause_execution import PauseExecutionExpression
 from ..actions.play_sound import PlaySoundExpression
 from ..expression.expression import Expression
 
-__all__ = ('expressions_from_midi', 'expressions_from_nbs')
+__all__ = (
+    'NoteEvent',
+    'music_into_note_events',
+    'note_events_into_expressions',
+    'music_into_expressions',
+)
 
 
 # NBS instrument ID -> Housing sound (raw)
@@ -73,20 +78,31 @@ def _midi_program_to_sound(program: int) -> ALL_SOUNDS:
     return 'note.harp'
 
 
-def _nbs_key_to_pitch(key: float) -> float:
+def _nbs_key_to_pitch(
+    key: float,
+    *,
+    clamp_pitch: bool = True,
+) -> float:
     """Convert NBS key (0-87, fractional for fine-tuning) to Housing pitch (0.0-2.0).
 
     Key 33 = F#3 -> 0.0, Key 45 = F#4 -> 1.0, Key 57 = F#5 -> 2.0
     """
-    return max(0.0, min(2.0, (key - 33) / 12))
+    pitch = (key - 33) / 12
+    if clamp_pitch:
+        pitch = max(0.0, min(2.0, pitch))
+    return pitch
 
 
-def _midi_note_to_pitch(note: int) -> float:
+def _midi_note_to_pitch(
+    note: int,
+    *,
+    clamp_pitch: bool = True,
+) -> float:
     """Convert MIDI note (0-127) to Housing pitch (0.0-2.0).
 
     MIDI 21 = A0 = NBS key 0, so nbs_key = midi_note - 21.
     """
-    return _nbs_key_to_pitch(note - 21)
+    return _nbs_key_to_pitch(note - 21, clamp_pitch=clamp_pitch)
 
 
 @dataclass
@@ -97,26 +113,35 @@ class NoteEvent:
     pitch: float
 
 
-def _events_to_expressions(events: list[NoteEvent]) -> list[Expression]:
+def note_events_into_expressions(
+    events: list[NoteEvent],
+    strip_pauses: bool = True,
+) -> list[Expression]:
     events.sort(key=lambda e: e.housing_tick)
     result: list[Expression] = []
     current_tick = 0
-    for event in events:
+    for i, event in enumerate(events):
         delta = event.housing_tick - current_tick
         if delta > 0:
-            result.append(PauseExecutionExpression(ticks=delta))
+            if not (strip_pauses and (i == 0 or i == len(events) - 1)):
+                result.append(PauseExecutionExpression(ticks=delta))
             current_tick = event.housing_tick
         result.append(
             PlaySoundExpression(
                 sound=event.sound,
                 volume=event.volume,
                 pitch=event.pitch,
+                check_valid=False,
             )
         )
     return result
 
 
-def expressions_from_nbs(path: str | Path) -> list[Expression]:
+def _events_from_nbs(
+    path: Path,
+    *,
+    clamp_pitch: bool = True,
+) -> list[NoteEvent]:
     song = pynbs.read(str(path))
     tps = song.header.tempo
     events: list[NoteEvent] = []
@@ -131,7 +156,10 @@ def expressions_from_nbs(path: str | Path) -> list[Expression]:
             sound = NBS_INSTRUMENT_TO_SOUND.get(note.instrument, 'note.harp')
             layer_vol = layer_volumes.get(note.layer, 1.0)
             volume = (note.velocity / 100) * layer_vol
-            pitch = _nbs_key_to_pitch(note.key + note.pitch / 100)
+            pitch = _nbs_key_to_pitch(
+                note.key + note.pitch / 100,
+                clamp_pitch=clamp_pitch,
+            )
             events.append(
                 NoteEvent(
                     housing_tick=housing_tick,
@@ -141,10 +169,14 @@ def expressions_from_nbs(path: str | Path) -> list[Expression]:
                 )
             )
 
-    return _events_to_expressions(events)
+    return events
 
 
-def expressions_from_midi(path: str | Path) -> list[Expression]:
+def _events_from_midi(
+    path: Path,
+    *,
+    clamp_pitch: bool = True,
+) -> list[NoteEvent]:
     mid = mido.MidiFile(str(path))
     events: list[NoteEvent] = []
     channel_programs: dict[int, int] = {}
@@ -166,7 +198,7 @@ def expressions_from_midi(path: str | Path) -> list[Expression]:
         else:
             program = channel_programs.get(msg.channel, 0)
             sound = _midi_program_to_sound(program)
-            pitch = _midi_note_to_pitch(msg.note)
+            pitch = _midi_note_to_pitch(msg.note, clamp_pitch=clamp_pitch)
 
         volume = msg.velocity / 127
         events.append(
@@ -178,4 +210,41 @@ def expressions_from_midi(path: str | Path) -> list[Expression]:
             )
         )
 
-    return _events_to_expressions(events)
+    return events
+
+
+def music_into_note_events(
+    path: str | Path,
+    *,
+    clamp_pitch: bool = True,
+    time_range: tuple[float, float] | None = None,
+) -> list[NoteEvent]:
+    path = Path(path)
+    if path.suffix.lower() == '.nbs':
+        events = _events_from_nbs(path, clamp_pitch=clamp_pitch)
+    elif path.suffix.lower() == '.mid' or path.suffix.lower() == '.midi':
+        events = _events_from_midi(path, clamp_pitch=clamp_pitch)
+    else:
+        raise ValueError(f'Unsupported music file format: {path.suffix}')
+
+    if time_range is not None:
+        start_tick = round(time_range[0] * 20)
+        end_tick = round(time_range[1] * 20)
+        events = [e for e in events if start_tick <= e.housing_tick <= end_tick]
+
+    return events
+
+
+def music_into_expressions(
+    path: str | Path,
+    *,
+    clamp_pitch: bool = True,
+    time_range: tuple[float, float] | None = None,
+    strip_pauses: bool = True,
+) -> list[Expression]:
+    events = music_into_note_events(
+        path,
+        clamp_pitch=clamp_pitch,
+        time_range=time_range,
+    )
+    return note_events_into_expressions(events, strip_pauses=strip_pauses)

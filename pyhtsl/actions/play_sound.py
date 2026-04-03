@@ -17,6 +17,7 @@ class PlaySoundExpression(Expression):
     pitch: float
     coordinates: str | None
     location: ALL_LOCATIONS
+    check_valid: bool
 
     def __init__(
         self,
@@ -25,12 +26,19 @@ class PlaySoundExpression(Expression):
         pitch: float = 1.0,
         coordinates: str | None = None,
         location: ALL_LOCATIONS = 'invokers_location',
+        *,
+        check_valid: bool = True,
     ) -> None:
         self.sound = sound
         self.volume = volume
+        if check_valid and (self.volume < 0.0 or self.volume > 2.0):
+            raise ValueError('volume must be between 0.0 and 2.0')
         self.pitch = pitch
+        if check_valid and (self.pitch < 0.0 or self.pitch > 2.0):
+            raise ValueError('pitch must be between 0.0 and 2.0')
         self.coordinates = coordinates
         self.location = location
+        self.check_valid = check_valid
 
     def into_htsl(self) -> str:
         line = f'sound {self.inline_quoted(self.sound)} {self.inline(self.volume)} {self.inline(self.pitch)} {self.inline_quoted(self.location)}'
@@ -45,6 +53,7 @@ class PlaySoundExpression(Expression):
             pitch=self.pitch,
             coordinates=self.coordinates,
             location=self.location,
+            check_valid=self.check_valid,
         )
 
     def equals(self, other: object) -> bool:

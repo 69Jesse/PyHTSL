@@ -256,7 +256,6 @@ def play(
     path = random.choice(paths)
     data, sample_rate = _load_wav(path)
 
-    pitch = max(0.0, min(2.0, pitch))
     data = _resample(data, _housing_pitch(pitch))
     data = data * volume
 
