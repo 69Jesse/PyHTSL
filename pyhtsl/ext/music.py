@@ -146,21 +146,19 @@ def note_events_into_expressions(
 
     if sound_filter is not None:
         filtered: list[Expression] = []
+        pending_ticks = 0
         for expr in result:
+            if isinstance(expr, PauseExecutionExpression):
+                pending_ticks += expr.ticks
+                continue
             if isinstance(expr, PlaySoundExpression) and not sound_filter(expr):
-                if filtered and isinstance(filtered[-1], PauseExecutionExpression):
-                    filtered.pop()
                 continue
-            if (
-                isinstance(expr, PauseExecutionExpression)
-                and filtered
-                and isinstance(filtered[-1], PauseExecutionExpression)
-            ):
-                filtered[-1] = PauseExecutionExpression(
-                    ticks=filtered[-1].ticks + expr.ticks,
-                )
-                continue
+            if pending_ticks > 0:
+                filtered.append(PauseExecutionExpression(ticks=pending_ticks))
+                pending_ticks = 0
             filtered.append(expr)
+        if pending_ticks > 0:
+            filtered.append(PauseExecutionExpression(ticks=pending_ticks))
         result = filtered
 
     if strip_pauses:
