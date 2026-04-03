@@ -7,7 +7,10 @@ from ..execute.backend_type import BackendType
 from ..internal_type import InternalType
 from ..placeholders import PlaceholderCheckable
 
-__all__ = ('PlayerLevel',)
+__all__ = (
+    'PlayerLevelPlaceholder',
+    'PlayerLevel',
+)
 
 
 @final

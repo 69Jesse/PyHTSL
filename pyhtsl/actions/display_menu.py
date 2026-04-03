@@ -3,7 +3,10 @@ from typing import Self, final
 from ..expression.expression import Expression
 from .menu import Menu
 
-__all__ = ('display_menu',)
+__all__ = (
+    'DisplayMenuExpression',
+    'display_menu',
+)
 
 
 @final

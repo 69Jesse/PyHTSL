@@ -7,7 +7,10 @@ from ..utils.log import log
 if TYPE_CHECKING:
     from ..execute.context import ExecutionContext
 
-__all__ = ('play_sound',)
+__all__ = (
+    'PlaySoundExpression',
+    'play_sound',
+)
 
 
 @final

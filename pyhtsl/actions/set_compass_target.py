@@ -5,7 +5,10 @@ from ..expression.expression import Expression
 from ..expression.housing_type import HousingType
 from ..types import ALL_LOCATIONS
 
-__all__ = ('set_compass_target',)
+__all__ = (
+    'SetCompassTargetExpression',
+    'set_compass_target',
+)
 
 
 @final

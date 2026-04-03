@@ -4,7 +4,10 @@ from ..expression.expression import Expression
 from ..types import _INVENTORY_SLOTS_PRETTY_NAME_MAPPING, INVENTORY_SLOTS
 from .item import Item
 
-__all__ = ('give_item',)
+__all__ = (
+    'GiveItemExpression',
+    'give_item',
+)
 
 
 @final

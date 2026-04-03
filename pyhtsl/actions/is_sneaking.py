@@ -1,6 +1,9 @@
 from ..expression.condition.named_condition import NamedCondition
 
-__all__ = ('IsSneaking',)
+__all__ = (
+    'IsSneakingCondition',
+    'IsSneaking',
+)
 
 
 class IsSneakingCondition(NamedCondition):

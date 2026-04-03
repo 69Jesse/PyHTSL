@@ -2,7 +2,10 @@ from typing import Self, final
 
 from ..expression.expression import Expression
 
-__all__ = ('give_experience_levels',)
+__all__ = (
+    'GiveExperienceLevelsExpression',
+    'give_experience_levels',
+)
 
 
 @final

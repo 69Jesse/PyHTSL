@@ -2,7 +2,10 @@ from typing import Self, final
 
 from ..expression.expression import Expression
 
-__all__ = ('send_to_lobby',)
+__all__ = (
+    'SendToLobbyExpression',
+    'send_to_lobby',
+)
 
 
 @final

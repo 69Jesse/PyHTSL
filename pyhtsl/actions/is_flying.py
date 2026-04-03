@@ -1,6 +1,9 @@
 from ..expression.condition.named_condition import NamedCondition
 
-__all__ = ('IsFlying',)
+__all__ = (
+    'IsFlyingCondition',
+    'IsFlying',
+)
 
 
 class IsFlyingCondition(NamedCondition):

@@ -5,7 +5,10 @@ from ..expression.expression import Expression
 from ..expression.housing_type import HousingType
 from ..types import ALL_LOCATIONS
 
-__all__ = ('teleport_player',)
+__all__ = (
+    'TeleportPlayerExpression',
+    'teleport_player',
+)
 
 
 @final

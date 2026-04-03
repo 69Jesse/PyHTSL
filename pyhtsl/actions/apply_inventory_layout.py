@@ -3,7 +3,10 @@ from typing import Self, final
 from ..expression.expression import Expression
 from .layout import Layout
 
-__all__ = ('apply_inventory_layout',)
+__all__ = (
+    'ApplyInventoryLayoutExpression',
+    'apply_inventory_layout',
+)
 
 
 @final

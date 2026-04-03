@@ -5,7 +5,11 @@ from ..config import INDENT
 from ..container import ContainerContextManager, ExpressionContext
 from ..expression.expression import Expression
 
-__all__ = ('Random',)
+__all__ = (
+    'RandomContextManager',
+    'RandomExpression',
+    'Random',
+)
 
 
 @final

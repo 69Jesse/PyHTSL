@@ -6,7 +6,10 @@ if TYPE_CHECKING:
     from ..execute.context import ExecutionContext
 
 
-__all__ = ('pause_execution',)
+__all__ = (
+    'PauseExecutionExpression',
+    'pause_execution',
+)
 
 
 @final

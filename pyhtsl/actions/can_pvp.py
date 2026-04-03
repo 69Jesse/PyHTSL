@@ -1,6 +1,9 @@
 from ..expression.condition.named_condition import NamedCondition
 
-__all__ = ('CanPVP',)
+__all__ = (
+    'CanPVPCondition',
+    'CanPVP',
+)
 
 
 class CanPVPCondition(NamedCondition):

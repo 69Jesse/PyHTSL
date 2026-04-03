@@ -2,7 +2,10 @@ from typing import Self, final
 
 from ..expression.expression import Expression
 
-__all__ = ('full_heal',)
+__all__ = (
+    'FullHealExpression',
+    'full_heal',
+)
 
 
 @final

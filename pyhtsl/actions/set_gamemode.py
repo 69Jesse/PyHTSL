@@ -3,7 +3,10 @@ from typing import Self, final
 from ..expression.expression import Expression
 from ..types import ALL_GAMEMODES
 
-__all__ = ('set_gamemode',)
+__all__ = (
+    'SetGamemodeExpression',
+    'set_gamemode',
+)
 
 
 @final

@@ -3,7 +3,10 @@ from typing import Self, final
 from ..expression.expression import Expression
 from ..types import ALL_POTION_EFFECTS
 
-__all__ = ('apply_potion_effect',)
+__all__ = (
+    'ApplyPotionEffectExpression',
+    'apply_potion_effect',
+)
 
 
 @final

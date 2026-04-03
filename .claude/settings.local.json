@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import pyhtsl; print\\('OK'\\)\")",
+      "Bash(python fix_all.py)"
+    ]
+  }
+}

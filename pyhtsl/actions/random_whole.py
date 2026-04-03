@@ -8,7 +8,10 @@ from ..execute.backend_type import BackendType
 from ..internal_type import InternalType
 from ..placeholders import PlaceholderCheckable
 
-__all__ = ('RandomWhole',)
+__all__ = (
+    'RandomWholePlaceholder',
+    'RandomWhole',
+)
 
 
 def _random_whole_factory(match: re.Match[str]) -> 'RandomWholePlaceholder':

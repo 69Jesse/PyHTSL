@@ -8,7 +8,10 @@ from ..internal_type import InternalType
 from ..placeholders import PlaceholderCheckable
 from .team import Team
 
-__all__ = ('TeamPlayers',)
+__all__ = (
+    'TeamPlayersPlaceholder',
+    'TeamPlayers',
+)
 
 
 def _team_players_factory(match: re.Match[str]) -> 'TeamPlayersPlaceholder':

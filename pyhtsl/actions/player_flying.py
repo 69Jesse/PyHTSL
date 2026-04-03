@@ -1,6 +1,9 @@
 from ..expression.condition.named_condition import NamedCondition
 
-__all__ = ('PlayerFlying',)
+__all__ = (
+    'PlayerFlyingCondition',
+    'PlayerFlying',
+)
 
 
 class PlayerFlyingCondition(NamedCondition):

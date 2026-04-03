@@ -4,7 +4,10 @@ from ..checkable import Checkable
 from ..expression.expression import Expression
 from ..expression.housing_type import HousingType
 
-__all__ = ('display_title',)
+__all__ = (
+    'DisplayTitleExpression',
+    'display_title',
+)
 
 
 @final

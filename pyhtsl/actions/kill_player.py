@@ -2,7 +2,10 @@ from typing import Self, final
 
 from ..expression.expression import Expression
 
-__all__ = ('kill_player',)
+__all__ = (
+    'KillPlayerExpression',
+    'kill_player',
+)
 
 
 @final

@@ -3,7 +3,10 @@ from typing import Self, final
 from ..expression.expression import Expression
 from .item import Item
 
-__all__ = ('remove_item',)
+__all__ = (
+    'RemoveItemExpression',
+    'remove_item',
+)
 
 
 @final

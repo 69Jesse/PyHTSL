@@ -1,6 +1,9 @@
 from ..expression.condition.named_condition import NamedCondition
 
-__all__ = ('DoingParkour',)
+__all__ = (
+    'DoingParkourCondition',
+    'DoingParkour',
+)
 
 
 class DoingParkourCondition(NamedCondition):
