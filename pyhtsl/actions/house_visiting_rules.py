@@ -5,7 +5,10 @@ from ..execute.backend_type import BackendType
 from ..internal_type import InternalType
 from ..placeholders import PlaceholderCheckable
 
-__all__ = ('HouseVisitingRules',)
+__all__ = (
+    'HouseVisitingRulesPlaceholder',
+    'HouseVisitingRules',
+)
 
 
 @final

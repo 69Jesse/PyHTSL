@@ -3,7 +3,10 @@ from typing import Self, final
 from ..expression.expression import Expression
 from .group import Group
 
-__all__ = ('change_player_group',)
+__all__ = (
+    'ChangePlayerGroupExpression',
+    'change_player_group',
+)
 
 
 @final

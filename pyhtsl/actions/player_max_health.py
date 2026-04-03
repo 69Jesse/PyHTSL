@@ -7,7 +7,10 @@ from ..execute.backend_type import BackendType
 from ..internal_type import InternalType
 from ..placeholders import PlaceholderEditable
 
-__all__ = ('PlayerMaxHealth',)
+__all__ = (
+    'PlayerMaxHealthPlaceholder',
+    'PlayerMaxHealth',
+)
 
 
 @final

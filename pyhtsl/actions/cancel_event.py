@@ -2,7 +2,10 @@ from typing import Self, final
 
 from ..expression.expression import Expression
 
-__all__ = ('cancel_event',)
+__all__ = (
+    'CancelEventExpression',
+    'cancel_event',
+)
 
 
 @final

@@ -8,7 +8,10 @@ from ..execute.backend_type import BackendType
 from ..internal_type import InternalType
 from ..placeholders import PlaceholderCheckable
 
-__all__ = ('RandomDecimal',)
+__all__ = (
+    'RandomDecimalPlaceholder',
+    'RandomDecimal',
+)
 
 
 def _random_decimal_factory(match: re.Match[str]) -> 'RandomDecimalPlaceholder':

@@ -6,7 +6,10 @@ from ..expression.housing_type import HousingType
 from .item import Item
 from .no_fallback_values import NoFallbackValues
 
-__all__ = ('drop_item',)
+__all__ = (
+    'DropItemExpression',
+    'drop_item',
+)
 
 
 @final

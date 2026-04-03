@@ -6,7 +6,10 @@ if TYPE_CHECKING:
     from ..execute.context import ExecutionContext
 
 
-__all__ = ('exit_function',)
+__all__ = (
+    'ExitFunctionExpression',
+    'exit_function',
+)
 
 
 @final

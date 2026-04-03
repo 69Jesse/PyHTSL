@@ -2,7 +2,10 @@ from typing import Self, final
 
 from ..expression.expression import Expression
 
-__all__ = ('reset_inventory',)
+__all__ = (
+    'ResetInventoryExpression',
+    'reset_inventory',
+)
 
 
 @final

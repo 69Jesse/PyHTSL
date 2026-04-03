@@ -2,7 +2,10 @@ from typing import Self, final
 
 from ..expression.expression import Expression
 
-__all__ = ('clear_potion_effects',)
+__all__ = (
+    'ClearPotionEffectsExpression',
+    'clear_potion_effects',
+)
 
 
 @final

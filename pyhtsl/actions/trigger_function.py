@@ -8,7 +8,10 @@ if TYPE_CHECKING:
     from ..execute.context import ExecutionContext
 
 
-__all__ = ('trigger_function',)
+__all__ = (
+    'TriggerFunctionExpression',
+    'trigger_function',
+)
 
 
 @final

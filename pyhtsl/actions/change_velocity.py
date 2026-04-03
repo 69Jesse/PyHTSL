@@ -4,7 +4,10 @@ from ..checkable import Checkable
 from ..expression.expression import Expression
 from ..expression.housing_type import NumericHousingType
 
-__all__ = ('change_velocity',)
+__all__ = (
+    'ChangeVelocityExpression',
+    'change_velocity',
+)
 
 
 @final

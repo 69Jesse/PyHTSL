@@ -2,7 +2,10 @@ from typing import Self, final
 
 from ..expression.expression import Expression
 
-__all__ = ('go_to_house_spawn',)
+__all__ = (
+    'GoToHouseSpawnExpression',
+    'go_to_house_spawn',
+)
 
 
 @final

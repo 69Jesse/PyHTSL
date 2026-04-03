@@ -6,7 +6,10 @@ from ..expression.housing_type import HousingType
 from ..stats.stat import Stat
 from ..types import ALL_LOCATIONS
 
-__all__ = ('launch_to_target',)
+__all__ = (
+    'LaunchToTargetExpression',
+    'launch_to_target',
+)
 
 
 @final

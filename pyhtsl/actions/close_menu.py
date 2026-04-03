@@ -2,7 +2,10 @@ from typing import Self, final
 
 from ..expression.expression import Expression
 
-__all__ = ('close_menu',)
+__all__ = (
+    'CloseMenuExpression',
+    'close_menu',
+)
 
 
 @final

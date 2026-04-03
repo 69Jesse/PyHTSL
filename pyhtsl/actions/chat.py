@@ -9,7 +9,10 @@ if TYPE_CHECKING:
     from ..execute.context import ExecutionContext
 
 
-__all__ = ('chat',)
+__all__ = (
+    'ChatExpression',
+    'chat',
+)
 
 
 @final
