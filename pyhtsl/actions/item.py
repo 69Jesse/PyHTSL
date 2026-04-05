@@ -25,7 +25,10 @@ from ..utils.formatting import (
 from ..utils.log import log
 from .enchantment import Enchantment
 
-__all__ = ('Item',)
+__all__ = (
+    'normalize_item_key',
+    'Item',
+)
 
 
 class ItemJsonData(TypedDict):
@@ -55,6 +58,12 @@ HIDE_FLAGS['hide_all_flags'] = max(HIDE_FLAGS.values()) * 2 - 1
 
 
 SAVED_CACHE: dict[str, str] = {}
+
+
+def normalize_item_key(key: ALL_ITEM_KEYS) -> str:
+    if isinstance(key, str):
+        return key
+    return key[0]
 
 
 class Item:
@@ -372,9 +381,7 @@ class Item:
 
     @property
     def normalized_key(self) -> str:
-        if isinstance(self._key, str):
-            return self._key
-        return self._key[0]
+        return normalize_item_key(self._key)
 
     @property
     def name(self) -> str | None:

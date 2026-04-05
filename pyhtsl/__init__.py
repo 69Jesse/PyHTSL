@@ -1,9 +1,13 @@
 from .actions.apply_inventory_layout import (
     ApplyInventoryLayoutExpression as ApplyInventoryLayoutExpression,
+)
+from .actions.apply_inventory_layout import (
     apply_inventory_layout as apply_inventory_layout,
 )
 from .actions.apply_potion_effect import (
     ApplyPotionEffectExpression as ApplyPotionEffectExpression,
+)
+from .actions.apply_potion_effect import (
     apply_potion_effect as apply_potion_effect,
 )
 from .actions.block_type import BlockType as BlockType
@@ -11,26 +15,38 @@ from .actions.can_pvp import CanPVP as CanPVP
 from .actions.can_pvp import CanPVPCondition as CanPVPCondition
 from .actions.cancel_event import (
     CancelEventExpression as CancelEventExpression,
+)
+from .actions.cancel_event import (
     cancel_event as cancel_event,
 )
 from .actions.change_player_group import (
     ChangePlayerGroupExpression as ChangePlayerGroupExpression,
+)
+from .actions.change_player_group import (
     change_player_group as change_player_group,
 )
 from .actions.change_velocity import (
     ChangeVelocityExpression as ChangeVelocityExpression,
+)
+from .actions.change_velocity import (
     change_velocity as change_velocity,
 )
 from .actions.chat import (
     ChatExpression as ChatExpression,
+)
+from .actions.chat import (
     chat as chat,
 )
 from .actions.clear_potion_effects import (
     ClearPotionEffectsExpression as ClearPotionEffectsExpression,
+)
+from .actions.clear_potion_effects import (
     clear_potion_effects as clear_potion_effects,
 )
 from .actions.close_menu import (
     CloseMenuExpression as CloseMenuExpression,
+)
+from .actions.close_menu import (
     close_menu as close_menu,
 )
 from .actions.conditional.statements import Else as Else
@@ -38,6 +54,8 @@ from .actions.conditional.statements import IfAnd as IfAnd
 from .actions.conditional.statements import IfOr as IfOr
 from .actions.consume_item import (
     ConsumeItemExpression as ConsumeItemExpression,
+)
+from .actions.consume_item import (
     consume_item as consume_item,
 )
 from .actions.create_function import create_function as create_function
@@ -51,51 +69,73 @@ from .actions.delete_items import (
 )
 from .actions.display_action_bar import (
     DisplayActionBarExpression as DisplayActionBarExpression,
+)
+from .actions.display_action_bar import (
     display_action_bar as display_action_bar,
 )
 from .actions.display_menu import (
     DisplayMenuExpression as DisplayMenuExpression,
+)
+from .actions.display_menu import (
     display_menu as display_menu,
 )
 from .actions.display_title import (
     DisplayTitleExpression as DisplayTitleExpression,
+)
+from .actions.display_title import (
     display_title as display_title,
 )
 from .actions.doing_parkour import DoingParkour as DoingParkour
 from .actions.doing_parkour import DoingParkourCondition as DoingParkourCondition
 from .actions.drop_item import (
     DropItemExpression as DropItemExpression,
+)
+from .actions.drop_item import (
     drop_item as drop_item,
 )
 from .actions.enchant_held_item import (
     EnchantHeldItemExpression as EnchantHeldItemExpression,
+)
+from .actions.enchant_held_item import (
     enchant_held_item as enchant_held_item,
 )
 from .actions.enchantment import Enchantment as Enchantment
 from .actions.exit_function import (
     ExitFunctionExpression as ExitFunctionExpression,
+)
+from .actions.exit_function import (
     exit_function as exit_function,
 )
 from .actions.fail_parkour import (
     FailParkourExpression as FailParkourExpression,
+)
+from .actions.fail_parkour import (
     fail_parkour as fail_parkour,
 )
 from .actions.fishing_environment import FishingEnvironment as FishingEnvironment
 from .actions.full_heal import (
     FullHealExpression as FullHealExpression,
+)
+from .actions.full_heal import (
     full_heal as full_heal,
 )
 from .actions.function import Function as Function
 from .actions.give_experience_levels import (
     GiveExperienceLevelsExpression as GiveExperienceLevelsExpression,
+)
+from .actions.give_experience_levels import (
     give_experience_levels as give_experience_levels,
 )
 from .actions.give_item import (
     GiveItemExpression as GiveItemExpression,
+)
+from .actions.give_item import (
     give_item as give_item,
 )
 from .actions.go_to_house_spawn import (
     GoToHouseSpawnExpression as GoToHouseSpawnExpression,
+)
+from .actions.go_to_house_spawn import (
     go_to_house_spawn as go_to_house_spawn,
 )
 from .actions.group import Group as Group
@@ -129,12 +169,17 @@ from .actions.is_item import IsItem as IsItem
 from .actions.is_sneaking import IsSneaking as IsSneaking
 from .actions.is_sneaking import IsSneakingCondition as IsSneakingCondition
 from .actions.item import Item as Item
+from .actions.item import normalize_item_key as normalize_item_key
 from .actions.kill_player import (
     KillPlayerExpression as KillPlayerExpression,
+)
+from .actions.kill_player import (
     kill_player as kill_player,
 )
 from .actions.launch_to_target import (
     LaunchToTargetExpression as LaunchToTargetExpression,
+)
+from .actions.launch_to_target import (
     launch_to_target as launch_to_target,
 )
 from .actions.layout import Layout as Layout
@@ -144,14 +189,20 @@ from .actions.no_optimization import NoOptimization as NoOptimization
 from .actions.no_type_casting import NoTypeCasting as NoTypeCasting
 from .actions.parkour_checkpoint import (
     ParkourCheckpointExpression as ParkourCheckpointExpression,
+)
+from .actions.parkour_checkpoint import (
     parkour_checkpoint as parkour_checkpoint,
 )
 from .actions.pause_execution import (
     PauseExecutionExpression as PauseExecutionExpression,
+)
+from .actions.pause_execution import (
     pause_execution as pause_execution,
 )
 from .actions.play_sound import (
     PlaySoundExpression as PlaySoundExpression,
+)
+from .actions.play_sound import (
     play_sound as play_sound,
 )
 from .actions.player_block_x import PlayerBlockX as PlayerBlockX
@@ -230,6 +281,8 @@ from .actions.random_whole import RandomWholePlaceholder as RandomWholePlacehold
 from .actions.region import Region as Region
 from .actions.remove_item import (
     RemoveItemExpression as RemoveItemExpression,
+)
+from .actions.remove_item import (
     remove_item as remove_item,
 )
 from .actions.required_gamemode import RequiredGamemode as RequiredGamemode
@@ -237,10 +290,14 @@ from .actions.required_group import RequiredGroup as RequiredGroup
 from .actions.required_team import RequiredTeam as RequiredTeam
 from .actions.reset_inventory import (
     ResetInventoryExpression as ResetInventoryExpression,
+)
+from .actions.reset_inventory import (
     reset_inventory as reset_inventory,
 )
 from .actions.send_to_lobby import (
     SendToLobbyExpression as SendToLobbyExpression,
+)
+from .actions.send_to_lobby import (
     send_to_lobby as send_to_lobby,
 )
 from .actions.server_name import ServerName as ServerName
@@ -251,14 +308,20 @@ from .actions.server_short_name import (
 )
 from .actions.set_compass_target import (
     SetCompassTargetExpression as SetCompassTargetExpression,
+)
+from .actions.set_compass_target import (
     set_compass_target as set_compass_target,
 )
 from .actions.set_gamemode import (
     SetGamemodeExpression as SetGamemodeExpression,
+)
+from .actions.set_gamemode import (
     set_gamemode as set_gamemode,
 )
 from .actions.set_player_team import (
     SetPlayerTeamExpression as SetPlayerTeamExpression,
+)
+from .actions.set_player_team import (
     set_player_team as set_player_team,
 )
 from .actions.team import Team as Team
@@ -272,10 +335,14 @@ from .actions.team_tag import TeamTag as TeamTag
 from .actions.team_tag import TeamTagPlaceholder as TeamTagPlaceholder
 from .actions.teleport_player import (
     TeleportPlayerExpression as TeleportPlayerExpression,
+)
+from .actions.teleport_player import (
     teleport_player as teleport_player,
 )
 from .actions.trigger_function import (
     TriggerFunctionExpression as TriggerFunctionExpression,
+)
+from .actions.trigger_function import (
     trigger_function as trigger_function,
 )
 from .actions.within_region import WithinRegion as WithinRegion
