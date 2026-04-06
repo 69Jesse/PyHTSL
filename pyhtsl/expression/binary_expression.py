@@ -16,6 +16,7 @@ from ..execute.exception import MismatchedTypeException, NotANumberException
 from ..internal_type import InternalType
 from ..stats.stat import Stat
 from ..stats.temporary_stat import TemporaryStat
+from .compound_expression import CompoundExpression
 from .expression import Expression
 from .housing_type import HousingType, housing_type_as_rhs
 
@@ -156,6 +157,10 @@ class BinaryExpression[
         def minimize(
             expr: BinaryExpression[Any, Any] | Checkable | HousingType,
         ) -> Checkable | HousingType:
+            if isinstance(expr, CompoundExpression):
+                assignment_expressions.extend(expr.expressions)
+                return expr.expressions[-1].left
+
             if not isinstance(expr, BinaryExpression):
                 return expr
 
@@ -182,6 +187,7 @@ class BinaryExpression[
                     left=stat,
                     right=expr.right,
                     operator=expr.operator,
+                    is_intentional_self_assignment=expr.is_intentional_self_assignment,
                 )
             )
             return stat
@@ -195,6 +201,7 @@ class BinaryExpression[
                 left=left,
                 right=right,
                 operator=self.operator,
+                is_intentional_self_assignment=self.is_intentional_self_assignment,
             ),
         )
 
@@ -309,6 +316,8 @@ class BinaryExpression[
                     continue
                 if expression.operator is not BinaryOperator.Set:
                     continue
+                if expression.left.is_same_stat(expression.right):
+                    continue
 
                 # We have:
                 # `left = right` (left is a stat, right is a temp stat)
@@ -363,7 +372,6 @@ class BinaryExpression[
                 )
 
         BinaryExpression.take_out_useless_expressions(expressions)
-        BinaryExpression.rename_temporary_stats(expressions)
 
     def into_executable_expressions(self) -> Generator[Expression, None, None]:
         expressions = self.generate_assignment_expressions()
@@ -419,6 +427,7 @@ class BinaryExpression[
             left=self.cloned_or_same(self.left),
             right=self.cloned_or_same(self.right),
             operator=self.operator,
+            is_intentional_self_assignment=self.is_intentional_self_assignment,
         )
 
     def equals_raw(self, other: object) -> bool:
@@ -553,3 +562,5 @@ class BinaryExpression[
             assert isinstance(expr, BinaryExpression)
             expr = expr.into_assignment_expression()
             self.execute_assignment_expression(expr, context)
+
+

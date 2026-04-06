@@ -349,7 +349,71 @@ class Checkable(BaseObject):
         self,
         other: 'Checkable | NumericHousingType',
     ) -> 'CompoundExpression':
-        raise NotImplementedError  # TODO
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+        from .expression.compound_expression import (
+            CompoundExpression,
+        )
+        from .stats.temporary_stat import TemporaryStat
+
+        expressions: list[BinaryExpression] = []
+
+        temporary_stat_1 = TemporaryStat(self.internal_type)
+        expressions.append(
+            BinaryExpression(
+                left=temporary_stat_1,
+                right=self,
+                operator=BinaryOperator.Set,
+            ),
+        )
+        expressions.append(
+            BinaryExpression(
+                left=temporary_stat_1,
+                right=other,
+                operator=BinaryOperator.Divide,
+            ),
+        )
+        if self.internal_type is InternalType.DOUBLE:
+            expressions.append(
+                BinaryExpression(
+                    left=temporary_stat_1.as_long(),
+                    right=temporary_stat_1,
+                    operator=BinaryOperator.Set,
+                    is_intentional_self_assignment=True,
+                ),
+            )
+            expressions.append(
+                BinaryExpression(
+                    left=temporary_stat_1.as_double(),
+                    right=temporary_stat_1,
+                    operator=BinaryOperator.Set,
+                    is_intentional_self_assignment=True,
+                ),
+            )
+        expressions.append(
+            BinaryExpression(
+                left=temporary_stat_1,
+                right=other,
+                operator=BinaryOperator.Multiply,
+            ),
+        )
+
+        temporary_stat_2 = TemporaryStat(self.internal_type)
+        expressions.append(
+            BinaryExpression(
+                left=temporary_stat_2,
+                right=self,
+                operator=BinaryOperator.Set,
+            ),
+        )
+        expressions.append(
+            BinaryExpression(
+                left=temporary_stat_2,
+                right=temporary_stat_1,
+                operator=BinaryOperator.Decrement,
+            ),
+        )
+
+        return CompoundExpression(expressions)
 
     def __mod__(
         self,
