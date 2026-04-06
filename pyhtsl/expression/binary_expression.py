@@ -12,11 +12,17 @@ from ..execute.backend_type import (
     is_default_backend,
 )
 from ..execute.context import ExecutionContext
-from ..execute.exception import MismatchedTypeException, NotANumberException
+from ..execute.exception import (
+    MismatchedTypeException,
+    NotANumberException,
+    descriptive_backend_type,
+)
 from ..internal_type import InternalType
+from ..logger import log
 from ..stats.stat import Stat
 from ..stats.temporary_stat import TemporaryStat
 from .compound_expression import CompoundExpression
+from .condition.comparison_condition import ComparisonCondition
 from .expression import Expression
 from .housing_type import HousingType, housing_type_as_rhs
 
@@ -43,17 +49,11 @@ class BinaryOperator(Enum):
         return f'{self.__class__.__name__}<{self.name}, {self.value}>'
 
     @cached_property
-    def allowed_left_side_types(self) -> set[InternalType]:
+    def allowed_types(self) -> set[InternalType]:
         if self is BinaryOperator.Set:
             return InternalType.all_types()
         else:
             return InternalType.numeric_types()
-
-    @cached_property
-    def allowed_right_side_types(self) -> set[InternalType]:
-        return (
-            self.allowed_left_side_types
-        )  # Will this ever not be the same? Am not sure
 
 
 type AssignmentExpression = BinaryExpression[Editable, Checkable | HousingType]
@@ -108,9 +108,16 @@ class BinaryExpression[
             )
         return self  # type: ignore
 
-    def make_type_compatible(
-        self,
-        expression: AssignmentExpression,
+    def is_assignment_expression(self) -> bool:
+        try:
+            self.into_assignment_expression()
+            return True
+        except TypeError:
+            return False
+
+    @staticmethod
+    def fix_type_compatibility(
+        binary_object: AssignmentExpression | ComparisonCondition,
     ) -> None:
         def raise_type_error(
             side: str,
@@ -119,47 +126,47 @@ class BinaryExpression[
             allowed: set[InternalType],
         ) -> NoReturn:
             raise TypeError(
-                f'{side} side of operator "{expression.operator.name}" ({value!r}) must be one of the following types: '
+                f'{side} side of operator "{binary_object.operator.name}" ({value!r}) must be one of the following types: '
                 f'{", ".join(t.name for t in sorted(allowed, key=lambda t: t.value))}. Got {actual.name}.'
             )
 
         if (
-            expression.left.internal_type is not InternalType.ANY
-            and expression.left.internal_type
-            not in expression.operator.allowed_left_side_types
+            binary_object.left.internal_type is not InternalType.ANY
+            and binary_object.left.internal_type
+            not in binary_object.operator.allowed_types
         ):
             raise_type_error(
                 'Left',
-                expression.left,
-                expression.left.internal_type,
-                expression.operator.allowed_left_side_types,
+                binary_object.left,
+                binary_object.left.internal_type,
+                binary_object.operator.allowed_types,
             )
 
-        expression.right = expression.left.internal_type.type_compatible(
-            expression.right
+        binary_object.right = binary_object.left.internal_type.type_compatible(
+            binary_object.right
         )
 
-        right_internal_type = InternalType.from_value(expression.right)
+        right_internal_type = InternalType.from_value(binary_object.right)
         if (
             right_internal_type is not InternalType.ANY
-            and right_internal_type not in expression.operator.allowed_right_side_types
+            and right_internal_type not in binary_object.operator.allowed_types
         ):
             raise_type_error(
                 'Right',
-                expression.right,
+                binary_object.right,
                 right_internal_type,
-                expression.operator.allowed_right_side_types,
+                binary_object.operator.allowed_types,
             )
 
-    def generate_assignment_expressions(self) -> list[AssignmentExpression]:
-        assignment_expressions: list[AssignmentExpression] = []
+    def generate_assignment_expressions(self) -> list[Expression]:
+        expressions: list[Expression] = []
 
         def minimize(
             expr: BinaryExpression[Any, Any] | Checkable | HousingType,
         ) -> Checkable | HousingType:
             if isinstance(expr, CompoundExpression):
-                assignment_expressions.extend(expr.expressions)
-                return expr.expressions[-1].left
+                expressions.extend(expr.expressions)
+                return expr.result
 
             if not isinstance(expr, BinaryExpression):
                 return expr
@@ -175,14 +182,14 @@ class BinaryExpression[
 
             internal_type = InternalType.from_value(expr.left)
             stat = TemporaryStat(internal_type)
-            assignment_expressions.append(
+            expressions.append(
                 BinaryExpression(
                     left=stat,
                     right=expr.left,
                     operator=BinaryOperator.Set,
                 )
             )
-            assignment_expressions.append(
+            expressions.append(
                 BinaryExpression(
                     left=stat,
                     right=expr.right,
@@ -196,7 +203,7 @@ class BinaryExpression[
         assert isinstance(left, Editable)
         right = minimize(self.right)
 
-        assignment_expressions.append(
+        expressions.append(
             BinaryExpression(
                 left=left,
                 right=right,
@@ -205,10 +212,13 @@ class BinaryExpression[
             ),
         )
 
-        for expr in assignment_expressions:
-            self.make_type_compatible(expr)
+        for expr in expressions:
+            if isinstance(expr, BinaryExpression) and expr.is_assignment_expression():
+                BinaryExpression.fix_type_compatibility(
+                    expr.into_assignment_expression()
+                )
 
-        return assignment_expressions
+        return expressions
 
     @staticmethod
     def take_out_useless_expressions(expressions: list[Expression]) -> None:
@@ -442,15 +452,15 @@ class BinaryExpression[
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{repr(self.left)} {self.operator.value} {repr(self.right)}>'
 
+    @staticmethod
     def execute_assignment_expression(
-        self,
         expression: AssignmentExpression,
         context: 'ExecutionContext',
     ) -> None:
         if expression.operator is BinaryOperator.Set:
             context.put(
                 expression.left,
-                context.get_backend(expression.right),
+                context.get(expression.right, output='backend'),
                 ignore_warning=True,
             )
             return
@@ -460,13 +470,20 @@ class BinaryExpression[
             if not isinstance(expression.right, Checkable)
             else expression.right.into_string_rhs()
         )
-        left_value = context.get_backend(
+        left_value = context.get(
             expression.left,
-            default=backend_to_default_backend(context.get_backend(right_identifier)),
+            default=backend_to_default_backend(
+                context.get(
+                    right_identifier,
+                    output='backend',
+                )
+            ),
+            output='backend',
         )
-        right_value = context.get_backend(
+        right_value = context.get(
             right_identifier,
             default=backend_to_default_backend(left_value),
+            output='backend',
         )
 
         if type(left_value) is not type(right_value):
@@ -561,6 +578,15 @@ class BinaryExpression[
         for expr in self.into_executable_expressions():
             assert isinstance(expr, BinaryExpression)
             expr = expr.into_assignment_expression()
+            if context.verbose:
+                log(
+                    f'{" " * 4}Executing \x1b[38;2;255;0;0m"{expr.left!r} {expr.operator.value} {expr.right!r}"\x1b[0m'
+                )
+                log(
+                    f'{" " * 8}BEFORE: {expr.left.into_string_lhs()} = {descriptive_backend_type(context.get(expr.left, output="backend"))}'
+                )
             self.execute_assignment_expression(expr, context)
-
-
+            if context.verbose:
+                log(
+                    f'{" " * 8}AFTER:  {expr.left.into_string_lhs()} = {descriptive_backend_type(context.get(expr.left, output="backend"))}'
+                )

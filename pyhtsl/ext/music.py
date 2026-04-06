@@ -119,7 +119,8 @@ def note_events_into_expressions(
     *,
     strip_pauses: bool = True,
     sound_factory: Callable[[NoteEvent], PlaySoundExpression] | None = None,
-    sound_transform: Callable[[PlaySoundExpression], PlaySoundExpression | None] | None = None,
+    sound_transform: Callable[[PlaySoundExpression], PlaySoundExpression | None]
+    | None = None,
     sound_filter: Callable[[PlaySoundExpression], bool] | None = None,
 ) -> list[Expression]:
     events.sort(key=lambda e: e.housing_tick)
@@ -275,7 +276,8 @@ def music_into_expressions(
     time_range: tuple[float, float] | None = None,
     strip_pauses: bool = True,
     sound_factory: Callable[[NoteEvent], PlaySoundExpression] | None = None,
-    sound_transform: Callable[[PlaySoundExpression], PlaySoundExpression | None] | None = None,
+    sound_transform: Callable[[PlaySoundExpression], PlaySoundExpression | None]
+    | None = None,
     sound_filter: Callable[[PlaySoundExpression], bool] | None = None,
 ) -> list[Expression]:
     events = music_into_note_events(

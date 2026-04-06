@@ -1,23 +1,25 @@
 from collections.abc import Generator
-from typing import TYPE_CHECKING, Self, final
+from typing import Self, final
 
 from ..editable import Editable
 from .expression import Expression
 
-if TYPE_CHECKING:
-    from .binary_expression import AssignmentExpression
-
 
 @final
 class CompoundExpression(Expression, Editable):
-    expressions: list['AssignmentExpression']
+    expressions: list[Expression]
+    result: Editable
 
-    def __init__(self, expressions: list['AssignmentExpression']) -> None:
+    def __init__(self, expressions: list[Expression], result: Editable) -> None:
         super().__init__()
         self.expressions = expressions
+        self.result = result
 
     def cloned_raw(self) -> Self:
-        return self.__class__([expr.cloned() for expr in self.expressions])
+        return self.__class__(
+            [expr.cloned() for expr in self.expressions],
+            self.result.cloned(),
+        )
 
     def equals_raw(self, other: object) -> bool:
         if not isinstance(other, CompoundExpression):
@@ -29,19 +31,19 @@ class CompoundExpression(Expression, Editable):
             )
         )
 
-    def into_executable_expressions(self) -> Generator['AssignmentExpression', None, None]:
+    def into_executable_expressions(self) -> Generator[Expression, None, None]:
         from .binary_expression import BinaryExpression
 
         expressions = [expr.cloned() for expr in self.expressions]
         BinaryExpression.optimize_binary_expressions(expressions)  # pyright: ignore[reportArgumentType]
-        BinaryExpression.rename_temporary_stats(expressions)  # pyright: ignore[reportArgumentType]
+        BinaryExpression.rename_temporary_stats(expressions)
         yield from expressions
 
     def write_and_get_result(self) -> Editable:
         expressions = list(self.into_executable_expressions())
         for expr in expressions:
             expr.write()
-        return expressions[-1].left
+        return self.result
 
     def into_string_lhs(self) -> str:
         return self.write_and_get_result().into_string_lhs()

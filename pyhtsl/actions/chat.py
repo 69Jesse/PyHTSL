@@ -37,7 +37,11 @@ class ChatExpression(Expression):
         return f'{self.__class__.__name__}<{self.line}>'
 
     def raw_execute(self, context: 'ExecutionContext') -> None:
-        log(formatting_to_ansi(f'&7* &f{context.substitute(self.line, cast=False)}'))
+        log(
+            formatting_to_ansi(
+                f'&7* &f{context.get(self.line, cast=False, output="string")}'
+            )
+        )
 
 
 def chat(line: str) -> None:

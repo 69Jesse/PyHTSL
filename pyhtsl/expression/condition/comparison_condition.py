@@ -1,8 +1,10 @@
 from enum import Enum
+from functools import cached_property
 from typing import TYPE_CHECKING, Self, final
 
 from ...base_object import BaseObject
 from ...expression.housing_type import HousingType
+from ...internal_type import InternalType
 from ..housing_type import housing_type_as_rhs
 from .condition import Condition
 
@@ -24,6 +26,10 @@ class ComparisonOperator(Enum):
     GreaterThanOrEqual = '>='
     LessThanOrEqual = '<='
 
+    @cached_property
+    def allowed_types(self) -> set[InternalType]:
+        return InternalType.numeric_types()
+
 
 @final
 class ComparisonCondition[LeftT: 'Checkable', RightT: 'Checkable | HousingType'](
@@ -39,9 +45,12 @@ class ComparisonCondition[LeftT: 'Checkable', RightT: 'Checkable | HousingType']
         right: RightT,
         operator: ComparisonOperator,
     ) -> None:
+        from ..binary_expression import BinaryExpression
+
         self.left = left
         self.right = right
         self.operator = operator
+        BinaryExpression.fix_type_compatibility(self)
 
     def into_htsl_raw(self) -> str:
         from ...checkable import Checkable
@@ -90,8 +99,8 @@ class ComparisonCondition[LeftT: 'Checkable', RightT: 'Checkable | HousingType']
         return f'{self.__class__.__name__}<{repr(self.left)} {self.operator.value} {repr(self.right)}, inverted={self.inverted}>'
 
     def raw_evaluate(self, context: 'ExecutionContext') -> bool:
-        left_value = context.get_backend(self.left)
-        right_value = context.get_backend(self.right)
+        left_value = context.get(self.left, output='backend')
+        right_value = context.get(self.right, output='backend')
         if type(left_value) is not type(right_value):
             return False
         if self.operator is ComparisonOperator.Equal:
