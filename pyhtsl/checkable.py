@@ -70,11 +70,16 @@ class Checkable(BaseObject):
         *,
         include_internal_type: bool,
     ) -> str:
-        if include_internal_type and not no_type_casting():
-            if self.internal_type is InternalType.LONG:
-                text += 'L'
-            elif self.internal_type is InternalType.DOUBLE:
-                text += 'D'
+        if (
+            not include_internal_type
+            or no_type_casting()
+            or self.internal_type is InternalType.ANY
+        ):
+            return text
+        if self.internal_type is InternalType.LONG:
+            text += 'L'
+        elif self.internal_type is InternalType.DOUBLE:
+            text += 'D'
         return self.inline_quoted(text)
 
     def into_string_lhs(self) -> str:
@@ -353,9 +358,10 @@ class Checkable(BaseObject):
         from .expression.compound_expression import (
             CompoundExpression,
         )
+        from .expression.expression import Expression
         from .stats.temporary_stat import TemporaryStat
 
-        expressions: list[BinaryExpression] = []
+        expressions: list[Expression] = []
 
         temporary_stat_1 = TemporaryStat(self.internal_type)
         expressions.append(
@@ -413,13 +419,49 @@ class Checkable(BaseObject):
             ),
         )
 
-        return CompoundExpression(expressions)
+        return CompoundExpression(expressions, temporary_stat_2)
 
     def __mod__(
         self,
         other: 'Checkable | NumericHousingType',
     ) -> 'CompoundExpression':
-        raise NotImplementedError  # TODO
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+        from .expression.compound_expression import CompoundExpression
+        from .expression.condition.comparison_condition import (
+            ComparisonCondition,
+            ComparisonOperator,
+        )
+        from .expression.condition.conditional_expression import (
+            ConditionalExpression,
+            ConditionalMode,
+        )
+        from .expression.expression import Expression
+
+        remainder = self.remainder(other)
+        result = remainder.result
+
+        expressions: list[Expression] = list(remainder.expressions)
+        expressions.append(
+            ConditionalExpression(
+                conditions=[
+                    ComparisonCondition(
+                        left=result,
+                        right=0,
+                        operator=ComparisonOperator.LessThan,
+                    ),
+                ],
+                mode=ConditionalMode.AND,
+                if_expressions=[
+                    BinaryExpression(
+                        left=result,
+                        right=other,
+                        operator=BinaryOperator.Increment,
+                    ),
+                ],
+            ),
+        )
+
+        return CompoundExpression(expressions, result)
 
     def __and__[T: 'Checkable | NumericHousingType'](
         self,

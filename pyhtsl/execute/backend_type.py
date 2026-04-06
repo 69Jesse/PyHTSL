@@ -86,8 +86,10 @@ def backend_matches_internal_type(
 
 
 def cast_to_backend_long(value: str) -> np.int64 | None:
+    if not value:
+        return np.int64(0)
     try:
-        n = int(value)
+        n = int(np.float64(value))
     except (ValueError, ArithmeticError):
         return None
     if n < -9223372036854775808 or n > 9223372036854775807:
@@ -96,6 +98,8 @@ def cast_to_backend_long(value: str) -> np.int64 | None:
 
 
 def cast_to_backend_double(value: str) -> np.float64 | None:
+    if not value:
+        return np.float64(0.0)
     try:
         return np.float64(value)
     except (ValueError, ArithmeticError):

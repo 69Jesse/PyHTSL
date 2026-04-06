@@ -48,7 +48,7 @@ class AssertExecutionExpression(ExecutionExpression):
         )
 
     def __repr__(self) -> str:
-        return f'AssertExecutionExpression(conditions={self.conditions!r}, mode={self.mode!r})'
+        return f'{self.__class__.__name__}(conditions={self.conditions!r}, mode={self.mode!r})'
 
     def throw(
         self,
@@ -60,7 +60,9 @@ class AssertExecutionExpression(ExecutionExpression):
 
         assert len(failed_conditions) > 0
 
-        message = f'"{context.substitute(self.message)}": ' if self.message else ''
+        message = (
+            f'"{context.get(self.message, output="string")}": ' if self.message else ''
+        )
         if self.mode is ConditionalMode.AND:
             assert len(failed_conditions) == 1
             middle = 'The following condition did not hold: '
@@ -69,7 +71,7 @@ class AssertExecutionExpression(ExecutionExpression):
 
         def descriptive_condition(cond: 'Condition') -> str:
             return f'{" " * 4}{cond!r}\n' + '\n'.join(
-                f'{" " * 8}{part!r}: {descriptive_backend_type(context.get_backend(part))}'
+                f'{" " * 8}{part!r}: {descriptive_backend_type(context.get(part, output="backend"))}'
                 for part in cond.related_debug_parts()
                 if isinstance(part, Checkable)
             )

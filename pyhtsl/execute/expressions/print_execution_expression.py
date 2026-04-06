@@ -27,7 +27,7 @@ class PrintExecutionExpression(ExecutionExpression):
         return self.line == other.line and self.cast == other.cast
 
     def __repr__(self) -> str:
-        return f'PrintExecutionExpression(line={self.line!r}, cast={self.cast!r})'
+        return f'{self.__class__.__name__}(line={self.line!r}, cast={self.cast!r})'
 
     def raw_execute(self, context: 'ExecutionContext') -> None:
-        log(context.substitute(self.line, cast=self.cast))
+        log(context.get(self.line, cast=self.cast, output='string'))

@@ -21,6 +21,7 @@ from .backend_type import (
 )
 from .expressions.assert_execution_expression import AssertExecutionExpression
 from .expressions.print_execution_expression import PrintExecutionExpression
+from .expressions.run_execution_expression import CallbackType, RunExecutionExpression
 from .schedulers import ActionScheduler, DelayedActionScheduler
 from .signal import ExitSignal, PauseSignal
 
@@ -111,6 +112,20 @@ class ExecutionContext(Container):
                 next_schedulers.append(scheduler)
         self.schedulers = next_schedulers + self.schedulers
 
+    @overload
+    def _get_raw(self, key: Checkable) -> BackendType | None: ...
+
+    @overload
+    def _get_raw(self, key: Checkable, *, default: BackendType) -> BackendType: ...
+
+    def _get_raw(
+        self,
+        key: Checkable,
+        *,
+        default: BackendType | None = None,
+    ) -> BackendType | None:
+        return self.checkable_mapping.get(key.into_hashable(), default)
+
     def _yield(
         self,
         result: BackendType,
@@ -121,66 +136,6 @@ class ExecutionContext(Container):
         if output == 'backend':
             return result
         return into_housing_type(result)
-
-    @overload
-    def get(
-        self,
-        key: Checkable | str,
-        *,
-        default: HousingType | BackendType = ...,
-        output: Literal['regular'] = ...,
-    ) -> HousingType: ...
-
-    @overload
-    def get(
-        self,
-        key: Checkable | str,
-        *,
-        default: HousingType | BackendType = ...,
-        output: Literal['backend'],
-    ) -> BackendType: ...
-
-    @overload
-    def get(
-        self,
-        key: Checkable | str,
-        *,
-        default: HousingType | BackendType = ...,
-        output: Literal['string'],
-    ) -> str: ...
-
-    def get(
-        self,
-        key: Checkable | str,
-        *,
-        default: HousingType | BackendType = '',
-        output: Literal['regular', 'backend', 'string'] = 'regular',
-    ) -> HousingType | BackendType | str:
-        if isinstance(key, str):
-            return self.substitute(key, output=output)
-
-        value = self.checkable_mapping.get(
-            key.into_hashable(),
-            None,
-        )
-        if value is None:
-            value = key.get_backend_fallback_value()
-        if value is None:
-            value = into_backend_type(default)
-
-        return self._yield(value, output=output)
-
-    def get_backend(
-        self,
-        key: Checkable | HousingType,
-        default: BackendType | HousingType = '',
-    ) -> BackendType:
-        if not isinstance(key, Checkable):
-            value = into_backend_type(key)
-            if isinstance(value, str):
-                value = self.substitute(value, output='backend')
-            return value
-        return self.get(key, default=default, output='backend')
 
     def _walk_subclasses[T](self, cls: type[T]) -> Generator[type[T], None, None]:
         yield cls
@@ -196,19 +151,27 @@ class ExecutionContext(Container):
                 result.append((cls.pattern, cls.pattern_factory))
         return result
 
-    def _substitute_single_placeholder(self, placeholder: str) -> BackendType | None:
+    def _substitute_single_placeholder(
+        self,
+        placeholder: str,
+        *,
+        default: BackendType,
+    ) -> BackendType | None:
         for pattern, factory in self._placeholders_and_factories():
             match = pattern.fullmatch(placeholder)
             if match is not None:
-                return self.get(factory(match), output='backend')
+                return self._get_raw(factory(match), default=default)
         return None
 
     def _substitute_all_placeholders(self, text: str) -> str:
         for pattern, factory in self._placeholders_and_factories():
-            text = pattern.sub(
-                lambda match: self.get(factory(match), output='string'),  # noqa: B023
-                text,
-            )
+
+            def replace_placeholder(match: re.Match[str]) -> str:
+                value = self._get_raw(factory(match), default='')  # noqa: B023
+                return backend_into_string(value)
+
+            text = pattern.sub(replace_placeholder, text)
+
         return text
 
     def _has_any_placeholders(self, text: str) -> bool:
@@ -236,54 +199,68 @@ class ExecutionContext(Container):
             return new_value
         return None
 
+    def _substitute(self, key: str, *, default: BackendType) -> BackendType:
+        if (
+            value := self._substitute_single_placeholder(key, default=default)
+        ) is not None:
+            return value
+        return self._substitute_all_placeholders(key)
+
     @overload
-    def substitute(
+    def get(
         self,
-        text: str,
+        key: Checkable | HousingType,
         *,
+        default: HousingType | BackendType = ...,
         cast: bool = True,
-        output: Literal['regular'],
+        output: Literal['regular'] = ...,
     ) -> HousingType: ...
 
     @overload
-    def substitute(
+    def get(
         self,
-        text: str,
+        key: Checkable | HousingType,
         *,
+        default: HousingType | BackendType = ...,
         cast: bool = True,
         output: Literal['backend'],
     ) -> BackendType: ...
 
     @overload
-    def substitute(
+    def get(
         self,
-        text: str,
+        key: Checkable | HousingType,
         *,
+        default: HousingType | BackendType = ...,
         cast: bool = True,
-        output: Literal['string'] = ...,
+        output: Literal['string'],
     ) -> str: ...
 
-    def substitute(
+    def get(
         self,
-        text: str,
+        key: Checkable | HousingType,
         *,
+        default: HousingType | BackendType = '',
         cast: bool = True,
-        output: Literal['regular', 'backend', 'string'] = 'string',
-    ) -> str | HousingType | BackendType:
-        if not self._is_in_quotes(text):
-            if (new_value := self._substitute_single_placeholder(text)) is not None:
-                return self._yield(new_value, output=output)
-            if (new_value := self._maybe_cast_to_backend(text)) is not None:
-                return self._yield(new_value, output=output)
+        output: Literal['regular', 'backend', 'string'] = 'regular',
+    ) -> HousingType | BackendType | str:
+        if isinstance(key, Checkable):
+            key = key.into_string_rhs()
 
-        value = self._remove_quotes(text)
-        if not self._has_any_placeholders(value):
-            return self._yield(value, output=output)
+        if isinstance(key, str):
+            value = self._substitute(key, default=into_backend_type(default))
+        else:
+            value = into_backend_type(key)
 
-        value = self._substitute_all_placeholders(value)
-
-        if cast and (new_value := self._maybe_cast_to_backend(value)) is not None:
-            value = new_value
+        if isinstance(value, str):
+            assert isinstance(key, str)
+            value = self._remove_quotes(value)
+            if (
+                cast
+                and self._has_any_placeholders(key)
+                and (new_value := self._maybe_cast_to_backend(value)) is not None
+            ):
+                value = new_value
 
         return self._yield(value, output=output)
 
@@ -301,7 +278,7 @@ class ExecutionContext(Container):
 
         value = into_backend_type(value)
         if isinstance(value, str):
-            value = self.substitute(value)
+            value = self.get(value, output='backend')
         self.checkable_mapping[key.into_hashable()] = value
 
     def pop(self, key: Checkable) -> None:
@@ -337,4 +314,9 @@ class ExecutionContext(Container):
                 mode=ConditionalMode.OR,
                 message=str(message) if message is not None else None,
             )
+        )
+
+    def run(self, callback: CallbackType) -> None:
+        self.write_or_execute(
+            RunExecutionExpression(callback=callback),
         )

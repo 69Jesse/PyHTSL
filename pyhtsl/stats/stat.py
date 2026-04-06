@@ -61,12 +61,6 @@ class Stat(Editable):
             include_internal_type=include_internal_type,
         )
 
-    def into_comparison_left_side(self) -> str:
-        return self.into_string_lhs()
-
-    def into_comparison_right_side(self) -> str:
-        return self.into_string_rhs()
-
     def into_string_prefix(self) -> str:
         return f'%var.{self.right_side_keyword()}/{self.name}'
 
