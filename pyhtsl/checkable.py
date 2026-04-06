@@ -341,14 +341,52 @@ class Checkable(BaseObject):
     @overload
     def __pow__(
         self,
-        other: int,  # TODO type guard with >= 2 for only expression array
+        other: int,
     ) -> 'CompoundExpression | Self | Literal[1]': ...
 
     def __pow__(
         self,
         other: int,
     ) -> 'CompoundExpression | Self | Literal[1]':
-        raise NotImplementedError  # TODO
+        if other < 0:
+            raise ValueError('Exponent must be a non-negative integer')
+        if other == 0:
+            return 1
+        if other == 1:
+            return self
+
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+        from .expression.compound_expression import CompoundExpression
+        from .expression.expression import Expression
+        from .stats.temporary_stat import TemporaryStat
+
+        tmp = TemporaryStat(self.internal_type)
+
+        def build_ops(n: int) -> list[Expression]:
+            if n == 1:
+                return []
+            if n % 2 == 0:
+                return build_ops(n // 2) + [
+                    BinaryExpression(tmp, tmp, BinaryOperator.Multiply),
+                ]
+            # odd: try both approaches, pick the shorter one
+            # option a: x^((n-1)/2) -> square -> multiply by x
+            option_a = build_ops((n - 1) // 2) + [
+                BinaryExpression(tmp, tmp, BinaryOperator.Multiply),
+                BinaryExpression(tmp, self, BinaryOperator.Multiply),
+            ]
+            # option b: x^((n+1)/2) -> square -> divide by x
+            option_b = build_ops((n + 1) // 2) + [
+                BinaryExpression(tmp, tmp, BinaryOperator.Multiply),
+                BinaryExpression(tmp, self, BinaryOperator.Divide),
+            ]
+            return option_a if len(option_a) <= len(option_b) else option_b
+
+        expressions: list[Expression] = [
+            BinaryExpression(tmp, self, BinaryOperator.Set),
+        ]
+        expressions.extend(build_ops(other))
+        return CompoundExpression(expressions, tmp)
 
     def remainder(
         self,
