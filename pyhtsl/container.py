@@ -66,6 +66,15 @@ class Container:
         self.is_finalized = False
 
     @property
+    def expressions(self) -> list['Expression']:
+        if len(self.blocks) != 1:
+            raise RuntimeError(
+                'Shortcut "Container.expressions" should only be used when there is exactly one block in the container'
+                ', since it would be ambiguous otherwise. Use "Container.blocks" to access the blocks directly and get their expressions.'
+            )
+        return self.blocks[0].expressions
+
+    @property
     def is_global(self) -> bool:
         return self is CONTAINERS[0]
 

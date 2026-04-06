@@ -290,27 +290,43 @@ class ExecutionContext(Container):
         else:
             self.write_expression(expression)
 
-    def print(self, *lines: object, cast: bool = False) -> None:
+    def print(
+        self,
+        *values: object | Callable[[], object] | Callable[['ExecutionContext'], object],
+        cast: bool = False,
+    ) -> None:
         self.write_or_execute(
             PrintExecutionExpression(
-                line=' '.join(map(str, lines)),
+                values=values,
                 cast=cast,
             )
         )
 
-    def assert_all(self, *conditions: Condition, message: object = None) -> None:
+    def assert_all(
+        self,
+        *conditions: Condition
+        | Callable[[], Condition]
+        | Callable[['ExecutionContext'], Condition],
+        message: object = None,
+    ) -> None:
         self.write_or_execute(
             AssertExecutionExpression(
-                list(conditions),
+                conditions,
                 mode=ConditionalMode.AND,
                 message=str(message) if message is not None else None,
             )
         )
 
-    def assert_any(self, *conditions: Condition, message: object = None) -> None:
+    def assert_any(
+        self,
+        *conditions: Condition
+        | Callable[[], Condition]
+        | Callable[['ExecutionContext'], Condition],
+        message: object = None,
+    ) -> None:
         self.write_or_execute(
             AssertExecutionExpression(
-                list(conditions),
+                conditions,
                 mode=ConditionalMode.OR,
                 message=str(message) if message is not None else None,
             )

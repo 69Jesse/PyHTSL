@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyhtsl"
-version = "3.2.0"
+version = "3.2.1"
 description = "Python wrapper for HTSL created to simplify the process of making housings on Hypixel"
 requires-python = ">=3.12"
 authors = [{ name = "Jesse Janssen" }]

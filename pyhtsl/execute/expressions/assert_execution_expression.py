@@ -1,11 +1,12 @@
+from collections.abc import Callable
 from typing import TYPE_CHECKING, NoReturn, Self
 
+from ...expression.condition.condition import Condition
 from ...expression.condition.conditional_expression import ConditionalMode
 from ..exception import descriptive_backend_type
 from .execution_expression import ExecutionExpression
 
 if TYPE_CHECKING:
-    from ...expression.condition.condition import Condition
     from ..context import ExecutionContext
 
 
@@ -13,13 +14,21 @@ __all__ = ('AssertExecutionExpression',)
 
 
 class AssertExecutionExpression(ExecutionExpression):
-    conditions: list['Condition']
+    conditions: tuple[
+        Condition | Callable[[], Condition] | Callable[['ExecutionContext'], Condition],
+        ...,
+    ]
     mode: ConditionalMode
     message: str | None
 
     def __init__(
         self,
-        conditions: list['Condition'],
+        conditions: tuple[
+            Condition
+            | Callable[[], Condition]
+            | Callable[['ExecutionContext'], Condition],
+            ...,
+        ],
         *,
         mode: ConditionalMode,
         message: str | None = None,
@@ -30,7 +39,10 @@ class AssertExecutionExpression(ExecutionExpression):
 
     def cloned(self) -> Self:
         return self.__class__(
-            conditions=[cond.cloned() for cond in self.conditions],
+            conditions=tuple(
+                cond.cloned() if not callable(cond) else cond
+                for cond in self.conditions
+            ),
             mode=self.mode,
             message=self.message,
         )
@@ -43,7 +55,11 @@ class AssertExecutionExpression(ExecutionExpression):
         if len(self.conditions) != len(other.conditions):
             return False
         return all(
-            self.conditions[i].equals(other.conditions[i])
+            self.conditions[i].equals(other.conditions[i])  # type: ignore
+            if not callable(self.conditions[i]) and not callable(other.conditions[i])
+            else self.conditions[i] == other.conditions[i]
+            if callable(self.conditions[i]) and callable(other.conditions[i])
+            else False
             for i in range(len(self.conditions))
         )
 
@@ -81,13 +97,32 @@ class AssertExecutionExpression(ExecutionExpression):
             + '\n'.join(map(descriptive_condition, failed_conditions))
         )
 
+    def flattened_conditions(self, context: 'ExecutionContext') -> list['Condition']:
+        flattened = []
+        for cond in self.conditions:
+            if callable(cond):
+                if cond.__code__.co_argcount == 0:
+                    cond = cond()  # pyright: ignore[reportCallIssue]
+                elif cond.__code__.co_argcount == 1:
+                    cond = cond(context)  # pyright: ignore[reportCallIssue]
+                else:
+                    raise ValueError(
+                        f'Callable conditions must take 0 or 1 arguments, got {cond.__code__.co_argcount}'
+                    )
+            if isinstance(cond, AssertExecutionExpression) and cond.mode == self.mode:
+                flattened.extend(cond.flattened_conditions(context))
+            else:
+                flattened.append(cond)
+        return flattened
+
     def raw_execute(self, context: 'ExecutionContext') -> None:
+        conditions = self.flattened_conditions(context)
         if self.mode == ConditionalMode.AND:
-            for condition in self.conditions:
+            for condition in conditions:
                 if not condition.evaluate(context):
                     self.throw(context, failed_conditions=[condition])
         elif self.mode == ConditionalMode.OR:
-            for condition in self.conditions:
+            for condition in conditions:
                 if condition.evaluate(context):
                     return
-            self.throw(context, failed_conditions=self.conditions)
+            self.throw(context, failed_conditions=conditions)
