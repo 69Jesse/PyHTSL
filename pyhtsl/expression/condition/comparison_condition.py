@@ -28,6 +28,8 @@ class ComparisonOperator(Enum):
 
     @cached_property
     def allowed_types(self) -> set[InternalType]:
+        if self is ComparisonOperator.Equal:
+            return InternalType.all_types()
         return InternalType.numeric_types()
 
 
@@ -105,7 +107,7 @@ class ComparisonCondition[LeftT: 'Checkable', RightT: 'Checkable | HousingType']
             return False
         if self.operator is ComparisonOperator.Equal:
             return left_value == right_value
-        if isinstance(left_value, str) or isinstance(left_value, bool):
+        if isinstance(left_value, str):
             return False
         if self.operator is ComparisonOperator.GreaterThan:
             return (left_value > right_value).astype(bool)
