@@ -8,6 +8,13 @@ __all__ = ('TemporaryStat',)
 
 
 class Number:
+    counter: ClassVar[int] = 1_000_000
+
+    @staticmethod
+    def new() -> 'Number':
+        Number.counter += 1
+        return Number(Number.counter)
+
     value: int
 
     def __init__(self, value: int) -> None:
@@ -26,7 +33,7 @@ class TemporaryStat(Stat):
     ) -> None:
         super().__init__('', auto_unset=False)
         self.internal_type = internal_type
-        self._number = Number(id(self) + 1_000_000)
+        self._number = Number.new()
 
     def into_player_stat(self) -> PlayerStat:
         return PlayerStat(self.name, internal_type=self.internal_type)
