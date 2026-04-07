@@ -31,6 +31,7 @@ __all__ = ('ExecutionContext',)
 class ExecutionContext(Container):
     verbose: bool
     expression_callback: Callable[[Expression], None] | None
+    ignore_action_limits: bool
     pause_multiplier: float
     volume_multiplier: float
 
@@ -44,12 +45,14 @@ class ExecutionContext(Container):
         *,
         verbose: bool = False,
         expression_callback: Callable[[Expression], None] | None = None,
+        ignore_action_limits: bool = False,
         pause_multiplier: float = 1,
         volume_multiplier: float = 1.0,
     ) -> None:
         super().__init__()
         self.verbose = verbose
         self.expression_callback = expression_callback
+        self.ignore_action_limits = ignore_action_limits
         self.pause_multiplier = pause_multiplier
         self.volume_multiplier = volume_multiplier
         self.started_execution = False
@@ -111,6 +114,9 @@ class ExecutionContext(Container):
             if scheduler.has_next():
                 next_schedulers.append(scheduler)
         self.schedulers = next_schedulers + self.schedulers
+
+    def should_fix_action_limits(self) -> bool:
+        return not self.ignore_action_limits
 
     @overload
     def _get_raw(self, key: Checkable) -> BackendType | None: ...
