@@ -78,9 +78,11 @@ def get_htsl_import_folder() -> Path:
 
     log('\x1b[38;2;255;0;0mCould not find your HTSL imports folder.\x1b[0m')
     while True:
-        raw_path = input(
-            'Please enter the path to your \x1b[38;2;0;255;0mHTSL imports folder\x1b[0m (relative or absolute): '
-        ).strip()
+        log(
+            'Please enter the path to your \x1b[38;2;0;255;0mHTSL imports folder\x1b[0m (relative or absolute): ',
+            end='',
+        )
+        raw_path = input().strip()
         if not raw_path:
             log('\x1b[38;2;255;0;0mPlease provide a valid path.\x1b[0m')
             continue

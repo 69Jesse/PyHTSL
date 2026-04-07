@@ -122,10 +122,14 @@ class Block(BaseObject):
             f'Created a new function \x1b[38;2;255;0;0m"{function.name}"\x1b[0m to avoid hitting the action limit in block \x1b[38;2;0;255;0m"{self.get_name()}"\x1b[0m'
         )
 
+    def should_fix_action_limits(self) -> bool:
+        return True
+
     def finalize(self, container: 'Container', index: int) -> None:
         self.maybe_run_callback()
         container.finalize_expressions(self.expressions)
-        self.fix_action_limits(container, index)
+        if self.should_fix_action_limits():
+            self.fix_action_limits(container, index)
 
     def execute_all_expressions(self, context: 'ExecutionContext') -> None:
         from .execute.signal import ExitSignal, PauseSignal
