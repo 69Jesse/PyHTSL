@@ -11,6 +11,7 @@ from .condition import Condition
 if TYPE_CHECKING:
     from ...checkable import Checkable
     from ...execute.context import ExecutionContext
+    from ...stats.stat import Stat
 
 
 __all__ = (
@@ -69,6 +70,12 @@ class ComparisonCondition[LeftT: 'Checkable', RightT: 'Checkable | HousingType']
             line += f' {fallback_value}'
 
         return line
+
+    def _set_stat(self, key: str, value: 'Stat') -> None:
+        from ..binary_expression import BinaryExpression
+
+        setattr(self, key, value)
+        BinaryExpression.fix_type_compatibility(self)
 
     def cloned_raw(self) -> Self:
         return self.__class__(

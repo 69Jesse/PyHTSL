@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from collections.abc import Callable, Generator
 from typing import TYPE_CHECKING, Self, final
 
 from ...base_object import BaseObject
@@ -9,6 +10,7 @@ if TYPE_CHECKING:
     from ...checkable import Checkable
     from ...execute.context import ExecutionContext
     from ...expression.housing_type import HousingType
+    from ...stats.stat import Stat
 
 
 __all__ = ('Condition',)
@@ -69,3 +71,15 @@ class Condition(BaseObject):
 
     def finalize(self, container: Container) -> None:
         self.into_htsl()
+
+    def _set_stat(self, key: str, value: 'Stat') -> None:
+        setattr(self, key, value)
+
+    def get_all_stats_used(
+        self,
+    ) -> Generator[tuple['Stat', Callable[['Stat'], None]], None, None]:
+        from ...stats.stat import Stat
+
+        for key, value in vars(self).items():
+            if isinstance(value, Stat):
+                yield (value, lambda new, _k=key: self._set_stat(_k, new))

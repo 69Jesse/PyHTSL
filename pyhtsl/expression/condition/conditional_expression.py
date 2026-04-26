@@ -1,4 +1,4 @@
-from collections.abc import Generator
+from collections.abc import Callable, Generator
 from enum import Enum
 from typing import TYPE_CHECKING, Self, final
 
@@ -8,6 +8,7 @@ from ..expression import Expression
 
 if TYPE_CHECKING:
     from ...execute.context import ExecutionContext
+    from ...stats.stat import Stat
     from .condition import Condition
 
 
@@ -104,6 +105,13 @@ class ConditionalExpression(Expression):
             yield from expr.walk_expressions()
         for expr in self.else_expressions:
             yield from expr.walk_expressions()
+
+    def get_all_stats_used(
+        self,
+    ) -> Generator[tuple['Stat', Callable[['Stat'], None]], None, None]:
+        yield from super().get_all_stats_used()
+        for cond in self.conditions:
+            yield from cond.get_all_stats_used()
 
     def __repr__(self) -> str:
         return f'If<{self.mode.name}, conditions={len(self.conditions)}, if_exprs={len(self.if_expressions)}, else_exprs={len(self.else_expressions)}>'

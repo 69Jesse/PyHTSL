@@ -285,7 +285,7 @@ class BinaryExpression[
         numbers_already_used: set[int] = set()
         for expression in expressions:
             for expr in expression.walk_expressions():
-                for stat in expr.get_all_stats_used().values():
+                for stat, _ in expr.get_all_stats_used():
                     if isinstance(stat, TemporaryStat):
                         continue
                     number = TemporaryStat.extract_number_from_name(stat.name)
@@ -296,7 +296,7 @@ class BinaryExpression[
         temp_stats: dict[int, list[TemporaryStat]] = {}
         for expression in expressions:
             for expr in expression.walk_expressions():
-                for stat in expr.get_all_stats_used().values():
+                for stat, _ in expr.get_all_stats_used():
                     if not isinstance(stat, TemporaryStat):
                         continue
                     temp_stats.setdefault(stat.number, []).append(stat)
@@ -422,7 +422,10 @@ class BinaryExpression[
                 return value.into_string_rhs()
             return housing_type_as_rhs(value)
 
-        def into_line(expr: AssignmentExpression) -> str:
+        def into_line(expr: Expression) -> str:
+            if not isinstance(expr, BinaryExpression):
+                return expr.into_htsl()
+
             line = f'{expr.left.into_string_lhs()} {expr.operator.value} {format_rhs(expr.right)}'
 
             if isinstance(expr.left, Stat):
@@ -430,7 +433,7 @@ class BinaryExpression[
 
             return line
 
-        return '\n'.join(map(into_line, self.into_executable_expressions()))  # type: ignore
+        return '\n'.join(map(into_line, self.into_executable_expressions()))
 
     def cloned_raw(self) -> Self:
         return self.__class__(

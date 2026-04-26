@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from collections.abc import Generator
+from collections.abc import Callable, Generator
 from typing import TYPE_CHECKING, Any, final
 
 from ..base_object import BaseObject
@@ -41,17 +41,17 @@ class Expression(BaseObject):
     def _get_all_values(self) -> dict[str, Any]:
         return vars(self)
 
-    def get_all_stats_used(self) -> dict[str, 'Stat']:
+    def get_all_stats_used(
+        self,
+    ) -> Generator[tuple['Stat', Callable[['Stat'], None]], None, None]:
         from ..stats.stat import Stat
 
-        stats: dict[str, Stat] = {}
         for key, value in self._get_all_values().items():
             if isinstance(value, Stat):
-                stats[key] = value
-        return stats
+                yield (value, lambda new, _key=key: setattr(self, _key, new))
 
     def is_using_stat(self, stat: 'Stat') -> bool:
-        return any(s.is_same_stat(stat) for s in self.get_all_stats_used().values())
+        return any(s.is_same_stat(stat) for s, _ in self.get_all_stats_used())
 
     def is_using_stats_together(
         self,
@@ -66,11 +66,12 @@ class Expression(BaseObject):
         new_stat: 'Stat',
     ) -> bool:
         has_changed: bool = False
-        for key, value in self.get_all_stats_used().items():
-            if not value.is_same_stat(old_stat):
-                continue
-            setattr(self, key, new_stat)
-            has_changed = True
+        for expr in self.walk_expressions():
+            for value, setter in expr.get_all_stats_used():
+                if not value.is_same_stat(old_stat):
+                    continue
+                setter(new_stat)
+                has_changed = True
         return has_changed
 
     def walk_expressions(self) -> Generator['Expression', None, None]:
