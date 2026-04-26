@@ -637,7 +637,33 @@ class Checkable(BaseObject):
         return self.__mul__(-1)
 
     def abs(self) -> 'CompoundExpression':
-        raise NotImplementedError  # TODO
+        from .expression.binary_expression import BinaryExpression, BinaryOperator
+        from .expression.compound_expression import CompoundExpression
+        from .expression.condition.conditional_expression import (
+            ConditionalExpression,
+            ConditionalMode,
+        )
+        from .expression.expression import Expression
+        from .stats.temporary_stat import TemporaryStat
+
+        tmp = TemporaryStat(self.internal_type)
+        expressions: list[Expression] = [
+            BinaryExpression(tmp, self, BinaryOperator.Set),
+            ConditionalExpression(
+                conditions=[
+                    ComparisonCondition(
+                        left=tmp,
+                        right=0,
+                        operator=ComparisonOperator.LessThan,
+                    ),
+                ],
+                mode=ConditionalMode.ALL,
+                if_expressions=[
+                    BinaryExpression(tmp, -1, BinaryOperator.Multiply),
+                ],
+            ),
+        ]
+        return CompoundExpression(expressions, tmp)
 
     def __abs__(self) -> 'CompoundExpression':
         return self.abs()
