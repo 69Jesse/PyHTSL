@@ -79,7 +79,7 @@ class AssertExecutionExpression(ExecutionExpression):
         message = (
             f'"{context.get(self.message, output="string")}": ' if self.message else ''
         )
-        if self.mode is ConditionalMode.AND:
+        if self.mode is ConditionalMode.ALL:
             assert len(failed_conditions) == 1
             middle = 'The following condition did not hold: '
         else:
@@ -117,11 +117,11 @@ class AssertExecutionExpression(ExecutionExpression):
 
     def raw_execute(self, context: 'ExecutionContext') -> None:
         conditions = self.flattened_conditions(context)
-        if self.mode == ConditionalMode.AND:
+        if self.mode == ConditionalMode.ALL:
             for condition in conditions:
                 if not condition.evaluate(context):
                     self.throw(context, failed_conditions=[condition])
-        elif self.mode == ConditionalMode.OR:
+        elif self.mode == ConditionalMode.ANY:
             for condition in conditions:
                 if condition.evaluate(context):
                     return

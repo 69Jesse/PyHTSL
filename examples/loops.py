@@ -1,7 +1,7 @@
 # can be replaced with `from pyhtsl import *`
 from pyhtsl import (
     Else,
-    IfAnd,
+    IfAll,
     PlayerStat,
     chat,
 )
@@ -10,7 +10,7 @@ chat('&aChecking for empty teams..')
 # This remains Python, so you can do things like this:
 for letter in ('A', 'B', 'C', 'D', 'E', 'F'):
     stat = PlayerStat(f'team_{letter}_players')
-    with IfAnd(stat == 0):
+    with IfAll(stat == 0):
         chat(f'&eTeam {letter} is empty!')
     with Else:
         chat(f'&aTeam {letter} has {stat} player(s)!')

@@ -168,7 +168,7 @@ def fix_action_limits(
             result.append(expr)
             index += 1
         elif should_wrap:
-            dummy = ConditionalExpression([], ConditionalMode.AND)
+            dummy = ConditionalExpression([], ConditionalMode.ALL)
             if global_counter.would_exceed(dummy):
                 break
 
@@ -186,7 +186,7 @@ def fix_action_limits(
 
             cond = ConditionalExpression(
                 conditions=[],
-                mode=ConditionalMode.AND,
+                mode=ConditionalMode.ALL,
                 if_expressions=group,
             )
             global_counter.increment(cond)
@@ -225,11 +225,11 @@ def fix_action_limits(
                     break
 
             if not placed:
-                dummy = ConditionalExpression([], ConditionalMode.AND)
+                dummy = ConditionalExpression([], ConditionalMode.ALL)
                 if not global_counter.would_exceed(dummy):
                     cond = ConditionalExpression(
                         conditions=[],
-                        mode=ConditionalMode.AND,
+                        mode=ConditionalMode.ALL,
                         if_expressions=[trigger],
                     )
                     global_counter.increment(cond)

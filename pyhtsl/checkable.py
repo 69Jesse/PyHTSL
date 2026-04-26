@@ -488,7 +488,7 @@ class Checkable(BaseObject):
                         operator=ComparisonOperator.LessThan,
                     ),
                 ],
-                mode=ConditionalMode.AND,
+                mode=ConditionalMode.ALL,
                 if_expressions=[
                     BinaryExpression(
                         left=result,

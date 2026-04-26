@@ -2,7 +2,7 @@
 from pyhtsl import (
     Else,
     GlobalStat,
-    IfAnd,
+    IfAll,
     PlayerStat,
     chat,
 )
@@ -19,7 +19,7 @@ chat(f'&aYour EXP has been updated to &6{experience}g')
 level = PlayerStat('level')
 EXP_TO_LEVEL_UP = 100  # Python variable, ! not ! a stat
 
-with IfAnd(experience >= EXP_TO_LEVEL_UP):
+with IfAll(experience >= EXP_TO_LEVEL_UP):
     experience -= EXP_TO_LEVEL_UP
     level += 1
     chat(f'&eYou leveled up to &dLevel {level}&e!')

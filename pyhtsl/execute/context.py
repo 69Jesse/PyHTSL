@@ -318,7 +318,7 @@ class ExecutionContext(Container):
         self.write_or_execute(
             AssertExecutionExpression(
                 conditions,
-                mode=ConditionalMode.AND,
+                mode=ConditionalMode.ALL,
                 message=str(message) if message is not None else None,
             )
         )
@@ -333,7 +333,7 @@ class ExecutionContext(Container):
         self.write_or_execute(
             AssertExecutionExpression(
                 conditions,
-                mode=ConditionalMode.OR,
+                mode=ConditionalMode.ANY,
                 message=str(message) if message is not None else None,
             )
         )

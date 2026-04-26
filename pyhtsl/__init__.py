@@ -50,8 +50,8 @@ from .actions.close_menu import (
     close_menu as close_menu,
 )
 from .actions.conditional.statements import Else as Else
-from .actions.conditional.statements import IfAnd as IfAnd
-from .actions.conditional.statements import IfOr as IfOr
+from .actions.conditional.statements import IfAll as IfAll
+from .actions.conditional.statements import IfAny as IfAny
 from .actions.consume_item import (
     ConsumeItemExpression as ConsumeItemExpression,
 )

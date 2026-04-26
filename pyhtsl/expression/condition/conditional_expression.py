@@ -15,8 +15,8 @@ __all__ = ('ConditionalExpression',)
 
 
 class ConditionalMode(Enum):
-    AND = 'and'
-    OR = 'or'
+    ALL = 'and'
+    ANY = 'or'
 
 
 @final
@@ -111,7 +111,7 @@ class ConditionalExpression(Expression):
     def raw_execute(self, context: 'ExecutionContext') -> None:
         holds = (
             all(cond.evaluate(context) for cond in self.conditions)
-            if self.mode == ConditionalMode.AND
+            if self.mode == ConditionalMode.ALL
             else any(cond.evaluate(context) for cond in self.conditions)
         )
         expressions = self.if_expressions if holds else self.else_expressions

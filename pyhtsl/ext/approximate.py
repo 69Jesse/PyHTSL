@@ -1,6 +1,6 @@
 from typing import Literal, overload
 
-from ..actions.conditional.statements import Else, IfAnd
+from ..actions.conditional.statements import Else, IfAll
 from ..checkable import Checkable
 from ..editable import Editable
 from ..stats.player_stat import PlayerStat
@@ -189,14 +189,14 @@ def approximate_sin_cos(
             x_or_temp2.value = original_x + 90.0
             x_or_temp2.value = x_or_temp2 % 180.0 - 90.0
         else:
-            with IfAnd(x >= 0.0):
+            with IfAll(x >= 0.0):
                 original_x.value = x
             with Else:
                 original_x.value = x + 360.0
             x_or_temp2.value = original_x + 90.0
-            with IfAnd(x_or_temp2 >= 180.0):
+            with IfAll(x_or_temp2 >= 180.0):
                 x_or_temp2.value -= 180.0
-            with IfAnd(x_or_temp2 >= 180.0):
+            with IfAll(x_or_temp2 >= 180.0):
                 x_or_temp2.value -= 270.0
             with Else:
                 x_or_temp2.value -= 90.0
@@ -228,7 +228,7 @@ def approximate_sin_cos(
         assign_to_sin.value += x_or_temp2
 
     if certain_x_in_range != 90:
-        with IfAnd(
+        with IfAll(
             original_x >= 90.0,
             original_x < 270.0,
         ):
