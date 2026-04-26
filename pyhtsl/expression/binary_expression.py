@@ -224,6 +224,17 @@ class BinaryExpression[
 
     @staticmethod
     def take_out_useless_expressions(expressions: list[Expression]) -> None:
+        has_changed = True
+        while has_changed:
+            has_changed = False
+            has_changed |= BinaryExpression._remove_no_op_expressions(expressions)
+            has_changed |= BinaryExpression._merge_identity_set_with_op(expressions)
+            has_changed |= BinaryExpression._fold_consecutive_constant_ops(expressions)
+            has_changed |= BinaryExpression._eliminate_dead_stores(expressions)
+
+    @staticmethod
+    def _remove_no_op_expressions(expressions: list[Expression]) -> bool:
+        has_changed = False
         for i in range(len(expressions) - 1, -1, -1):
             _expression = expressions[i]
 
@@ -239,6 +250,7 @@ class BinaryExpression[
             ):
                 # stat = stat
                 del expressions[i]
+                has_changed = True
 
             elif (
                 (
@@ -251,6 +263,7 @@ class BinaryExpression[
                 # editable += 0
                 # editable -= 0
                 del expressions[i]
+                has_changed = True
 
             elif (
                 (
@@ -263,6 +276,7 @@ class BinaryExpression[
                 # editable *= 1
                 # editable /= 1
                 del expressions[i]
+                has_changed = True
 
             elif (
                 (
@@ -281,6 +295,239 @@ class BinaryExpression[
                 # editable >>= 0
                 # editable >>>= 0
                 del expressions[i]
+                has_changed = True
+
+        return has_changed
+
+    @staticmethod
+    def _is_left_identity_for(operator: BinaryOperator, value: object) -> bool:
+        """`identity OP rhs == rhs` lets us collapse `lhs = identity; lhs OP rhs`."""
+        if operator is BinaryOperator.Increment and isinstance(value, int | float):
+            return value == 0
+        if operator is BinaryOperator.Multiply and isinstance(value, int | float):
+            return value == 1
+        if operator is BinaryOperator.BitwiseOr and isinstance(value, int):
+            return value == 0
+        if operator is BinaryOperator.BitwiseXor and isinstance(value, int):
+            return value == 0
+        if operator is BinaryOperator.BitwiseAnd and isinstance(value, int):
+            return value == -1
+        return False
+
+    @staticmethod
+    def _merge_identity_set_with_op(expressions: list[Expression]) -> bool:
+        """`lhs = identity; lhs OP rhs` -> `lhs = rhs` (covers +, *, |, ^, &)."""
+        has_changed = False
+        i = 0
+        while i < len(expressions) - 1:
+            expr_i = expressions[i]
+            if not (
+                isinstance(expr_i, BinaryExpression)
+                and isinstance(expr_i.left, Stat)
+                and expr_i.operator is BinaryOperator.Set
+                and not expr_i.is_intentional_self_assignment
+            ):
+                i += 1
+                continue
+
+            lhs = expr_i.left
+            init_value = expr_i.right
+
+            j = i + 1
+            merge_target: BinaryExpression[Any, Any] | None = None
+            while j < len(expressions):
+                expr_j = expressions[j]
+                if (
+                    isinstance(expr_j, BinaryExpression)
+                    and isinstance(expr_j.left, Stat)
+                    and expr_j.left.is_same_stat(lhs)
+                    and BinaryExpression._is_left_identity_for(
+                        expr_j.operator, init_value
+                    )
+                ):
+                    merge_target = expr_j
+                    break
+                if expr_j.is_using_stat(lhs):
+                    break
+                j += 1
+
+            if merge_target is None:
+                i += 1
+                continue
+
+            rhs = merge_target.right
+            if isinstance(rhs, Stat):
+                if rhs.is_same_stat(lhs):
+                    i += 1
+                    continue
+                if any(
+                    isinstance(expressions[k], BinaryExpression)
+                    and isinstance(expressions[k].left, Stat)  # type: ignore[union-attr]
+                    and expressions[k].left.is_same_stat(rhs)  # type: ignore[union-attr]
+                    for k in range(i + 1, j)
+                ):
+                    i += 1
+                    continue
+
+            expressions[i] = BinaryExpression(
+                left=lhs,
+                right=rhs,
+                operator=BinaryOperator.Set,
+            )
+            del expressions[j]
+            has_changed = True
+            i += 1
+
+        return has_changed
+
+    @staticmethod
+    def _combine_constant_ops(
+        op_a: BinaryOperator,
+        val_a: int | float,
+        op_b: BinaryOperator,
+        val_b: int | float,
+    ) -> tuple[BinaryOperator, int | float] | None:
+        """Combine two consecutive constant ops on the same lhs into one."""
+        # `lhs = c1; lhs OP c2` -> `lhs = applied(c1, c2)`. Skip Divide because
+        # the result depends on lhs's internal type (long floors, double doesn't).
+        if op_a is BinaryOperator.Set:
+            if op_b is BinaryOperator.Increment:
+                return BinaryOperator.Set, val_a + val_b
+            if op_b is BinaryOperator.Decrement:
+                return BinaryOperator.Set, val_a - val_b
+            if op_b is BinaryOperator.Multiply:
+                return BinaryOperator.Set, val_a * val_b
+            if isinstance(val_a, int) and isinstance(val_b, int):
+                if op_b is BinaryOperator.BitwiseAnd:
+                    return BinaryOperator.Set, val_a & val_b
+                if op_b is BinaryOperator.BitwiseOr:
+                    return BinaryOperator.Set, val_a | val_b
+                if op_b is BinaryOperator.BitwiseXor:
+                    return BinaryOperator.Set, val_a ^ val_b
+                if op_b is BinaryOperator.LeftShift:
+                    return BinaryOperator.Set, val_a << val_b
+                if op_b is BinaryOperator.RightShift:
+                    return BinaryOperator.Set, val_a >> val_b
+            return None
+
+        # Inc/Dec mix arithmetically.
+        if op_a in (BinaryOperator.Increment, BinaryOperator.Decrement) and op_b in (
+            BinaryOperator.Increment,
+            BinaryOperator.Decrement,
+        ):
+            sign_a = 1 if op_a is BinaryOperator.Increment else -1
+            sign_b = 1 if op_b is BinaryOperator.Increment else -1
+            combined = sign_a * val_a + sign_b * val_b
+            if combined >= 0:
+                return BinaryOperator.Increment, combined
+            return BinaryOperator.Decrement, -combined
+
+        if op_a is op_b:
+            if op_a is BinaryOperator.Multiply:
+                return op_a, val_a * val_b
+            if op_a is BinaryOperator.Divide:
+                return op_a, val_a * val_b
+            if op_a in (
+                BinaryOperator.LeftShift,
+                BinaryOperator.RightShift,
+                BinaryOperator.LogicalRightShift,
+            ) and isinstance(val_a, int) and isinstance(val_b, int):
+                return op_a, val_a + val_b
+            if isinstance(val_a, int) and isinstance(val_b, int):
+                if op_a is BinaryOperator.BitwiseAnd:
+                    return op_a, val_a & val_b
+                if op_a is BinaryOperator.BitwiseOr:
+                    return op_a, val_a | val_b
+                if op_a is BinaryOperator.BitwiseXor:
+                    return op_a, val_a ^ val_b
+
+        return None
+
+    @staticmethod
+    def _fold_consecutive_constant_ops(expressions: list[Expression]) -> bool:
+        """`lhs OP1 c1; lhs OP2 c2` -> `lhs OP_combined c_combined` when adjacent."""
+        has_changed = False
+        i = 0
+        while i < len(expressions) - 1:
+            expr_a = expressions[i]
+            expr_b = expressions[i + 1]
+            if not (
+                isinstance(expr_a, BinaryExpression)
+                and isinstance(expr_b, BinaryExpression)
+                and isinstance(expr_a.left, Stat)
+                and isinstance(expr_b.left, Stat)
+                and expr_a.left.is_same_stat(expr_b.left)
+                and isinstance(expr_a.right, int | float)
+                and isinstance(expr_b.right, int | float)
+            ):
+                i += 1
+                continue
+
+            combined = BinaryExpression._combine_constant_ops(
+                expr_a.operator, expr_a.right, expr_b.operator, expr_b.right
+            )
+            if combined is None:
+                i += 1
+                continue
+
+            new_op, new_val = combined
+            expressions[i] = BinaryExpression(
+                left=expr_a.left,
+                right=new_val,
+                operator=new_op,
+            )
+            del expressions[i + 1]
+            has_changed = True
+            # Don't advance; the new expression at i may fold with i+1.
+
+        return has_changed
+
+    @staticmethod
+    def _eliminate_dead_stores(expressions: list[Expression]) -> bool:
+        """`lhs OP a; ... (lhs unread) ...; lhs = b` (b doesn't read lhs) -> drop first.
+
+        Any op that writes to lhs (Set, Increment, Multiply, ...) is dead if the
+        next expression that touches lhs is a full overwrite without reading it.
+        """
+        has_changed = False
+        i = 0
+        while i < len(expressions):
+            expr_i = expressions[i]
+            if not (
+                isinstance(expr_i, BinaryExpression)
+                and isinstance(expr_i.left, Stat)
+                and not expr_i.is_intentional_self_assignment
+            ):
+                i += 1
+                continue
+
+            lhs = expr_i.left
+            is_dead = False
+            for j in range(i + 1, len(expressions)):
+                expr_j = expressions[j]
+                if not expr_j.is_using_stat(lhs):
+                    continue
+                if (
+                    isinstance(expr_j, BinaryExpression)
+                    and isinstance(expr_j.left, Stat)
+                    and expr_j.left.is_same_stat(lhs)
+                    and expr_j.operator is BinaryOperator.Set
+                    and not expr_j.is_intentional_self_assignment
+                    and not (
+                        isinstance(expr_j.right, Stat)
+                        and expr_j.right.is_same_stat(lhs)
+                    )
+                ):
+                    is_dead = True
+                break
+
+            if is_dead:
+                del expressions[i]
+                has_changed = True
+            else:
+                i += 1
+
+        return has_changed
 
     @staticmethod
     def rename_temporary_stats(expressions: list[Expression]) -> None:
