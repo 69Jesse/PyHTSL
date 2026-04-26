@@ -117,6 +117,8 @@ class Container:
         CONTAINERS.pop()
 
     def finalize_expressions(self, expressions: list['Expression']) -> None:
+        from .expression.binary_expression import BinaryExpression
+
         def on_new_expression(expression: 'Expression') -> None:
             nonlocal index
             expressions.insert(index, expression)
@@ -128,6 +130,8 @@ class Container:
                 expression = expressions[index]
                 expression.finalize(self)
                 index -= 1
+
+        BinaryExpression.optimize_binary_expressions(expressions)
 
     def finalize(self) -> None:
         if self.is_finalized:
