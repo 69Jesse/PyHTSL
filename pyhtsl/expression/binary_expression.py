@@ -171,28 +171,30 @@ class BinaryExpression[
             if not isinstance(expr, BinaryExpression):
                 return expr
 
-            if isinstance(expr.left, BinaryExpression):
-                expr.left = minimize(expr.left)
-            if isinstance(expr.right, BinaryExpression):
-                expr.right = minimize(expr.right)
-
-            assert not (
-                isinstance(expr.left, HousingType) and isinstance(expr.left, Checkable)
+            left: Checkable | HousingType = (
+                minimize(expr.left)
+                if isinstance(expr.left, BinaryExpression)
+                else expr.left
+            )
+            right: Checkable | HousingType = (
+                minimize(expr.right)
+                if isinstance(expr.right, BinaryExpression)
+                else expr.right
             )
 
-            internal_type = InternalType.from_value(expr.left)
+            internal_type = InternalType.from_value(left)
             stat = TemporaryStat(internal_type)
             expressions.append(
                 BinaryExpression(
                     left=stat,
-                    right=expr.left,
+                    right=left,
                     operator=BinaryOperator.Set,
                 )
             )
             expressions.append(
                 BinaryExpression(
                     left=stat,
-                    right=expr.right,
+                    right=right,
                     operator=expr.operator,
                     is_intentional_self_assignment=expr.is_intentional_self_assignment,
                 )
