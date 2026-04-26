@@ -158,7 +158,7 @@ class BinaryExpression[
                 binary_object.operator.allowed_types,
             )
 
-    def generate_assignment_expressions(self) -> list[Expression]:
+    def flatten(self) -> list[Expression]:
         expressions: list[Expression] = []
 
         def minimize(
@@ -633,8 +633,9 @@ class BinaryExpression[
         BinaryExpression.take_out_useless_expressions(expressions)
 
     def into_executable_expressions(self) -> Generator[Expression, None, None]:
-        expressions = self.generate_assignment_expressions()
-        self.optimize_binary_expressions(expressions)  # pyright: ignore[reportArgumentType]
+        expressions = self.flatten()
+        self.optimize_binary_expressions(expressions)
+        self.rename_temporary_stats(expressions)
         yield from expressions
 
     def create_temp_stat_and_write(self) -> TemporaryStat:
