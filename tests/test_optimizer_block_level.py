@@ -2,7 +2,6 @@
 
 from pyhtsl import Container, PlayerStat
 
-
 # Adjacent inc/dec across statements collapse
 with Container() as container:
     x = PlayerStat('x').as_long()
@@ -72,9 +71,5 @@ with Container() as container:
     y.value = x  # reads x
     x += 3
 
-expected = (
-    'var "x" += 5 true\n'
-    'var "y" = "%var.player/x 0%L" true\n'
-    'var "x" += 3 true'
-)
+expected = 'var "x" += 5 true\nvar "y" = "%var.player/x 0%L" true\nvar "x" += 3 true'
 assert container.into_htsl() == expected, container.into_htsl()

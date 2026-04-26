@@ -427,11 +427,16 @@ class BinaryExpression[
                 return op_a, val_a * val_b
             if op_a is BinaryOperator.Divide:
                 return op_a, val_a * val_b
-            if op_a in (
-                BinaryOperator.LeftShift,
-                BinaryOperator.RightShift,
-                BinaryOperator.LogicalRightShift,
-            ) and isinstance(val_a, int) and isinstance(val_b, int):
+            if (
+                op_a
+                in (
+                    BinaryOperator.LeftShift,
+                    BinaryOperator.RightShift,
+                    BinaryOperator.LogicalRightShift,
+                )
+                and isinstance(val_a, int)
+                and isinstance(val_b, int)
+            ):
                 return op_a, val_a + val_b
             if isinstance(val_a, int) and isinstance(val_b, int):
                 if op_a is BinaryOperator.BitwiseAnd:

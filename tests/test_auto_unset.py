@@ -2,7 +2,6 @@
 
 from pyhtsl import Container, PlayerStat
 
-
 with Container() as container:
     x = PlayerStat('x', auto_unset=True)
     x.value = 5
@@ -24,8 +23,5 @@ with Container() as container:
     a.value = 1
     b.value = 2
 
-expected = (
-    'var "a" = 1 true\n'
-    'var "b" = 2 false'
-)
+expected = 'var "a" = 1 true\nvar "b" = 2 false'
 assert container.into_htsl() == expected, container.into_htsl()

@@ -1,15 +1,11 @@
 from pyhtsl import Container, PlayerStat
 
-
 with Container() as container:
     x = PlayerStat('x').as_long()
     y = PlayerStat('y').as_long()
     y.value = -x
 
-expected = (
-    'var "y" = "%var.player/x 0%L" true\n'
-    'var "y" *= -1 true'
-)
+expected = 'var "y" = "%var.player/x 0%L" true\nvar "y" *= -1 true'
 assert container.into_htsl() == expected, container.into_htsl()
 
 

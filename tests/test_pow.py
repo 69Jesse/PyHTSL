@@ -1,10 +1,9 @@
 from pyhtsl import Container, PlayerStat
 
-
 # x ** 0 -> integer 1, no expressions written
 with Container() as container:
     x = PlayerStat('x').as_long()
-    result = x ** 0
+    result = x**0
 
 assert result == 1
 assert container.into_htsl() == ''
@@ -13,7 +12,7 @@ assert container.into_htsl() == ''
 # x ** 1 -> x itself, no expressions written when not assigned
 with Container() as container:
     x = PlayerStat('x').as_long()
-    result = x ** 1
+    result = x**1
 
 assert result is x
 
@@ -22,12 +21,9 @@ assert result is x
 with Container() as container:
     x = PlayerStat('x').as_long()
     y = PlayerStat('y').as_long()
-    y.value = x ** 2
+    y.value = x**2
 
-expected = (
-    'var "y" = "%var.player/x 0%L" true\n'
-    'var "y" *= "%var.player/y 0%L" true'
-)
+expected = 'var "y" = "%var.player/x 0%L" true\nvar "y" *= "%var.player/y 0%L" true'
 assert container.into_htsl() == expected, container.into_htsl()
 
 
@@ -35,7 +31,7 @@ assert container.into_htsl() == expected, container.into_htsl()
 with Container() as container:
     x = PlayerStat('x').as_long()
     y = PlayerStat('y').as_long()
-    y.value = x ** 3
+    y.value = x**3
 
 expected = (
     'var "y" = "%var.player/x 0%L" true\n'
@@ -49,7 +45,7 @@ assert container.into_htsl() == expected, container.into_htsl()
 with Container() as container:
     x = PlayerStat('x').as_long()
     y = PlayerStat('y').as_long()
-    y.value = x ** 4
+    y.value = x**4
 
 expected = (
     'var "y" = "%var.player/x 0%L" true\n'
@@ -64,7 +60,7 @@ with Container():
     x = PlayerStat('x').as_long()
     raised = False
     try:
-        x ** -1
+        x**-1
     except ValueError:
         raised = True
     assert raised, 'expected ValueError for negative exponent'

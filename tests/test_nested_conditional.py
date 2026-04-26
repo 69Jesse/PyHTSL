@@ -2,7 +2,6 @@
 
 from pyhtsl import Container, IfAll, PlayerStat, chat
 
-
 with Container() as container:
     x = PlayerStat('x').as_long()
     y = PlayerStat('y').as_long()

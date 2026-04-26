@@ -2,7 +2,6 @@
 
 from pyhtsl import Container, PlayerStat
 
-
 # Increment identity is 0
 with Container() as container:
     x = PlayerStat('x').as_long()
@@ -10,9 +9,9 @@ with Container() as container:
     x.value = 0
     x += y
 
-assert (
-    container.into_htsl() == 'var "x" = "%var.player/y 0%L" true'
-), container.into_htsl()
+assert container.into_htsl() == 'var "x" = "%var.player/y 0%L" true', (
+    container.into_htsl()
+)
 
 
 # Multiply identity is 1
@@ -22,9 +21,9 @@ with Container() as container:
     x.value = 1
     x *= y
 
-assert (
-    container.into_htsl() == 'var "x" = "%var.player/y 0%L" true'
-), container.into_htsl()
+assert container.into_htsl() == 'var "x" = "%var.player/y 0%L" true', (
+    container.into_htsl()
+)
 
 
 # BitwiseOr identity is 0
@@ -34,9 +33,9 @@ with Container() as container:
     x.value = 0
     x |= y
 
-assert (
-    container.into_htsl() == 'var "x" = "%var.player/y 0%L" true'
-), container.into_htsl()
+assert container.into_htsl() == 'var "x" = "%var.player/y 0%L" true', (
+    container.into_htsl()
+)
 
 
 # BitwiseXor identity is 0
@@ -46,9 +45,9 @@ with Container() as container:
     x.value = 0
     x ^= y
 
-assert (
-    container.into_htsl() == 'var "x" = "%var.player/y 0%L" true'
-), container.into_htsl()
+assert container.into_htsl() == 'var "x" = "%var.player/y 0%L" true', (
+    container.into_htsl()
+)
 
 
 # BitwiseAnd identity is -1 (all bits set)
@@ -58,9 +57,9 @@ with Container() as container:
     x.value = -1
     x &= y
 
-assert (
-    container.into_htsl() == 'var "x" = "%var.player/y 0%L" true'
-), container.into_htsl()
+assert container.into_htsl() == 'var "x" = "%var.player/y 0%L" true', (
+    container.into_htsl()
+)
 
 
 # Non-identity init -> no merge (constant fold takes over instead)

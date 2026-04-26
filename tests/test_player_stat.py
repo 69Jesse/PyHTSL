@@ -1,6 +1,5 @@
 from pyhtsl import Container, PlayerStat
 
-
 with Container() as container:
     x = PlayerStat('x')
     x.value = 5

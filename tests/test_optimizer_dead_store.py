@@ -2,7 +2,6 @@
 
 from pyhtsl import Container, PlayerStat
 
-
 # Set followed by Set: first is dead
 with Container() as container:
     x = PlayerStat('x').as_long()
@@ -38,11 +37,7 @@ with Container() as container:
     y.value = x  # reads x; the earlier x = 5 is now alive
     x.value = 10
 
-expected = (
-    'var "x" = 5 true\n'
-    'var "y" = "%var.player/x 0%L" true\n'
-    'var "x" = 10 true'
-)
+expected = 'var "x" = 5 true\nvar "y" = "%var.player/x 0%L" true\nvar "x" = 10 true'
 assert container.into_htsl() == expected, container.into_htsl()
 
 

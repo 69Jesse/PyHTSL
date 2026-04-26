@@ -1,6 +1,5 @@
 from pyhtsl import Container, PlayerStat
 
-
 with Container() as container:
     s = PlayerStat('name').as_string()
     s.value = 'Alice'
@@ -35,6 +34,6 @@ with Container() as container:
     # cross-type: assigning long-stat to double-stat reads it via fallback "0"
     other.value = long
 
-assert (
-    container.into_htsl() == 'var "b" = "%var.player/a 0.0%D" true'
-), container.into_htsl()
+assert container.into_htsl() == 'var "b" = "%var.player/a 0.0%D" true', (
+    container.into_htsl()
+)

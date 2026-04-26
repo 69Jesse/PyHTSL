@@ -1,6 +1,5 @@
 from pyhtsl import Container, PlayerStat
 
-
 with Container() as container:
     x = PlayerStat('x').as_long()
     y = PlayerStat('y').as_long()

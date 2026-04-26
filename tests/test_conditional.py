@@ -1,6 +1,5 @@
 from pyhtsl import Container, Else, IfAll, IfAny, PlayerStat, chat
 
-
 # IfAll with multiple conditions
 with Container() as container:
     x = PlayerStat('x').as_long()
@@ -9,9 +8,7 @@ with Container() as container:
         chat('both')
 
 assert container.into_htsl() == (
-    'if and (var "x" > 0 0, var "y" < 10 0) {\n'
-    '    chat "both"\n'
-    '}'
+    'if and (var "x" > 0 0, var "y" < 10 0) {\n    chat "both"\n}'
 ), container.into_htsl()
 
 
@@ -22,9 +19,7 @@ with Container() as container:
         chat('one or two')
 
 assert container.into_htsl() == (
-    'if or (var "x" == 1 0, var "x" == 2 0) {\n'
-    '    chat "one or two"\n'
-    '}'
+    'if or (var "x" == 1 0, var "x" == 2 0) {\n    chat "one or two"\n}'
 ), container.into_htsl()
 
 
@@ -50,11 +45,9 @@ with Container() as container:
     with IfAny():
         chat('always')
 
-assert container.into_htsl() == (
-    'if and () {\n'
-    '    chat "always"\n'
-    '}'
-), container.into_htsl()
+assert container.into_htsl() == ('if and () {\n    chat "always"\n}'), (
+    container.into_htsl()
+)
 
 
 # IfAny with no conditions and all_if_no_conditions=False -> "or ()"
@@ -62,11 +55,9 @@ with Container() as container:
     with IfAny(all_if_no_conditions=False):
         chat('never')
 
-assert container.into_htsl() == (
-    'if or () {\n'
-    '    chat "never"\n'
-    '}'
-), container.into_htsl()
+assert container.into_htsl() == ('if or () {\n    chat "never"\n}'), (
+    container.into_htsl()
+)
 
 
 # Else without preceding If raises
