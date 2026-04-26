@@ -132,6 +132,18 @@ class ExecutionContext(Container):
     ) -> BackendType | None:
         return self.checkable_mapping.get(key.into_hashable(), default)
 
+    def get_raw(
+        self,
+        key: Checkable,
+        *,
+        default: HousingType | None = None,
+    ) -> HousingType:
+        if default is None:
+            default = key.internal_type.default_housing_type()
+            if default is None:
+                default = ''
+        return into_housing_type(self._get_raw(key, default=into_backend_type(default)))
+
     def _yield(
         self,
         result: BackendType,
@@ -311,8 +323,8 @@ class ExecutionContext(Container):
     def assert_all(
         self,
         *conditions: Condition
-        | Callable[[], Condition]
-        | Callable[['ExecutionContext'], Condition],
+        | Callable[[], Condition | None]
+        | Callable[['ExecutionContext'], Condition | None],
         message: object = None,
     ) -> None:
         self.write_or_execute(
@@ -326,8 +338,8 @@ class ExecutionContext(Container):
     def assert_any(
         self,
         *conditions: Condition
-        | Callable[[], Condition]
-        | Callable[['ExecutionContext'], Condition],
+        | Callable[[], Condition | None]
+        | Callable[['ExecutionContext'], Condition | None],
         message: object = None,
     ) -> None:
         self.write_or_execute(

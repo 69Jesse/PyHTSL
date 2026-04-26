@@ -20,7 +20,7 @@ from ..execute.exception import (
 from ..internal_type import InternalType
 from ..logger import log
 from ..stats.stat import Stat
-from ..stats.temporary_stat import TemporaryStat
+from ..stats.temporary_stat import Number, TemporaryStat
 from .compound_expression import CompoundExpression
 from .condition.comparison_condition import ComparisonCondition
 from .expression import Expression
@@ -165,8 +165,8 @@ class BinaryExpression[
             expr: BinaryExpression[Any, Any] | Checkable | HousingType,
         ) -> Checkable | HousingType:
             if isinstance(expr, CompoundExpression):
-                expressions.extend(expr.expressions)
-                return expr.result
+                expressions.extend(e.cloned() for e in expr.expressions)
+                return expr.result.cloned()
 
             if not isinstance(expr, BinaryExpression):
                 return expr
@@ -536,32 +536,28 @@ class BinaryExpression[
 
     @staticmethod
     def rename_temporary_stats(expressions: list[Expression]) -> None:
-        numbers_already_used: set[int] = set()
+        reserved: set[int] = set()
+        first_uses: list[TemporaryStat] = []
+        seen: set[Number] = set()
         for expression in expressions:
             for expr in expression.walk_expressions():
                 for stat, _ in expr.get_all_stats_used():
                     if isinstance(stat, TemporaryStat):
-                        continue
-                    number = TemporaryStat.extract_number_from_name(stat.name)
-                    if number is not None:
-                        numbers_already_used.add(number)
+                        if stat._number not in seen:
+                            seen.add(stat._number)
+                            first_uses.append(stat)
+                    else:
+                        n = TemporaryStat.extract_number_from_name(stat.name)
+                        if n is not None:
+                            reserved.add(n)
 
-        # TODO does these lists ever have more than 1? idk
-        temp_stats: dict[int, list[TemporaryStat]] = {}
-        for expression in expressions:
-            for expr in expression.walk_expressions():
-                for stat, _ in expr.get_all_stats_used():
-                    if not isinstance(stat, TemporaryStat):
-                        continue
-                    temp_stats.setdefault(stat.number, []).append(stat)
-
-        new_number = 0
-        for stats in temp_stats.values():
-            while new_number in numbers_already_used:
-                new_number += 1
-            numbers_already_used.add(new_number)
-            for stat in stats:
-                stat.number = new_number
+        next_number = 0
+        for stat in first_uses:
+            while next_number in reserved:
+                next_number += 1
+            reserved.add(next_number)
+            stat.number = next_number
+            next_number += 1
 
     @staticmethod
     def optimize_binary_expressions(expressions: list[Expression]) -> None:
@@ -834,7 +830,9 @@ class BinaryExpression[
 
     def raw_execute(self, context: 'ExecutionContext') -> None:
         for expr in self.into_executable_expressions():
-            assert isinstance(expr, BinaryExpression)
+            if not isinstance(expr, BinaryExpression):
+                expr.execute(context)
+                continue
             expr = expr.into_assignment_expression()
             if context.verbose:
                 log(

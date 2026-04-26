@@ -15,7 +15,9 @@ __all__ = ('AssertExecutionExpression',)
 
 class AssertExecutionExpression(ExecutionExpression):
     conditions: tuple[
-        Condition | Callable[[], Condition] | Callable[['ExecutionContext'], Condition],
+        Condition
+        | Callable[[], Condition | None]
+        | Callable[['ExecutionContext'], Condition | None],
         ...,
     ]
     mode: ConditionalMode
@@ -25,8 +27,8 @@ class AssertExecutionExpression(ExecutionExpression):
         self,
         conditions: tuple[
             Condition
-            | Callable[[], Condition]
-            | Callable[['ExecutionContext'], Condition],
+            | Callable[[], Condition | None]
+            | Callable[['ExecutionContext'], Condition | None],
             ...,
         ],
         *,
@@ -109,6 +111,8 @@ class AssertExecutionExpression(ExecutionExpression):
                     raise ValueError(
                         f'Callable conditions must take 0 or 1 arguments, got {cond.__code__.co_argcount}'
                     )
+                if cond is None:
+                    continue
             if isinstance(cond, AssertExecutionExpression) and cond.mode == self.mode:
                 flattened.extend(cond.flattened_conditions(context))
             else:

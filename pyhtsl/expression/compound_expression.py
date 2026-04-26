@@ -35,7 +35,7 @@ class CompoundExpression(Expression, Editable):
         from .binary_expression import BinaryExpression
 
         expressions = [expr.cloned() for expr in self.expressions]
-        BinaryExpression.optimize_binary_expressions(expressions)  # pyright: ignore[reportArgumentType]
+        BinaryExpression.optimize_binary_expressions(expressions)
         BinaryExpression.rename_temporary_stats(expressions)
         yield from expressions
 
