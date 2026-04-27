@@ -164,18 +164,6 @@ class ExecutionContext(Container):
             return result
         return into_housing_type(result)
 
-    def _substitute_single_placeholder(
-        self,
-        placeholder: str,
-        *,
-        default: BackendType,
-    ) -> BackendType | None:
-        for pattern, factory in Checkable.iter_pattern_factories():
-            match = pattern.fullmatch(placeholder)
-            if match is not None:
-                return self._get_raw(factory(match), default=default)
-        return None
-
     def _substitute_all_placeholders(self, text: str) -> str:
         for pattern, factory in Checkable.iter_pattern_factories():
 
@@ -213,11 +201,23 @@ class ExecutionContext(Container):
         return None
 
     def _substitute(self, key: str, *, default: BackendType) -> BackendType:
-        if (
-            value := self._substitute_single_placeholder(key, default=default)
-        ) is not None:
-            return value
-        return self._substitute_all_placeholders(key)
+        seen: set[str] = set()
+        while key not in seen:
+            seen.add(key)
+            matched = False
+            for pattern, factory in Checkable.iter_pattern_factories():
+                match = pattern.fullmatch(key)
+                if match is None:
+                    continue
+                value = self._get_raw(factory(match), default=default)
+                if not isinstance(value, str):
+                    return value
+                key = value
+                matched = True
+                break
+            if not matched:
+                return self._substitute_all_placeholders(key)
+        return key
 
     @overload
     def get(
@@ -284,11 +284,7 @@ class ExecutionContext(Container):
             warn(
                 'Putting values into the context should be done BEFORE writing any expressions, since this line is ALWAYS ran, even, for example, if it looks like it is behind a condition that may not hold.',
             )
-
-        value = into_backend_type(value)
-        if isinstance(value, str):
-            value = self.get(value, output='backend')
-        self.checkable_mapping[key.into_hashable()] = value
+        self.checkable_mapping[key.into_hashable()] = into_backend_type(value)
 
     def pop(self, key: Checkable) -> None:
         self.checkable_mapping.pop(key.into_hashable(), None)
