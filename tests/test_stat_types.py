@@ -37,3 +37,57 @@ with Container() as container:
 assert container.into_htsl() == 'var "b" = "%var.player/a 0.0%D" true', (
     container.into_htsl()
 )
+
+
+# Same-type stat-to-stat assignment, ANY: bare placeholder (no quotes, no
+# fallback shown). HTSL evaluates this in native mode, so the rhs reads as a
+# direct stat reference rather than a string template.
+with Container() as container:
+    a = PlayerStat('a')
+    b = PlayerStat('b')
+    b.value = a
+
+assert container.into_htsl() == 'var "b" = %var.player/a% true', container.into_htsl()
+
+
+# Python-`str` rhs that happens to be a placeholder: `housing_type_as_rhs`
+# wraps it in quotes, signalling string-mode to HTSL — which substitutes and
+# casts at evaluation time. Compare to the bare form above.
+with Container() as container:
+    a = PlayerStat('a')
+    c = PlayerStat('c')
+    c.value = f'{a}'
+
+assert container.into_htsl() == 'var "c" = "%var.player/a%" true', container.into_htsl()
+
+
+# Same-type stat-to-stat with explicit numeric types: `into_string_rhs` adds
+# the type-tagged form (`L` / `D`) inside quotes so HTSL parses through the
+# matching backend type.
+with Container() as container:
+    a = PlayerStat('a').as_long()
+    b = PlayerStat('b').as_long()
+    b.value = a
+
+assert container.into_htsl() == 'var "b" = "%var.player/a 0%L" true', (
+    container.into_htsl()
+)
+
+
+with Container() as container:
+    a = PlayerStat('a').as_double()
+    b = PlayerStat('b').as_double()
+    b.value = a
+
+assert container.into_htsl() == 'var "b" = "%var.player/a 0.0%D" true', (
+    container.into_htsl()
+)
+
+
+# Same-type STRING-to-STRING: quoted placeholder, no L/D suffix.
+with Container() as container:
+    a = PlayerStat('a').as_string()
+    b = PlayerStat('b').as_string()
+    b.value = a
+
+assert container.into_htsl() == 'var "b" = "%var.player/a%" true', container.into_htsl()
