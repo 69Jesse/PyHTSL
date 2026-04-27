@@ -298,7 +298,7 @@ class ExecutionContext(Container):
         *,
         ignore_warning: bool = False,
     ) -> None:
-        if not ignore_warning and len(self.blocks) > 0:
+        if not ignore_warning and any(not block.is_empty() for block in self.blocks):
             warn(
                 'Putting values into the context should be done BEFORE writing any expressions, since this line is ALWAYS ran, even, for example, if it looks like it is behind a condition that may not hold.',
             )
