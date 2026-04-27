@@ -1,6 +1,6 @@
 import re
 from abc import abstractmethod
-from collections.abc import Callable
+from collections.abc import Callable, Generator
 from typing import TYPE_CHECKING, ClassVar, Literal, Self, final, overload
 
 from .actions.no_type_casting import no_type_casting
@@ -43,6 +43,28 @@ class Checkable(BaseObject):
             )
         cls.pattern = pattern
         cls.pattern_factory = pattern_factory
+
+    @classmethod
+    def _iter_subclasses(cls) -> Generator[type['Checkable'], None, None]:
+        yield cls
+        for sub in cls.__subclasses__():
+            yield from sub._iter_subclasses()
+
+    @classmethod
+    def iter_pattern_factories(
+        cls,
+    ) -> Generator[
+        tuple[re.Pattern[str], Callable[[re.Match[str]], 'Checkable']], None, None
+    ]:
+        for sub in cls._iter_subclasses():
+            if sub.pattern is not None and sub.pattern_factory is not None:
+                yield sub.pattern, sub.pattern_factory
+
+    @classmethod
+    def iter_in_string(cls, text: str) -> Generator['Checkable', None, None]:
+        for pattern, factory in cls.iter_pattern_factories():
+            for match in pattern.finditer(text):
+                yield factory(match)
 
     internal_type: InternalType = InternalType.ANY
     fallback_value: HousingType | None

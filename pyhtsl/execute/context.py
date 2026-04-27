@@ -1,6 +1,6 @@
 import re
 import time
-from collections.abc import Callable, Generator
+from collections.abc import Callable
 from types import TracebackType
 from typing import Literal, overload
 
@@ -164,34 +164,20 @@ class ExecutionContext(Container):
             return result
         return into_housing_type(result)
 
-    def _walk_subclasses[T](self, cls: type[T]) -> Generator[type[T], None, None]:
-        yield cls
-        for subclass in cls.__subclasses__():
-            yield from self._walk_subclasses(subclass)
-
-    def _placeholders_and_factories(
-        self,
-    ) -> list[tuple[re.Pattern[str], Callable[[re.Match[str]], Checkable]]]:
-        result: list[tuple[re.Pattern[str], Callable[[re.Match[str]], Checkable]]] = []
-        for cls in self._walk_subclasses(Checkable):
-            if cls.pattern is not None and cls.pattern_factory is not None:
-                result.append((cls.pattern, cls.pattern_factory))
-        return result
-
     def _substitute_single_placeholder(
         self,
         placeholder: str,
         *,
         default: BackendType,
     ) -> BackendType | None:
-        for pattern, factory in self._placeholders_and_factories():
+        for pattern, factory in Checkable.iter_pattern_factories():
             match = pattern.fullmatch(placeholder)
             if match is not None:
                 return self._get_raw(factory(match), default=default)
         return None
 
     def _substitute_all_placeholders(self, text: str) -> str:
-        for pattern, factory in self._placeholders_and_factories():
+        for pattern, factory in Checkable.iter_pattern_factories():
 
             def replace_placeholder(match: re.Match[str]) -> str:
                 value = self._get_raw(factory(match), default='')  # noqa: B023
@@ -202,7 +188,7 @@ class ExecutionContext(Container):
         return text
 
     def _has_any_placeholders(self, text: str) -> bool:
-        for pattern, _ in self._placeholders_and_factories():
+        for pattern, _ in Checkable.iter_pattern_factories():
             if pattern.search(text) is not None:
                 return True
         return False
