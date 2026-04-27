@@ -13,10 +13,7 @@ with ExecutionContext() as ctx:
     x = PlayerStat('x').as_long()
     ctx.put(x, 42)
 
-    def check() -> None:
-        assert int(ctx.get(x)) == 42, ctx.get(x)
-
-    ctx.assert_all(check)
+assert int(ctx.get(x)) == 42, ctx.get(x)
 
 
 # put/get round-trip for double (use get_raw to avoid the simulator's 3-decimal
@@ -25,10 +22,7 @@ with ExecutionContext() as ctx:
     d = PlayerStat('d').as_double()
     ctx.put(d, 3.14159)
 
-    def check() -> None:
-        assert float(ctx.get_raw(d)) == 3.14159, ctx.get_raw(d)
-
-    ctx.assert_all(check)
+assert float(ctx.get_raw(d)) == 3.14159, ctx.get_raw(d)
 
 
 # put/get round-trip for string
@@ -36,32 +30,22 @@ with ExecutionContext() as ctx:
     s = PlayerStat('s').as_string()
     ctx.put(s, 'hello')
 
-    def check() -> None:
-        assert str(ctx.get(s)) == 'hello', ctx.get(s)
-
-    ctx.assert_all(check)
+assert str(ctx.get(s)) == 'hello', ctx.get(s)
 
 
 # Stat that wasn't put returns its default fallback (long: 0)
 with ExecutionContext() as ctx:
     x = PlayerStat('x').as_long()
 
-    def check() -> None:
-        assert int(ctx.get(x)) == 0, ctx.get(x)
-
-    ctx.assert_all(check)
+assert int(ctx.get(x)) == 0, ctx.get(x)
 
 
-# `with_fallback(N)` is honored by both `get` and `get_raw` when the stat hasn't
-# been put — mirrors HTSL's `%var.player/x N%` semantics.
+# `with_fallback(N)` is honored by both `get` and `get_raw` when the stat hasn't been set
 with ExecutionContext() as ctx:
     x = PlayerStat('x').as_long().with_fallback(42)
 
-    def check() -> None:
-        assert int(ctx.get(x)) == 42, ctx.get(x)
-        assert int(ctx.get_raw(x)) == 42, ctx.get_raw(x)
-
-    ctx.assert_all(check)
+assert int(ctx.get(x)) == 42, ctx.get(x)
+assert int(ctx.get_raw(x)) == 42, ctx.get_raw(x)
 
 
 # `ctx.put` overrides the fallback.
@@ -69,10 +53,7 @@ with ExecutionContext() as ctx:
     x = PlayerStat('x').as_long().with_fallback(42)
     ctx.put(x, 7)
 
-    def check() -> None:
-        assert int(ctx.get(x)) == 7, ctx.get(x)
-
-    ctx.assert_all(check)
+assert int(ctx.get(x)) == 7, ctx.get(x)
 
 
 # Arithmetic propagates through execution
@@ -82,10 +63,7 @@ with ExecutionContext() as ctx:
     ctx.put(x, 10)
     y.value = x + 5
 
-    def check() -> None:
-        assert int(ctx.get(y)) == 15, ctx.get(y)
-
-    ctx.assert_all(check)
+assert int(ctx.get(y)) == 15, ctx.get(y)
 
 
 # GlobalStat works in execution too
@@ -93,10 +71,7 @@ with ExecutionContext() as ctx:
     g = GlobalStat('shared').as_long()
     ctx.put(g, 7)
 
-    def check() -> None:
-        assert int(ctx.get(g)) == 7, ctx.get(g)
-
-    ctx.assert_all(check)
+assert int(ctx.get(g)) == 7, ctx.get(g)
 
 
 # Conditional execution: branch is taken when the condition holds
@@ -108,10 +83,7 @@ with ExecutionContext() as ctx:
         y.value = 1
     # else: y stays at 0
 
-    def check() -> None:
-        assert int(ctx.get(y)) == 1, ctx.get(y)
-
-    ctx.assert_all(check)
+assert int(ctx.get(y)) == 1, ctx.get(y)
 
 
 # Conditional execution: branch is skipped when the condition fails
@@ -122,10 +94,7 @@ with ExecutionContext() as ctx:
     with IfAll(x > 5):
         y.value = 1
 
-    def check() -> None:
-        assert int(ctx.get(y)) == 0, ctx.get(y)
-
-    ctx.assert_all(check)
+assert int(ctx.get(y)) == 0, ctx.get(y)
 
 
 # Failing assert raises AssertionError that escapes the context manager
@@ -152,7 +121,7 @@ with ExecutionContext() as ctx:
     x = PlayerStat('x').as_long()
     ctx.put(x, 5)
 
-    def maybe_check() -> None:  # type: ignore[no-untyped-def]
+    def maybe_check() -> None:
         return None  # callable returns None, condition is discarded
 
     # Vacuously passes since the only condition is discarded.

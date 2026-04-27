@@ -9,10 +9,7 @@ with ExecutionContext() as ctx:
     ctx.put(x, 1.234567)
     round_double(x, 2)
 
-    def check() -> None:
-        assert float(ctx.get_raw(x)) == 1.24, ctx.get_raw(x)
-
-    ctx.assert_all(check)
+assert float(ctx.get_raw(x)) == 1.24, ctx.get_raw(x)
 
 
 # 0.5 rounded to 0 decimals -> 1.0 (rounds via +0.5 then truncate)
@@ -21,10 +18,7 @@ with ExecutionContext() as ctx:
     ctx.put(x, 0.5)
     round_double(x, 0)
 
-    def check() -> None:
-        assert float(ctx.get_raw(x)) == 1.0, ctx.get_raw(x)
-
-    ctx.assert_all(check)
+assert float(ctx.get_raw(x)) == 1.0, ctx.get_raw(x)
 
 
 # Result is close to the expected mathematical rounding (within 0.001 of round
@@ -35,11 +29,7 @@ with ExecutionContext() as ctx:
     ctx.put(x, 3.14159)
     round_double(x, 2)
 
-    def check() -> None:
-        actual = float(ctx.get_raw(x))
-        assert abs(actual - 3.14) < 0.01, actual
-
-    ctx.assert_all(check)
+assert abs(float(ctx.get_raw(x)) - 3.14) < 0.01, ctx.get_raw(x)
 
 
 with ExecutionContext() as ctx:
@@ -47,11 +37,7 @@ with ExecutionContext() as ctx:
     ctx.put(x, 7.0)
     round_double(x, 3)
 
-    def check() -> None:
-        actual = float(ctx.get_raw(x))
-        assert abs(actual - 7.0) < 0.001, actual
-
-    ctx.assert_all(check)
+assert abs(float(ctx.get_raw(x)) - 7.0) < 0.001, ctx.get_raw(x)
 
 
 # Sanity: round_double also produces valid HTSL (compile-only)

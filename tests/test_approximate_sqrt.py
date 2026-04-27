@@ -14,15 +14,10 @@ def assert_sqrt_close(v: float) -> None:
         ctx.put(x, v)
         approximate_sqrt(x, assign_to=result)
 
-        def check() -> None:
-            actual = float(ctx.get_raw(result))
-            expected = math.sqrt(v)
-            err = abs(actual - expected)
-            assert err < 0.01, (
-                f'sqrt({v}): got {actual}, expected {expected}, err={err}'
-            )
-
-        ctx.assert_all(check)
+    actual = float(ctx.get_raw(result))
+    expected = math.sqrt(v)
+    err = abs(actual - expected)
+    assert err < 0.01, f'sqrt({v}): got {actual}, expected {expected}, err={err}'
 
 
 for _ in range(20):

@@ -25,21 +25,18 @@ def assert_sin_cos_close(
             certain_x_in_range=certain_x_in_range,
         )  # type: ignore
 
-        def check() -> None:
-            actual_sin = float(ctx.get_raw(sin_out))
-            actual_cos = float(ctx.get_raw(cos_out))
-            expected_sin = math.sin(math.radians(deg))
-            expected_cos = math.cos(math.radians(deg))
-            err_sin = abs(actual_sin - expected_sin)
-            err_cos = abs(actual_cos - expected_cos)
-            assert err_sin < 0.02, (
-                f'sin({deg}): got {actual_sin}, expected {expected_sin}, err={err_sin}'
-            )
-            assert err_cos < 0.02, (
-                f'cos({deg}): got {actual_cos}, expected {expected_cos}, err={err_cos}'
-            )
-
-        ctx.assert_all(check)
+    actual_sin = float(ctx.get_raw(sin_out))
+    actual_cos = float(ctx.get_raw(cos_out))
+    expected_sin = math.sin(math.radians(deg))
+    expected_cos = math.cos(math.radians(deg))
+    err_sin = abs(actual_sin - expected_sin)
+    err_cos = abs(actual_cos - expected_cos)
+    assert err_sin < 0.02, (
+        f'sin({deg}): got {actual_sin}, expected {expected_sin}, err={err_sin}'
+    )
+    assert err_cos < 0.02, (
+        f'cos({deg}): got {actual_cos}, expected {expected_cos}, err={err_cos}'
+    )
 
 
 # Within [-90, 90] (no range adjustment needed)
@@ -73,11 +70,8 @@ with ExecutionContext() as ctx:
         cos_sign=-1,
     )
 
-    def check() -> None:
-        actual_sin = float(ctx.get_raw(sin_out))
-        actual_cos = float(ctx.get_raw(cos_out))
-        # With sin_sign=-1 the output approximates -sin(30) = -0.5
-        assert abs(actual_sin - (-math.sin(math.radians(30)))) < 0.02, actual_sin
-        assert abs(actual_cos - (-math.cos(math.radians(30)))) < 0.02, actual_cos
-
-    ctx.assert_all(check)
+# With sin_sign=-1 / cos_sign=-1 the output approximates -sin(30) / -cos(30).
+actual_sin = float(ctx.get_raw(sin_out))
+actual_cos = float(ctx.get_raw(cos_out))
+assert abs(actual_sin - (-math.sin(math.radians(30)))) < 0.02, actual_sin
+assert abs(actual_cos - (-math.cos(math.radians(30)))) < 0.02, actual_cos
