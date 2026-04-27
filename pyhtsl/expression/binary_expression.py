@@ -119,6 +119,12 @@ class BinaryExpression[
     def fix_type_compatibility(
         binary_object: AssignmentExpression | ComparisonCondition,
     ) -> None:
+        if (
+            isinstance(binary_object, BinaryExpression)
+            and binary_object.is_intentional_self_assignment
+        ):
+            return
+
         def raise_type_error(
             side: str,
             value: Checkable | HousingType,

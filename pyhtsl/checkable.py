@@ -419,16 +419,16 @@ class Checkable(BaseObject):
         if self.internal_type is InternalType.DOUBLE:
             expressions.append(
                 BinaryExpression(
-                    left=temporary_stat_1.as_long(),
-                    right=temporary_stat_1,
+                    left=temporary_stat_1,
+                    right=temporary_stat_1.as_long(),
                     operator=BinaryOperator.Set,
                     is_intentional_self_assignment=True,
                 ),
             )
             expressions.append(
                 BinaryExpression(
-                    left=temporary_stat_1.as_double(),
-                    right=temporary_stat_1,
+                    left=temporary_stat_1,
+                    right=temporary_stat_1.as_double(),
                     operator=BinaryOperator.Set,
                     is_intentional_self_assignment=True,
                 ),
