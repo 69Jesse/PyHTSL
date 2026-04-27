@@ -51,11 +51,21 @@ class Expression(BaseObject):
                 yield (value, lambda new, _key=key: setattr(self, _key, new))
 
     def is_using_stat(self, stat: 'Stat') -> bool:
-        return any(
-            s.is_same_stat(stat)
-            for expr in self.walk_expressions()
-            for s, _ in expr.get_all_stats_used()
-        )
+        from ..checkable import Checkable
+        from ..stats.stat import Stat
+
+        for expr in self.walk_expressions():
+            for s, _ in expr.get_all_stats_used():
+                if s.is_same_stat(stat):
+                    return True
+            # Stats can also be referenced by their placeholders inside string fields, kind of hacky but whatever
+            for value in expr._get_all_values().values():
+                if not isinstance(value, str):
+                    continue
+                for ref in Checkable.iter_in_string(value):
+                    if isinstance(ref, Stat) and ref.is_same_stat(stat):
+                        return True
+        return False
 
     def is_using_stats_together(
         self,

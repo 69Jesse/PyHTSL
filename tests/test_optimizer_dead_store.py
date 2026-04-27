@@ -74,3 +74,20 @@ expected = (
     'var "x" = 10 true'
 )
 assert container.into_htsl() == expected, container.into_htsl()
+
+
+# A stat referenced via its rendered placeholder inside a string field also
+# counts as a "use". `chat(f"...{x}...")` embeds `%var.player/x ...%` in the
+# expression's `line` attribute; without scanning string fields,
+# `is_using_stat` would miss it and the dead-store optimizer would wrongly
+# eliminate the prior `x = 5`.
+from pyhtsl import chat  # noqa: E402
+
+with Container() as container:
+    x = PlayerStat('x').as_long()
+    x.value = 5
+    chat(f'value is {x}')
+    x.value = 10
+
+expected = 'var "x" = 5 true\nchat "value is %var.player/x 0%"\nvar "x" = 10 true'
+assert container.into_htsl() == expected, container.into_htsl()
