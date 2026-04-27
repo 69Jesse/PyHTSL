@@ -69,3 +69,30 @@ with Container() as container:
     x += 3
 
 assert container.into_htsl() == 'var "x" = 8 true', container.into_htsl()
+
+
+# A conditional that reads lhs between `lhs = identity` and the OP blocks the
+# merge — `is_using_stat` recurses into `ConditionalExpression`'s body. Without
+# this, the optimizer would silently rewrite `x = 0; if(c) z = x; x += y`
+# into `x = y; if(c) z = x` and the read inside the conditional would observe
+# the post-increment value.
+from pyhtsl import IfAll  # noqa: E402
+
+with Container() as container:
+    x = PlayerStat('x').as_long()
+    y = PlayerStat('y').as_long()
+    z = PlayerStat('z').as_long()
+    cond = PlayerStat('cond').as_long()
+    x.value = 0
+    with IfAll(cond > 0):
+        z.value = x
+    x += y
+
+expected = (
+    'var "x" = 0 true\n'
+    'if and (var "cond" > 0 0) {\n'
+    '    var "z" = "%var.player/x 0%L" true\n'
+    '}\n'
+    'var "x" += "%var.player/y 0%L" true'
+)
+assert container.into_htsl() == expected, container.into_htsl()

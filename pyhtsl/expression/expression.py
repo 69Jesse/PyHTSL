@@ -51,7 +51,11 @@ class Expression(BaseObject):
                 yield (value, lambda new, _key=key: setattr(self, _key, new))
 
     def is_using_stat(self, stat: 'Stat') -> bool:
-        return any(s.is_same_stat(stat) for s, _ in self.get_all_stats_used())
+        return any(
+            s.is_same_stat(stat)
+            for expr in self.walk_expressions()
+            for s, _ in expr.get_all_stats_used()
+        )
 
     def is_using_stats_together(
         self,
