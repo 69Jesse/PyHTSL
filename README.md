@@ -46,19 +46,20 @@ python example.py
 ```
 Will generate the following HTSL code in `example.htsl`:
 ```
-// Generated with PyHTSL https://github.com/69Jesse/PyHTSL
-var temp1 = "%var.player/reward 0.0%D" true
-var temp1 *= "%var.player/multiplier 0.0%D" true
-var temp1 *= "%var.global/multiplier 0.0%D" true
-var experience += "%var.player/temp1 0%L" true
-chat "&eYour EXP has been updated to &a%var.player/experience%&e!"
-if and (var experience >= 100 0) {
-var experience -= 100 true
-var level += 1 true
-chat "&eYou leveled up to &dLevel %var.player/level%&e!"
+var "tmp0" = "%var.player/reward 0.0%D" false
+var "tmp0" *= "%var.player/multiplier 0.0%D" false
+var "tmp0" *= "%var.global/multiplier 0.0%D" false
+var "experience" += "%var.player/tmp0 0%L" true
+
+chat "&eYour EXP has been updated to &a%var.player/experience 0%&e!"
+
+if and (var "experience" >= 100 0) {
+    var "experience" -= 100 true
+    var "level" += 1 true
+    chat "&eYou leveled up to &dLevel %var.player/level 0%&e!"
 } else {
-var temp1 = 100 true
-var temp1 -= "%var.player/experience 0%L" true
-chat "&eOnly &a%var.player/temp1% EXP&e left to level up!"
+    var "tmp0" = 100 false
+    var "tmp0" -= "%var.player/experience 0%L" false
+    chat "&eOnly &a%var.player/tmp0 0% EXP&e left to level up!"
 }
 ```
