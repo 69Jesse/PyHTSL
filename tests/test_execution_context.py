@@ -156,3 +156,25 @@ with ExecutionContext() as ctx:
 assert 'var "result" = %var.player/c%' in ctx.into_htsl(), ctx.into_htsl()
 assert str(ctx.get_raw(c)) == '%var.player/s0%', ctx.get_raw(c)
 assert int(ctx.get_raw(result)) == 5, ctx.get_raw(result)
+
+
+# Stat-to-stat assignment preserves the rhs's native type, but a Python-`str`
+# rhs (which renders to HTSL as quoted, `var "c" = "%var.player/a%"`) routes
+# through string-mode → substitute → cast, so `c.value = f"{a}"` stores long
+# 123 even though `a` is double 123.0.
+with ExecutionContext() as ctx:
+    a = PlayerStat('a').without_auto_unset()
+    a.value = 123.0
+    b = PlayerStat('b').without_auto_unset()
+    b.value = a
+    c = PlayerStat('c').without_auto_unset()
+    c.value = f'{a}'
+
+assert 'var "b" = %var.player/a%' in ctx.into_htsl(), ctx.into_htsl()
+assert 'var "c" = "%var.player/a%"' in ctx.into_htsl(), ctx.into_htsl()
+assert isinstance(ctx.get_raw(b), float), type(ctx.get_raw(b))
+assert ctx.get_raw(b) == 123.0, ctx.get_raw(b)
+assert isinstance(ctx.get_raw(c), int) and not isinstance(ctx.get_raw(c), bool), type(
+    ctx.get_raw(c)
+)
+assert ctx.get_raw(c) == 123, ctx.get_raw(c)

@@ -5,6 +5,7 @@ from typing import Any, NoReturn, Self, final
 
 import numpy as np
 
+from ..actions.no_type_casting import no_type_casting
 from ..checkable import Checkable
 from ..editable import Editable
 from ..execute.backend_type import (
@@ -30,6 +31,13 @@ __all__ = (
     'BinaryOperator',
     'BinaryExpression',
 )
+
+
+def _is_single_placeholder(value: str) -> bool:
+    return any(
+        pattern.fullmatch(value) is not None
+        for pattern, _ in Checkable.iter_pattern_factories()
+    )
 
 
 class BinaryOperator(Enum):
@@ -677,6 +685,12 @@ class BinaryExpression[
         def format_rhs(value: Checkable | HousingType) -> str:
             if isinstance(value, Checkable):
                 return value.into_string_rhs()
+            if (
+                isinstance(value, str)
+                and no_type_casting()
+                and _is_single_placeholder(value)
+            ):
+                return value
             return housing_type_as_rhs(value)
 
         def into_line(expr: Expression) -> str:
@@ -718,9 +732,14 @@ class BinaryExpression[
         context: 'ExecutionContext',
     ) -> None:
         if expression.operator is BinaryOperator.Set:
+            rhs = expression.right
+            if isinstance(rhs, str) and not (
+                no_type_casting() and _is_single_placeholder(rhs)
+            ):
+                rhs = f'"{rhs}"'
             context.put(
                 expression.left,
-                context.get(expression.right, output='backend'),
+                context.get(rhs, output='backend'),
                 ignore_warning=True,
             )
             return

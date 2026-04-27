@@ -117,6 +117,7 @@ class Container:
         CONTAINERS.pop()
 
     def finalize_expressions(self, expressions: list['Expression']) -> None:
+        from .actions.no_optimization import no_optimization
         from .expression.binary_expression import BinaryExpression
 
         def on_new_expression(expression: 'Expression') -> None:
@@ -131,7 +132,8 @@ class Container:
                 expression.finalize(self)
                 index -= 1
 
-        BinaryExpression.optimize_binary_expressions(expressions)
+        if not no_optimization():
+            BinaryExpression.optimize_binary_expressions(expressions)
 
     def finalize(self) -> None:
         if self.is_finalized:
