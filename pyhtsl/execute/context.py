@@ -238,7 +238,6 @@ class ExecutionContext(Container):
         self,
         key: Checkable | HousingType,
         *,
-        default: HousingType | BackendType = ...,
         cast: bool = True,
         output: Literal['regular'] = ...,
     ) -> HousingType: ...
@@ -248,7 +247,6 @@ class ExecutionContext(Container):
         self,
         key: Checkable | HousingType,
         *,
-        default: HousingType | BackendType = ...,
         cast: bool = True,
         output: Literal['backend'],
     ) -> BackendType: ...
@@ -258,7 +256,6 @@ class ExecutionContext(Container):
         self,
         key: Checkable | HousingType,
         *,
-        default: HousingType | BackendType = ...,
         cast: bool = True,
         output: Literal['string'],
     ) -> str: ...
@@ -267,7 +264,6 @@ class ExecutionContext(Container):
         self,
         key: Checkable | HousingType,
         *,
-        default: HousingType | BackendType = '',
         cast: bool = True,
         output: Literal['regular', 'backend', 'string'] = 'regular',
     ) -> HousingType | BackendType | str:
@@ -275,7 +271,7 @@ class ExecutionContext(Container):
             key = key.into_string_rhs()
 
         if isinstance(key, str):
-            value = self._substitute(key, default=into_backend_type(default))
+            value = self._substitute(key, default='')
         else:
             value = into_backend_type(key)
 

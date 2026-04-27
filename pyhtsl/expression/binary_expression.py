@@ -730,21 +730,16 @@ class BinaryExpression[
             if not isinstance(expression.right, Checkable)
             else expression.right.into_string_rhs()
         )
-        left_value = context.get(
-            expression.left,
-            default=backend_to_default_backend(
-                context.get(
-                    right_identifier,
-                    output='backend',
-                )
-            ),
-            output='backend',
-        )
-        right_value = context.get(
-            right_identifier,
-            default=backend_to_default_backend(left_value),
-            output='backend',
-        )
+        left_value = context.get(expression.left, output='backend')
+        right_value = context.get(right_identifier, output='backend')
+
+        # If either operand is unset and has no fallback (`ctx.get` returns `''`),
+        # substitute the type-zero of the other operand so arithmetic gets a
+        # matching type instead of a string.
+        if isinstance(left_value, str) and not left_value:
+            left_value = backend_to_default_backend(right_value)
+        if isinstance(right_value, str) and not right_value:
+            right_value = backend_to_default_backend(left_value)
 
         if type(left_value) is not type(right_value):
             MismatchedTypeException.throw(
