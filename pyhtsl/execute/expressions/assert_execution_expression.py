@@ -100,23 +100,27 @@ class AssertExecutionExpression(ExecutionExpression):
         )
 
     def flattened_conditions(self, context: 'ExecutionContext') -> list['Condition']:
-        flattened = []
+        flattened: list[Condition] = []
         for cond in self.conditions:
             if callable(cond):
-                if cond.__code__.co_argcount == 0:
+                code = cond.__code__
+                defaults = cond.__defaults__ or ()
+                required = code.co_argcount - len(defaults)
+                if required == 0:
                     cond = cond()  # pyright: ignore[reportCallIssue]
-                elif cond.__code__.co_argcount == 1:
+                elif required == 1:
                     cond = cond(context)  # pyright: ignore[reportCallIssue]
                 else:
                     raise ValueError(
-                        f'Callable conditions must take 0 or 1 arguments, got {cond.__code__.co_argcount}'
+                        f'Callable conditions must take 0 or 1 required '
+                        f'arguments, got {required}'
                     )
                 if cond is None:
                     continue
             if isinstance(cond, AssertExecutionExpression) and cond.mode == self.mode:
                 flattened.extend(cond.flattened_conditions(context))
             else:
-                flattened.append(cond)
+                flattened.append(cond)  # type: ignore
         return flattened
 
     def raw_execute(self, context: 'ExecutionContext') -> None:
