@@ -1,4 +1,4 @@
-from pyhtsl import Container, PlayerStat
+from pyhtsl import Container, ExecutionContext, PlayerStat
 
 # x ** 0 -> integer 1, no expressions written
 with Container() as container:
@@ -60,7 +60,20 @@ with Container():
     x = PlayerStat('x').as_long()
     raised = False
     try:
-        x**-1
+        _ = x**-1
     except ValueError:
         raised = True
     assert raised, 'expected ValueError for negative exponent'
+
+
+for base in [0, 1, 2, 3, 5, -3, 7]:
+    for exp in [2, 3, 4, 5, 6]:
+        with ExecutionContext() as ctx:
+            x = PlayerStat('x').as_long()
+            y = PlayerStat('y').as_long()
+            ctx.put(x, base)
+            y.value = x**exp
+
+        actual = int(ctx.get_raw(y))
+        expected = base**exp
+        assert actual == expected, f'{base}**{exp}: got {actual}, expected {expected}'
