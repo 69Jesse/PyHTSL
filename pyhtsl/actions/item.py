@@ -194,7 +194,10 @@ class Item:
     def get_item_name(self) -> str:
         return self._get_item_data()['title']
 
-    def into_nbt(self, data: ItemJsonData) -> NBTCompound[NBT]:
+    def into_nbt(self, data: ItemJsonData | None = None) -> NBTCompound[NBT]:
+        if data is None:
+            data = self._get_item_data()
+
         extras_copy = self.extras.copy()
 
         result: NBTCompound[NBT] = NBTCompound(
