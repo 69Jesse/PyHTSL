@@ -1,5 +1,4 @@
 import re
-from typing import Literal
 
 __all__ = (
     'normalize_formatting',
@@ -7,15 +6,23 @@ __all__ = (
     'formatting_to_ansi',
 )
 
-FORMATTING_REGEX: re.Pattern[str] = re.compile(r'[&§]([0-9a-fk-or])')
+# `&&` escapes a literal `&`; `&[code]` is shorthand for `§[code]`.
+NORMALIZE_REGEX: re.Pattern[str] = re.compile(r'&&|&([0-9a-fk-or])')
+SECTION_REGEX: re.Pattern[str] = re.compile(r'§([0-9a-fk-or])')
 
 
-def normalize_formatting(text: str, *, symbol: Literal['&', '§'] = '§') -> str:
-    return FORMATTING_REGEX.sub(f'{symbol}\\1', text)
+def normalize_formatting(text: str) -> str:
+    def replace(match: re.Match) -> str:
+        code = match.group(1)
+        if code is None:
+            return '&'
+        return f'§{code}'
+
+    return NORMALIZE_REGEX.sub(replace, text)
 
 
 def remove_formatting(text: str) -> str:
-    return FORMATTING_REGEX.sub('', text)
+    return SECTION_REGEX.sub('', normalize_formatting(text))
 
 
 COLOR_MAPPINGS: dict[str, int] = {
@@ -62,4 +69,4 @@ def formatting_to_ansi(text: str) -> str:
             return ''
         return ansi_color('', color, reset=False)
 
-    return FORMATTING_REGEX.sub(replace, text) + '\033[0m'
+    return SECTION_REGEX.sub(replace, text) + '\033[0m'
