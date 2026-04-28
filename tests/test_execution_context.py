@@ -1,5 +1,7 @@
 """ExecutionContext basics: put/get round-trips, default values, conditional assertions."""
 
+from helpers import expect_exception
+
 from pyhtsl import (
     Container,
     ExecutionContext,
@@ -98,15 +100,11 @@ assert int(ctx.get(y)) == 0, ctx.get(y)
 
 
 # Failing assert raises AssertionError that escapes the context manager
-raised = False
-try:
+with expect_exception(AssertionError):
     with ExecutionContext() as ctx:
         x = PlayerStat('x').as_long()
         ctx.put(x, 5)
         ctx.assert_all(x == 10)
-except AssertionError:
-    raised = True
-assert raised, 'expected the failing assert_all to raise AssertionError'
 
 
 # assert_any: passes when at least one condition holds

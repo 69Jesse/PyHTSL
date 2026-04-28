@@ -3,6 +3,8 @@
 import math
 import random
 
+from helpers import expect_exception
+
 from pyhtsl import ExecutionContext, PlayerStat
 from pyhtsl.ext import approximate_sqrt
 
@@ -25,11 +27,7 @@ for _ in range(20):
 
 
 # Cannot assign to the same stat as input
-raised = False
-try:
+with expect_exception(ValueError):
     with ExecutionContext():
         x = PlayerStat('x').as_double()
         approximate_sqrt(x, assign_to=x)
-except ValueError:
-    raised = True
-assert raised, 'expected ValueError when assign_to == input'

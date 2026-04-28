@@ -1,3 +1,5 @@
+from helpers import expect_exception
+
 from pyhtsl import Container, Else, IfAll, IfAny, PlayerStat, chat
 
 # IfAll with multiple conditions
@@ -62,10 +64,6 @@ assert container.into_htsl() == ('if or () {\n    chat "never"\n}'), (
 
 # Else without preceding If raises
 with Container():
-    raised = False
-    try:
+    with expect_exception(SyntaxError):
         with Else:
             chat('orphan')
-    except SyntaxError:
-        raised = True
-    assert raised, 'expected SyntaxError for orphan Else'
