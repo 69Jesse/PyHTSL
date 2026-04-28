@@ -48,6 +48,7 @@ class ExecutionContext(Container):
         ignore_action_limits: bool = False,
         pause_multiplier: float = 1,
         volume_multiplier: float = 1.0,
+        allow_nested_blocks: bool = False,
     ) -> None:
         super().__init__()
         self.verbose = verbose
@@ -55,6 +56,7 @@ class ExecutionContext(Container):
         self.ignore_action_limits = ignore_action_limits
         self.pause_multiplier = pause_multiplier
         self.volume_multiplier = volume_multiplier
+        self.allow_nested_blocks = allow_nested_blocks
         self.started_execution = False
         self.checkable_mapping = {}
         self.functions_on_cooldown_for_ticks = {}

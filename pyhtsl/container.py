@@ -56,6 +56,7 @@ class Container:
     contexts: list[ExpressionContext]
 
     is_finalized: bool
+    allow_nested_blocks: bool
 
     def __init__(self) -> None:
         from .block import GlobalBlock
@@ -64,6 +65,7 @@ class Container:
         self.blocks = [GlobalBlock()]
         self.contexts = []
         self.is_finalized = False
+        self.allow_nested_blocks = False
 
     @property
     def expressions(self) -> list['Expression']:
@@ -225,6 +227,19 @@ class ContainerContextManager(ABC):
     def __enter__(self) -> None:
         context = self.create_context()
         container = get_current_container()
+        if (
+            context.parent_expression is not None
+            and not context.parent_expression.can_be_nested()
+            and not container.allow_nested_blocks
+            and any(
+                ctx.parent_expression is not None
+                and not ctx.parent_expression.can_be_nested()
+                for ctx in container.contexts
+            )
+        ):
+            raise SyntaxError(
+                'It is not allowed to put another nestable expression (if/random) inside of a nestable expression.'
+            )
         if context.add_expression_to_container:
             assert context.parent_expression is not None
             container.write_expression(context.parent_expression)
