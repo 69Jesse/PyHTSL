@@ -35,6 +35,21 @@ class Block(BaseObject):
         self._overflow_root_ref = None
         self._overflow_counter = 1
 
+    def expression_counts(
+        self,
+        *,
+        nested: bool = False,
+    ) -> dict[type['Expression'], int]:
+        counts: dict[type[Expression], int] = {}
+        expressions = self.expressions.copy()
+        for expr in expressions:
+            counts[type(expr)] = counts.get(type(expr), 0) + 1
+            if not nested:
+                continue
+            for sub_expressions in expr.nested_expressions_refs():
+                expressions.extend(sub_expressions)
+        return counts
+
     @abstractmethod
     def equals_raw(self, other: object) -> bool:
         raise NotImplementedError

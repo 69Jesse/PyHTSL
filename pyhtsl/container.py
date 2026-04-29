@@ -103,6 +103,17 @@ class Container:
 
         return expressions
 
+    def expression_counts(
+        self,
+        *,
+        nested: bool = False,
+    ) -> dict[type['Expression'], int]:
+        counts: dict[type[Expression], int] = {}
+        for block in self.blocks:
+            for cls, count in block.expression_counts(nested=nested).items():
+                counts[cls] = counts.get(cls, 0) + count
+        return counts
+
     @property
     def is_global(self) -> bool:
         return self is CONTAINERS[0]
