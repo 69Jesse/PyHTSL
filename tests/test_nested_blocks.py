@@ -1,6 +1,6 @@
 """Nested if/else/random blocks aren't valid HTSL — entering one should raise SyntaxError.
 
-ExecutionContext exposes ``allow_nested_blocks`` to bypass this check during simulation.
+ExecutionContext exposes ``allow_nested_expressions`` to bypass this check during simulation.
 Entering a Random/If/Else inside a function block (a Block scope, not an expression scope)
 must still be allowed: only nested *expression* blocks are rejected.
 """
@@ -105,7 +105,7 @@ with Container() as container:
 container.into_htsl()
 
 
-# ExecutionContext with allow_nested_blocks=False (default) still raises
+# ExecutionContext with allow_nested_expressions=False (default) still raises
 with expect_exception(SyntaxError):
     with ExecutionContext() as ctx:
         x = PlayerStat('x').as_long()
@@ -115,8 +115,8 @@ with expect_exception(SyntaxError):
                 chat('nope')
 
 
-# ExecutionContext with allow_nested_blocks=True bypasses the check
-with ExecutionContext(allow_nested_blocks=True) as ctx:
+# ExecutionContext with allow_nested_expressions=True bypasses the check
+with ExecutionContext(allow_nested_expressions=True) as ctx:
     x = PlayerStat('x').as_long()
     y = PlayerStat('y').as_long()
     ctx.put(x, 10, ignore_warning=True)

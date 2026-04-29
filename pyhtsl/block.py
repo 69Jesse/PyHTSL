@@ -16,10 +16,11 @@ if TYPE_CHECKING:
 
 
 class Block(BaseObject):
+    container: 'Container'
     expressions: list['Expression']
     callback: Callable[[], None] | None
     callback_ran: bool
-    _overflow_base_name: str | None
+    _overflow_root_ref: 'Block | None'
     _overflow_counter: int
 
     def __init__(
@@ -31,7 +32,7 @@ class Block(BaseObject):
         self.expressions = expressions if expressions is not None else []
         self.callback = callback
         self.callback_ran = False
-        self._overflow_base_name = None
+        self._overflow_root_ref = None
         self._overflow_counter = 1
 
     @abstractmethod
@@ -97,7 +98,8 @@ class Block(BaseObject):
             self.callback_ran = True
 
     def fix_action_limits(self, container: 'Container', index: int) -> None:
-        base_name = self._overflow_base_name or self.get_name()
+        root = self._overflow_root_ref or self
+        base_name = root.get_name()
         next_counter = self._overflow_counter + 1
         function = Function(
             name=f'{base_name} {next_counter}',
@@ -115,20 +117,17 @@ class Block(BaseObject):
             function=function,
             expressions=rest,
         )
-        new_block._overflow_base_name = base_name
+        new_block._overflow_root_ref = root
         new_block._overflow_counter = next_counter
-        container.blocks.insert(index + 1, new_block)
+        container.add_block(new_block, index=index + 1)
         log(
             f'Created a new function \x1b[38;2;255;0;0m"{function.name}"\x1b[0m to avoid hitting the action limit in block \x1b[38;2;0;255;0m"{self.get_name()}"\x1b[0m'
         )
 
-    def should_fix_action_limits(self) -> bool:
-        return True
-
     def finalize(self, container: 'Container', index: int) -> None:
         self.maybe_run_callback()
         container.finalize_expressions(self.expressions)
-        if self.should_fix_action_limits():
+        if not self.container.ignore_action_limits:
             self.fix_action_limits(container, index)
 
     def execute_all_expressions(self, context: 'ExecutionContext') -> None:

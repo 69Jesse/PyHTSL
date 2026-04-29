@@ -26,7 +26,7 @@ def create_function(
         function = Function(name=name)
         block = FunctionBlock(function=function, callback=callback)
 
-        get_current_container().blocks.append(block)
+        get_current_container().add_block(block)
         if run_right_now:
             block.maybe_run_callback()
 

@@ -31,7 +31,6 @@ __all__ = ('ExecutionContext',)
 class ExecutionContext(Container):
     verbose: bool
     expression_callback: Callable[[Expression], None] | None
-    ignore_action_limits: bool
     pause_multiplier: float
     volume_multiplier: float
 
@@ -43,20 +42,21 @@ class ExecutionContext(Container):
     def __init__(
         self,
         *,
+        ignore_action_limits: bool = False,
+        allow_nested_expressions: bool = False,
         verbose: bool = False,
         expression_callback: Callable[[Expression], None] | None = None,
-        ignore_action_limits: bool = False,
         pause_multiplier: float = 1,
         volume_multiplier: float = 1.0,
-        allow_nested_blocks: bool = False,
     ) -> None:
-        super().__init__()
+        super().__init__(
+            ignore_action_limits=ignore_action_limits,
+            allow_nested_expressions=allow_nested_expressions,
+        )
         self.verbose = verbose
         self.expression_callback = expression_callback
-        self.ignore_action_limits = ignore_action_limits
         self.pause_multiplier = pause_multiplier
         self.volume_multiplier = volume_multiplier
-        self.allow_nested_blocks = allow_nested_blocks
         self.started_execution = False
         self.checkable_mapping = {}
         self.functions_on_cooldown_for_ticks = {}
@@ -116,9 +116,6 @@ class ExecutionContext(Container):
             if scheduler.has_next():
                 next_schedulers.append(scheduler)
         self.schedulers = next_schedulers + self.schedulers
-
-    def should_fix_action_limits(self) -> bool:
-        return not self.ignore_action_limits
 
     @overload
     def _get_raw(self, key: Checkable) -> BackendType | None: ...

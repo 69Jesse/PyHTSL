@@ -6,7 +6,7 @@ from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from pathlib import Path
 from types import TracebackType
-from typing import TYPE_CHECKING, ClassVar, NamedTuple, Self
+from typing import TYPE_CHECKING, ClassVar, NamedTuple, NoReturn, Self
 
 from .config import (
     get_htsl_import_folder,
@@ -56,25 +56,52 @@ class Container:
     contexts: list[ExpressionContext]
 
     is_finalized: bool
-    allow_nested_blocks: bool
+    ignore_action_limits: bool
+    allow_nested_expressions: bool
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        ignore_action_limits: bool = False,
+        allow_nested_expressions: bool = False,
+    ) -> None:
         from .block import GlobalBlock
 
         self.logger = AntiSpamLogger()
-        self.blocks = [GlobalBlock()]
+        self.blocks = []
+        self.add_block(GlobalBlock())
         self.contexts = []
-        self.is_finalized = False
-        self.allow_nested_blocks = False
 
-    @property
+        self.is_finalized = False
+        self.allow_nested_expressions = allow_nested_expressions
+        self.ignore_action_limits = ignore_action_limits
+
     def expressions(self) -> list['Expression']:
-        if len(self.blocks) != 1:
+        def throw() -> NoReturn:
             raise RuntimeError(
-                'Shortcut "Container.expressions" should only be used when there is exactly one block in the container'
+                'Shortcut "Container.expressions" should only be used when there is exactly one non-empty block in the container'
                 ', since it would be ambiguous otherwise. Use "Container.blocks" to access the blocks directly and get their expressions.'
             )
-        return self.blocks[0].expressions
+
+        found_block: Block | None = None
+        expressions: list[Expression] = []
+        for block in self.blocks:
+            if block.is_empty():
+                continue
+            if block._overflow_root_ref is not None:
+                if found_block is None or block._overflow_root_ref is not found_block:
+                    throw()
+                expressions.extend(block.expressions)
+                continue
+            if found_block is not None:
+                throw()
+            found_block = block
+            expressions.extend(block.expressions)
+
+        if found_block is None:
+            throw()
+
+        return expressions
 
     @property
     def is_global(self) -> bool:
@@ -96,6 +123,13 @@ class Container:
             )
 
         self.get_expressions_ref_in_context().append(expression)
+
+    def add_block(self, block: 'Block', *, index: int | None = None) -> None:
+        block.container = self
+        if index is None:
+            self.blocks.append(block)
+        else:
+            self.blocks.insert(index, block)
 
     def add_context(self, context: ExpressionContext) -> None:
         self.contexts.append(context)
@@ -230,7 +264,7 @@ class ContainerContextManager(ABC):
         if (
             context.parent_expression is not None
             and not context.parent_expression.can_be_nested()
-            and not container.allow_nested_blocks
+            and not container.allow_nested_expressions
             and any(
                 ctx.parent_expression is not None
                 and not ctx.parent_expression.can_be_nested()
