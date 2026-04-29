@@ -132,9 +132,6 @@ class ExecutionContext(Container):
         *,
         default: BackendType | None = None,
     ) -> BackendType | None:
-        # Mirrors HTSL's `%var.player/x 42%` semantics: if the stat is set,
-        # return its value; otherwise the fallback baked into the placeholder
-        # wins; otherwise the caller-supplied `default`.
         value = self.checkable_mapping.get(key.into_hashable())
         if value is not None:
             return value
