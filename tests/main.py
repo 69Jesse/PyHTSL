@@ -44,7 +44,9 @@ def main() -> int:
 
     total_elapsed = time.perf_counter() - total_start
     print()
-    print(f'{len(test_files) - len(failures)}/{len(test_files)} passed in {_fmt(total_elapsed)}')
+    print(
+        f'{len(test_files) - len(failures)}/{len(test_files)} passed in {_fmt(total_elapsed)}'
+    )
     for name, tb in failures:
         print(f'\n--- {name} ---')
         print(tb)

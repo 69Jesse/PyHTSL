@@ -9,6 +9,7 @@ from ..actions.no_type_casting import no_type_casting
 from ..checkable import Checkable
 from ..editable import Editable
 from ..execute.backend_type import (
+    BackendType,
     backend_to_default_backend,
     is_default_backend,
 )
@@ -30,7 +31,11 @@ from .housing_type import HousingType, housing_type_as_rhs
 __all__ = (
     'BinaryOperator',
     'BinaryExpression',
+    'SET_STRING_MAX_LENGTH',
 )
+
+
+SET_STRING_MAX_LENGTH = 32
 
 
 def _is_single_placeholder(value: str) -> bool:
@@ -38,6 +43,16 @@ def _is_single_placeholder(value: str) -> bool:
         pattern.fullmatch(value) is not None
         for pattern, _ in Checkable.iter_pattern_factories()
     )
+
+
+def _rhs_references_stat(rhs: object, stat: 'Stat') -> bool:
+    if isinstance(rhs, Stat) and rhs.is_same_stat(stat):
+        return True
+    if isinstance(rhs, str):
+        for ref in Checkable.iter_in_string(rhs):
+            if isinstance(ref, Stat) and ref.is_same_stat(stat):
+                return True
+    return False
 
 
 class BinaryOperator(Enum):
@@ -532,10 +547,7 @@ class BinaryExpression[
                     and expr_j.left.is_same_stat(lhs)
                     and expr_j.operator is BinaryOperator.Set
                     and not expr_j.is_intentional_self_assignment
-                    and not (
-                        isinstance(expr_j.right, Stat)
-                        and expr_j.right.is_same_stat(lhs)
-                    )
+                    and not _rhs_references_stat(expr_j.right, lhs)
                 ):
                     is_dead = True
                 break
@@ -685,6 +697,10 @@ class BinaryExpression[
         def format_rhs(value: Checkable | HousingType) -> str:
             if isinstance(value, Checkable):
                 return value.into_string_rhs()
+            if isinstance(value, str) and len(value) > SET_STRING_MAX_LENGTH:
+                raise ValueError(
+                    f'rhs exceeds {SET_STRING_MAX_LENGTH} characters ({len(value)}): {value!r}'
+                )
             if (
                 isinstance(value, str)
                 and no_type_casting()
@@ -736,7 +752,18 @@ class BinaryExpression[
             if isinstance(rhs, str) and not (
                 no_type_casting() and _is_single_placeholder(rhs)
             ):
-                rhs = f'"{rhs}"'
+                substituted = context._substitute_all_placeholders(rhs)
+                if len(substituted) > SET_STRING_MAX_LENGTH:
+                    value_to_store: BackendType = rhs
+                else:
+                    cast_value: BackendType | None = None
+                    if context._has_any_placeholders(rhs):
+                        cast_value = context._maybe_cast_to_backend(substituted)
+                    value_to_store = (
+                        cast_value if cast_value is not None else substituted
+                    )
+                context.put(expression.left, value_to_store, ignore_warning=True)
+                return
             context.put(
                 expression.left,
                 context.get(rhs, output='backend'),

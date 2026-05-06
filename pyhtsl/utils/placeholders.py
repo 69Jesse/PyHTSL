@@ -1,17 +1,20 @@
-import re
-
-PLACEHOLDER_PARTS_REGEX: re.Pattern[str] = re.compile(r'%[^%]*%')
-
-
 def get_placeholder_parts(value: str) -> list[str]:
-    # TODO fix
+    from ..checkable import Checkable
+
+    spans: list[tuple[int, int]] = []
+    for pattern, _ in Checkable.iter_pattern_factories():
+        for match in pattern.finditer(value):
+            spans.append(match.span())
+
+    spans.sort()
+
     parts: list[str] = []
     last_index = 0
-
-    for match in PLACEHOLDER_PARTS_REGEX.finditer(value):
-        start, end = match.span()
+    for start, end in spans:
+        if start < last_index:
+            continue
         parts.append(value[last_index:start])
-        parts.append(match.group())
+        parts.append(value[start:end])
         last_index = end
 
     parts.append(value[last_index:])

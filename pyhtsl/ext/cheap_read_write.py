@@ -183,6 +183,9 @@ def _detect_pattern(
     return _detect_pattern_a(items) or _detect_pattern_b(items)
 
 
+_FAST_READ_NAMES = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+
 def _emit_fast_read(
     *,
     pattern: list[ColumnInfo],
@@ -190,9 +193,11 @@ def _emit_fast_read(
     output: Sequence[Editable],
 ) -> None:
     width = len(pattern)
-    n_stats = [PlayerStat(f'tmp{k}').as_long() for k in range(width)]
-    tmp_str_stats = [PlayerStat(f'tmp{width + k}') for k in range(width)]
-    p_stats = [PlayerStat(f'tmp{2 * width + k}') for k in range(width)]
+    if 3 * width > len(_FAST_READ_NAMES):
+        raise ValueError(f'cheap_read fast path: width {width} too large')
+    n_stats = [PlayerStat(_FAST_READ_NAMES[k]).as_long() for k in range(width)]
+    tmp_str_stats = [PlayerStat(_FAST_READ_NAMES[width + k]) for k in range(width)]
+    p_stats = [PlayerStat(_FAST_READ_NAMES[2 * width + k]) for k in range(width)]
 
     for k, (cls, prefix, suffix, coeff, offset) in enumerate(pattern):
         scope = cls.right_side_keyword()
@@ -211,7 +216,6 @@ def _emit_fast_read(
         else:
             template = f'%var.{scope}/%var.player/{n_k.name}%{suffix}%'
 
-        # tmp_str_k.value = template
         set_string(tmp_str_k, template)
         tmp_str_k.set(tmp_str_k, is_intentional_self_assignment=True)
         output[k].value = tmp_str_k

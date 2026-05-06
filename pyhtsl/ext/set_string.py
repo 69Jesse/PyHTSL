@@ -1,66 +1,80 @@
 from ..editable import Editable
-from ..stats.player_stat import PlayerStat
+from ..expression.binary_expression import SET_STRING_MAX_LENGTH
 from ..utils.placeholders import get_placeholder_parts
 
 __all__ = ('set_string',)
 
 
-def get_set_string_parts(value: str) -> list[str]:
-    raw_parts = get_placeholder_parts(value)
-    parts: list[str] = []
-    for i, part in enumerate(raw_parts):
+def _atomize(value: str) -> list[str]:
+    """Split value into indivisible atoms: each character of literal text and
+    each placeholder source string.
+    """
+    parts = get_placeholder_parts(value)
+    atoms: list[str] = []
+    for i, part in enumerate(parts):
         if i % 2 == 0:
-            parts.extend(list(part))
+            atoms.extend(part)
         else:
-            parts.append(part)
-
-    previous_was_space = False
-    for i in range(len(parts) - 1, -1, -1):
-        if previous_was_space:
-            parts[i] = parts[i] + parts[i + 1]
-            parts.pop(i + 1)
-        if parts[i] == ' ':
-            previous_was_space = True
-            parts.pop(i)
-            if i >= len(parts):
-                continue
-            parts[i] = ' ' + parts[i]
-        else:
-            previous_was_space = False
-
-    return parts
+            atoms.append(part)
+    return atoms
 
 
-def set_string(
-    stat: Editable,
-    value: str,
-    *,
-    unset_temp_stat: bool = False,
-) -> None:
-    parts = get_set_string_parts(value)
-    assert len(parts) >= 1
+def _has_placeholders(value: str) -> bool:
+    parts = get_placeholder_parts(value)
+    return any(parts[i] for i in range(1, len(parts), 2))
 
-    temp_stat = PlayerStat('t').as_string()
-    used_temp_stat = False
 
-    stat_str_length = len(str(stat))
+def set_string(stat: Editable, value: str) -> None:
+    if len(value) <= SET_STRING_MAX_LENGTH:
+        stat.value = value
+        return
 
-    index = 0
-    while index < len(parts):
-        is_first_time = index == 0
-        part = parts[index]
-        index += 1
-        while index < len(parts) and len(part) + len(parts[index]) <= 32:
-            part = part + parts[index]
-            index += 1
-        assert len(part) <= 32
-        if not is_first_time:
-            if len(part) + stat_str_length <= 32:
-                part = f'{stat}{part}'
-            else:
-                temp_stat.value = part
-                used_temp_stat = True
-                part = f'{stat}{temp_stat}'
-        stat.value = part
-    if used_temp_stat and unset_temp_stat:
-        temp_stat.unset()
+    if not _has_placeholders(value):
+        raise ValueError(
+            f'set_string: value of {len(value)} chars has no placeholders to '
+            f'shrink it under the {SET_STRING_MAX_LENGTH}-char limit'
+        )
+
+    self_ref = str(stat)
+    self_ref_len = len(self_ref)
+    if self_ref_len >= SET_STRING_MAX_LENGTH:
+        raise ValueError(
+            f'set_string: stat self-reference {self_ref!r} is {self_ref_len} '
+            f'chars; no room for content within the '
+            f'{SET_STRING_MAX_LENGTH}-char limit'
+        )
+
+    budget_continuation = SET_STRING_MAX_LENGTH - self_ref_len
+    atoms = _atomize(value)
+
+    chunks: list[str] = []
+    current: list[str] = []
+    current_len = 0
+
+    def budget() -> int:
+        return SET_STRING_MAX_LENGTH if not chunks else budget_continuation
+
+    for atom in atoms:
+        if current_len + len(atom) > budget():
+            if not current:
+                raise ValueError(
+                    f'set_string: atom {atom!r} of {len(atom)} chars exceeds '
+                    f'chunk budget of {budget()} chars'
+                )
+            chunks.append(''.join(current))
+            current = []
+            current_len = 0
+            if len(atom) > budget():
+                raise ValueError(
+                    f'set_string: atom {atom!r} of {len(atom)} chars exceeds '
+                    f'chunk budget of {budget()} chars'
+                )
+        current.append(atom)
+        current_len += len(atom)
+
+    if current:
+        chunks.append(''.join(current))
+
+    stat.value = chunks[0]
+    for chunk in chunks[1:]:
+        stat.value = self_ref + chunk
