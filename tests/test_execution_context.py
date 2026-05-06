@@ -135,9 +135,10 @@ assert container.into_htsl() == 'var "x" = 1 true', container.into_htsl()
 
 
 # Storage path: each assignment substitutes the rhs once. Chained-placeholder
-# strings stay one level deep (here `value` keeps `%var.player/s0%`, not 5).
-# Stat-to-stat assignment of a string-typed value also preserves the literal
-# string instead of transitively resolving it.
+# strings stay one level deep when stored (here `c` keeps `%var.player/s0%`,
+# not 5). An intentional self-assignment then routes through get()'s fullmatch
+# loop, which DOES chase the chain transitively, so c ends up holding the
+# resolved numeric value 5.
 with ExecutionContext() as ctx:
     s0 = PlayerStat('s0').without_auto_unset()
     s0.value = 5
@@ -148,12 +149,24 @@ with ExecutionContext() as ctx:
 
     c = PlayerStat('c').without_auto_unset()
     c.value = '%var.player/a%%var.player/b%%'
-    result = PlayerStat('result').without_auto_unset()
-    result.value = c
 
-assert 'var "result" = %var.player/c%' in ctx.into_htsl(), ctx.into_htsl()
-assert str(ctx.get_raw(c)) == '%var.player/s0%', ctx.get_raw(c)
-assert int(ctx.get_raw(result)) == 5, ctx.get_raw(result)
+    # Mid-execution check: at this point c stores the once-substituted
+    # placeholder string. get_raw bypasses substitution so we see the literal.
+    def check_before_self_assign() -> None:
+        assert str(ctx.get_raw(c)) == '%var.player/s0%', ctx.get_raw(c)
+
+    ctx.run(check_before_self_assign)
+
+    # Intentional self-assign: rhs renders as bare `%var.player/c%` (no type
+    # suffix because fix_type_compatibility is skipped), and get()'s fullmatch
+    # loop chases the placeholder chain `c` -> `%var.player/s0%` -> `s0` -> 5.
+    c.set(c, is_intentional_self_assignment=True)
+
+# Emitted HTSL keeps the bare placeholder form for the self-assign.
+assert 'var "c" = %var.player/c%' in ctx.into_htsl(), ctx.into_htsl()
+
+# After execution: c now holds the resolved value, not the placeholder.
+assert int(ctx.get_raw(c)) == 5, ctx.get_raw(c)
 
 
 # Stat-to-stat assignment preserves the rhs's native type, but a Python-`str`

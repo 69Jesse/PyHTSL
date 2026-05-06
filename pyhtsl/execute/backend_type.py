@@ -39,16 +39,16 @@ def into_housing_type(value: HousingType | BackendType) -> HousingType:
 
 def backend_into_string(value: BackendType) -> str:
     if isinstance(value, np.integer):
-        return str(int(value))
+        return f'{int(value):,}'
     if isinstance(value, np.floating):
         d = float(value)
         if d.is_integer() and abs(d) < 1e15:
-            return str(int(d))
+            return f'{int(d):,}'
         rep = repr(d)
         if 'e' in rep or 'E' in rep:
             return _java_double_tostring(d)
         rounded = round(d, 3)
-        result = f'{rounded:.3f}'.rstrip('0').rstrip('.')
+        result = f'{rounded:,.3f}'.rstrip('0').rstrip('.')
         return result
     return value
 
@@ -88,8 +88,9 @@ def backend_matches_internal_type(
 def cast_to_backend_long(value: str) -> np.int64 | None:
     if not value:
         return np.int64(0)
+    cleaned = value.replace(',', '')
     try:
-        n = int(np.float64(value))
+        n = int(np.float64(cleaned))
     except (ValueError, ArithmeticError):
         return None
     if n < -9223372036854775808 or n > 9223372036854775807:
@@ -100,8 +101,9 @@ def cast_to_backend_long(value: str) -> np.int64 | None:
 def cast_to_backend_double(value: str) -> np.float64 | None:
     if not value:
         return np.float64(0.0)
+    cleaned = value.replace(',', '')
     try:
-        return np.float64(value)
+        return np.float64(cleaned)
     except (ValueError, ArithmeticError):
         return None
 

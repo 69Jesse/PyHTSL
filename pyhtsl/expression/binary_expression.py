@@ -859,10 +859,10 @@ class BinaryExpression[
                     f'{" " * 4}Executing \x1b[38;2;255;0;0m"{expr.left!r} {expr.operator.value} {expr.right!r}"\x1b[0m'
                 )
                 log(
-                    f'{" " * 8}BEFORE: {expr.left.into_string_lhs()} = {descriptive_backend_type(context.get(expr.left, output="backend"))}'
+                    f'{" " * 8}BEFORE: {expr.left.into_string_lhs()} = {descriptive_backend_type(context._get_raw(expr.left))}'
                 )
             self.execute_assignment_expression(expr, context)
             if context.verbose:
                 log(
-                    f'{" " * 8}AFTER:  {expr.left.into_string_lhs()} = {descriptive_backend_type(context.get(expr.left, output="backend"))}'
+                    f'{" " * 8}AFTER:  {expr.left.into_string_lhs()} = {descriptive_backend_type(context._get_raw(expr.left))}'
                 )

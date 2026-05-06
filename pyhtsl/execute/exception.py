@@ -34,13 +34,15 @@ def internal_type_to_description(internal_type: InternalType) -> str:
     raise ValueError(f'Unknown internal type: {internal_type}')
 
 
-def descriptive_backend_type(value: BackendType) -> str:
+def descriptive_backend_type(value: BackendType | None) -> str:
     if isinstance(value, np.integer):
         return f'long<{value}>'
     if isinstance(value, np.floating):
         return f'double<{value}>'
     if isinstance(value, str):
         return f'string<{value!r}>'
+    if value is None:
+        return '<unset>'
     raise
 
 
