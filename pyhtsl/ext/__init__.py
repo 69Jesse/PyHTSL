@@ -16,6 +16,8 @@ from .approximate import (
 from .approximate import (
     approximate_sqrt as approximate_sqrt,
 )
+from .cheap_read_write import cheap_read as cheap_read
+from .cheap_read_write import cheap_write as cheap_write
 from .compute_layout import (
     compute_best_layout as compute_best_layout,
 )

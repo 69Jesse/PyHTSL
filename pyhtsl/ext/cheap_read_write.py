@@ -101,16 +101,17 @@ def cheap_write_inner(
         assign(items[0], input)
         return
 
-    best_total = n
+    best_ce = n
+    best_be = 0
     best_cs = 0
     best_hoist = False
     for hoist in (False, True):
         max_cs = (25 if hoist else 23) // width
-        be_cost = 2 if hoist else 0
+        be = 2 if hoist else 0
         for cs in range(1, min(max_cs, n - 1) + 1):
-            total = 2 * math.ceil(n / cs) - 1 + cs + be_cost
-            if total < best_total:
-                best_total, best_cs, best_hoist = total, cs, hoist
+            ce = 2 * math.ceil(n / cs) - 1 + cs
+            if (ce, be) < (best_ce, best_be):
+                best_ce, best_be, best_cs, best_hoist = ce, be, cs, hoist
 
     if best_cs == 0:
         for i, item in enumerate(items):

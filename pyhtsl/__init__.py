@@ -355,10 +355,17 @@ from .container import CONTAINERS as CONTAINERS
 from .container import Container as Container
 from .container import get_current_container as get_current_container
 from .editable import Editable as Editable
+from .execute.backend_type import BackendType as BackendType
 from .execute.context import ExecutionContext as ExecutionContext
 from .export import export as export
+from .expression.binary_expression import BinaryExpression as BinaryExpression
 from .expression.condition.condition import Condition as Condition
+from .expression.condition.conditional_expression import (
+    ConditionalExpression as ConditionalExpression,
+)
+from .expression.expression import Expression as Expression
 from .expression.housing_type import HousingType as HousingType
+from .internal_type import InternalType as InternalType
 from .misc.skull_data import SKULL_DATA as SKULL_DATA
 from .misc.skull_data import SkullData as SkullData
 from .stats.global_stat import GlobalStat as GlobalStat
