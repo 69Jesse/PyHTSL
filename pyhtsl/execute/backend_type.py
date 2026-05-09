@@ -90,9 +90,12 @@ def cast_to_backend_long(value: str) -> np.int64 | None:
         return np.int64(0)
     cleaned = value.replace(',', '')
     try:
-        n = int(np.float64(cleaned))
-    except (ValueError, ArithmeticError):
-        return None
+        n = int(cleaned)
+    except ValueError:
+        try:
+            n = int(np.float64(cleaned))
+        except (ValueError, ArithmeticError):
+            return None
     if n < -9223372036854775808 or n > 9223372036854775807:
         return None
     return np.int64(n)

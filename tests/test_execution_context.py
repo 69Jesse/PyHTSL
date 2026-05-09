@@ -9,6 +9,7 @@ from pyhtsl import (
     IfAll,
     PlayerStat,
 )
+from pyhtsl.execute.backend_type import cast_to_backend_long
 
 # put/get round-trip for long
 with ExecutionContext() as ctx:
@@ -189,3 +190,75 @@ assert isinstance(ctx.get_raw(c), int) and not isinstance(ctx.get_raw(c), bool),
     ctx.get_raw(c)
 )
 assert ctx.get_raw(c) == 123, ctx.get_raw(c)
+
+
+# === Long precision: matches Java's Long, no float64 round-trip drift ===
+#
+# Java's `long` is exactly 64 bits. The simulator must round-trip every
+# representable long through ctx.get without losing precision — float64 only
+# has ~53 bits of mantissa, so anything above 2**53 had been silently
+# corrupted before cast_to_backend_long was fixed to try int() first.
+
+# Boundary: exactly 2**53 round-trips cleanly via either path.
+with ExecutionContext() as ctx:
+    x = PlayerStat('x').as_long()
+    ctx.put(x, 2**53)
+
+assert int(ctx.get(x)) == 2**53, ctx.get(x)
+
+
+# Above the float53 line: values that float64 cannot represent exactly.
+for _v in (2**53 + 1, 2**60 - 1, 22551026487849030, 9223372036854775807):
+    with ExecutionContext() as ctx:
+        x = PlayerStat('x').as_long()
+        ctx.put(x, _v)
+
+    got = int(ctx.get(x))
+    assert got == _v, f'long round-trip lost precision: got {got}, want {_v}'
+
+
+# Java long min / max boundaries.
+for _v in (-(2**63), 2**63 - 1):
+    with ExecutionContext() as ctx:
+        x = PlayerStat('x').as_long()
+        ctx.put(x, _v)
+
+    got = int(ctx.get(x))
+    assert got == _v, f'long boundary lost precision: got {got}, want {_v}'
+
+
+# Bitwise ops on large packed longs preserve precision (the use-case that
+# motivated the fix — IntStack packs many small ints into one long).
+with ExecutionContext() as ctx:
+    x = PlayerStat('x').as_long()
+    y = PlayerStat('y').as_long()
+    # Packed value [70, 60, 50, 40, 30, 20] at 10 bits per slot.
+    packed = 70 + 60 * 1024 + 50 * 2**20 + 40 * 2**30 + 30 * 2**40 + 20 * 2**50
+    ctx.put(x, packed)
+    y.value = x & 1023
+
+assert int(ctx.get(y)) == 70, ctx.get(y)
+
+
+# Right-shift through the high bits keeps the bit pattern intact.
+with ExecutionContext() as ctx:
+    x = PlayerStat('x').as_long()
+    y = PlayerStat('y').as_long()
+    ctx.put(x, 1 << 60)
+    y.value = x >> 60
+
+assert int(ctx.get(y)) == 1, ctx.get(y)
+
+
+# Decimal/exponent strings still parse via the float fallback (so existing
+# behavior on non-integer literals is preserved).
+
+assert (x := cast_to_backend_long('1.5')) is not None and int(x) == 1
+assert (x := cast_to_backend_long('2.9')) is not None and int(x) == 2
+assert (x := cast_to_backend_long('1e3')) is not None and int(x) == 1000
+assert cast_to_backend_long('garbage') is None
+assert (x := cast_to_backend_long('')) is not None and int(x) == 0
+assert (x := cast_to_backend_long('1,000')) is not None and int(x) == 1000
+# Out-of-range integer string returns None instead of clipping.
+assert cast_to_backend_long('9223372036854775808') is None  # 2**63
+assert cast_to_backend_long('-9223372036854775809') is None  # -(2**63) - 1

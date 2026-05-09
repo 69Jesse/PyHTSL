@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pyhtsl.actions.conditional.context_manager import (
     ElseContextManager,
     IfContextManager,
@@ -14,18 +16,22 @@ __all__ = (
 )
 
 
-def IfAll(*conditions: Condition) -> IfContextManager:
-    return IfContextManager(list(conditions), mode=ConditionalMode.ALL)
+def IfAll(*conditions: Condition | Literal[False]) -> IfContextManager:
+    return IfContextManager(
+        [c for c in conditions if c is not False],
+        mode=ConditionalMode.ALL,
+    )
 
 
 def IfAny(
-    *conditions: Condition,
+    *conditions: Condition | Literal[False],
     all_if_no_conditions: bool = True,
 ) -> IfContextManager:
+    filtered = [c for c in conditions if c is not False]
     return IfContextManager(
-        list(conditions),
+        filtered,
         mode=ConditionalMode.ANY
-        if len(conditions) > 1 or not all_if_no_conditions
+        if len(filtered) > 1 or not all_if_no_conditions
         else ConditionalMode.ALL,
     )
 

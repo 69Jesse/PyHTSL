@@ -5,11 +5,10 @@ from pathlib import Path
 import mido
 import pynbs
 
-from pyhtsl.types import ALL_SOUNDS
-
 from ..actions.pause_execution import PauseExecutionExpression
 from ..actions.play_sound import PlaySoundExpression
 from ..expression.expression import Expression
+from ..types import ALL_SOUNDS
 
 __all__ = (
     'NoteEvent',
