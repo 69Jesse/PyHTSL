@@ -46,8 +46,8 @@ class ExecutionContext(Container):
         allow_nested_expressions: bool = False,
         verbose: bool = False,
         expression_callback: Callable[[Expression], None] | None = None,
-        pause_multiplier: float = 1,
-        volume_multiplier: float = 1.0,
+        pause_multiplier: float = 1.0,
+        volume_multiplier: float = 0.1,
     ) -> None:
         super().__init__(
             ignore_action_limits=ignore_action_limits,

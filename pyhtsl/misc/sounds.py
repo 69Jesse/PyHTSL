@@ -18,7 +18,7 @@ _CHANNELS = 1
 
 
 class Mixer:
-    voices: list[tuple[np.ndarray, int]]  # (data, offset)
+    voices: list[list]  # [data, offset]
     stream: sd.OutputStream | None
     _lock: threading.Lock
 
@@ -27,19 +27,6 @@ class Mixer:
         self.stream = None
         self._lock = threading.Lock()
 
-    def _ensure_stream(self) -> None:
-        if self.stream is not None and self.stream.active:
-            return
-        if self.stream is not None:
-            self.stream.close()
-        self.stream = sd.OutputStream(
-            samplerate=_SAMPLE_RATE,
-            channels=_CHANNELS,
-            dtype='float32',
-            callback=self._callback,
-        )
-        self.stream.start()
-
     def _callback(
         self,
         outdata: np.ndarray,
@@ -47,59 +34,54 @@ class Mixer:
         _time: object,
         _status: object,
     ) -> None:
-        outdata[:] = 0
+        outdata.fill(0)
         with self._lock:
-            still_active: list[tuple[np.ndarray, int]] = []
-            for data, offset in self.voices:
+            still_active: list[list] = []
+            for voice in self.voices:
+                data, offset = voice
                 remaining = len(data) - offset
                 if remaining <= 0:
                     continue
                 chunk = min(frames, remaining)
-                outdata[:chunk] += data[offset : offset + chunk]
-                if offset + chunk < len(data):
-                    still_active.append((data, offset + chunk))
+                outdata[:chunk, 0] += data[offset : offset + chunk]
+                new_offset = offset + chunk
+                if new_offset < len(data):
+                    voice[1] = new_offset
+                    still_active.append(voice)
             self.voices = still_active
-        if not still_active:
-            raise sd.CallbackStop
+        # Soft-limit so overlapping voices compress instead of clipping harshly.
+        np.tanh(outdata, out=outdata)
 
-    def add(self, data: np.ndarray, sample_rate: int) -> None:
-        if sample_rate != _SAMPLE_RATE:
-            ratio = _SAMPLE_RATE / sample_rate
-            new_len = int(len(data) * ratio)
-            old_indices = np.linspace(0, len(data) - 1, new_len)
-            if data.ndim == 1:
-                data = np.interp(old_indices, np.arange(len(data)), data).astype(
-                    np.float32
-                )
-            else:
-                resampled = np.empty((new_len, data.shape[1]), dtype=np.float32)
-                for ch in range(data.shape[1]):
-                    resampled[:, ch] = np.interp(
-                        old_indices, np.arange(len(data)), data[:, ch]
-                    )
-                data = resampled
-
-        if data.ndim > 1:
-            data = data.mean(axis=1)
-        data = data.reshape(-1, _CHANNELS)
-
+    def add(self, data: np.ndarray) -> None:
         with self._lock:
-            self.voices.append((data, 0))
-        self._ensure_stream()
+            self.voices.append([data, 0])
+            if self.stream is None or not self.stream.active:
+                if self.stream is not None:
+                    self.stream.close()
+                self.stream = sd.OutputStream(
+                    samplerate=_SAMPLE_RATE,
+                    channels=_CHANNELS,
+                    dtype='float32',
+                    callback=self._callback,
+                )
+                self.stream.start()
 
     def shutdown(self) -> None:
-        if self.stream is not None:
-            if self.stream.active:
-                sd.sleep(
-                    int(
-                        max((len(d) - o) / _SAMPLE_RATE * 1000 for d, o in self.voices)
-                        if self.voices
-                        else 0
-                    )
-                )
-            self.stream.close()
+        with self._lock:
+            stream = self.stream
             self.stream = None
-        self.voices.clear()
+            if stream is not None and stream.active and self.voices:
+                max_ms = int(
+                    max((len(d) - o) / _SAMPLE_RATE * 1000 for d, o in self.voices)
+                ) + 100
+            else:
+                max_ms = 0
+        if max_ms:
+            sd.sleep(max_ms)
+        if stream is not None:
+            stream.close()
+        with self._lock:
+            self.voices = []
 
 
 mixer = Mixer()
@@ -177,10 +159,10 @@ def get_sound_paths(raw_sound: ALL_SOUNDS_RAW) -> list[Path]:
     return _get_mapping().get(raw_sound, [])
 
 
-_AUDIO_CACHE: dict[Path, tuple[np.ndarray, int]] = {}
+_AUDIO_CACHE: dict[Path, np.ndarray] = {}
 
 
-def _load_wav(path: Path) -> tuple[np.ndarray, int]:
+def _load_wav(path: Path) -> np.ndarray:
     cached = _AUDIO_CACHE.get(path)
     if cached is not None:
         return cached
@@ -193,29 +175,30 @@ def _load_wav(path: Path) -> tuple[np.ndarray, int]:
         raw_data = wf.readframes(n_frames)
 
     if sample_width == 1:
-        dtype = np.uint8
+        data = np.frombuffer(raw_data, dtype=np.uint8).astype(np.float32)
+        data = (data - 128.0) / 128.0
     elif sample_width == 2:
-        dtype = np.int16
+        data = np.frombuffer(raw_data, dtype=np.int16).astype(np.float32) / 32768.0
     elif sample_width == 4:
-        dtype = np.int32
+        data = np.frombuffer(raw_data, dtype=np.int32).astype(np.float32) / 2147483648.0
     else:
         raise ValueError(f'Unsupported sample width: {sample_width}')
 
-    data = np.frombuffer(raw_data, dtype=dtype).astype(np.float32)
-
-    if dtype == np.uint8:
-        data = (data - 128) / 128
-    elif dtype == np.int16:
-        data /= 32768
-    elif dtype == np.int32:
-        data /= 2147483648
-
     if n_channels > 1:
-        data = data.reshape(-1, n_channels)
+        data = data.reshape(-1, n_channels).mean(axis=1)
 
-    result = (data, sample_rate)
-    _AUDIO_CACHE[path] = result
-    return result
+    if sample_rate != _SAMPLE_RATE:
+        ratio = _SAMPLE_RATE / sample_rate
+        new_len = int(len(data) * ratio)
+        if new_len > 0:
+            old_indices = np.linspace(0, len(data) - 1, new_len)
+            data = np.interp(old_indices, np.arange(len(data)), data).astype(
+                np.float32
+            )
+
+    data = np.ascontiguousarray(data, dtype=np.float32)
+    _AUDIO_CACHE[path] = data
+    return data
 
 
 def _resample(data: np.ndarray, pitch: float) -> np.ndarray:
@@ -224,18 +207,11 @@ def _resample(data: np.ndarray, pitch: float) -> np.ndarray:
 
     n_frames = len(data)
     new_length = int(n_frames / pitch)
-    if new_length == 0:
+    if new_length <= 0:
         return data[:1]
 
     old_indices = np.linspace(0, n_frames - 1, new_length)
-
-    if data.ndim == 1:
-        return np.interp(old_indices, np.arange(n_frames), data).astype(np.float32)
-
-    result = np.empty((new_length, data.shape[1]), dtype=np.float32)
-    for ch in range(data.shape[1]):
-        result[:, ch] = np.interp(old_indices, np.arange(n_frames), data[:, ch])
-    return result
+    return np.interp(old_indices, np.arange(n_frames), data).astype(np.float32)
 
 
 def _housing_pitch(pitch: float) -> float:
@@ -254,10 +230,10 @@ def play(
         return False
 
     path = random.choice(paths)
-    data, sample_rate = _load_wav(path)
-
+    data = _load_wav(path)
     data = _resample(data, _housing_pitch(pitch))
-    data = data * volume
+    if volume != 1.0:
+        data = data * np.float32(volume)
 
-    mixer.add(data, sample_rate)
+    mixer.add(data)
     return True
