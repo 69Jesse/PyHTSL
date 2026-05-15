@@ -1,8 +1,14 @@
-from typing import Self, final
+from typing import TYPE_CHECKING, Self, final
+
+from pyhtsl.utils.formatting import formatting_to_ansi
+from pyhtsl.utils.log import log
 
 from ..checkable import Checkable
 from ..expression.expression import Expression
 from ..expression.housing_type import HousingType
+
+if TYPE_CHECKING:
+    from ..execute.context import ExecutionContext
 
 __all__ = (
     'DisplayActionBarExpression',
@@ -30,6 +36,14 @@ class DisplayActionBarExpression(Expression):
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{self.text}>'
+
+    def raw_execute(self, context: 'ExecutionContext') -> None:
+        log(
+            formatting_to_ansi(
+                '&7<display-action-bar>\n'
+                f'&7    text: &f{context.get(self.text, cast=False, output="string")}'
+            )
+        )
 
 
 def display_action_bar(
