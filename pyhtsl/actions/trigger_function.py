@@ -58,12 +58,17 @@ class TriggerFunctionExpression(Expression):
                 f'Function \x1b[38;2;255;0;0m"{self.function.name}"\x1b[0m is on cooldown for \x1b[38;2;0;255;0m{ticks} more tick{"s" * (ticks != 1)}\x1b[0m, so it will \x1b[38;2;0;255;0mnot be executed\x1b[0m'
             )
             return
+        context.functions_on_cooldown_for_ticks[self.function.name] = 4
         if self.function.block is None:
             log(
                 f'Function \x1b[38;2;255;0;0m"{self.function.name}"\x1b[0m has no expression block attached, \x1b[38;2;0;255;0mnothing will be executed\x1b[0m'
             )
             return
-        context.functions_on_cooldown_for_ticks[self.function.name] = 4
+        if self.function.block.is_empty():
+            log(
+                f'Function \x1b[38;2;255;0;0m"{self.function.name}"\x1b[0m has an empty expression block, \x1b[38;2;0;255;0mnothing will be executed\x1b[0m. \x1b[38;2;0;255;0mThis may be because not everything has finalized yet, consider using the \x1b[38;2;255;0;0mexecute\x1b[38;2;0;255;0m decorator\x1b[0m'
+            )
+            return
         self.function.block.execute_all_expressions(context)
 
 
