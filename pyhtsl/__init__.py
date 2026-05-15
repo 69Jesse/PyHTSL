@@ -357,6 +357,7 @@ from .container import get_current_container as get_current_container
 from .editable import Editable as Editable
 from .execute.backend_type import BackendType as BackendType
 from .execute.context import ExecutionContext as ExecutionContext
+from .execute.decorator import execute as execute
 from .export import export as export
 from .expression.binary_expression import BinaryExpression as BinaryExpression
 from .expression.condition.condition import Condition as Condition

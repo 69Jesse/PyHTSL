@@ -129,9 +129,7 @@ class Container:
             return
 
         if self.is_finalized:
-            raise RuntimeError(
-                'Container is already finalized, cannot write new expressions'
-            )
+            return
 
         self.get_expressions_ref_in_context().append(expression)
 
@@ -330,14 +328,17 @@ def on_program_exit() -> None:
             'Program exited without exporting a non-global container. This should never happen.'
         )
 
+    container.finalize()
     if should_disable_global_export():
         log(
             '\x1b[38;2;255;0;0mGlobal export is disabled. No .htsl file will be written.\x1b[0m'
         )
-        return
+    else:
+        container.export(GLOBAL_NAME)
 
-    container.finalize()
-    container.export(GLOBAL_NAME)
+    from .execute.decorator import run_saved_execution_contexts
+
+    run_saved_execution_contexts()
 
 
 sys.excepthook = exception_hook
