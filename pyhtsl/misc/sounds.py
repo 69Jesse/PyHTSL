@@ -10,7 +10,7 @@ import sounddevice as sd
 
 from ..types import ALL_SOUNDS, ALL_SOUNDS_PRETTY_TO_RAW, ALL_SOUNDS_RAW
 
-__all__ = ('get_sound_paths', 'play')
+__all__ = ('get_sound_paths', 'preview_sound')
 
 
 _SAMPLE_RATE = 44100
@@ -20,11 +20,13 @@ _CHANNELS = 1
 class Mixer:
     voices: list[list]  # [data, offset]
     stream: sd.OutputStream | None
+    played: bool
     _lock: threading.Lock
 
     def __init__(self) -> None:
         self.voices = []
         self.stream = None
+        self.played = False
         self._lock = threading.Lock()
 
     def _callback(
@@ -55,6 +57,7 @@ class Mixer:
     def add(self, data: np.ndarray) -> None:
         with self._lock:
             self.voices.append([data, 0])
+            self.played = True
             if self.stream is None or not self.stream.active:
                 if self.stream is not None:
                     self.stream.close()
@@ -84,8 +87,7 @@ class Mixer:
             self.voices = []
 
 
-mixer = Mixer()
-atexit.register(mixer.shutdown)
+SOUND_MIXER = Mixer()
 
 
 SOUNDS_DIR = Path(__file__).parent / 'sounds' / '1.8.9'
@@ -218,7 +220,7 @@ def _housing_pitch(pitch: float) -> float:
     return 0.5 * (2**pitch)
 
 
-def play(
+def preview_sound(
     sound: ALL_SOUNDS,
     *,
     volume: float = 0.7,
@@ -235,5 +237,5 @@ def play(
     if volume != 1.0:
         data = data * np.float32(volume)
 
-    mixer.add(data)
+    SOUND_MIXER.add(data)
     return True

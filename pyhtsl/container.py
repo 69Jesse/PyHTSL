@@ -340,6 +340,9 @@ def on_program_exit() -> None:
 
     run_saved_execution_contexts()
 
+    from .misc.sounds import SOUND_MIXER
+    SOUND_MIXER.shutdown()
+
 
 sys.excepthook = exception_hook
 atexit.register(on_program_exit)

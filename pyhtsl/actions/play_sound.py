@@ -74,9 +74,9 @@ class PlaySoundExpression(Expression):
         return f'{self.__class__.__name__}<{self.sound} vol={self.volume} pitch={self.pitch}>'
 
     def raw_execute(self, context: 'ExecutionContext') -> None:
-        from ..misc.sounds import play
+        from ..misc.sounds import preview_sound
 
-        found = play(
+        found = preview_sound(
             self.sound,
             volume=self.volume * context.volume_multiplier,
             pitch=self.pitch,
