@@ -18,9 +18,9 @@ __all__ = (
 
 @final
 class DisplayActionBarExpression(Expression):
-    text: Checkable | HousingType
+    text: Checkable | str
 
-    def __init__(self, text: Checkable | HousingType) -> None:
+    def __init__(self, text: Checkable | str) -> None:
         self.text = text
 
     def into_htsl(self) -> str:
@@ -47,7 +47,7 @@ class DisplayActionBarExpression(Expression):
 
 
 def display_action_bar(
-    text: Checkable | HousingType | None = None,
+    text: Checkable | str | None = None,
 ) -> None:
-    resolved: Checkable | HousingType = text if text is not None else '&r'  # type: ignore
+    resolved: Checkable | HousingType = text if text is not None else '&r'
     DisplayActionBarExpression(text=resolved).write()
