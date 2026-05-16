@@ -1,4 +1,3 @@
-import atexit
 import random
 import threading
 import wave
