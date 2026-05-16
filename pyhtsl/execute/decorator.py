@@ -1,6 +1,6 @@
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any
 
+from ..expression.expression import Expression
 from ..utils.callback import call_with_optional_arg
 from .context import ExecutionContext
 from .expressions.run_execution_expression import CallbackType
@@ -14,19 +14,28 @@ __all__ = (
 _saved_execution_contexts: list[tuple[ExecutionContext, CallbackType]] = []
 
 
-def _execute(*args: Any, **kwargs: Any) -> Callable[[CallbackType], ExecutionContext]:
+def execute(
+    *,
+    ignore_action_limits: bool = False,
+    allow_nested_expressions: bool = False,
+    verbose: bool = False,
+    expression_callback: Callable[[Expression], None] | None = None,
+    pause_multiplier: float = 1.0,
+    volume_multiplier: float = 0.1,
+) -> Callable[[CallbackType], ExecutionContext]:
     def decorator(callback: CallbackType) -> ExecutionContext:
-        context = ExecutionContext(*args, **kwargs)
+        context = ExecutionContext(
+            ignore_action_limits=ignore_action_limits,
+            allow_nested_expressions=allow_nested_expressions,
+            verbose=verbose,
+            expression_callback=expression_callback,
+            pause_multiplier=pause_multiplier,
+            volume_multiplier=volume_multiplier,
+        )
         _saved_execution_contexts.append((context, callback))
         return context
 
     return decorator
-
-
-if TYPE_CHECKING:
-    execute = ExecutionContext().__init__
-else:
-    execute = _execute
 
 
 def run_saved_execution_contexts() -> None:
