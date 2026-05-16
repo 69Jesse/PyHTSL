@@ -45,6 +45,10 @@ class CompoundExpression(Expression, Editable):
             expr.write()
         return self.result
 
+    def materialize(self) -> tuple[list[Expression], Editable]:
+        clone = self.cloned()
+        return list(clone.expressions), clone.result
+
     def into_string_lhs(self) -> str:
         return self.write_and_get_result().into_string_lhs()
 
@@ -54,9 +58,9 @@ class CompoundExpression(Expression, Editable):
         )
 
     def into_inside_string(self, include_fallback_value: bool = True) -> str:
-        return self.write_and_get_result().into_inside_string(
-            include_fallback_value=include_fallback_value,
-        )
+        from ..deferred import register_deferred
+
+        return register_deferred(self, include_fallback_value)
 
     def into_htsl(self) -> str:
         return '\n'.join(expr.into_htsl() for expr in self.expressions)

@@ -16,9 +16,11 @@ class Number:
         return Number(Number.counter)
 
     value: int
+    finalized: bool
 
     def __init__(self, value: int) -> None:
         self.value = value
+        self.finalized = False
 
 
 @final

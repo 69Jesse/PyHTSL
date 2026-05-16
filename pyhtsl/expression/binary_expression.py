@@ -561,7 +561,11 @@ class BinaryExpression[
         return has_changed
 
     @staticmethod
-    def rename_temporary_stats(expressions: list[Expression]) -> None:
+    def rename_temporary_stats(
+        expressions: list[Expression],
+        *,
+        finalize: bool = False,
+    ) -> None:
         reserved: set[int] = set()
         first_uses: list[TemporaryStat] = []
         seen: set[Number] = set()
@@ -569,7 +573,9 @@ class BinaryExpression[
             for expr in expression.walk_expressions():
                 for stat, _ in expr.get_all_stats_used():
                     if isinstance(stat, TemporaryStat):
-                        if stat._number not in seen:
+                        if stat._number.finalized:
+                            reserved.add(stat.number)
+                        elif stat._number not in seen:
                             seen.add(stat._number)
                             first_uses.append(stat)
                     else:
@@ -584,6 +590,10 @@ class BinaryExpression[
             reserved.add(next_number)
             stat.number = next_number
             next_number += 1
+
+        if finalize:
+            for stat in first_uses:
+                stat._number.finalized = True
 
     @staticmethod
     def optimize_binary_expressions(expressions: list[Expression]) -> None:
@@ -680,6 +690,15 @@ class BinaryExpression[
 
         return stat
 
+    def materialize(self) -> tuple[list[Expression], TemporaryStat]:
+        stat = TemporaryStat(self.internal_type)
+        expressions = BinaryExpression(
+            left=stat,
+            right=self.cloned(),
+            operator=BinaryOperator.Set,
+        ).flatten()
+        return expressions, stat
+
     def into_string_lhs(self) -> str:
         return self.create_temp_stat_and_write().into_string_lhs()
 
@@ -689,9 +708,9 @@ class BinaryExpression[
         )
 
     def into_inside_string(self, include_fallback_value: bool = True) -> str:
-        return self.create_temp_stat_and_write().into_inside_string(
-            include_fallback_value=include_fallback_value,
-        )
+        from ..deferred import register_deferred
+
+        return register_deferred(self, include_fallback_value)
 
     def into_htsl(self) -> str:
         def format_rhs(value: Checkable | HousingType) -> str:

@@ -53,6 +53,11 @@ class Expression(BaseObject):
     def is_using_stat(self, stat: 'Stat') -> bool:
         from ..checkable import Checkable
         from ..stats.stat import Stat
+        from ..stats.temporary_stat import TemporaryStat
+
+        string_stat: Stat = (
+            stat.into_player_stat() if isinstance(stat, TemporaryStat) else stat
+        )
 
         for expr in self.walk_expressions():
             for s, _ in expr.get_all_stats_used():
@@ -63,7 +68,7 @@ class Expression(BaseObject):
                 if not isinstance(value, str):
                     continue
                 for ref in Checkable.iter_in_string(value):
-                    if isinstance(ref, Stat) and ref.is_same_stat(stat):
+                    if isinstance(ref, Stat) and ref.is_same_stat(string_stat):
                         return True
         return False
 

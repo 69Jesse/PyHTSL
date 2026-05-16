@@ -19,6 +19,7 @@ from .utils.slug import into_slug
 
 if TYPE_CHECKING:
     from .block import Block
+    from .editable import Editable
     from .expression.expression import Expression
 
 
@@ -161,9 +162,68 @@ class Container:
         self.finalize()
         CONTAINERS.pop()
 
+    def _materialize_deferred(
+        self,
+        deferred_ids: list[int],
+    ) -> tuple[list['Expression'], dict[int, str]]:
+        from . import deferred
+        from .expression.binary_expression import BinaryExpression
+
+        setup: list[Expression] = []
+        results: list[tuple[int, Editable, bool]] = []
+        for deferred_id in deferred_ids:
+            entry = deferred.lookup_deferred(deferred_id)
+            sub_expressions, result = entry.checkable.materialize()
+            setup.extend(sub_expressions)
+            results.append((deferred_id, result, entry.include_fallback_value))
+
+        BinaryExpression.optimize_binary_expressions(setup)
+        BinaryExpression.rename_temporary_stats(setup, finalize=True)
+
+        placeholders = {
+            deferred_id: result.into_inside_string(include_fallback_value)
+            for deferred_id, result, include_fallback_value in results
+        }
+        return setup, placeholders
+
+    def _resolve_deferred_expressions(
+        self,
+        expressions: list['Expression'],
+    ) -> None:
+        from . import deferred
+
+        index = 0
+        while index < len(expressions):
+            expression = expressions[index]
+
+            for nested in expression.nested_expressions_refs():
+                self._resolve_deferred_expressions(nested)
+
+            ids: dict[int, None] = {}
+            for value in expression._get_all_values().values():
+                if isinstance(value, str):
+                    for deferred_id in deferred.find_deferred_ids(value):
+                        ids.setdefault(deferred_id, None)
+            if not ids:
+                index += 1
+                continue
+
+            setup, placeholders = self._materialize_deferred(list(ids))
+            for key, value in expression._get_all_values().items():
+                if isinstance(value, str) and deferred.text_has_deferred(value):
+                    setattr(
+                        expression,
+                        key,
+                        deferred.substitute_deferred(value, placeholders),
+                    )
+            expressions[index:index] = setup
+            index += len(setup) + 1
+
     def finalize_expressions(self, expressions: list['Expression']) -> None:
         from .actions.no_optimization import no_optimization
         from .expression.binary_expression import BinaryExpression
+
+        self._resolve_deferred_expressions(expressions)
 
         def on_new_expression(expression: 'Expression') -> None:
             nonlocal index
@@ -341,6 +401,7 @@ def on_program_exit() -> None:
     run_saved_execution_contexts()
 
     from .misc.sounds import SOUND_MIXER
+
     SOUND_MIXER.shutdown()
 
 

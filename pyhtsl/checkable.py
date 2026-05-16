@@ -19,8 +19,10 @@ from .internal_type import InternalType
 from .utils.warn import warn
 
 if TYPE_CHECKING:
+    from .editable import Editable
     from .expression.binary_expression import BinaryExpression
     from .expression.compound_expression import CompoundExpression
+    from .expression.expression import Expression
 
 
 __all__ = ('Checkable',)
@@ -123,6 +125,9 @@ class Checkable(BaseObject):
         chat "hello %player.name%"
                     ^^^^^^^^^^^^^
         """
+        raise NotImplementedError
+
+    def materialize(self) -> 'tuple[list[Expression], Editable]':
         raise NotImplementedError
 
     @abstractmethod
