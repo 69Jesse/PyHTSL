@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, NoReturn, Self
 
 from ...expression.condition.condition import Condition
 from ...expression.condition.conditional_expression import ConditionalMode
+from ...utils.callback import call_with_optional_arg
 from ..exception import descriptive_backend_type
 from .execution_expression import ExecutionExpression
 
@@ -103,18 +104,7 @@ class AssertExecutionExpression(ExecutionExpression):
         flattened: list[Condition] = []
         for cond in self.conditions:
             if callable(cond):
-                code = cond.__code__
-                defaults = cond.__defaults__ or ()
-                required = code.co_argcount - len(defaults)
-                if required == 0:
-                    cond = cond()  # pyright: ignore[reportCallIssue]
-                elif required == 1:
-                    cond = cond(context)  # pyright: ignore[reportCallIssue]
-                else:
-                    raise ValueError(
-                        f'Callable conditions must take 0 or 1 required '
-                        f'arguments, got {required}'
-                    )
+                cond = call_with_optional_arg(cond, context, noun='conditions')
                 if cond is None:
                     continue
             if isinstance(cond, AssertExecutionExpression) and cond.mode == self.mode:

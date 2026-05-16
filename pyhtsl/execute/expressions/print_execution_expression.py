@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Self
 
+from ...utils.callback import call_with_optional_arg
 from ...utils.log import log
 from .execution_expression import ExecutionExpression
 
@@ -45,14 +46,7 @@ class PrintExecutionExpression(ExecutionExpression):
         flattened = []
         for value in self.values:
             if callable(value):
-                if value.__code__.co_argcount == 0:
-                    flattened.append(value())  # pyright: ignore[reportCallIssue]
-                elif value.__code__.co_argcount == 1:
-                    flattened.append(value(context))  # pyright: ignore[reportCallIssue]
-                else:
-                    raise ValueError(
-                        f'Callable values must take 0 or 1 arguments, got {value.__code__.co_argcount}'
-                    )
+                flattened.append(call_with_optional_arg(value, context, noun='values'))
             else:
                 flattened.append(value)
         return tuple(flattened)

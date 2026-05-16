@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Self
 
+from ...utils.callback import call_with_optional_arg
 from .execution_expression import ExecutionExpression
 
 if TYPE_CHECKING:
@@ -34,7 +35,4 @@ class RunExecutionExpression(ExecutionExpression):
         return f'{self.__class__.__name__}(callback={self.callback!r})'
 
     def raw_execute(self, context: 'ExecutionContext') -> None:
-        if self.callback.__code__.co_argcount == 0:
-            self.callback()  # pyright: ignore[reportCallIssue]
-        else:
-            self.callback(context)  # pyright: ignore[reportCallIssue]
+        call_with_optional_arg(self.callback, context, noun='callback')

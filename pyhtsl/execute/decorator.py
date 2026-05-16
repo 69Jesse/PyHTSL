@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
+from ..utils.callback import call_with_optional_arg
 from .context import ExecutionContext
 from .expressions.run_execution_expression import CallbackType
 
@@ -32,7 +33,4 @@ def run_saved_execution_contexts() -> None:
     while _saved_execution_contexts:
         context, callback = _saved_execution_contexts.pop(0)
         with context:
-            if callback.__code__.co_argcount == 0:
-                callback()  # pyright: ignore[reportCallIssue]
-            else:
-                callback(context)  # pyright: ignore[reportCallIssue]
+            call_with_optional_arg(callback, context, noun='callback')
