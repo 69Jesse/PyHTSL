@@ -851,9 +851,19 @@ class BinaryExpression[
             elif expression.operator is BinaryOperator.RightShift:
                 result_long = left_long >> right_long
             elif expression.operator is BinaryOperator.LogicalRightShift:
-                # Logical right shift (unsigned)
+                # Logical right shift (unsigned): vacated high bits fill
+                # with 0 rather than the sign bit. When the operand has its
+                # top bit set it reads as a negative int64, so the shift is
+                # done on the unsigned 64-bit pattern in plain Python ints
+                # (`np.int64 % (1 << 64)` would overflow — 1 << 64 fits in
+                # neither int64 nor uint64) and folded back into a signed
+                # int64.
                 if left_long < 0:
-                    result_long = (left_long % (1 << 64)) >> right_long
+                    unsigned = int(left_long) & ((1 << 64) - 1)
+                    shifted = unsigned >> int(right_long)
+                    result_long = np.int64(
+                        shifted - (1 << 64) if shifted >= (1 << 63) else shifted
+                    )
                 else:
                     result_long = left_long >> right_long
             else:
