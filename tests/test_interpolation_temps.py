@@ -10,7 +10,6 @@ from pyhtsl import (
     HousePlayers,
     IfAll,
     PlayerStat,
-    Random,
     chat,
     display_title,
 )
