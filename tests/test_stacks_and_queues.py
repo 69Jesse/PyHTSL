@@ -1,16 +1,20 @@
 """Tests for the stack/queue implementations in `pyhtsl.ext.stack_queue`.
 
-Covers `IntStack` today; future stack/queue types in the same module should add
-their cases here rather than spawning a parallel file.
+Covers `IntStack`, `IntQueue`, `Stack` and `Queue`; future stack/queue types in
+the same module should add their cases here rather than spawning a parallel
+file.
 
 Capacity arithmetic used throughout:
-    most=255  -> bit_length=8  -> per_holder_capacity = 63 // 8 = 7
-    most=1023 -> bit_length=10 -> per_holder_capacity = 63 // 10 = 6
+    most=255  -> bit_length=8  -> per_holder_capacity = 64 // 8 = 8
+    most=1023 -> bit_length=10 -> per_holder_capacity = 64 // 10 = 6
 """
+
+import io
+from contextlib import redirect_stdout
 
 from helpers import expect_exception
 
-from pyhtsl import ExecutionContext, PlayerStat
+from pyhtsl import Container, ExecutionContext, PlayerStat
 from pyhtsl.ext.stack_queue import IntQueue, IntStack, Queue, Stack
 
 # === Single holder, width 1 ===
@@ -1517,3 +1521,243 @@ with expect_exception(ValueError):
         counter=PlayerStat('c').as_long(),
     )
     q.remove(output=(PlayerStat('a').as_long(), PlayerStat('b').as_long()))
+
+
+# ===========================================================================
+# Large containers
+# ===========================================================================
+#
+# A bulk shift/cascade over a container with many holders emits far more stat
+# changes than HTSL allows inside one if-statement. `add` / `remove` split
+# those across several sequential `IfAll` blocks (see
+# `pyhtsl.helpers.chunked_if`). These cases pin two things:
+#   1. execution stays correct once the body is spread over many blocks, and
+#   2. finalization through a real `Container` no longer raises the
+#      action-limit error an un-chunked body used to trigger.
+#
+# Sizes are kept to the smallest that still overflow the ~25-action cap: a
+# 28-slot shift and a 13-holder cascade each land two chunks deep.
+
+_BIG = 28  # slot holders: a 27-deep shift clears the per-if action cap
+_INT_CAP = 104  # IntStack/IntQueue capacity -> 13 holders, tile-even for 8-bit
+
+
+# --- Slot Queue: many holders, plain FIFO ---
+with ExecutionContext(ignore_action_limits=True) as ctx:
+    holders = [PlayerStat(f'bigq{i}').as_long() for i in range(_BIG)]
+    counter = PlayerStat('c').as_long()
+    outs = [PlayerStat(f'bigqo{i}').as_long() for i in range(_BIG)]
+    q = Queue(holders=holders, counter=counter)
+    for i in range(_BIG):
+        q.add(i + 1)
+    for i in range(_BIG):
+        q.remove(output=outs[i])
+
+    def check_big_queue(_outs: list = outs) -> None:
+        for i in range(_BIG):
+            got = int(ctx.get(_outs[i]))
+            assert got == i + 1, f'big queue deq {i}: got {got}, want {i + 1}'
+
+    ctx.assert_all(check_big_queue)
+
+
+# --- Slot Queue: many holders, override_oldest drops the front when full ---
+with ExecutionContext(ignore_action_limits=True) as ctx:
+    holders = [PlayerStat(f'bigqo{i}').as_long() for i in range(_BIG)]
+    counter = PlayerStat('c').as_long()
+    outs = [PlayerStat(f'bigqoo{i}').as_long() for i in range(_BIG)]
+    q = Queue(holders=holders, counter=counter, on_overflow='override_oldest')
+    for i in range(_BIG + 8):  # first 8 fall off the front
+        q.add(i + 1)
+    for i in range(_BIG):
+        q.remove(output=outs[i])
+
+    def check_big_queue_oldest(_outs: list = outs) -> None:
+        for i in range(_BIG):
+            got = int(ctx.get(_outs[i]))
+            want = i + 9  # FIFO of [9 .. 36]
+            assert got == want, f'big queue oldest deq {i}: got {got}, want {want}'
+
+    ctx.assert_all(check_big_queue_oldest)
+
+
+# --- Slot Queue: many holders, override_newest replaces the back when full ---
+with ExecutionContext(ignore_action_limits=True) as ctx:
+    holders = [PlayerStat(f'bigqn{i}').as_long() for i in range(_BIG)]
+    counter = PlayerStat('c').as_long()
+    outs = [PlayerStat(f'bigqno{i}').as_long() for i in range(_BIG)]
+    q = Queue(holders=holders, counter=counter, on_overflow='override_newest')
+    for i in range(_BIG + 8):  # 1..28 fill; 29..36 each replace the back
+        q.add(i + 1)
+    for i in range(_BIG):
+        q.remove(output=outs[i])
+
+    def check_big_queue_newest(_outs: list = outs) -> None:
+        # Stored front -> back: [1 .. 27, 36].
+        expected = list(range(1, _BIG)) + [_BIG + 8]
+        for i, want in enumerate(expected):
+            got = int(ctx.get(_outs[i]))
+            assert got == want, f'big queue newest deq {i}: got {got}, want {want}'
+
+    ctx.assert_all(check_big_queue_newest)
+
+
+# --- Slot Stack: many holders, plain LIFO ---
+with ExecutionContext(ignore_action_limits=True) as ctx:
+    holders = [PlayerStat(f'bigs{i}').as_long() for i in range(_BIG)]
+    counter = PlayerStat('c').as_long()
+    outs = [PlayerStat(f'bigso{i}').as_long() for i in range(_BIG)]
+    s = Stack(holders=holders, counter=counter)
+    for i in range(_BIG):
+        s.add(i + 1)
+    for i in range(_BIG):
+        s.remove(output=outs[i])
+
+    def check_big_stack(_outs: list = outs) -> None:
+        for i in range(_BIG):
+            got = int(ctx.get(_outs[i]))
+            want = _BIG - i  # LIFO of [1 .. 28]
+            assert got == want, f'big stack pop {i}: got {got}, want {want}'
+
+    ctx.assert_all(check_big_stack)
+
+
+# --- Slot Stack: many holders, override_oldest drops the bottom when full ---
+with ExecutionContext(ignore_action_limits=True) as ctx:
+    holders = [PlayerStat(f'bigso{i}').as_long() for i in range(_BIG)]
+    counter = PlayerStat('c').as_long()
+    outs = [PlayerStat(f'bigsoo{i}').as_long() for i in range(_BIG)]
+    s = Stack(holders=holders, counter=counter, on_overflow='override_oldest')
+    for i in range(_BIG + 8):  # first 8 fall off the bottom
+        s.add(i + 1)
+    for i in range(_BIG):
+        s.remove(output=outs[i])
+
+    def check_big_stack_oldest(_outs: list = outs) -> None:
+        for i in range(_BIG):
+            got = int(ctx.get(_outs[i]))
+            want = _BIG + 8 - i  # LIFO of [9 .. 36]
+            assert got == want, f'big stack oldest pop {i}: got {got}, want {want}'
+
+    ctx.assert_all(check_big_stack_oldest)
+
+
+# --- Slot Stack: many holders, override_newest replaces the top when full ---
+with ExecutionContext(ignore_action_limits=True) as ctx:
+    holders = [PlayerStat(f'bigsn{i}').as_long() for i in range(_BIG)]
+    counter = PlayerStat('c').as_long()
+    outs = [PlayerStat(f'bigsno{i}').as_long() for i in range(_BIG)]
+    s = Stack(holders=holders, counter=counter, on_overflow='override_newest')
+    for i in range(_BIG + 8):  # 1..28 fill; 29..36 each replace the top
+        s.add(i + 1)
+    for i in range(_BIG):
+        s.remove(output=outs[i])
+
+    def check_big_stack_newest(_outs: list = outs) -> None:
+        # Stored top -> bottom: [36, 27, 26, ..., 1].
+        expected = [_BIG + 8] + [_BIG - i for i in range(1, _BIG)]
+        for i, want in enumerate(expected):
+            got = int(ctx.get(_outs[i]))
+            assert got == want, f'big stack newest pop {i}: got {got}, want {want}'
+
+    ctx.assert_all(check_big_stack_newest)
+
+
+# --- IntQueue: large capacity (13 holders), plain FIFO ---
+# most=255 -> per_holder_capacity=8; capacity=104 -> 13 holders, so the
+# pop-side cascade runs past the per-if action cap.
+with ExecutionContext(ignore_action_limits=True) as ctx:
+    counter = PlayerStat('c').as_long()
+    outs = [PlayerStat(f'bigiq{i}').as_long() for i in range(16)]
+    q = IntQueue(
+        holder=lambda i: PlayerStat(f'bigiqh{i}').as_long(),
+        counter=counter,
+        most=255,
+        capacity=_INT_CAP,
+    )
+    for i in range(16):
+        q.add(i + 1)
+    for i in range(16):
+        q.remove(output=outs[i])
+
+    def check_big_intqueue(_outs: list = outs) -> None:
+        for i in range(16):
+            got = int(ctx.get(_outs[i]))
+            assert got == i + 1, f'big IntQueue deq {i}: got {got}, want {i + 1}'
+
+    ctx.assert_all(check_big_intqueue)
+
+
+# --- IntStack: large capacity (13 holders), plain LIFO ---
+with ExecutionContext(ignore_action_limits=True) as ctx:
+    counter = PlayerStat('c').as_long()
+    outs = [PlayerStat(f'bigis{i}').as_long() for i in range(16)]
+    s = IntStack(
+        holder=lambda i: PlayerStat(f'bigish{i}').as_long(),
+        counter=counter,
+        most=255,
+        capacity=_INT_CAP,
+    )
+    for i in range(16):
+        s.add(i + 1)
+    for i in range(16):
+        s.remove(output=outs[i])
+
+    def check_big_intstack(_outs: list = outs) -> None:
+        for i in range(16):
+            got = int(ctx.get(_outs[i]))
+            want = 16 - i  # LIFO of [1 .. 16]
+            assert got == want, f'big IntStack pop {i}: got {got}, want {want}'
+
+    ctx.assert_all(check_big_intstack)
+
+
+# --- Finalization through a real Container must not raise the action-limit
+#     error. ExecutionContext above ignores those limits; here they bite, so
+#     this is the case that actually exercises the chunked-block split across
+#     every overflow mode of every container type. ---
+with redirect_stdout(io.StringIO()):  # silence "created a new function" logs
+    for _ov in ('ignore', 'override_oldest', 'override_newest'):
+        with Container() as _container:
+            _q = Queue(
+                holders=[PlayerStat(f'fq{i}').as_long() for i in range(_BIG)],
+                counter=PlayerStat('fqc').as_long(),
+                on_overflow=_ov,
+            )
+            _q.add(1)
+            _q.remove(output=PlayerStat('fqo').as_long())
+        assert _container.into_htsl()
+
+        with Container() as _container:
+            _s = Stack(
+                holders=[PlayerStat(f'fs{i}').as_long() for i in range(_BIG)],
+                counter=PlayerStat('fsc').as_long(),
+                on_overflow=_ov,
+            )
+            _s.add(1)
+            _s.remove(output=PlayerStat('fso').as_long())
+        assert _container.into_htsl()
+
+        with Container() as _container:
+            _iq = IntQueue(
+                holder=lambda i: PlayerStat(f'fiq{i}').as_long(),
+                counter=PlayerStat('fiqc').as_long(),
+                most=255,
+                capacity=_INT_CAP,
+                on_overflow=_ov,
+            )
+            _iq.add(1)
+            _iq.remove(output=PlayerStat('fiqo').as_long())
+        assert _container.into_htsl()
+
+        with Container() as _container:
+            _is = IntStack(
+                holder=lambda i: PlayerStat(f'fis{i}').as_long(),
+                counter=PlayerStat('fisc').as_long(),
+                most=255,
+                capacity=_INT_CAP,
+                on_overflow=_ov,
+            )
+            _is.add(1)
+            _is.remove(output=PlayerStat('fiso').as_long())
+        assert _container.into_htsl()
