@@ -21,6 +21,12 @@ class IfContextManager(ContainerContextManager):
     def __init__(self, conditions: list['Condition'], mode: ConditionalMode) -> None:
         self.expression = ConditionalExpression(conditions, mode)
 
+    def cloned(self) -> 'IfContextManager':
+        return IfContextManager(
+            [condition.cloned() for condition in self.expression.conditions],
+            self.expression.mode,
+        )
+
     def create_context(self) -> ExpressionContext:
         return ExpressionContext(
             parent_expression=self.expression,
