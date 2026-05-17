@@ -108,9 +108,9 @@ class Block(BaseObject):
     def maybe_run_callback(self) -> None:
         if self.callback is None or self.callback_ran:
             return
+        self.callback_ran = True
         with BlockContextManager(self):
             self.callback()
-            self.callback_ran = True
 
     def fix_action_limits(self, container: 'Container', index: int) -> None:
         root = self._overflow_root_ref or self

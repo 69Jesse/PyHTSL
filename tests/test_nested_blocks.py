@@ -7,6 +7,7 @@ must still be allowed: only nested *expression* blocks are rejected.
 
 from helpers import expect_exception
 
+import pyhtsl.container
 from pyhtsl import (
     Container,
     Else,
@@ -158,3 +159,21 @@ with expect_exception(SyntaxError):
                 with IfAll(x > 5):
                     with IfAll(x > 10):
                         chat('nope')
+
+
+# A function callback that raises must not corrupt the container stack: the
+# block is marked as run even on failure (so finalize does not run it again and
+# re-raise), and the container is always popped off the stack on exit.
+_depth_before = len(pyhtsl.container.CONTAINERS)
+with expect_exception(SyntaxError):
+    with Container():
+        x = PlayerStat('x').as_long()
+
+        @create_function('raising body', run_right_now=True)
+        def raising_body() -> None:
+            with IfAll(x > 0):
+                with IfAll(x > 1):
+                    chat('nope')
+
+
+assert len(pyhtsl.container.CONTAINERS) == _depth_before, pyhtsl.container.CONTAINERS

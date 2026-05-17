@@ -159,8 +159,10 @@ class Container:
         traceback: TracebackType | None,
     ) -> None:
         assert CONTAINERS[-1] is self, 'Container stack is corrupted'
-        self.finalize()
-        CONTAINERS.pop()
+        try:
+            self.finalize()
+        finally:
+            CONTAINERS.pop()
 
     def _materialize_deferred(
         self,
