@@ -104,3 +104,9 @@ class Expression(BaseObject):
 
     def can_be_nested(self) -> bool:
         return len(self.nested_expressions_refs()) == 0
+
+    def describe_nestable_block(self) -> str:
+        return repr(self)
+
+    def nestable_block_detail_lines(self) -> list[str]:
+        return []

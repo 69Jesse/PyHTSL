@@ -133,3 +133,16 @@ class ConditionalExpression(Expression):
 
     def nested_expressions_refs(self) -> list[list['Expression']]:
         return [self.if_expressions, self.else_expressions]
+
+    def describe_nestable_block(self) -> str:
+        name = 'IfAll' if self.mode is ConditionalMode.ALL else 'IfAny'
+        plural = '' if len(self.conditions) == 1 else 's'
+        return f'{name}(...) with {len(self.conditions)} condition{plural}'
+
+    def nestable_block_detail_lines(self) -> list[str]:
+        limit = 10
+        lines = [repr(cond) for cond in self.conditions[:limit]]
+        extra = len(self.conditions) - limit
+        if extra > 0:
+            lines.append(f'... and {extra} more condition{"" if extra == 1 else "s"}')
+        return lines

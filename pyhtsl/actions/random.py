@@ -58,6 +58,9 @@ class RandomExpression(Expression):
     def nested_expressions_refs(self) -> list[list['Expression']]:
         return [self.expressions]
 
+    def describe_nestable_block(self) -> str:
+        return 'Random'
+
 
 @final
 class RandomContextManager(ContainerContextManager):

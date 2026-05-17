@@ -125,3 +125,36 @@ with ExecutionContext(allow_nested_expressions=True) as ctx:
             y.value = 1
 
 assert int(ctx.get(y)) == 1, ctx.get(y)
+
+
+# A `run_right_now=True` function runs its callback synchronously, at decoration
+# time. Defining one inside an open IfAll must still give the function body a
+# fresh nesting scope: an IfAll inside that body is its own HTSL block, so it is
+# legal even though the outer IfAll is still open on the context stack.
+with Container() as container:
+    x = PlayerStat('x').as_long()
+    with IfAll(x > 0):
+
+        @create_function('rrn inner', run_right_now=True)
+        def rrn_inner() -> None:
+            with IfAll(x > 5):
+                chat('legal inside run_right_now function')
+
+        chat('then')
+
+# Just check it didn't raise; render it for good measure.
+container.into_htsl()
+
+
+# ...but a genuine IfAll-inside-IfAll *within* that function body still raises:
+# the fresh scope resets nesting at the function boundary, not inside it.
+with expect_exception(SyntaxError):
+    with Container():
+        x = PlayerStat('x').as_long()
+        with IfAll(x > 0):
+
+            @create_function('rrn bad', run_right_now=True)
+            def rrn_bad() -> None:
+                with IfAll(x > 5):
+                    with IfAll(x > 10):
+                        chat('nope')

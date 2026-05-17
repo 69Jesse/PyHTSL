@@ -322,6 +322,42 @@ class Container:
         )
 
 
+def _format_nested_expression_error(
+    new_context: ExpressionContext,
+    open_context: ExpressionContext,
+) -> str:
+    assert new_context.parent_expression is not None
+    assert open_context.parent_expression is not None
+    new_expr = new_context.parent_expression
+    open_expr = open_context.parent_expression
+    # Among nestable contexts, only the `Else` branch is added with
+    # `add_expression_to_container=False`.
+    branch = '' if open_context.add_expression_to_container else ' (else branch)'
+
+    lines: list[str] = [
+        'It is not allowed to write a nestable expression (if/random) inside of another nestable expression.',
+        '',
+        f'You are trying to write:  {new_expr.describe_nestable_block()}',
+        *(f'    {detail}' for detail in new_expr.nestable_block_detail_lines()),
+        '',
+        f'but you are still inside:  {open_expr.describe_nestable_block()}{branch}',
+        *(f'    {detail}' for detail in open_expr.nestable_block_detail_lines()),
+    ]
+
+    written = open_context.expressions_ref
+    if written:
+        count = len(written)
+        plural = '' if count == 1 else 's'
+        limit = 15
+        lines.append('')
+        lines.append(f'{count} expression{plural} written in that block so far:')
+        for index, expr in enumerate(written[:limit], start=1):
+            lines.append(f'  {index}. {expr!r}')
+        if count > limit:
+            lines.append(f'  ... and {count - limit} more')
+    return '\n'.join(lines)
+
+
 class ContainerContextManager(ABC):
     @abstractmethod
     def create_context(self) -> ExpressionContext:
@@ -334,15 +370,28 @@ class ContainerContextManager(ABC):
             context.parent_expression is not None
             and not context.parent_expression.can_be_nested()
             and not container.allow_nested_expressions
-            and any(
-                ctx.parent_expression is not None
-                and not ctx.parent_expression.can_be_nested()
-                for ctx in container.contexts
-            )
         ):
-            raise SyntaxError(
-                'It is not allowed to put another nestable expression (if/random) inside of a nestable expression.'
-            )
+            # A function body starts a fresh nesting scope. Entering a function
+            # block pushes a context with `parent_expression is None`; an
+            # if/random inside that function is emitted as its own HTSL block,
+            # so if/random blocks opened before the function boundary must not
+            # count (this matters when a `run_right_now=True` function runs
+            # synchronously inside an already-open if/random). Only consider
+            # contexts opened after the most recent block boundary.
+            boundary = -1
+            for index, ctx in enumerate(container.contexts):
+                if ctx.parent_expression is None:
+                    boundary = index
+            open_nestables = [
+                ctx
+                for ctx in container.contexts[boundary + 1 :]
+                if ctx.parent_expression is not None
+                and not ctx.parent_expression.can_be_nested()
+            ]
+            if open_nestables:
+                raise SyntaxError(
+                    _format_nested_expression_error(context, open_nestables[-1])
+                )
         if context.add_expression_to_container:
             assert context.parent_expression is not None
             container.write_expression(context.parent_expression)
