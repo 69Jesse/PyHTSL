@@ -73,9 +73,10 @@ class Mixer:
             stream = self.stream
             self.stream = None
             if stream is not None and stream.active and self.voices:
-                max_ms = int(
-                    max((len(d) - o) / _SAMPLE_RATE * 1000 for d, o in self.voices)
-                ) + 100
+                max_ms = (
+                    int(max((len(d) - o) / _SAMPLE_RATE * 1000 for d, o in self.voices))
+                    + 100
+                )
             else:
                 max_ms = 0
         if max_ms:
@@ -193,9 +194,7 @@ def _load_wav(path: Path) -> np.ndarray:
         new_len = int(len(data) * ratio)
         if new_len > 0:
             old_indices = np.linspace(0, len(data) - 1, new_len)
-            data = np.interp(old_indices, np.arange(len(data)), data).astype(
-                np.float32
-            )
+            data = np.interp(old_indices, np.arange(len(data)), data).astype(np.float32)
 
     data = np.ascontiguousarray(data, dtype=np.float32)
     _AUDIO_CACHE[path] = data
