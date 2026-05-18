@@ -34,7 +34,6 @@ __all__ = (
     'BinaryOperator',
     'BinaryExpression',
     'SET_STRING_MAX_LENGTH',
-    'len',
 )
 
 

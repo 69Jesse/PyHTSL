@@ -31,8 +31,8 @@ def set_string(stat: Editable, value: str) -> None:
 
     if not _has_placeholders(value):
         raise ValueError(
-            f'set_string: value of {len(value)} chars has no placeholders to '
-            f'shrink it under the {SET_STRING_MAX_LENGTH}-char limit'
+            f'set_string: value of {len(value)} chars has no '
+            f'placeholders to shrink it under the {SET_STRING_MAX_LENGTH}-char limit'
         )
 
     self_ref = str(stat)
@@ -55,22 +55,23 @@ def set_string(stat: Editable, value: str) -> None:
         return SET_STRING_MAX_LENGTH if not chunks else budget_continuation
 
     for atom in atoms:
-        if current_len + len(atom) > budget():
+        atom_len = len(atom)
+        if current_len + atom_len > budget():
             if not current:
                 raise ValueError(
-                    f'set_string: atom {atom!r} of {len(atom)} chars exceeds '
+                    f'set_string: atom {atom!r} of {atom_len} chars exceeds '
                     f'chunk budget of {budget()} chars'
                 )
             chunks.append(''.join(current))
             current = []
             current_len = 0
-            if len(atom) > budget():
+            if atom_len > budget():
                 raise ValueError(
-                    f'set_string: atom {atom!r} of {len(atom)} chars exceeds '
+                    f'set_string: atom {atom!r} of {atom_len} chars exceeds '
                     f'chunk budget of {budget()} chars'
                 )
         current.append(atom)
-        current_len += len(atom)
+        current_len += atom_len
 
     if current:
         chunks.append(''.join(current))
