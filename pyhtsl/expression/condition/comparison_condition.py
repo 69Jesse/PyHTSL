@@ -117,13 +117,13 @@ class ComparisonCondition[LeftT: 'Checkable', RightT: 'Checkable | HousingType']
         if isinstance(left_value, str):
             return False
         if self.operator is ComparisonOperator.GreaterThan:
-            return (left_value > right_value).astype(bool)
+            return bool(left_value > right_value)
         if self.operator is ComparisonOperator.LessThan:
-            return (left_value < right_value).astype(bool)
+            return bool(left_value < right_value)
         if self.operator is ComparisonOperator.GreaterThanOrEqual:
-            return (left_value >= right_value).astype(bool)
+            return bool(left_value >= right_value)
         if self.operator is ComparisonOperator.LessThanOrEqual:
-            return (left_value <= right_value).astype(bool)
+            return bool(left_value <= right_value)
         raise RuntimeError(f'Unsupported operator {self.operator}')
 
     def related_debug_parts(self) -> list['Checkable | HousingType']:

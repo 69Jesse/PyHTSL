@@ -4,9 +4,11 @@ import numpy as np
 
 from ..expression.housing_type import HousingType
 from ..internal_type import InternalType
+from .java_long import INT64_MAX, INT64_MIN, JavaLong
 
 __all__ = (
     'BackendType',
+    'JavaLong',
     'into_backend_type',
     'into_housing_type',
     'backend_into_string',
@@ -18,19 +20,19 @@ __all__ = (
 )
 
 
-type BackendType = np.int64 | np.float64 | str
+type BackendType = JavaLong | np.float64 | str
 
 
 def into_backend_type(value: HousingType | BackendType) -> BackendType:
     if isinstance(value, int):
-        return np.int64(value)
+        return JavaLong(value)
     if isinstance(value, float):
         return np.float64(value)
     return value
 
 
 def into_housing_type(value: HousingType | BackendType) -> HousingType:
-    if isinstance(value, np.integer):
+    if isinstance(value, JavaLong):
         return int(value)
     if isinstance(value, np.floating):
         return float(value)
@@ -38,7 +40,7 @@ def into_housing_type(value: HousingType | BackendType) -> HousingType:
 
 
 def backend_into_string(value: BackendType) -> str:
-    if isinstance(value, np.integer):
+    if isinstance(value, JavaLong):
         return f'{int(value):,}'
     if isinstance(value, np.floating):
         d = float(value)
@@ -77,7 +79,7 @@ def backend_matches_internal_type(
     if internal_type is InternalType.ANY:
         return True
     if internal_type is InternalType.LONG:
-        return isinstance(value, np.integer)
+        return isinstance(value, JavaLong)
     if internal_type is InternalType.DOUBLE:
         return isinstance(value, np.floating)
     if internal_type is InternalType.STRING:
@@ -85,9 +87,9 @@ def backend_matches_internal_type(
     return False
 
 
-def cast_to_backend_long(value: str) -> np.int64 | None:
+def cast_to_backend_long(value: str) -> JavaLong | None:
     if not value:
-        return np.int64(0)
+        return JavaLong(0)
     cleaned = value.replace(',', '')
     try:
         n = int(cleaned)
@@ -96,9 +98,9 @@ def cast_to_backend_long(value: str) -> np.int64 | None:
             n = int(np.float64(cleaned))
         except (ValueError, ArithmeticError):
             return None
-    if n < -9223372036854775808 or n > 9223372036854775807:
+    if n < INT64_MIN or n > INT64_MAX:
         return None
-    return np.int64(n)
+    return JavaLong(n)
 
 
 def cast_to_backend_double(value: str) -> np.float64 | None:
@@ -112,8 +114,8 @@ def cast_to_backend_double(value: str) -> np.float64 | None:
 
 
 def backend_to_default_backend(value: BackendType) -> BackendType:
-    if isinstance(value, np.integer):
-        return np.int64(0)
+    if isinstance(value, JavaLong):
+        return JavaLong(0)
     if isinstance(value, np.floating):
         return np.float64(0.0)
     return ''

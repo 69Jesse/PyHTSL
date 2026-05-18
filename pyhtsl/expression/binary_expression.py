@@ -8,8 +8,10 @@ import numpy as np
 from ..actions.no_type_casting import no_type_casting
 from ..checkable import Checkable
 from ..editable import Editable
+from ..execute import java_long
 from ..execute.backend_type import (
     BackendType,
+    JavaLong,
     backend_to_default_backend,
     is_default_backend,
 )
@@ -32,10 +34,12 @@ __all__ = (
     'BinaryOperator',
     'BinaryExpression',
     'SET_STRING_MAX_LENGTH',
+    'len',
 )
 
 
 SET_STRING_MAX_LENGTH = 32
+
 
 
 def _is_single_placeholder(value: str) -> bool:
@@ -415,31 +419,61 @@ class BinaryExpression[
         val_a: int | float,
         op_b: BinaryOperator,
         val_b: int | float,
+        internal_type: InternalType,
     ) -> tuple[BinaryOperator, int | float] | None:
-        """Combine two consecutive constant ops on the same lhs into one."""
-        # `lhs = c1; lhs OP c2` -> `lhs = applied(c1, c2)`. Skip Divide because
-        # the result depends on lhs's internal type (long floors, double doesn't).
+        """Combine two consecutive constant ops on the same lhs into one.
+
+        A fold is only emitted when it provably computes the same value as
+        running the two ops would: long results wrap to 64 bits exactly as the
+        executor does, and folds that would otherwise change a result
+        (out-of-range integers on a non-long stat, shift counts past the
+        6-bit mask) are declined so the two ops simply survive.
+        """
+        is_long = internal_type is InternalType.LONG
+        both_int = isinstance(val_a, int) and isinstance(val_b, int)
+
+        def fold_to(value: int | float) -> int | float | None:
+            # An integer result that overflows a long is only safe to emit
+            # when the stat really is a long — then the executor wraps the
+            # literal the same way. On any other stat, decline the fold.
+            if isinstance(value, int) and not java_long.in_int64_range(value):
+                return int(JavaLong(value)) if is_long else None
+            return value
+
+        # `lhs = c1; lhs OP c2` -> `lhs = combined`. The runtime applies `OP`
+        # exactly once either way, so this stays exact for doubles too.
         if op_a is BinaryOperator.Set:
             if op_b is BinaryOperator.Increment:
-                return BinaryOperator.Set, val_a + val_b
+                v = fold_to(val_a + val_b)
+                return None if v is None else (BinaryOperator.Set, v)
             if op_b is BinaryOperator.Decrement:
-                return BinaryOperator.Set, val_a - val_b
+                v = fold_to(val_a - val_b)
+                return None if v is None else (BinaryOperator.Set, v)
             if op_b is BinaryOperator.Multiply:
-                return BinaryOperator.Set, val_a * val_b
-            if isinstance(val_a, int) and isinstance(val_b, int):
+                v = fold_to(val_a * val_b)
+                return None if v is None else (BinaryOperator.Set, v)
+            if both_int:
+                assert isinstance(val_a, int) and isinstance(val_b, int)
                 if op_b is BinaryOperator.BitwiseAnd:
-                    return BinaryOperator.Set, val_a & val_b
+                    v = fold_to(val_a & val_b)
+                    return None if v is None else (BinaryOperator.Set, v)
                 if op_b is BinaryOperator.BitwiseOr:
-                    return BinaryOperator.Set, val_a | val_b
+                    v = fold_to(val_a | val_b)
+                    return None if v is None else (BinaryOperator.Set, v)
                 if op_b is BinaryOperator.BitwiseXor:
-                    return BinaryOperator.Set, val_a ^ val_b
+                    v = fold_to(val_a ^ val_b)
+                    return None if v is None else (BinaryOperator.Set, v)
                 if op_b is BinaryOperator.LeftShift:
-                    return BinaryOperator.Set, val_a << val_b
+                    return BinaryOperator.Set, int(java_long.shl(val_a, val_b))
                 if op_b is BinaryOperator.RightShift:
-                    return BinaryOperator.Set, val_a >> val_b
+                    return BinaryOperator.Set, int(java_long.shr(val_a, val_b))
+                if op_b is BinaryOperator.LogicalRightShift:
+                    return BinaryOperator.Set, int(java_long.ushr(val_a, val_b))
             return None
 
-        # Inc/Dec mix arithmetically.
+        # `lhs += a; lhs -= b` -> one Inc/Dec. Addition is associative (mod
+        # 2**64 for longs), so the executor wrapping the emitted literal
+        # reproduces running the two ops exactly.
         if op_a in (BinaryOperator.Increment, BinaryOperator.Decrement) and op_b in (
             BinaryOperator.Increment,
             BinaryOperator.Decrement,
@@ -452,28 +486,39 @@ class BinaryExpression[
             return BinaryOperator.Decrement, -combined
 
         if op_a is op_b:
+            # `lhs *= a; lhs *= b` -> `lhs *= a*b`. Multiplication is
+            # associative (mod 2**64 for longs) and the executor wraps the
+            # emitted literal.
             if op_a is BinaryOperator.Multiply:
                 return op_a, val_a * val_b
+            # `lhs /= a; lhs /= b` -> `lhs /= a*b` holds for truncating
+            # division, but only while `a*b` stays in range — past that the
+            # executor would wrap the divisor and the results diverge.
             if op_a is BinaryOperator.Divide:
+                if both_int and not java_long.in_int64_range(val_a * val_b):
+                    return None
                 return op_a, val_a * val_b
-            if (
-                op_a
-                in (
+            if both_int:
+                assert isinstance(val_a, int) and isinstance(val_b, int)
+                if op_a is BinaryOperator.BitwiseAnd:
+                    v = fold_to(val_a & val_b)
+                    return None if v is None else (op_a, v)
+                if op_a is BinaryOperator.BitwiseOr:
+                    v = fold_to(val_a | val_b)
+                    return None if v is None else (op_a, v)
+                if op_a is BinaryOperator.BitwiseXor:
+                    v = fold_to(val_a ^ val_b)
+                    return None if v is None else (op_a, v)
+                # `(lhs << a) << b` == `lhs << (a+b)` only while neither count
+                # nor their sum crosses the 6-bit shift-count mask.
+                if op_a in (
                     BinaryOperator.LeftShift,
                     BinaryOperator.RightShift,
                     BinaryOperator.LogicalRightShift,
-                )
-                and isinstance(val_a, int)
-                and isinstance(val_b, int)
-            ):
-                return op_a, val_a + val_b
-            if isinstance(val_a, int) and isinstance(val_b, int):
-                if op_a is BinaryOperator.BitwiseAnd:
-                    return op_a, val_a & val_b
-                if op_a is BinaryOperator.BitwiseOr:
-                    return op_a, val_a | val_b
-                if op_a is BinaryOperator.BitwiseXor:
-                    return op_a, val_a ^ val_b
+                ):
+                    if 0 <= val_a <= 63 and 0 <= val_b <= 63 and val_a + val_b <= 63:
+                        return op_a, val_a + val_b
+                    return None
 
         return None
 
@@ -498,7 +543,11 @@ class BinaryExpression[
                 continue
 
             combined = BinaryExpression._combine_constant_ops(
-                expr_a.operator, expr_a.right, expr_b.operator, expr_b.right
+                expr_a.operator,
+                expr_a.right,
+                expr_b.operator,
+                expr_b.right,
+                expr_a.left.internal_type,
             )
             if combined is None:
                 i += 1
@@ -716,9 +765,13 @@ class BinaryExpression[
         def format_rhs(value: Checkable | HousingType) -> str:
             if isinstance(value, Checkable):
                 return value.into_string_rhs()
-            if isinstance(value, str) and len(value) > SET_STRING_MAX_LENGTH:
+            if (
+                isinstance(value, str)
+                and len(value) > SET_STRING_MAX_LENGTH
+            ):
                 raise ValueError(
-                    f'rhs exceeds {SET_STRING_MAX_LENGTH} characters ({len(value)}): {value!r}'
+                    f'rhs exceeds {SET_STRING_MAX_LENGTH} characters '
+                    f'({len(value)}): {value!r}'
                 )
             if (
                 isinstance(value, str)
@@ -821,8 +874,8 @@ class BinaryExpression[
                 operator=expression.operator,
             )
 
-        if not isinstance(left_value, np.integer | np.floating) or not isinstance(
-            right_value, np.integer | np.floating
+        if not isinstance(left_value, JavaLong | np.floating) or not isinstance(
+            right_value, JavaLong | np.floating
         ):
             raise RuntimeError(
                 'Expected numeric values for binary expression execution'
@@ -836,66 +889,70 @@ class BinaryExpression[
             BinaryOperator.RightShift,
             BinaryOperator.LogicalRightShift,
         ):
-            # For logical operators, convert to longs
-            left_long = np.int64(np.floor(left_value))
-            right_long = np.int64(np.floor(right_value))
+            # Bitwise/shift operators are defined on longs only; a double
+            # operand (which Java rejects at compile time) is first narrowed
+            # with Java's `(long)` cast.
+            original_is_double = isinstance(left_value, np.floating)
+            if isinstance(left_value, np.floating) or isinstance(
+                right_value, np.floating
+            ):
+                left_long = java_long.from_double(float(left_value))
+                right_long = java_long.from_double(float(right_value))
+            else:
+                left_long = left_value
+                right_long = right_value
 
             if expression.operator is BinaryOperator.BitwiseAnd:
-                result_long = left_long & right_long
+                result_long = java_long.bit_and(left_long, right_long)
             elif expression.operator is BinaryOperator.BitwiseOr:
-                result_long = left_long | right_long
+                result_long = java_long.bit_or(left_long, right_long)
             elif expression.operator is BinaryOperator.BitwiseXor:
-                result_long = left_long ^ right_long
+                result_long = java_long.bit_xor(left_long, right_long)
             elif expression.operator is BinaryOperator.LeftShift:
-                result_long = left_long << right_long
+                result_long = java_long.shl(left_long, right_long)
             elif expression.operator is BinaryOperator.RightShift:
-                result_long = left_long >> right_long
-            elif expression.operator is BinaryOperator.LogicalRightShift:
-                # Logical right shift (unsigned): vacated high bits fill
-                # with 0 rather than the sign bit. When the operand has its
-                # top bit set it reads as a negative int64, so the shift is
-                # done on the unsigned 64-bit pattern in plain Python ints
-                # (`np.int64 % (1 << 64)` would overflow — 1 << 64 fits in
-                # neither int64 nor uint64) and folded back into a signed
-                # int64.
-                if left_long < 0:
-                    unsigned = int(left_long) & ((1 << 64) - 1)
-                    shifted = unsigned >> int(right_long)
-                    result_long = np.int64(
-                        shifted - (1 << 64) if shifted >= (1 << 63) else shifted
-                    )
-                else:
-                    result_long = left_long >> right_long
-            else:
-                raise ValueError(f'Unexpected operator: {expression.operator}')
+                result_long = java_long.shr(left_long, right_long)
+            else:  # LogicalRightShift
+                result_long = java_long.ushr(left_long, right_long)
 
-            # If original was double, convert back to double
-            if isinstance(left_value, np.floating):
-                result = np.float64(result_long)
-            else:
-                result = result_long
-
+            result = np.float64(int(result_long)) if original_is_double else result_long
             context.put(expression.left, result, ignore_warning=True)
             return
 
-        # Arithmetic operators
-        if expression.operator is BinaryOperator.Increment:
-            result = left_value + right_value
-        elif expression.operator is BinaryOperator.Decrement:
-            result = left_value - right_value
-        elif expression.operator is BinaryOperator.Multiply:
-            result = left_value * right_value
-        elif expression.operator is BinaryOperator.Divide:
-            if right_value == 0:
-                return
-            if isinstance(left_value, np.integer) and isinstance(
-                right_value, np.integer
-            ):
-                result = left_value // right_value
-            else:
-                result = left_value / right_value
+        # Divide-by-zero is left as a no-op for both longs and doubles — HTSL
+        # does not abort the house over it.
+        if expression.operator is BinaryOperator.Divide and right_value == 0:
+            return
+
+        # Arithmetic operators. Longs and doubles never mix here (the type
+        # check above already rejected that).
+        if isinstance(left_value, np.floating):
+            assert isinstance(right_value, np.floating)
+            # `np.float64` is IEEE 754 binary64, exactly like a Java double;
+            # numpy's warnings are silenced so overflow yields inf/nan as Java.
+            with np.errstate(all='ignore'):
+                if expression.operator is BinaryOperator.Increment:
+                    result = np.float64(left_value + right_value)
+                elif expression.operator is BinaryOperator.Decrement:
+                    result = np.float64(left_value - right_value)
+                elif expression.operator is BinaryOperator.Multiply:
+                    result = np.float64(left_value * right_value)
+                elif expression.operator is BinaryOperator.Divide:
+                    result = np.float64(left_value / right_value)
+                else:
+                    raise ValueError(f'Unexpected operator: {expression.operator}')
         else:
-            raise ValueError(f'Unexpected operator: {expression.operator}')
+            assert isinstance(right_value, JavaLong)
+            if expression.operator is BinaryOperator.Increment:
+                result = java_long.add(left_value, right_value)
+            elif expression.operator is BinaryOperator.Decrement:
+                result = java_long.sub(left_value, right_value)
+            elif expression.operator is BinaryOperator.Multiply:
+                result = java_long.mul(left_value, right_value)
+            elif expression.operator is BinaryOperator.Divide:
+                result = java_long.div(left_value, right_value)
+            else:
+                raise ValueError(f'Unexpected operator: {expression.operator}')
 
         if isinstance(expression.left, Stat) and expression.left.auto_unset:
             if is_default_backend(result):

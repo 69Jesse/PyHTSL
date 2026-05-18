@@ -96,7 +96,7 @@ class InternalType(Enum):
     def from_value(value: 'Checkable | HousingType | BackendType') -> 'InternalType':
         if isinstance(value, str):
             return InternalType.STRING
-        elif isinstance(value, int | np.integer):
+        elif isinstance(value, int):
             return InternalType.LONG
         elif isinstance(value, float | np.floating):
             return InternalType.DOUBLE

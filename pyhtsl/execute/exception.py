@@ -6,7 +6,7 @@ from ..checkable import Checkable
 from ..editable import Editable
 from ..expression.housing_type import HousingType
 from ..internal_type import InternalType
-from .backend_type import BackendType
+from .backend_type import BackendType, JavaLong
 
 if TYPE_CHECKING:
     from ..expression.binary_expression import BinaryOperator
@@ -35,7 +35,7 @@ def internal_type_to_description(internal_type: InternalType) -> str:
 
 
 def descriptive_backend_type(value: BackendType | None) -> str:
-    if isinstance(value, np.integer):
+    if isinstance(value, JavaLong):
         return f'long<{value}>'
     if isinstance(value, np.floating):
         return f'double<{value}>'

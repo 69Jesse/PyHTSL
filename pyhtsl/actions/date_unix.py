@@ -2,9 +2,7 @@ import re
 import time
 from typing import Self, final
 
-import numpy as np
-
-from ..execute.backend_type import BackendType
+from ..execute.backend_type import BackendType, JavaLong
 from ..internal_type import InternalType
 from ..placeholders import PlaceholderCheckable
 
@@ -29,7 +27,7 @@ class DateUnixPlaceholder(
         )
 
     def get_backend_value(self) -> BackendType:
-        return np.int64(int(time.time()))
+        return JavaLong(int(time.time()))
 
     def cloned_raw(self) -> Self:
         return self.__class__()
@@ -51,7 +49,7 @@ class DateUnixMSPlaceholder(
         )
 
     def get_backend_value(self) -> BackendType:
-        return np.int64(int(time.time() * 1000))
+        return JavaLong(int(time.time() * 1000))
 
     def cloned_raw(self) -> Self:
         return self.__class__()

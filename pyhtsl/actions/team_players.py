@@ -1,9 +1,7 @@
 import re
 from typing import Self, final
 
-import numpy as np
-
-from ..execute.backend_type import BackendType
+from ..execute.backend_type import BackendType, JavaLong
 from ..internal_type import InternalType
 from ..placeholders import PlaceholderCheckable
 from .team import Team
@@ -37,7 +35,7 @@ class TeamPlayersPlaceholder(
         )
 
     def get_backend_value(self) -> BackendType:
-        return np.int64(0)
+        return JavaLong(0)
 
     def cloned_raw(self) -> Self:
         return self.__class__()
