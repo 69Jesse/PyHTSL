@@ -85,6 +85,8 @@ class ComparisonCondition[LeftT: 'Checkable', RightT: 'Checkable | HousingType']
         )
 
     def equals_raw(self, other: object) -> bool:
+        from ...checkable import Checkable
+
         if not isinstance(other, ComparisonCondition):
             return False
         return (

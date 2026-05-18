@@ -8,7 +8,7 @@ from pyhtsl.stats.stat import Stat
 from ..actions.conditional.statements import Else, IfAll
 from ..checkable import Checkable
 from ..editable import Editable, HousingType
-from ..helpers import chunked_if
+from ..helpers import chunked
 from .cheap_read_write import MaybeSequence, assert_same_widths, into_sequence
 
 type Factory[T] = Callable[[int], T]
@@ -200,7 +200,7 @@ class _BitPackedBase:
         if isinstance(if_present, EllipsisType):
             if_present = self.if_present
 
-        with chunked_if(IfAll(self.counter > 0)):
+        with chunked(IfAll(self.counter > 0)):
             self._cascade_right(outputs)
             if if_present is not None:
                 if_present()
@@ -263,7 +263,7 @@ class IntStack(_BitPackedBase):
                 column[0].value += values[w]
 
         if self.on_overflow == 'ignore':
-            with chunked_if(IfAll(self.counter < self.real_capacity)):
+            with chunked(IfAll(self.counter < self.real_capacity)):
                 cascade_up_and_insert()
                 self.counter.value += 1
         elif self.on_overflow == 'override_oldest':
@@ -271,7 +271,7 @@ class IntStack(_BitPackedBase):
             with IfAll(self.counter < self.real_capacity):
                 self.counter.value += 1
         else:
-            with chunked_if(IfAll(self.counter < self.real_capacity)):
+            with chunked(IfAll(self.counter < self.real_capacity)):
                 cascade_up_and_insert()
                 self.counter.value += 1
             with Else:
@@ -298,7 +298,7 @@ class IntQueue(_BitPackedBase):
         values = self._normalize_values(value, label='add')
 
         if self.on_overflow == 'override_oldest':
-            with chunked_if(IfAll(self.counter == self.real_capacity)):
+            with chunked(IfAll(self.counter == self.real_capacity)):
                 self._cascade_right(None)
                 self.counter.value -= 1
         elif self.on_overflow == 'override_newest':
@@ -458,12 +458,10 @@ class _SlotContainerBase:
         if isinstance(if_present, EllipsisType):
             if_present = self.if_present
 
-        with chunked_if(IfAll(self.counter > 0)):
+        with chunked(IfAll(self.counter > 0)):
             self._shift_down(outputs)
             if if_present is not None:
                 if_present()
-            # The only write the condition reads, kept last so it lands at
-            # the tail of the final chunk — see `chunked_if`.
             self.counter.value -= 1
         if if_empty is not None:
             with Else:
@@ -479,7 +477,7 @@ class Stack(_SlotContainerBase):
         values = self._normalize_values(value, label='add')
 
         if self.on_overflow == 'ignore':
-            with chunked_if(IfAll(self.counter < self.capacity)):
+            with chunked(IfAll(self.counter < self.capacity)):
                 self._shift_up()
                 self._write_at_slot(0, values)
                 self.counter.value += 1
@@ -489,7 +487,7 @@ class Stack(_SlotContainerBase):
             with IfAll(self.counter < self.capacity):
                 self.counter.value += 1
         else:
-            with chunked_if(IfAll(self.counter < self.capacity)):
+            with chunked(IfAll(self.counter < self.capacity)):
                 self._shift_up()
                 self._write_at_slot(0, values)
                 self.counter.value += 1
@@ -515,7 +513,7 @@ class Queue(_SlotContainerBase):
         values = self._normalize_values(value, label='add')
 
         if self.on_overflow == 'override_oldest':
-            with chunked_if(IfAll(self.counter == self.capacity)):
+            with chunked(IfAll(self.counter == self.capacity)):
                 self._shift_down(None)
                 self.counter.value -= 1
         elif self.on_overflow == 'override_newest':

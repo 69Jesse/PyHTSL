@@ -367,7 +367,7 @@ from .expression.condition.conditional_expression import (
 from .expression.expression import Expression as Expression
 from .expression.housing_type import HousingType as HousingType
 from .helpers import chunk_expressions as chunk_expressions
-from .helpers import chunked_if as chunked_if
+from .helpers import chunked as chunked
 from .internal_type import InternalType as InternalType
 from .misc.skull_data import SKULL_DATA as SKULL_DATA
 from .misc.skull_data import SkullData as SkullData
