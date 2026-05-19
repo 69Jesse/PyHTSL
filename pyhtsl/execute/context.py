@@ -5,7 +5,7 @@ from types import TracebackType
 from typing import Literal, overload
 
 from ..checkable import Checkable
-from ..container import Container
+from ..container import Container, override_write_expression
 from ..expression.condition.condition import Condition
 from ..expression.condition.conditional_expression import ConditionalMode
 from ..expression.expression import Expression
@@ -72,9 +72,12 @@ class ExecutionContext(Container):
         if exc_type is not None:
             return
         self.started_execution = True
-        for block in self.blocks:
-            block.execute(self)
-        self.run_tick_loop()
+        # This context is already popped off the stack; swallow any stray
+        # `write()` during the run so it does not leak into the global container.
+        with override_write_expression(lambda _: None):
+            for block in self.blocks:
+                block.execute(self)
+            self.run_tick_loop()
 
     def schedule_continuation(self, continuation: list[Expression], ticks: int) -> None:
         self.schedulers.append(DelayedActionScheduler(continuation, ticks))
