@@ -27,7 +27,7 @@ _TWO_64 = 2**64
 _DOUBLE_LIMIT = 2.0**63
 
 
-def in_int64_range(value: int) -> bool:
+def in_int64_range(value: float) -> bool:
     """Whether `value` already fits a signed 64-bit integer without wrapping."""
     return INT64_MIN <= value <= INT64_MAX
 
