@@ -462,15 +462,10 @@ class BinaryExpression[
         both_int = isinstance(val_a, int) and isinstance(val_b, int)
 
         def fold_to(value: int | float) -> int | float | None:
-            # An integer result that overflows a long is only safe to emit
-            # when the stat really is a long — then the executor wraps the
-            # literal the same way. On any other stat, decline the fold.
             if isinstance(value, int) and not java_long.in_int64_range(value):
                 return int(JavaLong(value)) if is_long else None
             return value
 
-        # `lhs = c1; lhs OP c2` -> `lhs = combined`. The runtime applies `OP`
-        # exactly once either way, so this stays exact for doubles too.
         if op_a is BinaryOperator.Set:
             if op_b is BinaryOperator.Increment:
                 v = fold_to(val_a + val_b)
@@ -500,9 +495,6 @@ class BinaryExpression[
                     return BinaryOperator.Set, int(java_long.ushr(val_a, val_b))
             return None
 
-        # `lhs += a; lhs -= b` -> one Inc/Dec. Addition is associative (mod
-        # 2**64 for longs), so the executor wrapping the emitted literal
-        # reproduces running the two ops exactly.
         if op_a in (BinaryOperator.Increment, BinaryOperator.Decrement) and op_b in (
             BinaryOperator.Increment,
             BinaryOperator.Decrement,
@@ -515,14 +507,8 @@ class BinaryExpression[
             return BinaryOperator.Decrement, -combined
 
         if op_a is op_b:
-            # `lhs *= a; lhs *= b` -> `lhs *= a*b`. Multiplication is
-            # associative (mod 2**64 for longs) and the executor wraps the
-            # emitted literal.
             if op_a is BinaryOperator.Multiply:
                 return op_a, val_a * val_b
-            # `lhs /= a; lhs /= b` -> `lhs /= a*b` holds for truncating
-            # division, but only while `a*b` stays in range — past that the
-            # executor would wrap the divisor and the results diverge.
             if op_a is BinaryOperator.Divide:
                 if both_int and not java_long.in_int64_range(val_a * val_b):
                     return None
@@ -538,8 +524,6 @@ class BinaryExpression[
                 if op_a is BinaryOperator.BitwiseXor:
                     v = fold_to(val_a ^ val_b)
                     return None if v is None else (op_a, v)
-                # `(lhs << a) << b` == `lhs << (a+b)` only while neither count
-                # nor their sum crosses the 6-bit shift-count mask.
                 if op_a in (
                     BinaryOperator.LeftShift,
                     BinaryOperator.RightShift,
