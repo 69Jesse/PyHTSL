@@ -283,6 +283,16 @@ class BinaryExpression[
         return changed_any
 
     @staticmethod
+    def _is_execution_barrier(expression: Expression) -> bool:
+        from ..actions.pause_execution import PauseExecutionExpression
+        from ..actions.trigger_function import TriggerFunctionExpression
+
+        return any(
+            isinstance(expr, PauseExecutionExpression | TriggerFunctionExpression)
+            for expr in expression.walk_expressions()
+        )
+
+    @staticmethod
     def _remove_no_op_expressions(expressions: list[Expression]) -> bool:
         has_changed = False
         for i in range(len(expressions) - 1, -1, -1):
@@ -387,6 +397,8 @@ class BinaryExpression[
             merge_target: BinaryExpression[Any, Any] | None = None
             while j < len(expressions):
                 expr_j = expressions[j]
+                if BinaryExpression._is_execution_barrier(expr_j):
+                    break
                 if (
                     isinstance(expr_j, BinaryExpression)
                     and isinstance(expr_j.left, Stat)
@@ -605,6 +617,8 @@ class BinaryExpression[
             is_dead = False
             for j in range(i + 1, len(expressions)):
                 expr_j = expressions[j]
+                if BinaryExpression._is_execution_barrier(expr_j):
+                    break
                 if not expr_j.is_using_stat(lhs):
                     continue
                 if (
@@ -723,6 +737,20 @@ class BinaryExpression[
                 if any(
                     expressions[j].is_using_stat(expression.right)
                     for j in range(i + 1, len(expressions))
+                ):
+                    continue
+
+                first_use = next(
+                    (
+                        j
+                        for j in range(i)
+                        if expressions[j].is_using_stat(expression.right)
+                    ),
+                    None,
+                )
+                if first_use is not None and any(
+                    BinaryExpression._is_execution_barrier(expressions[j])
+                    for j in range(first_use + 1, i)
                 ):
                     continue
 
