@@ -10,6 +10,7 @@ from .condition import Condition
 
 if TYPE_CHECKING:
     from ...checkable import Checkable
+    from ...container import Container
     from ...execute.context import ExecutionContext
     from ...stats.stat import Stat
 
@@ -76,6 +77,24 @@ class ComparisonCondition[LeftT: 'Checkable', RightT: 'Checkable | HousingType']
 
         setattr(self, key, value)
         BinaryExpression.fix_type_compatibility(self)
+
+    def finalize(self, container: 'Container') -> None:
+        from ..binary_expression import BinaryExpression
+        from ..compound_expression import CompoundExpression
+
+        # Replace a computed operand with the temp stat holding its result, so
+        # block-level optimization can see which temps the condition depends on.
+        def resolve(value: object) -> object:
+            if isinstance(value, BinaryExpression):
+                return value.create_temp_stat_and_write()
+            if isinstance(value, CompoundExpression):
+                return value.write_and_get_result()
+            return value
+
+        self.left = resolve(self.left)  # type: ignore
+        self.right = resolve(self.right)  # type: ignore
+        BinaryExpression.fix_type_compatibility(self)
+        super().finalize(container)
 
     def cloned_raw(self) -> Self:
         return self.__class__(

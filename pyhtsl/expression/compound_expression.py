@@ -14,6 +14,7 @@ class CompoundExpression(Expression, Editable):
         super().__init__()
         self.expressions = expressions
         self.result = result
+        self.internal_type = result.internal_type
 
     def cloned_raw(self) -> Self:
         return self.__class__(
@@ -31,23 +32,41 @@ class CompoundExpression(Expression, Editable):
             )
         )
 
+    def _flattened_expressions(self) -> list[Expression]:
+        """Clone the stored expressions, flattening any unflattened BinaryExpressions."""
+        from .binary_expression import BinaryExpression
+
+        expressions: list[Expression] = []
+        for expr in self.expressions:
+            expr = expr.cloned()
+            if isinstance(expr, BinaryExpression):
+                expressions.extend(expr.flatten())
+            else:
+                expressions.append(expr)
+        return expressions
+
     def into_executable_expressions(self) -> Generator[Expression, None, None]:
         from .binary_expression import BinaryExpression
 
-        expressions = [expr.cloned() for expr in self.expressions]
+        expressions = self._flattened_expressions()
         BinaryExpression.optimize_binary_expressions(expressions)
         BinaryExpression.rename_temporary_stats(expressions)
         yield from expressions
 
     def write_and_get_result(self) -> Editable:
-        expressions = list(self.into_executable_expressions())
+        from .binary_expression import BinaryExpression
+
+        expressions = self._flattened_expressions()
+        BinaryExpression.optimize_binary_expressions(expressions)
+        # Finalized: each lands in the block as its own statement and gets
+        # re-rendered independently, so the numbers must not drift.
+        BinaryExpression.rename_temporary_stats(expressions, finalize=True)
         for expr in expressions:
             expr.write()
         return self.result
 
     def materialize(self) -> tuple[list[Expression], Editable]:
-        clone = self.cloned()
-        return list(clone.expressions), clone.result
+        return self._flattened_expressions(), self.result.cloned()
 
     def into_string_lhs(self) -> str:
         return self.write_and_get_result().into_string_lhs()
@@ -63,7 +82,13 @@ class CompoundExpression(Expression, Editable):
         return register_deferred(self, include_fallback_value)
 
     def into_htsl(self) -> str:
-        return '\n'.join(expr.into_htsl() for expr in self.expressions)
+        from .binary_expression import BinaryExpression
+
+        expressions = self._flattened_expressions()
+        BinaryExpression.optimize_binary_expressions(expressions)
+        # Finalized so the per-expression re-render below stays consistent.
+        BinaryExpression.rename_temporary_stats(expressions, finalize=True)
+        return '\n'.join(expr.into_htsl() for expr in expressions)
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{", ".join(repr(expr) for expr in self.expressions)}>'

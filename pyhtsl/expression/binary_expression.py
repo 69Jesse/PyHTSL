@@ -49,8 +49,10 @@ def _is_single_placeholder(value: str) -> bool:
 
 
 def _rhs_references_stat(rhs: object, stat: 'Stat') -> bool:
-    if isinstance(rhs, Stat) and rhs.is_same_stat(stat):
-        return True
+    if isinstance(rhs, Stat):
+        return rhs.is_same_stat(stat)
+    if isinstance(rhs, Expression):
+        return rhs.is_using_stat(stat)
     if isinstance(rhs, str):
         for ref in Checkable.iter_in_string(rhs):
             if isinstance(ref, Stat) and ref.is_same_stat(stat):
@@ -103,7 +105,9 @@ class BinaryExpression[
         *,
         is_intentional_self_assignment: bool = False,
     ) -> None:
-        super().__init__(internal_type=InternalType.from_value(left))
+        super().__init__(
+            internal_type=BinaryExpression._operand_result_type(left, right)
+        )
         self.left = left
         self.right = right
         self.operator = operator
@@ -118,12 +122,25 @@ class BinaryExpression[
                 'Self assignment is only allowed for the same stat on both sides, with the Set operator'
             )
 
+    @staticmethod
+    def _operand_result_type(
+        left: 'BinaryExpression | Checkable | HousingType',
+        right: 'BinaryExpression | Checkable | HousingType',
+    ) -> InternalType:
+        """Internal type of `left OP right`. A bare numeric constant defers to a
+        typed operand, so `0 + double` stays a double."""
+        left_type = InternalType.from_value(left)
+        if isinstance(left, int | float) and not isinstance(right, int | float):
+            right_type = InternalType.from_value(right)
+            if right_type is not InternalType.ANY:
+                return right_type
+        return left_type
+
     def walk_expressions(self) -> Generator[Expression, None, None]:
         yield from super().walk_expressions()
-        if isinstance(self.left, BinaryExpression):
-            yield from self.left.walk_expressions()
-        if isinstance(self.right, BinaryExpression):
-            yield from self.right.walk_expressions()
+        for side in (self.left, self.right):
+            if isinstance(side, BinaryExpression | CompoundExpression):
+                yield from side.walk_expressions()
 
     def into_assignment_expression(self) -> AssignmentExpression:
         if not isinstance(self.left, Editable):
@@ -197,24 +214,21 @@ class BinaryExpression[
             expr: BinaryExpression[Any, Any] | Checkable | HousingType,
         ) -> Checkable | HousingType:
             if isinstance(expr, CompoundExpression):
-                expressions.extend(e.cloned() for e in expr.expressions)
+                for sub in expr.expressions:
+                    sub = sub.cloned()
+                    if isinstance(sub, BinaryExpression):
+                        expressions.extend(sub.flatten())
+                    else:
+                        expressions.append(sub)
                 return expr.result.cloned()
 
             if not isinstance(expr, BinaryExpression):
                 return expr
 
-            left: Checkable | HousingType = (
-                minimize(expr.left)
-                if isinstance(expr.left, BinaryExpression)
-                else expr.left
-            )
-            right: Checkable | HousingType = (
-                minimize(expr.right)
-                if isinstance(expr.right, BinaryExpression)
-                else expr.right
-            )
+            left: Checkable | HousingType = minimize(expr.left)
+            right: Checkable | HousingType = minimize(expr.right)
 
-            internal_type = InternalType.from_value(left)
+            internal_type = BinaryExpression._operand_result_type(left, right)
             stat = TemporaryStat(internal_type)
             expressions.append(
                 BinaryExpression(
@@ -734,13 +748,15 @@ class BinaryExpression[
     def create_temp_stat_and_write(self) -> TemporaryStat:
         stat = TemporaryStat(self.internal_type)
 
-        expressions = list(
-            BinaryExpression(
-                left=stat,
-                right=self,
-                operator=BinaryOperator.Set,
-            ).into_executable_expressions()
-        )
+        expressions = BinaryExpression(
+            left=stat,
+            right=self,
+            operator=BinaryOperator.Set,
+        ).flatten()
+        self.optimize_binary_expressions(expressions)
+        # Finalized: each lands in the block as its own statement and gets
+        # re-rendered independently, so the numbers must not drift.
+        self.rename_temporary_stats(expressions, finalize=True)
         for expr in expressions:
             expr.write()
 
