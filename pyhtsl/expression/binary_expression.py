@@ -255,7 +255,9 @@ class BinaryExpression[
         return expressions
 
     @staticmethod
-    def take_out_useless_expressions(expressions: list[Expression]) -> None:
+    def take_out_useless_expressions(expressions: list[Expression]) -> bool:
+        """Run the peephole passes to a fixed point, returning whether anything changed."""
+        changed_any = False
         has_changed = True
         while has_changed:
             has_changed = False
@@ -263,6 +265,8 @@ class BinaryExpression[
             has_changed |= BinaryExpression._merge_identity_set_with_op(expressions)
             has_changed |= BinaryExpression._fold_consecutive_constant_ops(expressions)
             has_changed |= BinaryExpression._eliminate_dead_stores(expressions)
+            changed_any |= has_changed
+        return changed_any
 
     @staticmethod
     def _remove_no_op_expressions(expressions: list[Expression]) -> bool:
@@ -708,14 +712,18 @@ class BinaryExpression[
                 ):
                     continue
 
-                has_changed |= any(
+                # A list, not a generator: `any` must not short-circuit and
+                # leave later occurrences un-rewritten.
+                substitutions = [
                     expressions[j].change_all_occurrences_of_stat(
                         expression.right, expression.left
                     )
                     for j in range(i + 1)
-                )
+                ]
+                has_changed |= any(substitutions)
 
-        BinaryExpression.take_out_useless_expressions(expressions)
+            # Inside the loop: a peephole fold can expose a new temp-stat merge.
+            has_changed |= BinaryExpression.take_out_useless_expressions(expressions)
 
     def into_executable_expressions(self) -> Generator[Expression, None, None]:
         expressions = self.flatten()
