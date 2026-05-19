@@ -1,6 +1,8 @@
+import difflib
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
+from typing import cast, get_args
 
 import mido
 import pynbs
@@ -8,14 +10,20 @@ import pynbs
 from ..actions.pause_execution import PauseExecutionExpression
 from ..actions.play_sound import PlaySoundExpression
 from ..expression.expression import Expression
-from ..types import ALL_SOUNDS
+from ..types import ALL_SOUNDS, ALL_SOUNDS_PRETTY_TO_RAW, ALL_SOUNDS_RAW
+from ..utils.log import log
 
 __all__ = (
     'NoteEvent',
-    'music_into_note_events',
+    'CustomInstrumentResolver',
     'note_events_into_expressions',
-    'music_into_expressions',
+    'nbs_into_note_events',
+    'midi_into_note_events',
+    'nbs_into_expressions',
+    'midi_into_expressions',
 )
+
+CustomInstrumentResolver = Callable[[str], ALL_SOUNDS_RAW | None]
 
 
 # NBS instrument ID -> Housing sound (raw)
@@ -71,6 +79,79 @@ MIDI_DRUM_TO_SOUND: dict[int, ALL_SOUNDS] = {
 MIDI_DRUM_DEFAULT = 'note.hat'
 
 
+def _normalize_sound_name(name: str) -> str:
+    """Lowercase, separators to dots, keep only a-z and dots."""
+    chars: list[str] = []
+    for ch in name.lower():
+        if 'a' <= ch <= 'z':
+            chars.append(ch)
+        elif not ch.isalnum():
+            chars.append('.')
+        # digits dropped
+    normalized = ''.join(chars)
+    while '..' in normalized:
+        normalized = normalized.replace('..', '.')
+    return normalized.strip('.')
+
+
+# Pretty names normalized like custom-instrument names, for direct lookup.
+_NORMALIZED_PRETTY_TO_RAW: dict[str, ALL_SOUNDS_RAW] = {
+    _normalize_sound_name(pretty): raw
+    for pretty, raw in ALL_SOUNDS_PRETTY_TO_RAW.items()
+}
+_ALL_RAW_SOUNDS: frozenset[str] = frozenset(get_args(ALL_SOUNDS_RAW))
+
+
+def _build_unique_tokens() -> dict[str, ALL_SOUNDS_RAW]:
+    """Map each pretty-name word that identifies exactly one sound to it."""
+    token_raws: dict[str, set[ALL_SOUNDS_RAW]] = {}
+    for normalized_pretty, raw in _NORMALIZED_PRETTY_TO_RAW.items():
+        for token in normalized_pretty.split('.'):
+            if token:
+                token_raws.setdefault(token, set()).add(raw)
+    return {
+        token: next(iter(raws)) for token, raws in token_raws.items() if len(raws) == 1
+    }
+
+
+_UNIQUE_TOKEN_TO_RAW: dict[str, ALL_SOUNDS_RAW] = _build_unique_tokens()
+
+_FUZZY_CUTOFF = 0.75
+
+
+def _fuzzy_match(normalized: str) -> ALL_SOUNDS_RAW | None:
+    for token in normalized.split('.'):
+        if not token:
+            continue
+        matches = difflib.get_close_matches(
+            token, _UNIQUE_TOKEN_TO_RAW, n=1, cutoff=_FUZZY_CUTOFF
+        )
+        if matches:
+            return _UNIQUE_TOKEN_TO_RAW[matches[0]]
+    return None
+
+
+def _resolve_custom_instrument(
+    name: str,
+    resolver: CustomInstrumentResolver | None,
+) -> ALL_SOUNDS:
+    """Resolve an NBS custom-instrument name to a Housing sound."""
+    normalized = _normalize_sound_name(name)
+    if resolver is not None:
+        override = resolver(normalized)
+        if override is not None:
+            return override
+    candidate = _NORMALIZED_PRETTY_TO_RAW.get(normalized, normalized)
+    if candidate in _ALL_RAW_SOUNDS:
+        return cast(ALL_SOUNDS_RAW, candidate)
+    fuzzy = _fuzzy_match(normalized)
+    if fuzzy is not None:
+        log(f'\x1b[38;2;255;0;0mNote:\x1b[0m using {fuzzy} for custom sound {name!r}')
+        return fuzzy
+    log(f'\x1b[38;2;255;0;0mWarning:\x1b[0m could not find {name!r}')
+    return 'note.harp'
+
+
 def _midi_program_to_sound(program: int) -> ALL_SOUNDS:
     for r, sound in MIDI_PROGRAM_TO_SOUND.items():
         if program in r:
@@ -83,11 +164,8 @@ def _nbs_key_to_pitch(
     *,
     clamp_pitch: bool = True,
 ) -> float:
-    """Convert NBS key (0-87, fractional for fine-tuning) to Housing pitch (0.0-2.0).
-
-    Key 33 = F#3 -> 0.0, Key 45 = F#4 -> 1.0, Key 57 = F#5 -> 2.0
-    """
-    pitch = (key - 33) / 12
+    """Convert an NBS note key to a Housing playSound pitch."""
+    pitch = 2 ** ((key - 45) / 12)
     if clamp_pitch:
         pitch = max(0.0, min(2.0, pitch))
     return pitch
@@ -98,7 +176,7 @@ def _midi_note_to_pitch(
     *,
     clamp_pitch: bool = True,
 ) -> float:
-    """Convert MIDI note (0-127) to Housing pitch (0.0-2.0).
+    """Convert a MIDI note number to a Housing playSound pitch.
 
     MIDI 21 = A0 = NBS key 0, so nbs_key = midi_note - 21.
     """
@@ -174,6 +252,7 @@ def _events_from_nbs(
     path: Path,
     *,
     clamp_pitch: bool = True,
+    custom_instrument_resolver: CustomInstrumentResolver | None = None,
 ) -> list[NoteEvent]:
     song = pynbs.read(str(path))
     tps = song.header.tempo
@@ -183,10 +262,25 @@ def _events_from_nbs(
     for i, layer in enumerate(song.layers):
         layer_volumes[i] = layer.volume / 100
 
+    # Custom instruments follow the built-ins: note.instrument == 16 + custom id.
+    builtin_count = len(NBS_INSTRUMENT_TO_SOUND)
+    custom_names: dict[int, str] = {
+        builtin_count + inst.id: inst.name or '' for inst in song.instruments
+    }
+    # Resolved lazily on first use, so unused instruments never log a note.
+    custom_sounds: dict[int, ALL_SOUNDS] = {}
+
     for tick, chord in song:
         housing_tick = round(tick * 20 / tps)
         for note in chord:
-            sound = NBS_INSTRUMENT_TO_SOUND.get(note.instrument, 'note.harp')
+            sound = NBS_INSTRUMENT_TO_SOUND.get(note.instrument)
+            if sound is None:
+                if note.instrument not in custom_sounds:
+                    name = custom_names.get(note.instrument, '')
+                    custom_sounds[note.instrument] = _resolve_custom_instrument(
+                        name, custom_instrument_resolver
+                    )
+                sound = custom_sounds[note.instrument]
             layer_vol = layer_volumes.get(note.layer, 1.0)
             volume = (note.velocity / 100) * layer_vol
             pitch = _nbs_key_to_pitch(
@@ -246,29 +340,70 @@ def _events_from_midi(
     return events
 
 
-def music_into_note_events(
+def _filter_time_range(
+    events: list[NoteEvent],
+    time_range: tuple[float, float] | None,
+) -> list[NoteEvent]:
+    if time_range is None:
+        return events
+    start_tick = round(time_range[0] * 20)
+    end_tick = round(time_range[1] * 20)
+    return [e for e in events if start_tick <= e.housing_tick <= end_tick]
+
+
+def nbs_into_note_events(
+    path: str | Path,
+    *,
+    clamp_pitch: bool = True,
+    time_range: tuple[float, float] | None = None,
+    custom_instrument_resolver: CustomInstrumentResolver | None = None,
+) -> list[NoteEvent]:
+    events = _events_from_nbs(
+        Path(path),
+        clamp_pitch=clamp_pitch,
+        custom_instrument_resolver=custom_instrument_resolver,
+    )
+    return _filter_time_range(events, time_range)
+
+
+def midi_into_note_events(
     path: str | Path,
     *,
     clamp_pitch: bool = True,
     time_range: tuple[float, float] | None = None,
 ) -> list[NoteEvent]:
-    path = Path(path)
-    if path.suffix.lower() == '.nbs':
-        events = _events_from_nbs(path, clamp_pitch=clamp_pitch)
-    elif path.suffix.lower() == '.mid' or path.suffix.lower() == '.midi':
-        events = _events_from_midi(path, clamp_pitch=clamp_pitch)
-    else:
-        raise ValueError(f'Unsupported music file format: {path.suffix}')
-
-    if time_range is not None:
-        start_tick = round(time_range[0] * 20)
-        end_tick = round(time_range[1] * 20)
-        events = [e for e in events if start_tick <= e.housing_tick <= end_tick]
-
-    return events
+    events = _events_from_midi(Path(path), clamp_pitch=clamp_pitch)
+    return _filter_time_range(events, time_range)
 
 
-def music_into_expressions(
+def nbs_into_expressions(
+    path: str | Path,
+    *,
+    clamp_pitch: bool = True,
+    time_range: tuple[float, float] | None = None,
+    custom_instrument_resolver: CustomInstrumentResolver | None = None,
+    strip_pauses: bool = True,
+    sound_factory: Callable[[NoteEvent], PlaySoundExpression] | None = None,
+    sound_transform: Callable[[PlaySoundExpression], PlaySoundExpression | None]
+    | None = None,
+    sound_filter: Callable[[PlaySoundExpression], bool] | None = None,
+) -> list[Expression]:
+    events = nbs_into_note_events(
+        path,
+        clamp_pitch=clamp_pitch,
+        time_range=time_range,
+        custom_instrument_resolver=custom_instrument_resolver,
+    )
+    return note_events_into_expressions(
+        events,
+        strip_pauses=strip_pauses,
+        sound_factory=sound_factory,
+        sound_transform=sound_transform,
+        sound_filter=sound_filter,
+    )
+
+
+def midi_into_expressions(
     path: str | Path,
     *,
     clamp_pitch: bool = True,
@@ -279,7 +414,7 @@ def music_into_expressions(
     | None = None,
     sound_filter: Callable[[PlaySoundExpression], bool] | None = None,
 ) -> list[Expression]:
-    events = music_into_note_events(
+    events = midi_into_note_events(
         path,
         clamp_pitch=clamp_pitch,
         time_range=time_range,

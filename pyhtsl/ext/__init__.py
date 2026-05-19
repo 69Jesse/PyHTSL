@@ -22,13 +22,22 @@ from .compute_layout import (
     compute_best_layout as compute_best_layout,
 )
 from .music import (
+    CustomInstrumentResolver as CustomInstrumentResolver,
+)
+from .music import (
     NoteEvent as NoteEvent,
 )
 from .music import (
-    music_into_expressions as music_into_expressions,
+    midi_into_expressions as midi_into_expressions,
 )
 from .music import (
-    music_into_note_events as music_into_note_events,
+    midi_into_note_events as midi_into_note_events,
+)
+from .music import (
+    nbs_into_expressions as nbs_into_expressions,
+)
+from .music import (
+    nbs_into_note_events as nbs_into_note_events,
 )
 from .music import (
     note_events_into_expressions as note_events_into_expressions,
