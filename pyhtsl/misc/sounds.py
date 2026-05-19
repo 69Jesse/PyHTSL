@@ -204,6 +204,8 @@ def _load_wav(path: Path) -> np.ndarray:
 def _resample(data: np.ndarray, pitch: float) -> np.ndarray:
     if pitch == 1.0:
         return data
+    if pitch <= 0.0:
+        return data[:1]
 
     n_frames = len(data)
     new_length = int(n_frames / pitch)
@@ -212,10 +214,6 @@ def _resample(data: np.ndarray, pitch: float) -> np.ndarray:
 
     old_indices = np.linspace(0, n_frames - 1, new_length)
     return np.interp(old_indices, np.arange(n_frames), data).astype(np.float32)
-
-
-def _housing_pitch(pitch: float) -> float:
-    return 0.5 * (2**pitch)
 
 
 def preview_sound(
@@ -231,7 +229,7 @@ def preview_sound(
 
     path = random.choice(paths)
     data = _load_wav(path)
-    data = _resample(data, _housing_pitch(pitch))
+    data = _resample(data, pitch)
     if volume != 1.0:
         data = data * np.float32(volume)
 
