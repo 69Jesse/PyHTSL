@@ -72,19 +72,21 @@ class Mixer:
         with self._lock:
             stream = self.stream
             self.stream = None
-            if stream is not None and stream.active and self.voices:
-                max_ms = (
-                    int(max((len(d) - o) / _SAMPLE_RATE * 1000 for d, o in self.voices))
-                    + 100
-                )
-            else:
-                max_ms = 0
-        if max_ms:
+            voices = self.voices
+            self.voices = []
+        try:
+            still_active = stream is not None and stream.active
+        except sd.PortAudioError:
+            # PortAudio's own atexit ran first; nothing to wait on or close.
+            return
+        if still_active and voices:
+            max_ms = int(max((len(d) - o) / _SAMPLE_RATE * 1000 for d, o in voices)) + 100
             sd.sleep(max_ms)
         if stream is not None:
-            stream.close()
-        with self._lock:
-            self.voices = []
+            try:
+                stream.close()
+            except sd.PortAudioError:
+                pass
 
 
 SOUND_MIXER = Mixer()
