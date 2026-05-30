@@ -10,6 +10,7 @@ from ..config import HERE, get_htsl_import_folder
 from ..nbt import NBT, NBTByte, NBTCompound, NBTInt, NBTList, NBTShort, NBTString
 from ..types import (
     ALL_ENCHANTMENTS,
+    ALL_ITEM_KEY_STRINGS,
     ALL_ITEM_KEYS,
     COOKIE_ITEM_KEY,
     DAMAGEABLE_ITEM_KEYS,
@@ -75,6 +76,13 @@ HIDE_FLAGS['hide_all_flags'] = max(HIDE_FLAGS.values()) * 2 - 1
 SAVED_CACHE: dict[str, str] = {}
 
 
+class _MissingType:
+    __slots__ = ()
+
+
+MISSING = _MissingType()
+
+
 def normalize_item_key(key: ALL_ITEM_KEYS) -> str:
     if isinstance(key, str):
         return key
@@ -82,8 +90,23 @@ def normalize_item_key(key: ALL_ITEM_KEYS) -> str:
 
 
 class Item:
-    _key: ALL_ITEM_KEYS
-    extras: dict[str, Any]
+    key: ALL_ITEM_KEY_STRINGS
+    name: str | None
+    lore: str | None
+    count: int
+    enchantments: list[Enchantment] | None
+    interaction_data_key: str | None
+    unbreakable: bool
+    damage: int
+    color: ColorType
+    skull_data: NBTCompound | None
+    is_cookie_item: bool
+    hide_all_flags: bool
+    hide_enchantments_flag: bool
+    hide_modifiers_flag: bool
+    hide_unbreakable_flag: bool
+    hide_additional_flag: bool
+    hide_dye_flag: bool
 
     @overload
     def __init__(
@@ -185,26 +208,81 @@ class Item:
         count: int = 1,
         enchantments: list[Enchantment] | None = None,
         interaction_data_key: str | None = None,
+        unbreakable: bool = False,
+        damage: int = 0,
+        color: ColorType = None,
+        skull_data: NBTCompound | None = None,
+        is_cookie_item: bool = False,
         hide_all_flags: bool = False,
         hide_enchantments_flag: bool = False,
         hide_modifiers_flag: bool = False,
+        hide_unbreakable_flag: bool = False,
         hide_additional_flag: bool = False,
-        **extras: Any,
+        hide_dye_flag: bool = False,
     ) -> None: ...
 
     def __init__(
         self,
         key: ALL_ITEM_KEYS,
-        **extras: Any,
+        *,
+        name: str | None = None,
+        lore: str | None = None,
+        count: int = 1,
+        enchantments: list[Enchantment] | None = None,
+        interaction_data_key: str | None = None,
+        unbreakable: bool = False,
+        damage: int = 0,
+        color: ColorType = None,
+        skull_data: NBTCompound | None = None,
+        is_cookie_item: bool = False,
+        hide_all_flags: bool = False,
+        hide_enchantments_flag: bool = False,
+        hide_modifiers_flag: bool = False,
+        hide_unbreakable_flag: bool = False,
+        hide_additional_flag: bool = False,
+        hide_dye_flag: bool = False,
     ) -> None:
-        self._key = key
-        self.extras = extras
+        if isinstance(key, tuple):
+            string_key, packed = key
+            if string_key in get_args(LEATHER_ARMOR_KEYS):
+                if color is not None:
+                    log(
+                        '\x1b[38;2;255;0;0mcolor was given both in the key tuple and as a keyword argument; the tuple takes precedence\x1b[0m'
+                    )
+                color = cast(ColorType, packed)
+            elif string_key in get_args(PLAYER_SKULL_ITEM_KEY):
+                if skull_data is not None:
+                    log(
+                        '\x1b[38;2;255;0;0mskull_data was given both in the key tuple and as a keyword argument; the tuple takes precedence\x1b[0m'
+                    )
+                skull_data = cast('NBTCompound | None', packed)
+            else:
+                raise ValueError(f'Item key {string_key!r} does not take a tuple value')
+            key = string_key
+
+        self.key = cast(ALL_ITEM_KEY_STRINGS, key)
+        self.name = name
+        self.lore = lore
+        self.count = count
+        self.enchantments = enchantments
+        self.interaction_data_key = interaction_data_key
+        self.unbreakable = unbreakable
+        self.damage = damage
+        self.color = color
+        self.skull_data = skull_data
+        self.is_cookie_item = is_cookie_item
+        self.hide_all_flags = hide_all_flags
+        self.hide_enchantments_flag = hide_enchantments_flag
+        self.hide_modifiers_flag = hide_modifiers_flag
+        self.hide_unbreakable_flag = hide_unbreakable_flag
+        self.hide_additional_flag = hide_additional_flag
+        self.hide_dye_flag = hide_dye_flag
         self._get_item_data()
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Item):
             return False
-        return self._key == other._key and self.extras == other.extras
+        return vars(self) == vars(other)
 
     @classmethod
     def from_name(cls, name: str) -> 'Item':
@@ -240,11 +318,11 @@ class Item:
         damage = nbt.get('Damage')
         damage_value = damage.value if damage is not None else 0
 
-        extras: dict[str, Any] = {}
+        options: dict[str, Any] = {}
         if name in DAMAGEABLE_KEY_BY_NAME:
             key = DAMAGEABLE_KEY_BY_NAME[name]
             if damage_value:
-                extras['damage'] = damage_value
+                options['damage'] = damage_value
         else:
             key = KEY_BY_NAME_AND_DATA.get((name, damage_value))
             if key is None:
@@ -254,51 +332,51 @@ class Item:
 
         count = nbt.get('Count')
         if count is not None and count.value != 1:
-            extras['count'] = count.value
+            options['count'] = count.value
 
         tags = nbt.get('tag')
         if isinstance(tags, NBTCompound):
-            cls._extract_tags(tags, extras)
+            cls._extract_tags(tags, options)
 
-        return cls(cast(ALL_ITEM_KEYS, key), **extras)
+        return cls(cast(ALL_ITEM_KEYS, key), **options)
 
     @staticmethod
-    def _extract_tags(tags: NBTCompound, extras: dict[str, Any]) -> None:
+    def _extract_tags(tags: NBTCompound, options: dict[str, Any]) -> None:
         ench = tags.get('ench')
         if isinstance(ench, NBTList):
-            extras['enchantments'] = [
+            options['enchantments'] = [
                 Enchantment(ENCHANTMENT_BY_ID[entry['id'].value], entry['lvl'].value)
                 for entry in ench.value
             ]
 
         if tags.get('Unbreakable') is not None:
-            extras['unbreakable'] = True
+            options['unbreakable'] = True
 
         hide_flags = tags.get('HideFlags')
         if hide_flags is not None:
             value = hide_flags.value
             if value == HIDE_FLAGS['hide_all_flags']:
-                extras['hide_all_flags'] = True
+                options['hide_all_flags'] = True
             else:
                 for flag, bit in HIDE_FLAGS.items():
                     if flag != 'hide_all_flags' and value & bit:
-                        extras[flag] = True
+                        options[flag] = True
 
         display = tags.get('display')
         if isinstance(display, NBTCompound):
             lore = display.get('Lore')
             if isinstance(lore, NBTList):
-                extras['lore'] = '\n'.join(line.value for line in lore.value)
+                options['lore'] = '\n'.join(line.value for line in lore.value)
             display_name = display.get('Name')
             if display_name is not None:
-                extras['name'] = display_name.value
+                options['name'] = display_name.value
             color = display.get('color')
             if color is not None:
-                extras['color'] = color.value
+                options['color'] = color.value
 
         skull_owner = tags.get('SkullOwner')
         if skull_owner is not None:
-            extras['skull_data'] = skull_owner
+            options['skull_data'] = skull_owner
 
         extra_attributes = tags.get('ExtraAttributes')
         if isinstance(extra_attributes, NBTCompound):
@@ -306,9 +384,9 @@ class Item:
             if isinstance(interact, NBTCompound):
                 data = interact.get('data')
                 if data is not None:
-                    extras['interaction_data_key'] = data.value
+                    options['interaction_data_key'] = data.value
             if extra_attributes.get('COOKIE_ITEM') is not None:
-                extras['is_cookie_item'] = True
+                options['is_cookie_item'] = True
 
     def get_item_name(self) -> str:
         return self._get_item_data()['title']
@@ -317,12 +395,10 @@ class Item:
         if data is None:
             data = self._get_item_data()
 
-        extras_copy = self.extras.copy()
-
         result: NBTCompound[NBT] = NBTCompound(
             {
                 'id': NBTString(data['name']),
-                'Count': NBTByte(extras_copy.pop('count', 1)),
+                'Count': NBTByte(self.count),
                 'Damage': NBTShort(data['data_value']),
             }
         )
@@ -330,10 +406,9 @@ class Item:
         tags = NBTCompound()
 
         if data['can_be_damaged']:
-            result.put('Damage', NBTShort(extras_copy.pop('damage', 0)))
+            result.put('Damage', NBTShort(self.damage))
 
-        enchantments: list[Enchantment] | None = extras_copy.pop('enchantments', None)
-        if enchantments is not None:
+        if self.enchantments is not None:
             tags.put(
                 'ench',
                 NBTList(
@@ -341,21 +416,16 @@ class Item:
                         NBTCompound()
                         .put('lvl', NBTShort(enchantment.level or 1))
                         .put('id', NBTShort(ENCHANTMENT_TO_ID[enchantment.name]))
-                        for enchantment in enchantments
+                        for enchantment in self.enchantments
                     ]
                 ),
             )
 
-        unbreakable: int = int(extras_copy.pop('unbreakable', False))
-        if unbreakable:
-            tags.put('Unbreakable', NBTByte(unbreakable))
+        if self.unbreakable:
+            tags.put('Unbreakable', NBTByte(1))
 
         hide_flags: int = min(
-            sum(
-                value
-                for key, value in HIDE_FLAGS.items()
-                if extras_copy.pop(key, False)
-            ),
+            sum(value for flag, value in HIDE_FLAGS.items() if getattr(self, flag)),
             HIDE_FLAGS['hide_all_flags'],
         )
         if hide_flags:
@@ -363,23 +433,15 @@ class Item:
 
         display = NBTCompound()
 
-        lore: str | None = extras_copy.pop('lore', None)
-        if lore is not None:
-            lore = normalize_formatting(lore)
+        if self.lore is not None:
+            lore = normalize_formatting(self.lore)
             display.put('Lore', NBTList([NBTString(line) for line in lore.split('\n')]))
 
-        name: str | None = extras_copy.pop('name', None)
-        if name is not None:
-            name = normalize_formatting(name)
+        if self.name is not None:
+            name = normalize_formatting(self.name)
             display.put('Name', NBTString(name))
 
-        color: ColorType = extras_copy.pop('color', None)
-        if (
-            color is None
-            and isinstance(self._key, tuple)
-            and self._key[0] in get_args(LEATHER_ARMOR_KEYS)
-        ):
-            color = self._key[1]  # type: ignore
+        color: ColorType = self.color
         if color is not None:
             if not isinstance(color, int | str | tuple):
                 raise ValueError(f'Invalid color type: {type(color)}')
@@ -389,32 +451,23 @@ class Item:
                 color = color[0] << 16 | color[1] << 8 | color[2]
             display.put('color', NBTInt(color))
 
-        skull_data: NBTCompound | None = extras_copy.pop('skull_data', None)
-        if (
-            skull_data is None
-            and isinstance(self._key, tuple)
-            and self._key[0] in get_args(PLAYER_SKULL_ITEM_KEY)
-        ):
-            skull_data = self._key[1]  # type: ignore
-        if skull_data is not None:
-            tags.put('SkullOwner', skull_data)
+        if self.skull_data is not None:
+            tags.put('SkullOwner', self.skull_data)
 
         if not display.is_empty():
             tags.put('display', display)
 
         extra_attributes = NBTCompound()
 
-        interaction_data_key: str | None = extras_copy.pop('interaction_data_key', None)
-        if interaction_data_key is not None:
+        if self.interaction_data_key is not None:
             interact_data = (
                 NBTCompound()
-                .put('data', NBTString(interaction_data_key))
+                .put('data', NBTString(self.interaction_data_key))
                 .put('version', NBTInt(2))
             )
             extra_attributes.put('interact_data', interact_data)
 
-        is_cookie_item: bool = extras_copy.pop('is_cookie_item', False)
-        if is_cookie_item:
+        if self.is_cookie_item:
             extra_attributes.put('COOKIE_ITEM', NBTByte(1))
 
         if not extra_attributes.is_empty():
@@ -423,34 +476,70 @@ class Item:
         if not tags.is_empty():
             result.put('tag', tags)
 
-        if extras_copy:
-            log(
-                f'\x1b[38;2;255;0;0mIgnoring unused keys whilst saving "{self._key}": {", ".join(extras_copy.keys())}\x1b[0m'
-            )
-
         return result
 
     def _get_item_data(self) -> ItemJsonData:
-        item = ITEMS.get(self.normalized_key, None)
+        item = ITEMS.get(self.key, None)
         if item is None:
             closest = difflib.get_close_matches(
-                self.normalized_key.lower(),
+                self.key.lower(),
                 ITEMS.keys(),
                 n=1,
                 cutoff=0.0,
             )[0]
             raise ValueError(
-                f'Invalid item key: \x1b[38;2;255;0;0m{self.normalized_key}\x1b[0m. Did you mean \x1b[38;2;0;255;0m{closest}\x1b[0m?\nHave you already saved this in your imports folder? Do not create an Item, use the string "{self.normalized_key}" instead.'
+                f'Invalid item key: \x1b[38;2;255;0;0m{self.key}\x1b[0m. Did you mean \x1b[38;2;0;255;0m{closest}\x1b[0m?\nHave you already saved this in your imports folder? Do not create an Item, use the string "{self.key}" instead.'
             )
         return item
 
-    def copied(self) -> 'Item':
-        return Item(self._key, **self.extras)
+    def cloned(
+        self,
+        key: ALL_ITEM_KEYS | _MissingType = MISSING,
+        *,
+        name: str | None | _MissingType = MISSING,
+        lore: str | None | _MissingType = MISSING,
+        count: int | _MissingType = MISSING,
+        enchantments: list[Enchantment] | None | _MissingType = MISSING,
+        interaction_data_key: str | None | _MissingType = MISSING,
+        unbreakable: bool | _MissingType = MISSING,
+        damage: int | _MissingType = MISSING,
+        color: ColorType | _MissingType = MISSING,
+        skull_data: NBTCompound | None | _MissingType = MISSING,
+        is_cookie_item: bool | _MissingType = MISSING,
+        hide_all_flags: bool | _MissingType = MISSING,
+        hide_enchantments_flag: bool | _MissingType = MISSING,
+        hide_modifiers_flag: bool | _MissingType = MISSING,
+        hide_unbreakable_flag: bool | _MissingType = MISSING,
+        hide_additional_flag: bool | _MissingType = MISSING,
+        hide_dye_flag: bool | _MissingType = MISSING,
+    ) -> 'Item':
+        """Returns a copy of the item, overriding only the given values."""
+        overrides: dict[str, Any] = {
+            'name': name,
+            'lore': lore,
+            'count': count,
+            'enchantments': enchantments,
+            'interaction_data_key': interaction_data_key,
+            'unbreakable': unbreakable,
+            'damage': damage,
+            'color': color,
+            'skull_data': skull_data,
+            'is_cookie_item': is_cookie_item,
+            'hide_all_flags': hide_all_flags,
+            'hide_enchantments_flag': hide_enchantments_flag,
+            'hide_modifiers_flag': hide_modifiers_flag,
+            'hide_unbreakable_flag': hide_unbreakable_flag,
+            'hide_additional_flag': hide_additional_flag,
+            'hide_dye_flag': hide_dye_flag,
+        }
+        resolved = {
+            field: getattr(self, field) if value is MISSING else value
+            for field, value in overrides.items()
+        }
+        return Item(self.key if isinstance(key, _MissingType) else key, **resolved)
 
     def _get_save_name(self, snbt: str) -> str:
-        prefix = into_slug(
-            f'{self.normalized_key}_{remove_formatting(self.extras.get("name", ""))}'
-        )
+        prefix = into_slug(f'{self.key}_{remove_formatting(self.name or "")}')
 
         suffix = hashlib.md5(snbt.encode()).hexdigest()[:8]
         return f'_{len(SAVED_CACHE) % 1000:03}_{prefix}_{suffix}'
@@ -463,7 +552,7 @@ class Item:
         title = f'\033[38;2;0;255;0m{data["title"]}\033[0m'
         if self.count != 1:
             title = f'\033[38;2;0;191;255mx{self.count}\033[0m ' + title
-        display_name = self.extras.get('name', None)
+        display_name = self.name
         if display_name is not None:
             title += f' ({formatting_to_ansi(display_name)})'
 
@@ -483,104 +572,3 @@ class Item:
             f'\n  \033[38;2;0;255;0m+\033[0m {path.absolute()}'
         )
         return name
-
-    @property
-    def key(self) -> ALL_ITEM_KEYS:
-        return self._key
-
-    @key.setter
-    def key(self, value: ALL_ITEM_KEYS) -> None:
-        if not isinstance(value, str):
-            raise TypeError(f'Expected str, got {type(value).__name__}')
-        self._key = value
-        self._get_item_data()
-
-    def with_key(self, key: ALL_ITEM_KEYS) -> 'Item':
-        """Returns a copy of the item with the specified key."""
-        new_item = self.copied()
-        new_item.key = key
-        return new_item
-
-    @property
-    def normalized_key(self) -> str:
-        return normalize_item_key(self._key)
-
-    @property
-    def name(self) -> str | None:
-        return self.extras.get('name', None)
-
-    @name.setter
-    def name(self, value: str | None) -> None:
-        if value is not None and not isinstance(value, str):
-            raise TypeError(f'Expected str, got {type(value).__name__}')
-        self.extras['name'] = value
-
-    def with_name(self, name: str | None) -> 'Item':
-        """Returns a copy of the item with the specified name."""
-        new_item = self.copied()
-        new_item.name = name
-        return new_item
-
-    @property
-    def lore(self) -> str | None:
-        return self.extras.get('lore', None)
-
-    @lore.setter
-    def lore(self, value: str | None) -> None:
-        if value is not None and not isinstance(value, str):
-            raise TypeError(f'Expected str, got {type(value).__name__}')
-        self.extras['lore'] = value
-
-    def with_lore(self, lore: str | None) -> 'Item':
-        """Returns a copy of the item with the specified lore."""
-        new_item = self.copied()
-        new_item.lore = lore
-        return new_item
-
-    @property
-    def count(self) -> int:
-        return self.extras.get('count', 1)
-
-    @count.setter
-    def count(self, value: int) -> None:
-        if not isinstance(value, int):
-            raise TypeError(f'Expected int, got {type(value).__name__}')
-        self.extras['count'] = value
-
-    def with_count(self, count: int) -> 'Item':
-        """Returns a copy of the item with the specified count."""
-        new_item = self.copied()
-        new_item.count = count
-        return new_item
-
-    @property
-    def enchantments(self) -> list[Enchantment] | None:
-        return self.extras.get('enchantments', None)
-
-    @enchantments.setter
-    def enchantments(self, value: list[Enchantment] | None) -> None:
-        if value is not None and not isinstance(value, list):
-            raise TypeError(f'Expected list, got {type(value).__name__}')
-        self.extras['enchantments'] = value
-
-    def with_enchantments(self, enchantments: list[Enchantment] | None) -> 'Item':
-        """Returns a copy of the item with the specified enchantments."""
-        new_item = self.copied()
-        new_item.enchantments = enchantments
-        return new_item
-
-    @property
-    def interaction_data_key(self) -> str | None:
-        return self.extras.get('interaction_data_key', None)
-
-    @interaction_data_key.setter
-    def interaction_data_key(self, value: str | None) -> None:
-        if value is not None and not isinstance(value, str):
-            raise TypeError(f'Expected str, got {type(value).__name__}')
-        self.extras['interaction_data_key'] = value
-
-    def with_interaction_data_key(self, key: str | None) -> 'Item':
-        """Returns a copy of the item with the specified interaction data key."""
-        new_item = self.copied()
-        new_item.interaction_data_key = key
-        return new_item

@@ -379,6 +379,7 @@ from .stats.temporary_stat import TemporaryStat as TemporaryStat
 from .types import ALL_DAMAGE_CAUSES as ALL_DAMAGE_CAUSES
 from .types import ALL_ENCHANTMENTS as ALL_ENCHANTMENTS
 from .types import ALL_GAMEMODES as ALL_GAMEMODES
+from .types import ALL_ITEM_KEY_STRINGS as ALL_ITEM_KEY_STRINGS
 from .types import ALL_ITEM_KEYS as ALL_ITEM_KEYS
 from .types import ALL_LOCATIONS as ALL_LOCATIONS
 from .types import ALL_POTION_EFFECTS as ALL_POTION_EFFECTS
