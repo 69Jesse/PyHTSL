@@ -1,13 +1,15 @@
 import difflib
 import hashlib
 import json
-from typing import Any, TypedDict, get_args, overload
+from pathlib import Path
+from typing import Any, TypedDict, cast, get_args, overload
 
 from pyhtsl.utils.slug import into_slug
 
 from ..config import HERE, get_htsl_import_folder
 from ..nbt import NBT, NBTByte, NBTCompound, NBTInt, NBTList, NBTShort, NBTString
 from ..types import (
+    ALL_ENCHANTMENTS,
     ALL_ITEM_KEYS,
     COOKIE_ITEM_KEY,
     DAMAGEABLE_ITEM_KEYS,
@@ -43,6 +45,19 @@ class ItemJsonData(TypedDict):
 ITEMS_JSON_FILE = HERE / 'misc' / 'items.json'
 with ITEMS_JSON_FILE.open('r', encoding='utf-8') as file:
     ITEMS: dict[str, ItemJsonData] = json.load(file)
+
+
+DAMAGEABLE_KEY_BY_NAME: dict[str, str] = {}
+KEY_BY_NAME_AND_DATA: dict[tuple[str, int], str] = {}
+for _key, _data in ITEMS.items():
+    if _data['can_be_damaged']:
+        DAMAGEABLE_KEY_BY_NAME[_data['name']] = _key
+    else:
+        KEY_BY_NAME_AND_DATA[(_data['name'], _data['data_value'])] = _key
+
+ENCHANTMENT_BY_ID: dict[int, ALL_ENCHANTMENTS] = {
+    v: k for k, v in ENCHANTMENT_TO_ID.items()
+}
 
 
 HIDE_FLAGS: dict[str, int] = {
@@ -190,6 +205,110 @@ class Item:
         if not isinstance(other, Item):
             return False
         return self._key == other._key and self.extras == other.extras
+
+    @classmethod
+    def from_name(cls, name: str) -> 'Item':
+        folder = get_htsl_import_folder()
+        path = folder / name
+        if path.suffix:
+            return cls.from_path(path)
+        for suffix in ('.json', '.snbt'):
+            candidate = path.with_suffix(suffix)
+            if candidate.exists():
+                return cls.from_path(candidate)
+        return cls.from_path(path.with_suffix('.json'))
+
+    @classmethod
+    def from_path(cls, path: Path) -> 'Item':
+        if path.suffix == '.json':
+            data = json.loads(path.read_text(encoding='utf-8'))
+            return cls.from_snbt(data['item'])
+        if path.suffix == '.snbt':
+            return cls.from_snbt(path.read_text(encoding='utf-8'))
+        raise ValueError(f'Unsupported item file type: {path.suffix}')
+
+    @classmethod
+    def from_snbt(cls, snbt: str) -> 'Item':
+        return cls.from_nbt(NBT.from_snbt(snbt.strip()))
+
+    @classmethod
+    def from_nbt(cls, nbt: NBT) -> 'Item':
+        if not isinstance(nbt, NBTCompound):
+            raise ValueError(f'Expected an NBT compound, got {type(nbt).__name__}')
+
+        name = nbt['id'].value
+        damage = nbt.get('Damage')
+        damage_value = damage.value if damage is not None else 0
+
+        extras: dict[str, Any] = {}
+        if name in DAMAGEABLE_KEY_BY_NAME:
+            key = DAMAGEABLE_KEY_BY_NAME[name]
+            if damage_value:
+                extras['damage'] = damage_value
+        else:
+            key = KEY_BY_NAME_AND_DATA.get((name, damage_value))
+            if key is None:
+                raise ValueError(
+                    f'Could not resolve an item key from id {name!r} with data value {damage_value}.'
+                )
+
+        count = nbt.get('Count')
+        if count is not None and count.value != 1:
+            extras['count'] = count.value
+
+        tags = nbt.get('tag')
+        if isinstance(tags, NBTCompound):
+            cls._extract_tags(tags, extras)
+
+        return cls(cast(ALL_ITEM_KEYS, key), **extras)
+
+    @staticmethod
+    def _extract_tags(tags: NBTCompound, extras: dict[str, Any]) -> None:
+        ench = tags.get('ench')
+        if isinstance(ench, NBTList):
+            extras['enchantments'] = [
+                Enchantment(ENCHANTMENT_BY_ID[entry['id'].value], entry['lvl'].value)
+                for entry in ench.value
+            ]
+
+        if tags.get('Unbreakable') is not None:
+            extras['unbreakable'] = True
+
+        hide_flags = tags.get('HideFlags')
+        if hide_flags is not None:
+            value = hide_flags.value
+            if value == HIDE_FLAGS['hide_all_flags']:
+                extras['hide_all_flags'] = True
+            else:
+                for flag, bit in HIDE_FLAGS.items():
+                    if flag != 'hide_all_flags' and value & bit:
+                        extras[flag] = True
+
+        display = tags.get('display')
+        if isinstance(display, NBTCompound):
+            lore = display.get('Lore')
+            if isinstance(lore, NBTList):
+                extras['lore'] = '\n'.join(line.value for line in lore.value)
+            display_name = display.get('Name')
+            if display_name is not None:
+                extras['name'] = display_name.value
+            color = display.get('color')
+            if color is not None:
+                extras['color'] = color.value
+
+        skull_owner = tags.get('SkullOwner')
+        if skull_owner is not None:
+            extras['skull_data'] = skull_owner
+
+        extra_attributes = tags.get('ExtraAttributes')
+        if isinstance(extra_attributes, NBTCompound):
+            interact = extra_attributes.get('interact_data')
+            if isinstance(interact, NBTCompound):
+                data = interact.get('data')
+                if data is not None:
+                    extras['interaction_data_key'] = data.value
+            if extra_attributes.get('COOKIE_ITEM') is not None:
+                extras['is_cookie_item'] = True
 
     def get_item_name(self) -> str:
         return self._get_item_data()['title']
