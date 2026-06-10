@@ -83,6 +83,11 @@ class Checkable(BaseObject):
     def into_hashable(self) -> tuple[object, ...]:
         return (self.__class__,)
 
+    def is_execution_player_scoped(self) -> bool:
+        """Whether this key's simulated value is stored per-player (a `var`/
+        `%player.…%`) rather than shared across everyone (a `globalvar`)."""
+        return False
+
     def get_backend_fallback_value(self) -> BackendType | None:
         if self.fallback_value is None:
             return None

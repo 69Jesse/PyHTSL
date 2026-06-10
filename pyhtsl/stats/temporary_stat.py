@@ -76,6 +76,9 @@ class TemporaryStat(Stat):
     def right_side_keyword() -> str:
         return PlayerStat.right_side_keyword()
 
+    def is_execution_player_scoped(self) -> bool:
+        return True
+
     def equals_raw(self, other: object) -> bool:
         if not isinstance(other, TemporaryStat):
             return False

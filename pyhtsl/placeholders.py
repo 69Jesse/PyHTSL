@@ -32,6 +32,11 @@ class PlaceholderCheckable(Checkable, ABC):
     def get_backend_value(self) -> BackendType:
         raise NotImplementedError
 
+    def is_execution_player_scoped(self) -> bool:
+        # `%player.…%` placeholders resolve against the executing player; the
+        # rest (`%server.…%`, `%house.…%`, …) are shared by everyone.
+        return self.as_string.startswith('%player.')
+
     @final
     def get_backend_fallback_value(self) -> BackendType | None:
         return super().get_backend_fallback_value() or self.get_backend_value()

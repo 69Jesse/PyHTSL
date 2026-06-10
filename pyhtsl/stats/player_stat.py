@@ -49,6 +49,9 @@ class PlayerStat(
     def right_side_keyword() -> str:
         return 'player'
 
+    def is_execution_player_scoped(self) -> bool:
+        return True
+
     def cloned_raw(self) -> 'PlayerStat':
         return PlayerStat(self.name)
 
