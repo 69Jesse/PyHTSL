@@ -45,6 +45,12 @@ from .music import (
 from .music import (
     note_events_into_expressions as note_events_into_expressions,
 )
+from .raycast import (
+    RaycastResult as RaycastResult,
+)
+from .raycast import (
+    create_raycast as create_raycast,
+)
 from .round import (
     round_double as round_double,
 )
