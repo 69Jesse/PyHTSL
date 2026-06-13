@@ -77,7 +77,7 @@ def create_raycast(
     on_hit_sender: HitCallback | None = None,
     conditions: ConditionsArg | None = None,
     hitbox_radius: float = 1.0,
-    detect_headshots: bool = True,
+    detect_headshots: bool = False,
     headshots_only: bool = False,
     max_hits: int | None = None,
     max_distance: float | None = None,
@@ -246,6 +246,9 @@ def create_raycast(
             if headshots_only:
                 with IfAll(my_hit == 1, my_headshot == 0):
                     my_hit.value = 0
+        else:
+            if headshots_only:
+                raise ValueError('headshots_only=True requires detect_headshots=True')
 
         if max_hits is not None:
             with IfAll(my_hit == 1, hits >= max_hits):
