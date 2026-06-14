@@ -32,6 +32,29 @@ __all__ = (
 WRITE_EXPRESSION_OVERRIDE_STACK: list[Callable[['Expression'], None]] = []
 
 
+def _format_nested_compound_error(
+    child: 'Expression',
+    offender: 'Expression',
+    open_expr: 'Expression',
+) -> str:
+    lines: list[str] = [
+        'It is not allowed to write a nestable expression (if/random) inside of another nestable expression.',
+        '',
+        'The expression you are writing expands into a nestable block. This happens'
+        ' with operations like "%" (modulo) and abs(), which compile to an if-block:',
+        f'    {child!r}',
+        f'    expands into:  {offender.describe_nestable_block()}',
+        *(f'        {detail}' for detail in offender.nestable_block_detail_lines()),
+        '',
+        f'but you are still inside:  {open_expr.describe_nestable_block()}',
+        *(f'    {detail}' for detail in open_expr.nestable_block_detail_lines()),
+        '',
+        'Compute it into a stat before the block (e.g. "tmp.value = x % 100" outside'
+        ' the block, then use "tmp" inside), or restructure your conditionals.',
+    ]
+    return '\n'.join(lines)
+
+
 @contextmanager
 def override_write_expression(
     func: Callable[['Expression'], None],
@@ -243,11 +266,38 @@ class Container:
             expressions[index:index] = setup
             index += len(setup) + 1
 
+    def _verify_no_nested_blocks(self, expressions: list['Expression']) -> None:
+        """A nestable block (if/random) must not contain another nestable, even
+        one buried inside a compound expression. `%` and `abs()` expand into an
+        if-block under the hood, so `x.value = x % 100` inside an `IfAll` would
+        otherwise emit illegal nested conditionals."""
+        if self.allow_nested_expressions:
+            return
+        for expression in expressions:
+            nested_refs = expression.nested_expressions_refs()
+            if not nested_refs:
+                continue
+            for body in nested_refs:
+                for child in body:
+                    offender = next(
+                        (
+                            expr
+                            for expr in child.walk_expressions()
+                            if not expr.can_be_nested()
+                        ),
+                        None,
+                    )
+                    if offender is not None:
+                        raise SyntaxError(
+                            _format_nested_compound_error(child, offender, expression)
+                        )
+
     def finalize_expressions(self, expressions: list['Expression']) -> None:
         from .actions.no_optimization import no_optimization
         from .expression.binary_expression import BinaryExpression
 
         self._resolve_deferred_expressions(expressions)
+        self._verify_no_nested_blocks(expressions)
 
         def on_new_expression(expression: 'Expression') -> None:
             nonlocal index

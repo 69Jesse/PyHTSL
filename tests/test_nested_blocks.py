@@ -177,3 +177,104 @@ with expect_exception(SyntaxError):
 
 
 assert len(pyhtsl.container.CONTAINERS) == _depth_before, pyhtsl.container.CONTAINERS
+
+
+# `%` (modulo) and abs() expand into an if-block under the hood, so using them
+# inside a nestable block would emit illegal nested conditionals. These are
+# caught at finalize time, even though no `with IfAll` is nested syntactically.
+
+# A modulo assignment inside IfAll raises
+with expect_exception(SyntaxError):
+    with Container():
+        x = PlayerStat('x').as_long()
+        with IfAll(x > 0):
+            x.value = x % 100
+
+
+# A modulo used as an operand inside IfAll raises
+with expect_exception(SyntaxError):
+    with Container():
+        x = PlayerStat('x').as_long()
+        y = PlayerStat('y').as_long()
+        with IfAll(x > 0):
+            y.value = (x % 100) + 5
+
+
+# abs() inside IfAll raises
+with expect_exception(SyntaxError):
+    with Container():
+        x = PlayerStat('x').as_long()
+        y = PlayerStat('y').as_long()
+        with IfAll(x > 0):
+            y.value = abs(x)
+
+
+# A modulo interpolated into an f-string inside IfAll raises (the deferred path
+# materialises the if-block into the same nestable body)
+with expect_exception(SyntaxError):
+    with Container():
+        x = PlayerStat('x').as_long()
+        with IfAll(x > 0):
+            chat(f'{x % 100}')
+
+
+# A modulo inside Random raises
+with expect_exception(SyntaxError):
+    with Container():
+        x = PlayerStat('x').as_long()
+        with Random:
+            x.value = x % 100
+
+
+# A modulo inside the Else branch raises
+with expect_exception(SyntaxError):
+    with Container():
+        x = PlayerStat('x').as_long()
+        with IfAll(x > 0):
+            chat('then')
+        with Else:
+            x.value = x % 100
+
+
+# The same modulo at the top level is fine: the if-block becomes a sibling
+with Container() as container:
+    x = PlayerStat('x').as_long()
+    x.value = x % 100
+
+assert container.into_htsl() == (
+    'var "tmp0" = "%var.player/x 0%L" false\n'
+    'var "tmp0" /= 100 false\n'
+    'var "tmp0" *= 100 false\n'
+    'var "x" -= "%var.player/tmp0 0%L" true\n'
+    'if and (var "x" < 0 0) {\n'
+    '    var "x" += 100 true\n'
+    '}'
+), container.into_htsl()
+
+
+# A function body is a fresh nesting scope: a modulo inside a function defined
+# inside an open IfAll is legal, since the function body is its own HTSL block.
+with Container() as container:
+    x = PlayerStat('x').as_long()
+    with IfAll(x > 0):
+
+        @create_function('mod inner')
+        def mod_inner() -> None:
+            x.value = x % 100
+
+        chat('then')
+
+# Just check it didn't raise; render it for good measure.
+container.into_htsl()
+
+
+# allow_nested_expressions bypasses the check and the modulo still simulates
+with ExecutionContext(allow_nested_expressions=True) as ctx:
+    x = PlayerStat('x').as_long()
+    out = PlayerStat('out').as_long()
+    ctx.put(x, 250, ignore_warning=True)
+    out.value = 0
+    with IfAll(x > 0):
+        out.value = x % 100
+
+assert int(ctx.get_raw(out)) == 50, ctx.get_raw(out)
