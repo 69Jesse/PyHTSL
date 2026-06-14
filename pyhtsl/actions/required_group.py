@@ -24,7 +24,7 @@ class RequiredGroup(Condition):
 
     def cloned_raw(self) -> Self:
         return self.__class__(
-            group=self.group.cloned(),
+            group=self.cloned_or_same(self.group),
             include_higher_groups=self.include_higher_groups,
         )
 
@@ -32,7 +32,7 @@ class RequiredGroup(Condition):
         if not isinstance(other, RequiredGroup):
             return False
         return (
-            self.group.equals(other.group)
+            self.equals_or_eq(self.group, other.group)
             and self.include_higher_groups == other.include_higher_groups
         )
 

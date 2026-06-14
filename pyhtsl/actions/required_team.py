@@ -22,7 +22,7 @@ class RequiredTeam(Condition):
 
     def cloned_raw(self) -> Self:
         return self.__class__(
-            team=self.team.cloned() if self.team is not None else None,
+            team=self.cloned_or_same(self.team),
         )
 
     def equals_raw(self, other: object) -> bool:

@@ -167,7 +167,7 @@ class Container:
     def _materialize_deferred(
         self,
         deferred_ids: list[int],
-    ) -> tuple[list['Expression'], dict[int, str]]:
+    ) -> tuple[list['Expression'], dict[int, str], dict[int, 'Editable']]:
         from . import deferred
         from .expression.binary_expression import BinaryExpression
 
@@ -186,13 +186,16 @@ class Container:
             deferred_id: result.into_inside_string(include_fallback_value)
             for deferred_id, result, include_fallback_value in results
         }
-        return setup, placeholders
+        editables = {deferred_id: result for deferred_id, result, _ in results}
+        return setup, placeholders, editables
 
     def _resolve_deferred_expressions(
         self,
         expressions: list['Expression'],
     ) -> None:
         from . import deferred
+        from .expression.binary_expression import BinaryExpression
+        from .expression.compound_expression import CompoundExpression
 
         index = 0
         while index < len(expressions):
@@ -202,15 +205,32 @@ class Container:
                 self._resolve_deferred_expressions(nested)
 
             ids: dict[int, None] = {}
-            for value in expression._get_all_values().values():
-                if isinstance(value, str):
+            # Computed expressions passed directly as a field (e.g. an action
+            # argument) only become a sentinel when into_htsl stringifies them —
+            # register them now so they share this statement's materialize batch.
+            # BinaryExpression/CompoundExpression handle their own operands via
+            # the flatten path, so we never materialize their fields here.
+            handles_own_operands = isinstance(
+                expression, BinaryExpression | CompoundExpression
+            )
+            direct_fields: list[tuple[str, int]] = []
+            for key, value in expression._get_all_values().items():
+                if not handles_own_operands and isinstance(
+                    value, BinaryExpression | CompoundExpression
+                ):
+                    deferred_id = deferred.find_deferred_ids(
+                        value.into_inside_string()
+                    )[0]
+                    ids.setdefault(deferred_id, None)
+                    direct_fields.append((key, deferred_id))
+                elif isinstance(value, str):
                     for deferred_id in deferred.find_deferred_ids(value):
                         ids.setdefault(deferred_id, None)
             if not ids:
                 index += 1
                 continue
 
-            setup, placeholders = self._materialize_deferred(list(ids))
+            setup, placeholders, editables = self._materialize_deferred(list(ids))
             for key, value in expression._get_all_values().items():
                 if isinstance(value, str) and deferred.text_has_deferred(value):
                     setattr(
@@ -218,6 +238,8 @@ class Container:
                         key,
                         deferred.substitute_deferred(value, placeholders),
                     )
+            for key, deferred_id in direct_fields:
+                setattr(expression, key, editables[deferred_id])
             expressions[index:index] = setup
             index += len(setup) + 1
 

@@ -18,12 +18,12 @@ class WithinRegion(Condition):
         return f'inRegion {self.inline_quoted(self.region.name)}'
 
     def cloned_raw(self) -> Self:
-        return self.__class__(region=self.region.cloned())
+        return self.__class__(region=self.cloned_or_same(self.region))
 
     def equals_raw(self, other: object) -> bool:
         if not isinstance(other, WithinRegion):
             return False
-        return self.region.equals(other.region)
+        return self.equals_or_eq(self.region, other.region)
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<region={self.region!r} inverted={self.inverted}>'

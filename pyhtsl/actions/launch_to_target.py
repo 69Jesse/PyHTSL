@@ -3,7 +3,6 @@ from typing import Self, final
 from ..checkable import Checkable
 from ..expression.expression import Expression
 from ..expression.housing_type import HousingType
-from ..stats.stat import Stat
 from ..types import ALL_LOCATIONS
 
 __all__ = (
@@ -16,13 +15,13 @@ __all__ = (
 class LaunchToTargetExpression(Expression):
     coordinates: str | None
     location: ALL_LOCATIONS
-    strength: Stat | int
+    strength: Checkable | int
 
     def __init__(
         self,
         coordinates: str | None = None,
         location: ALL_LOCATIONS = 'custom_coordinates',
-        strength: Stat | int = 2,
+        strength: Checkable | int = 2,
     ) -> None:
         self.coordinates = coordinates
         self.location = location
@@ -50,7 +49,7 @@ class LaunchToTargetExpression(Expression):
         return (
             self.coordinates == other.coordinates
             and self.location == other.location
-            and self.strength == other.strength
+            and self.equals_or_eq(self.strength, other.strength)
         )
 
     def __repr__(self) -> str:
@@ -74,7 +73,7 @@ def launch_to_target(
     | str
     | None,
     location: ALL_LOCATIONS = 'custom_coordinates',
-    strength: Stat | int = 2,
+    strength: Checkable | int = 2,
 ) -> None:
     resolved_coordinates: str | None = None
     if location == 'custom_coordinates':
