@@ -93,11 +93,17 @@ def get_limits() -> dict[type['Expression'] | type['PlaceholderEditable'], int]:
     return _LIMITS
 
 
-class Counter:
-    count: dict[type['Expression'] | type['PlaceholderEditable'], int]
+ActionCounts = dict[type['Expression'] | type['PlaceholderEditable'], int]
 
-    def __init__(self) -> None:
+
+class Counter:
+    count: ActionCounts
+
+    def __init__(self, memo: dict[int, ActionCounts] | None = None) -> None:
         self.count = {}
+        # Shared across the counters of one fix pass so the (somewhat costly)
+        # flatten per expression happens at most once.
+        self._memo = memo if memo is not None else {}
 
     @staticmethod
     def expression_into_cls(
@@ -112,15 +118,46 @@ class Counter:
                 return type(expr.left)
         return type(expression)
 
+    def action_counts(self, expression: 'Expression') -> ActionCounts:
+        """Rendered HTSL actions, by class, for one expression at its own block
+        level. A `BinaryExpression` / `CompoundExpression` flattens into several
+        actions (temps, modulo's if-block, ...), so counting the object as one
+        undercounts the real actions and lets a block slip past its limit."""
+        from .expression.binary_expression import BinaryExpression
+        from .expression.compound_expression import CompoundExpression
+
+        key = id(expression)
+        cached = self._memo.get(key)
+        if cached is not None:
+            return cached
+
+        counts: ActionCounts = {}
+        rendered = (
+            expression.into_executable_expressions()
+            if isinstance(expression, BinaryExpression | CompoundExpression)
+            else (expression,)
+        )
+        for rendered_expr in rendered:
+            cls = self.expression_into_cls(rendered_expr)
+            counts[cls] = counts.get(cls, 0) + 1
+        self._memo[key] = counts
+        return counts
+
     def increment(self, expression: 'Expression') -> None:
-        cls = self.expression_into_cls(expression)
-        self.count[cls] = self.count.get(cls, 0) + 1
+        for cls, amount in self.action_counts(expression).items():
+            self.count[cls] = self.count.get(cls, 0) + amount
 
     def would_exceed(self, expression: 'Expression') -> bool:
-        cls = self.expression_into_cls(expression)
-        new_count = self.count.get(cls, 0) + 1
-        limit = get_limits().get(cls)
-        return limit is not None and new_count > limit
+        for cls, amount in self.action_counts(expression).items():
+            limit = get_limits().get(cls)
+            if limit is not None and self.count.get(cls, 0) + amount > limit:
+                return True
+        return False
+
+    def exceeds_on_its_own(self, expression: 'Expression') -> bool:
+        """A single expression that renders to more actions than the limit can
+        never be made to fit by wrapping or moving it to a new block."""
+        return Counter(self._memo).would_exceed(expression)
 
 
 def is_within_limits(expressions: list['Expression']) -> bool:
@@ -151,7 +188,8 @@ def fix_action_limits(
     )
 
     result: list[Expression] = []
-    global_counter = Counter()
+    memo: dict[int, ActionCounts] = {}
+    global_counter = Counter(memo)
     index = 0
 
     while index < len(expressions):
@@ -168,12 +206,20 @@ def fix_action_limits(
             result.append(expr)
             index += 1
         elif should_wrap:
+            # A lone expression rendering to more actions than fit in a block can
+            # neither be wrapped nor moved; emit it as-is so we don't loop.
+            if global_counter.exceeds_on_its_own(expr):
+                global_counter.increment(expr)
+                result.append(expr)
+                index += 1
+                continue
+
             dummy = ConditionalExpression([], ConditionalMode.ALL)
             if global_counter.would_exceed(dummy):
                 break
 
             group: list[Expression] = []
-            group_counter = Counter()
+            group_counter = Counter(memo)
             while index < len(expressions) and expressions[index].can_be_nested():
                 if group_counter.would_exceed(expressions[index]):
                     break
