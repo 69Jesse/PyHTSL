@@ -48,8 +48,9 @@ class Condition(BaseObject):
         return self.inverted == other.inverted and self.equals_raw(other)
 
     def __invert__(self) -> Self:
-        self.inverted = not self.inverted
-        return self
+        clone = self.cloned()
+        clone.inverted = not clone.inverted
+        return clone
 
     def raw_evaluate(self, context: 'ExecutionContext') -> bool:
         log(

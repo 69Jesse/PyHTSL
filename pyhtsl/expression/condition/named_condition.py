@@ -18,9 +18,11 @@ class NamedCondition(Condition):
         return self.name
 
     def cloned_raw(self) -> Self:
-        return self.__class__(
-            name=self.name,
-        )
+        # Subclasses (PlayerSneaking, ...) hardcode their name with a no-arg
+        # __init__, so reconstruct without calling it.
+        clone = self.__class__.__new__(self.__class__)
+        clone.name = self.name
+        return clone
 
     def equals_raw(self, other: object) -> bool:
         if not isinstance(other, NamedCondition):
