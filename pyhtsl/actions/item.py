@@ -242,6 +242,7 @@ class Item:
         hide_additional_flag: bool = False,
         hide_dye_flag: bool = False,
     ) -> None:
+        faulty_tuple_key: str | None = None
         if isinstance(key, tuple):
             string_key, packed = key
             if string_key in get_args(LEATHER_ARMOR_KEYS):
@@ -257,7 +258,7 @@ class Item:
                     )
                 skull_data = cast('NBTCompound | None', packed)
             else:
-                raise ValueError(f'Item key {string_key!r} does not take a tuple value')
+                faulty_tuple_key = string_key
             key = string_key
 
         self.key = cast(ALL_ITEM_KEY_STRINGS, key)
@@ -278,6 +279,8 @@ class Item:
         self.hide_additional_flag = hide_additional_flag
         self.hide_dye_flag = hide_dye_flag
         self._get_item_data()
+        if faulty_tuple_key is not None:
+            raise ValueError(f'Item key {faulty_tuple_key!r} does not take a tuple value')
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Item):
