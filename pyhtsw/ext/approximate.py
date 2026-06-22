@@ -178,7 +178,9 @@ def approximate_sin_cos(
         if isinstance(x_or_temp1, Stat):
             x_or_temp1 = x_or_temp1.without_auto_unset()
     original_x = (
-        PlayerStat('tmp1' if can_modify_x else 'tmp2').as_double().without_auto_unset()
+        PlayerStat('tmp1' if can_modify_x else 'tmp2')
+        .as_double()
+        .without_auto_unset()
     )
 
     if certain_x_in_range != 90:

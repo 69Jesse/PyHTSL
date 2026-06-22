@@ -21,6 +21,9 @@ from .cheap_read_write import cheap_write as cheap_write
 from .compute_layout import (
     compute_best_layout as compute_best_layout,
 )
+from .format_time import (
+    format_time_string as format_time_string,
+)
 from .look_vector import (
     approximate_look_vector as approximate_look_vector,
 )
@@ -44,6 +47,9 @@ from .music import (
 )
 from .music import (
     note_events_into_expressions as note_events_into_expressions,
+)
+from .ordinal import (
+    set_ordinal_inline as set_ordinal_inline,
 )
 from .raycast import (
     RaycastResult as RaycastResult,
