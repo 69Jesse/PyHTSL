@@ -1,7 +1,7 @@
 """Multi-player ExecutionContext: per-player vs global scope, and the
 for-all-players function trigger (with caster self-exclusion via cooldown)."""
 
-from pyhtsl import (
+from pyhtsw import (
     ExecutionContext,
     ExecutionPlayer,
     GlobalStat,
@@ -12,7 +12,7 @@ from pyhtsl import (
     exit_function,
     trigger_function,
 )
-from pyhtsl.actions.player_name import PlayerName
+from pyhtsw.actions.player_name import PlayerName
 
 disable_global_export()
 

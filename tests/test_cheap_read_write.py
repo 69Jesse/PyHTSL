@@ -14,10 +14,10 @@ import random
 
 from helpers import expect_exception
 
-from pyhtsl import Container, ExecutionContext, GlobalStat, PlayerStat
-from pyhtsl.expression.binary_expression import BinaryExpression
-from pyhtsl.expression.condition.conditional_expression import ConditionalExpression
-from pyhtsl.ext.cheap_read_write import cheap_read, cheap_write
+from pyhtsw import Container, ExecutionContext, GlobalStat, PlayerStat
+from pyhtsw.expression.binary_expression import BinaryExpression
+from pyhtsw.expression.condition.conditional_expression import ConditionalExpression
+from pyhtsw.ext.cheap_read_write import cheap_read, cheap_write
 
 
 def letter_name(i: int) -> str:

@@ -7,7 +7,7 @@
 - `NoOptimization`: skips the peephole optimizer so source order is preserved.
 """
 
-from pyhtsl import (
+from pyhtsw import (
     Container,
     ExecutionContext,
     NoFallbackValues,

@@ -1,4 +1,4 @@
-from pyhtsl import Container, PlayerStat
+from pyhtsw import Container, PlayerStat
 
 with Container() as container:
     x = PlayerStat('x').as_long()

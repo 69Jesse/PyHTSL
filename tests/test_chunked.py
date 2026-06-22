@@ -1,4 +1,4 @@
-"""Tests for the chunking helpers in `pyhtsl.helpers`.
+"""Tests for the chunking helpers in `pyhtsw.helpers`.
 
 `chunked(IfAll(...))` spreads a body that overflows HTSL's per-block action
 cap across several sequential `if` blocks; `chunked(Else)` then packs a large
@@ -15,7 +15,7 @@ from contextlib import redirect_stdout
 
 from helpers import expect_exception
 
-from pyhtsl import (
+from pyhtsw import (
     Container,
     Else,
     ExecutionContext,

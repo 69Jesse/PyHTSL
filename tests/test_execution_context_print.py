@@ -3,7 +3,7 @@
 import io
 from contextlib import redirect_stdout
 
-from pyhtsl import ExecutionContext, PlayerStat
+from pyhtsw import ExecutionContext, PlayerStat
 
 # Plain text
 buf = io.StringIO()

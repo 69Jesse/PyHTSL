@@ -1,4 +1,4 @@
-from pyhtsl import Container, chat, create_function, trigger_function
+from pyhtsw import Container, chat, create_function, trigger_function
 
 with Container() as container:
 
@@ -8,5 +8,7 @@ with Container() as container:
 
     trigger_function(greet)
 
-expected = 'function "greet" false\n\n\ngoto "function" "greet"\n    chat "hello"'
+# No more goto wrappers: each block renders its own action list, and the
+# function lands in its own file at export time.
+expected = 'function "greet" false\n\n\nchat "hello"'
 assert container.into_htsl() == expected, container.into_htsl()

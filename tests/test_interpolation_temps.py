@@ -3,7 +3,7 @@
 import io
 from contextlib import redirect_stdout
 
-from pyhtsl import (
+from pyhtsw import (
     Container,
     ExecutionContext,
     GlobalStat,
@@ -135,7 +135,7 @@ with Container() as container:
     chat(f'&7Average Players:&e {playersum / n}')
     chat(
         f'&7AFK count:&e {currentafk}&7/&a{HousePlayers}&7 '
-        f'(&b{(currentafk / HousePlayers) * 100}%&7)'
+        f'(&b{(currentafk / HousePlayers) * 100}%&7)',
     )
     chat(f'&7Average AFK count:&e {afksum / n}&7 (&b{(afksum / playersum) * 100}%&7)')
 

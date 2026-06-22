@@ -2,7 +2,7 @@
 with the destination type's suffix on the rhs (so HTSL parses through the type
 on the way in)."""
 
-from pyhtsl import Container, PlayerStat
+from pyhtsw import Container, PlayerStat
 
 # Casting a double-typed stat to long: read x with the long suffix, write back.
 with Container() as container:

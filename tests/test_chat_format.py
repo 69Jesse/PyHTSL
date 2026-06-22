@@ -1,4 +1,4 @@
-from pyhtsl import Container, GlobalStat, PlayerStat, TeamStat, chat
+from pyhtsw import Container, GlobalStat, PlayerStat, TeamStat, chat
 
 # f-string with stat references inlines the placeholder
 with Container() as container:

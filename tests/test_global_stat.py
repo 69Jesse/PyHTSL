@@ -1,4 +1,4 @@
-from pyhtsl import Container, GlobalStat
+from pyhtsw import Container, GlobalStat
 
 with Container() as container:
     g = GlobalStat('shared').as_long()

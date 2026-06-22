@@ -7,8 +7,8 @@ must still be allowed: only nested *expression* blocks are rejected.
 
 from helpers import expect_exception
 
-import pyhtsl.container
-from pyhtsl import (
+import pyhtsw.container
+from pyhtsw import (
     Container,
     Else,
     ExecutionContext,
@@ -128,18 +128,17 @@ with ExecutionContext(allow_nested_expressions=True) as ctx:
 assert int(ctx.get(y)) == 1, ctx.get(y)
 
 
-# A `run_right_now=True` function runs its callback synchronously, at decoration
-# time. Defining one inside an open IfAll must still give the function body a
-# fresh nesting scope: an IfAll inside that body is its own HTSL block, so it is
-# legal even though the outer IfAll is still open on the context stack.
+# A single IfAll inside a function body is legal: the body is its own HTSL
+# block (its callback runs when the container finalizes), so an IfAll there does
+# not nest inside an IfAll that was open in the caller.
 with Container() as container:
     x = PlayerStat('x').as_long()
     with IfAll(x > 0):
 
-        @create_function('rrn inner', run_right_now=True)
-        def rrn_inner() -> None:
+        @create_function('fn inner')
+        def fn_inner() -> None:
             with IfAll(x > 5):
-                chat('legal inside run_right_now function')
+                chat('legal inside function body')
 
         chat('then')
 
@@ -147,36 +146,34 @@ with Container() as container:
 container.into_htsl()
 
 
-# ...but a genuine IfAll-inside-IfAll *within* that function body still raises:
-# the fresh scope resets nesting at the function boundary, not inside it.
-with expect_exception(SyntaxError):
-    with Container():
-        x = PlayerStat('x').as_long()
-        with IfAll(x > 0):
-
-            @create_function('rrn bad', run_right_now=True)
-            def rrn_bad() -> None:
-                with IfAll(x > 5):
-                    with IfAll(x > 10):
-                        chat('nope')
-
-
-# A function callback that raises must not corrupt the container stack: the
-# block is marked as run even on failure (so finalize does not run it again and
-# re-raise), and the container is always popped off the stack on exit.
-_depth_before = len(pyhtsl.container.CONTAINERS)
+# ...but a genuine IfAll-inside-IfAll *within* the function body still raises,
+# surfaced when the container finalizes on exit.
 with expect_exception(SyntaxError):
     with Container():
         x = PlayerStat('x').as_long()
 
-        @create_function('raising body', run_right_now=True)
+        @create_function('fn bad')
+        def fn_bad() -> None:
+            with IfAll(x > 5):
+                with IfAll(x > 10):
+                    chat('nope')
+
+
+# A function body that raises during finalize must not corrupt the container
+# stack: __exit__ always pops the container even when finalize raises.
+_depth_before = len(pyhtsw.container.CONTAINERS)
+with expect_exception(SyntaxError):
+    with Container():
+        x = PlayerStat('x').as_long()
+
+        @create_function('raising body')
         def raising_body() -> None:
             with IfAll(x > 0):
                 with IfAll(x > 1):
                     chat('nope')
 
 
-assert len(pyhtsl.container.CONTAINERS) == _depth_before, pyhtsl.container.CONTAINERS
+assert len(pyhtsw.container.CONTAINERS) == _depth_before, pyhtsw.container.CONTAINERS
 
 
 # `%` (modulo) and abs() expand into an if-block under the hood, so using them

@@ -13,12 +13,12 @@ Covers:
 
 from helpers import expect_exception
 
-from pyhtsl import Container, ExecutionContext, PlayerStat
-from pyhtsl.expression.binary_expression import (
+from pyhtsw import Container, ExecutionContext, PlayerStat
+from pyhtsw.expression.binary_expression import (
     SET_STRING_MAX_LENGTH,
     BinaryExpression,
 )
-from pyhtsl.ext.set_string import set_string
+from pyhtsw.ext.set_string import set_string
 
 # --- short values: single direct set ---
 
@@ -85,7 +85,7 @@ with expect_exception(ValueError):
 # expression's into_htsl() runs during finalize. Use a small try/except so
 # we can clean up the CONTAINERS stack if finalize raises mid-exit.
 
-import pyhtsl.container as _container_mod  # noqa: E402
+import pyhtsw.container as _container_mod  # noqa: E402
 
 caught = False
 try:

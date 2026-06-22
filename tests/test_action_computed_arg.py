@@ -6,9 +6,10 @@ because the deferred resolver only scanned string fields. It now materializes
 those fields into temp stats, the same way f-string interpolation does.
 """
 
-from pyhtsl import (
+from pyhtsw import (
     Container,
     IfAll,
+    Location,
     PlayerStat,
     change_velocity,
     launch_to_target,
@@ -79,7 +80,7 @@ assert container.into_htsl() == (
 # temps
 with Container() as container:
     x = PlayerStat('x').as_long()
-    launch_to_target((x + 1, 0, 0), strength=x * 2)
+    launch_to_target(Location.custom(x + 1, 0, 0), strength=x * 2)
 
 assert container.into_htsl() == (
     'var "tmp0" = "%var.player/x 0%L" false\n'

@@ -1,4 +1,4 @@
-from pyhtsl import Container, PlayerStat, RandomDecimal, RandomWhole
+from pyhtsw import Container, PlayerStat, RandomDecimal, RandomWhole
 
 with Container() as container:
     x = PlayerStat('x').as_long()

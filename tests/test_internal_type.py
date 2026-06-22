@@ -2,7 +2,7 @@
 
 from helpers import expect_exception
 
-from pyhtsl.internal_type import InternalType
+from pyhtsw.internal_type import InternalType
 
 # Coercion to LONG
 assert InternalType.LONG.type_compatible_housing_type(3.0) == 3

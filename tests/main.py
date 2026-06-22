@@ -4,7 +4,7 @@ import time
 import traceback
 from pathlib import Path
 
-from pyhtsl import disable_global_export
+from pyhtsw import disable_global_export
 
 disable_global_export()
 
@@ -45,7 +45,7 @@ def main() -> int:
     total_elapsed = time.perf_counter() - total_start
     print()
     print(
-        f'{len(test_files) - len(failures)}/{len(test_files)} passed in {_fmt(total_elapsed)}'
+        f'{len(test_files) - len(failures)}/{len(test_files)} passed in {_fmt(total_elapsed)}',
     )
     for name, tb in failures:
         print(f'\n--- {name} ---')

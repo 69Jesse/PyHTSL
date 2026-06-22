@@ -1,12 +1,12 @@
-"""approximate_sqrt from pyhtsl.ext: result close to math.sqrt for several inputs."""
+"""approximate_sqrt from pyhtsw.ext: result close to math.sqrt for several inputs."""
 
 import math
 import random
 
 from helpers import expect_exception
 
-from pyhtsl import ExecutionContext, PlayerStat
-from pyhtsl.ext import approximate_sqrt
+from pyhtsw import ExecutionContext, PlayerStat
+from pyhtsw.ext import approximate_sqrt
 
 
 def assert_sqrt_close(v: float) -> None:

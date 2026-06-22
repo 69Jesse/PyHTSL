@@ -1,6 +1,6 @@
 """`lhs = identity; lhs OP rhs` -> `lhs = rhs` for each operator's identity."""
 
-from pyhtsl import Container, PlayerStat
+from pyhtsw import Container, PlayerStat
 
 # Increment identity is 0
 with Container() as container:
@@ -76,7 +76,7 @@ assert container.into_htsl() == 'var "x" = 8 true', container.into_htsl()
 # this, the optimizer would silently rewrite `x = 0; if(c) z = x; x += y`
 # into `x = y; if(c) z = x` and the read inside the conditional would observe
 # the post-increment value.
-from pyhtsl import IfAll  # noqa: E402
+from pyhtsw import IfAll  # noqa: E402
 
 with Container() as container:
     x = PlayerStat('x').as_long()

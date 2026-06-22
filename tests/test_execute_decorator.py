@@ -7,7 +7,7 @@ that is exactly what you see. The `execute` decorator runs its callback later
 populated.
 """
 
-from pyhtsl import ExecutionContext, chat, create_function, execute
+from pyhtsw import ExecutionContext, chat, create_function, execute
 
 with ExecutionContext():
 

@@ -1,4 +1,4 @@
-"""create_raycast from pyhtsl.ext: hits, misses, headshots, piercing,
+"""create_raycast from pyhtsw.ext: hits, misses, headshots, piercing,
 caps, conditions and the sender callback, driven through a multi-player
 ExecutionContext with real geometry.
 
@@ -11,7 +11,7 @@ is unambiguously missed — comfortably clear of the simulator's 3-decimal
 rounding.
 """
 
-from pyhtsl import (
+from pyhtsw import (
     ExecutionContext,
     ExecutionPlayer,
     GlobalStat,
@@ -19,12 +19,12 @@ from pyhtsl import (
     PlayerStat,
     disable_global_export,
 )
-from pyhtsl.actions.player_position_pitch import PlayerPositionPitch
-from pyhtsl.actions.player_position_x import PlayerPositionX
-from pyhtsl.actions.player_position_y import PlayerPositionY
-from pyhtsl.actions.player_position_yaw import PlayerPositionYaw
-from pyhtsl.actions.player_position_z import PlayerPositionZ
-from pyhtsl.ext import create_raycast
+from pyhtsw.actions.player_position_pitch import PlayerPositionPitch
+from pyhtsw.actions.player_position_x import PlayerPositionX
+from pyhtsw.actions.player_position_y import PlayerPositionY
+from pyhtsw.actions.player_position_yaw import PlayerPositionYaw
+from pyhtsw.actions.player_position_z import PlayerPositionZ
+from pyhtsw.ext import create_raycast
 
 disable_global_export()
 
@@ -93,7 +93,9 @@ with ExecutionContext(players=[caster, head, body]) as ctx:
     place(body, 0.0, TORSO_TO_EYE, 8.0)  # torso at eye level → bodyshot
 
     rc = create_raycast(
-        'Ray', on_hit_target=lambda res: headshot_flag.set(res.is_headshot)
+        'Ray',
+        on_hit_target=lambda res: headshot_flag.set(res.is_headshot),
+        detect_headshots=True,
     )
     rc.trigger()
 
@@ -221,7 +223,9 @@ with ExecutionContext(players=[caster, friend, foe]) as ctx:
     foe.put(eligible, 0)
 
     rc = create_raycast(
-        'Ray', on_hit_target=lambda: marker.set(1), conditions=eligible == 1
+        'Ray',
+        on_hit_target=lambda: marker.set(1),
+        conditions=eligible == 1,
     )
     rc.trigger()
 

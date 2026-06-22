@@ -1,6 +1,6 @@
 from helpers import expect_exception
 
-from pyhtsl import Container, ExecutionContext, PlayerStat
+from pyhtsw import Container, ExecutionContext, PlayerStat
 
 # x ** 0 -> integer 1, no expressions written
 with Container() as container:

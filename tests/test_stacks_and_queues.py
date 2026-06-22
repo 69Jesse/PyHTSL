@@ -1,4 +1,4 @@
-"""Tests for the stack/queue implementations in `pyhtsl.ext.stack_queue`.
+"""Tests for the stack/queue implementations in `pyhtsw.ext.stack_queue`.
 
 Covers `IntStack`, `IntQueue`, `Stack` and `Queue`; future stack/queue types in
 the same module should add their cases here rather than spawning a parallel
@@ -14,8 +14,8 @@ from contextlib import redirect_stdout
 
 from helpers import expect_exception
 
-from pyhtsl import Container, ExecutionContext, PlayerStat
-from pyhtsl.ext.stack_queue import IntQueue, IntStack, Queue, Stack
+from pyhtsw import Container, ExecutionContext, PlayerStat
+from pyhtsw.ext.stack_queue import IntQueue, IntStack, Queue, Stack
 
 # === Single holder, width 1 ===
 
@@ -1530,7 +1530,7 @@ with expect_exception(ValueError):
 # A bulk shift/cascade over a container with many holders emits far more stat
 # changes than HTSL allows inside one if-statement. `add` / `remove` split
 # those across several sequential `IfAll` blocks (see
-# `pyhtsl.helpers.chunked_if`). These cases pin two things:
+# `pyhtsw.helpers.chunked_if`). These cases pin two things:
 #   1. execution stays correct once the body is spread over many blocks, and
 #   2. finalization through a real `Container` no longer raises the
 #      action-limit error an un-chunked body used to trigger.

@@ -5,7 +5,7 @@ so an in-place `__invert__` would corrupt the shared object for every later
 use — `print(PlayerSneaking, ~PlayerSneaking)` showed both as inverted.
 """
 
-from pyhtsl import (
+from pyhtsw import (
     Container,
     IfAll,
     PlayerSneaking,

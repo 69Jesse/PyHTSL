@@ -6,7 +6,7 @@ limit fixer must count what is rendered and split the overflow (HTSL caps each
 function at 25 stat changes), not trust the object count.
 """
 
-from pyhtsl import (
+from pyhtsw import (
     Container,
     PlayerStat,
     create_function,

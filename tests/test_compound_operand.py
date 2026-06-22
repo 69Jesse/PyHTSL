@@ -2,7 +2,7 @@
 
 import math
 
-from pyhtsl import (
+from pyhtsw import (
     Container,
     ExecutionContext,
     IfAll,
@@ -55,7 +55,7 @@ with Container() as sum_container:
             (x - PlayerPositionX.as_double()) ** 2,
             (y - PlayerPositionY.as_double()) ** 2,
             (z - PlayerPositionZ.as_double()) ** 2,
-        )
+        ),
     )
     with IfAll(distance_squared > 1000):
         chat('hi')

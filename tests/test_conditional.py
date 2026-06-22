@@ -1,6 +1,6 @@
 from helpers import expect_exception
 
-from pyhtsl import Container, Else, IfAll, IfAny, PlayerStat, chat
+from pyhtsw import Container, Else, IfAll, IfAny, PlayerStat, chat
 
 # IfAll with multiple conditions
 with Container() as container:

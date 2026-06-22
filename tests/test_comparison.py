@@ -1,4 +1,4 @@
-from pyhtsl import Container, IfAll, PlayerStat, chat
+from pyhtsw import Container, IfAll, PlayerStat, chat
 
 # Each comparison operator inside IfAll
 with Container() as container:

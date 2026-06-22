@@ -1,4 +1,4 @@
-from pyhtsl import Container, TeamStat
+from pyhtsw import Container, TeamStat
 
 with Container() as container:
     t = TeamStat('points', 'red').as_long()
