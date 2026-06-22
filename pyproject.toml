@@ -3,12 +3,12 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pyhtsl"
-version = "3.4.4"
-description = "Python wrapper for HTSL created to simplify the process of making housings on Hypixel"
+name = "pyhtsw"
+version = "4.0.0"
+description = "Python wrapper for HTSW created to simplify the process of making housings on Hypixel"
 requires-python = ">=3.13"
 authors = [{ name = "Jesse Janssen" }]
-urls = { Homepage = "https://github.com/69Jesse/PyHTSL" }
+urls = { Homepage = "https://github.com/69Jesse/PyHTSW" }
 readme = "README.md"
 dependencies = [
     "mido>=1.3.3",
@@ -27,6 +27,7 @@ select = [
     "C4",     # flake8-comprehensions
     "UP",     # pyupgrade
     "ARG001", # unused arguments in functions
+    "COM812", # missing trailing comma (explodes wrapped calls one-per-line)
 ]
 ignore = [
     "E501",  # line too long
@@ -40,7 +41,7 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["pyhtsl*"]
+include = ["pyhtsw*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.*", "misc/**/*"]

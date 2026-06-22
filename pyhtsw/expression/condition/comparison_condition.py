@@ -1,0 +1,151 @@
+from enum import Enum
+from functools import cached_property
+from typing import TYPE_CHECKING, Self, final
+
+from ...base_object import BaseObject
+from ...expression.housing_type import HousingType
+from ...internal_type import InternalType
+from ..housing_type import housing_type_as_rhs
+from .condition import Condition
+
+if TYPE_CHECKING:
+    from ...checkable import Checkable
+    from ...container import Container
+    from ...execute.context import ExecutionContext
+    from ...stats.stat import Stat
+
+
+__all__ = (
+    'ComparisonOperator',
+    'ComparisonCondition',
+)
+
+
+class ComparisonOperator(Enum):
+    Equal = '=='
+    GreaterThan = '>'
+    LessThan = '<'
+    GreaterThanOrEqual = '>='
+    LessThanOrEqual = '<='
+
+    @cached_property
+    def allowed_types(self) -> set[InternalType]:
+        if self is ComparisonOperator.Equal:
+            return InternalType.all_types()
+        return InternalType.numeric_types()
+
+
+@final
+class ComparisonCondition[LeftT: 'Checkable', RightT: 'Checkable | HousingType'](
+    Condition,
+):
+    left: LeftT
+    right: RightT
+    operator: ComparisonOperator
+
+    def __init__(
+        self,
+        left: LeftT,
+        right: RightT,
+        operator: ComparisonOperator,
+    ) -> None:
+        from ..binary_expression import BinaryExpression
+
+        self.left = left
+        self.right = right
+        self.operator = operator
+        BinaryExpression.fix_type_compatibility(self)
+
+    def into_htsl_raw(self) -> str:
+        from ...checkable import Checkable
+
+        def format_rhs(value: Checkable | HousingType) -> str:
+            if isinstance(value, Checkable):
+                return value.into_string_rhs()
+            return housing_type_as_rhs(value)
+
+        line = f'{self.left.into_string_lhs()} {self.operator.value} {format_rhs(self.right)}'
+
+        fallback_value = self.left.get_formatted_fallback_value()
+        if fallback_value is not None:
+            line += f' {fallback_value}'
+
+        return line
+
+    def _set_stat(self, key: str, value: 'Stat') -> None:
+        from ..binary_expression import BinaryExpression
+
+        setattr(self, key, value)
+        BinaryExpression.fix_type_compatibility(self)
+
+    def finalize(self, container: 'Container') -> None:
+        from ..binary_expression import BinaryExpression
+        from ..compound_expression import CompoundExpression
+
+        # Replace a computed operand with the temp stat holding its result, so
+        # block-level optimization can see which temps the condition depends on.
+        def resolve(value: object) -> object:
+            if isinstance(value, BinaryExpression):
+                return value.create_temp_stat_and_write()
+            if isinstance(value, CompoundExpression):
+                return value.write_and_get_result()
+            return value
+
+        self.left = resolve(self.left)  # type: ignore
+        self.right = resolve(self.right)  # type: ignore
+        BinaryExpression.fix_type_compatibility(self)
+        super().finalize(container)
+
+    def cloned_raw(self) -> Self:
+        return self.__class__(
+            left=self.left.cloned(),
+            right=BaseObject.cloned_or_same(self.right),
+            operator=self.operator,
+        )
+
+    def equals_raw(self, other: object) -> bool:
+        from ...checkable import Checkable
+
+        if not isinstance(other, ComparisonCondition):
+            return False
+        return (
+            self.left.equals(other.left)
+            and (
+                (
+                    isinstance(self.right, Checkable)
+                    and isinstance(other.right, Checkable)
+                    and self.right.equals(other.right)
+                )
+                or (
+                    not isinstance(self.right, Checkable)
+                    and not isinstance(other.right, Checkable)
+                    and self.right == other.right
+                )
+            )
+            and self.operator == other.operator
+        )
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}<{repr(self.left)} {self.operator.value} {repr(self.right)}, inverted={self.inverted}>'
+
+    def raw_evaluate(self, context: 'ExecutionContext') -> bool:
+        left_value = context.get(self.left, output='backend')
+        right_value = context.get(self.right, output='backend')
+        if type(left_value) is not type(right_value):
+            return False
+        if self.operator is ComparisonOperator.Equal:
+            return left_value == right_value
+        if isinstance(left_value, str):
+            return False
+        if self.operator is ComparisonOperator.GreaterThan:
+            return bool(left_value > right_value)
+        if self.operator is ComparisonOperator.LessThan:
+            return bool(left_value < right_value)
+        if self.operator is ComparisonOperator.GreaterThanOrEqual:
+            return bool(left_value >= right_value)
+        if self.operator is ComparisonOperator.LessThanOrEqual:
+            return bool(left_value <= right_value)
+        raise RuntimeError(f'Unsupported operator {self.operator}')
+
+    def related_debug_parts(self) -> list['Checkable | HousingType']:
+        return [self.left, self.right]
