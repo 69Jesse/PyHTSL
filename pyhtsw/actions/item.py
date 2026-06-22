@@ -16,7 +16,7 @@ from ..types import (
     PLAYER_SKULL_ITEM_KEY,
     ColorType,
 )
-from ..utils.formatting import normalize_formatting
+from ..utils.formatting import normalize_formatting, remove_formatting
 from ..utils.kebab import into_kebab
 from .enchantment import Enchantment
 
@@ -105,8 +105,32 @@ def right_click(func: Callable[[], None]) -> Callable[[], None]:
     return func
 
 
+def click(func: Callable[[], None]) -> Callable[[], None]:
+    func.__htsw_click__ = 'both'  # type: ignore[attr-defined]
+    return func
+
+
 # A click handler takes no args, or one arg that receives the Item instance.
 ItemHandler = Callable[[], Any] | Callable[['Item'], Any]
+
+
+def _resolve_click_handlers(
+    on_click: 'ItemHandler | None',
+    on_left_click: 'ItemHandler | None',
+    on_right_click: 'ItemHandler | None',
+) -> tuple['ItemHandler | None', 'ItemHandler | None']:
+    """on_click applies to both buttons; an explicit side overrides it."""
+    if on_click is not None and (on_left_click is not None or on_right_click is not None):
+        from ..utils.log import log
+
+        log(
+            '\x1b[38;2;255;191;0mItem given both "on_click" and an explicit '
+            '"on_left_click"/"on_right_click"; the explicit side overrides '
+            '"on_click".\x1b[0m',
+        )
+    left = on_left_click if on_left_click is not None else on_click
+    right = on_right_click if on_right_click is not None else on_click
+    return left, right
 
 
 class Item:
@@ -116,6 +140,7 @@ class Item:
 
     left_click = staticmethod(left_click)
     right_click = staticmethod(right_click)
+    click = staticmethod(click)
 
     key: ALL_ITEM_KEY_STRINGS
     name: str | None
@@ -153,6 +178,10 @@ class Item:
         hide_unbreakable_flag: bool | _MissingType = MISSING,
         hide_additional_flag: bool | _MissingType = MISSING,
         hide_dye_flag: bool | _MissingType = MISSING,
+        on_click: 'ItemHandler | None' = None,
+        on_left_click: 'ItemHandler | None' = None,
+        on_right_click: 'ItemHandler | None' = None,
+        importable_name: str | None = None,
     ) -> None:
         defaults = type(self).__htsw_item_defaults__
         explicit: dict[str, Any] = {
@@ -207,6 +236,29 @@ class Item:
                 f'Item key {faulty_tuple_key!r} does not take a tuple value',
             )
 
+        left_fn, right_fn = _resolve_click_handlers(
+            on_click,
+            on_left_click,
+            on_right_click,
+        )
+        self._importable_name: str | None = None
+        if left_fn is not None or right_fn is not None or importable_name is not None:
+            resolved_name = importable_name
+            if resolved_name is None:
+                if self.name is None:
+                    raise TypeError(
+                        'An interactive Item (with on_click/on_left_click/'
+                        'on_right_click) needs a "name" or "importable_name".',
+                    )
+                resolved_name = remove_formatting(self.name).strip()
+            self._importable_name = resolved_name
+            _register_item_instance_importable(
+                resolved_name,
+                self,
+                left_fn,
+                right_fn,
+            )
+
     def __init_subclass__(
         cls,
         key: ALL_ITEM_KEYS | _MissingType = MISSING,
@@ -225,6 +277,7 @@ class Item:
         hide_unbreakable_flag: bool | _MissingType = MISSING,
         hide_additional_flag: bool | _MissingType = MISSING,
         hide_dye_flag: bool | _MissingType = MISSING,
+        on_click: ItemHandler | None = None,
         on_left_click: ItemHandler | None = None,
         on_right_click: ItemHandler | None = None,
     ) -> None:
@@ -258,53 +311,29 @@ class Item:
                 f'Item subclass "{cls.__name__}" must specify a key, e.g. '
                 f'class {cls.__name__}(Item, key="blaze_rod"): ...',
             )
-        cls._register_importable(on_left_click, on_right_click)
+        cls._register_importable(on_click, on_left_click, on_right_click)
 
     @classmethod
     def _register_importable(
         cls,
+        on_click: ItemHandler | None,
         on_left_click: ItemHandler | None,
         on_right_click: ItemHandler | None,
     ) -> None:
-        from ..block import NamedBlock
-        from ..container import get_current_container
-        from ..importable import ItemImportable, call_with_args
-
+        both_fn = on_click
         left_fn = on_left_click
         right_fn = on_right_click
         for value in vars(cls).values():
             tag = getattr(value, '__htsw_click__', None)
-            if tag == 'left':
+            if tag == 'both':
+                both_fn = value
+            elif tag == 'left':
                 left_fn = value
             elif tag == 'right':
                 right_fn = value
 
-        item = cls()
-        container = get_current_container()
-        left_block = right_block = None
-        if left_fn is not None:
-            handler = left_fn
-            left_block = NamedBlock(
-                f'{cls.__name__} left',
-                callback=lambda: call_with_args(handler, item),
-            )
-            container.add_block(left_block)
-        if right_fn is not None:
-            handler = right_fn
-            right_block = NamedBlock(
-                f'{cls.__name__} right',
-                callback=lambda: call_with_args(handler, item),
-            )
-            container.add_block(right_block)
-
-        container.register_importable(
-            ItemImportable(
-                name=cls.__name__,
-                item=item,
-                left=left_block,
-                right=right_block,
-            ),
-        )
+        left_fn, right_fn = _resolve_click_handlers(both_fn, left_fn, right_fn)
+        _register_item_instance_importable(cls.__name__, cls(), left_fn, right_fn)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Item):
@@ -557,6 +586,36 @@ class Item:
         return f'items/{into_kebab(self.key)}-{suffix}.snbt'
 
 
+def _register_item_instance_importable(
+    name: str,
+    item: 'Item',
+    left_fn: 'ItemHandler | None',
+    right_fn: 'ItemHandler | None',
+) -> None:
+    from ..block import NamedBlock
+    from ..container import get_current_container
+    from ..importable import ItemImportable, call_with_args
+
+    container = get_current_container()
+    left_block = right_block = None
+    if left_fn is not None:
+        left_block = NamedBlock(
+            f'{name} left',
+            callback=lambda fn=left_fn: call_with_args(fn, item),
+        )
+        container.add_block(left_block)
+    if right_fn is not None:
+        right_block = NamedBlock(
+            f'{name} right',
+            callback=lambda fn=right_fn: call_with_args(fn, item),
+        )
+        container.add_block(right_block)
+
+    container.register_importable(
+        ItemImportable(name=name, item=item, left=left_block, right=right_block),
+    )
+
+
 def normalize_item(value: 'Item | type[Item]') -> Item:
     if isinstance(value, type):
         if not issubclass(value, Item):
@@ -569,7 +628,8 @@ def normalize_item(value: 'Item | type[Item]') -> Item:
 
 def item_action_reference(value: 'Item | type[Item]') -> str:
     """How an item is referenced from an action: a declared subclass by its
-    htsw name, an instance by its .snbt path."""
+    htsw name, an interactive instance by its importable name, a plain instance
+    by its .snbt path."""
     if isinstance(value, type):
         if not issubclass(value, Item):
             raise TypeError(f'Expected an Item subclass, got {value!r}')
@@ -578,5 +638,7 @@ def item_action_reference(value: 'Item | type[Item]') -> str:
             raise TypeError(f'{value!r} is not a declared item importable')
         return name
     if isinstance(value, Item):
+        if getattr(value, '_importable_name', None) is not None:
+            return value._importable_name  # type: ignore[return-value]
         return value.anonymous_path()
     raise TypeError(f'Expected an Item or Item subclass, got {value!r}')
