@@ -150,11 +150,11 @@ INVENTORY_SLOTS = Literal[
 
 # HTSL only seems to accept the pretty names for inventory slots
 _INVENTORY_SLOTS_PRETTY_NAME_MAPPING: dict[INVENTORY_SLOTS, INVENTORY_SLOTS] = {
-    'hand_slot': -2,
-    'Hand Slot': -2,
-    'first_slot': -1,
-    'First Slot': -1,
-    'First Available Slot': -1,
+    'hand_slot': 'Hand Slot',
+    'Hand Slot': 'Hand Slot',
+    'first_slot': 'First Available Slot',
+    'First Slot': 'First Available Slot',
+    'First Available Slot': 'First Available Slot',
     'hotbar_slot_1': 0,
     'Hotbar Slot 1': 0,
     'hotbar_slot_2': 1,

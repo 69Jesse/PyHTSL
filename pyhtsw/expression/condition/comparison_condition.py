@@ -64,10 +64,13 @@ class ComparisonCondition[LeftT: 'Checkable', RightT: 'Checkable | HousingType']
                 return value.into_string_rhs()
             return housing_type_as_rhs(value)
 
-        line = f'{self.left.into_string_lhs()} {self.operator.value} {format_rhs(self.right)}'
+        lhs = self.left.into_string_lhs()
+        line = f'{lhs} {self.operator.value} {format_rhs(self.right)}'
 
+        # htsw's placeholder comparison takes no fallback value (only var/
+        # globalvar/teamvar comparisons do).
         fallback_value = self.left.get_formatted_fallback_value()
-        if fallback_value is not None:
+        if fallback_value is not None and not lhs.startswith('placeholder'):
             line += f' {fallback_value}'
 
         return line

@@ -104,11 +104,13 @@ class Project:
     root: Path
     used_paths: set[str]
     item_paths: dict[str, str]
+    current_block_relpath: str | None
 
     def __init__(self, root: Path) -> None:
         self.root = root
         self.used_paths = set()
         self.item_paths = {}
+        self.current_block_relpath = None
 
     def _unique(self, base: str, ext: str) -> str:
         candidate = f'{base}{ext}'
@@ -126,8 +128,28 @@ class Project:
 
     def write_block(self, base: str, block: 'Block') -> str:
         relpath = self._unique(base, '.htsl')
-        self.write(relpath, f'{HEADER}\n{block.into_htsl()}\n')
+        # Render with this block as the "current" file so anonymous item
+        # references resolve relative to it (htsw resolves .snbt paths relative
+        # to the HTSL file that contains them).
+        self.current_block_relpath = relpath
+        try:
+            content = block.into_htsl()
+        finally:
+            self.current_block_relpath = None
+        self.write(relpath, f'{HEADER}\n{content}\n')
         return relpath
+
+    def item_reference(self, root_relpath: str) -> str:
+        """A root-relative item path rewritten relative to the block currently
+        being rendered (for direct .snbt references inside actions)."""
+        import posixpath
+
+        if self.current_block_relpath is None:
+            return root_relpath
+        block_dir = posixpath.dirname(self.current_block_relpath)
+        if not block_dir:
+            return root_relpath
+        return posixpath.relpath(root_relpath, block_dir)
 
     def item_path(self, item: 'Item | type[Item]', *, name: str | None = None) -> str:
         from .actions.item import normalize_item

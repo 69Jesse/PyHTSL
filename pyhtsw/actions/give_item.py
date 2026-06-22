@@ -14,14 +14,14 @@ __all__ = (
 class GiveItemExpression(Expression):
     item: Item | type[Item]
     allow_multiple: bool
-    inventory_slot: str
+    inventory_slot: str | int
     replace_existing_item: bool
 
     def __init__(
         self,
         item: Item | type[Item],
         allow_multiple: bool = False,
-        inventory_slot: str = 'first_slot',
+        inventory_slot: str | int = 'first_slot',
         replace_existing_item: bool = False,
     ) -> None:
         self.item = item
@@ -31,9 +31,16 @@ class GiveItemExpression(Expression):
 
     def into_htsl(self) -> str:
         name = item_action_reference(self.item)
+        # Numeric slots are emitted bare (htsw accepts -1..39); named slots
+        # (e.g. "First Available Slot", "Hand Slot") are quoted.
+        slot = (
+            self.inline(self.inventory_slot)
+            if isinstance(self.inventory_slot, int)
+            else self.inline_quoted(self.inventory_slot)
+        )
         return (
             f'giveItem {self.inline_quoted(name)} {self.inline(self.allow_multiple)}'
-            f' {self.inline_quoted(self.inventory_slot)} {self.inline(self.replace_existing_item)}'
+            f' {slot} {self.inline(self.replace_existing_item)}'
         )
 
     def cloned(self) -> Self:

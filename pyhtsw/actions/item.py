@@ -580,7 +580,8 @@ class Item:
 
         container = get_current_container()
         if container.project is not None:
-            return container.project.item_path(self)
+            root_relpath = container.project.item_path(self)
+            return container.project.item_reference(root_relpath)
         snbt = self.into_snbt()
         suffix = hashlib.md5(snbt.encode()).hexdigest()[:8]
         return f'items/{into_kebab(self.key)}-{suffix}.snbt'
