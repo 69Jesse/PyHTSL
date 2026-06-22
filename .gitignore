@@ -165,5 +165,8 @@ package.bat
 test/
 htsl-imports.lnk
 playing-around.lnk
-pyhtsl/cached_htsl_imports_folder.txt
+pyhtsw/cached_projects_folder.txt
 CLAUDE.md
+
+# mdBook build output
+docs/book/
