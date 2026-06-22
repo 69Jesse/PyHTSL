@@ -52,6 +52,8 @@ class Menu:
 
         return decorator
 
+    __htsw_importable__: ClassVar['MenuImportable']
+
     def __init_subclass__(cls, size: MenuSize) -> None:
         super().__init_subclass__()
         if not 1 <= size <= 6:
@@ -59,23 +61,46 @@ class Menu:
         cls.__htsw_name__ = cls.__name__
         cls.__htsw_size__ = size
 
-        container = get_current_container()
-        slots: list[MenuSlot] = []
+        importable = MenuImportable(name=cls.__name__, size=size, slots=[], menu_cls=cls)
+        cls.__htsw_importable__ = importable
+
         for value in vars(cls).values():
             if not isinstance(value, _Element):
                 continue
-            block = NamedBlock(f'{cls.__name__} slot', callback=value.func)
-            container.add_block(block)
-            slots.append(
-                MenuSlot(
-                    item=value.item,
-                    x=value.x,
-                    y=value.y,
-                    xy_check=value.xy_check,
-                    block=block,
-                ),
-            )
+            cls._add_slot(value.item, value.x, value.y, value.xy_check, value.func)
 
-        container.register_importable(
-            MenuImportable(name=cls.__name__, size=size, slots=slots, menu_cls=cls),
+        get_current_container().register_importable(importable)
+
+    @classmethod
+    def _add_slot(
+        cls,
+        item: 'Item | type[Item]',
+        x: MenuAxis,
+        y: MenuAxis,
+        xy_check: XYCheck | None,
+        func: Callable[..., Any],
+    ) -> None:
+        block = NamedBlock(f'{cls.__name__} slot', callback=func)
+        get_current_container().add_block(block)
+        cls.__htsw_importable__.slots.append(
+            MenuSlot(item=item, x=x, y=y, xy_check=xy_check, block=block),
         )
+
+    @classmethod
+    def add_element(
+        cls,
+        *,
+        item: 'Item | type[Item]',
+        x: MenuAxis = None,
+        y: MenuAxis = None,
+        xy_check: XYCheck | None = None,
+    ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+        """Add a slot to an already-defined menu (e.g. inside a loop). Mirrors
+        `@Menu.element`, but registers immediately on the class instead of being
+        collected from the class body."""
+
+        def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+            cls._add_slot(item, x, y, xy_check, func)
+            return func
+
+        return decorator
