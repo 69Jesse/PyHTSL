@@ -1,5 +1,6 @@
 from ..editable import Editable
 from ..expression.binary_expression import SET_STRING_MAX_LENGTH
+from ..stats.player_stat import PlayerStat
 from ..utils.placeholders import get_placeholder_parts
 
 __all__ = ('set_string',)
@@ -25,6 +26,10 @@ def _has_placeholders(value: str) -> bool:
 
 
 def set_string(stat: Editable, value: str) -> None:
+    """Set ``stat`` to ``value`` (which may contain placeholders, including the
+    stat's own) across as many ≤32-char assignments as needed. An oversized
+    placeholder atom is offloaded into a short scratch stat first, then appended
+    via its short reference, so long target names still fit the limit."""
     if len(value) <= SET_STRING_MAX_LENGTH:
         stat.value = value
         return
@@ -36,46 +41,50 @@ def set_string(stat: Editable, value: str) -> None:
         )
 
     self_ref = str(stat)
-    self_ref_len = len(self_ref)
-    if self_ref_len >= SET_STRING_MAX_LENGTH:
+    if len(self_ref) >= SET_STRING_MAX_LENGTH:
         raise ValueError(
-            f'set_string: stat self-reference {self_ref!r} is {self_ref_len} '
+            f'set_string: stat self-reference {self_ref!r} is {len(self_ref)} '
             f'chars; no room for content within the '
             f'{SET_STRING_MAX_LENGTH}-char limit',
         )
 
-    budget_continuation = SET_STRING_MAX_LENGTH - self_ref_len
+    scratch = PlayerStat('t').as_string()
+    scratch_ref = str(scratch)
+    continuation_budget = SET_STRING_MAX_LENGTH - len(self_ref)
+    used_scratch = False
+
     atoms = _atomize(value)
+    index = 0
+    first = True
+    while index < len(atoms):
+        budget = SET_STRING_MAX_LENGTH if first else continuation_budget
+        chunk = ''
+        while index < len(atoms) and len(chunk) + len(atoms[index]) <= budget:
+            chunk += atoms[index]
+            index += 1
 
-    chunks: list[str] = []
-    current: list[str] = []
-    current_len = 0
-
-    def budget() -> int:
-        return SET_STRING_MAX_LENGTH if not chunks else budget_continuation
-
-    for atom in atoms:
-        atom_len = len(atom)
-        if current_len + atom_len > budget():
-            if not current:
+        if not chunk:
+            atom = atoms[index]
+            if len(atom) > SET_STRING_MAX_LENGTH:
                 raise ValueError(
-                    f'set_string: atom {atom!r} of {atom_len} chars exceeds '
-                    f'chunk budget of {budget()} chars',
+                    f'set_string: atom {atom!r} of {len(atom)} chars exceeds '
+                    f'the {SET_STRING_MAX_LENGTH}-char limit',
                 )
-            chunks.append(''.join(current))
-            current = []
-            current_len = 0
-            if atom_len > budget():
+            if len(scratch_ref) > continuation_budget:
                 raise ValueError(
-                    f'set_string: atom {atom!r} of {atom_len} chars exceeds '
-                    f'chunk budget of {budget()} chars',
+                    f'set_string: target self-reference {self_ref!r} leaves no '
+                    f'room to append content within the {SET_STRING_MAX_LENGTH}-char limit',
                 )
-        current.append(atom)
-        current_len += atom_len
+            scratch.value = atom
+            used_scratch = True
+            index += 1
+            chunk = scratch_ref
 
-    if current:
-        chunks.append(''.join(current))
+        if first:
+            stat.value = chunk
+            first = False
+        else:
+            stat.value = self_ref + chunk
 
-    stat.value = chunks[0]
-    for chunk in chunks[1:]:
-        stat.value = self_ref + chunk
+    if used_scratch:
+        scratch.unset()
