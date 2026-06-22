@@ -21,7 +21,8 @@ def housing_type_as_rhs(value: HousingType) -> str:
             if '.' not in formatted:
                 formatted += '.0'
             return formatted
-    return f'"{value}"'
+    escaped = str(value).replace('"', '\\"')
+    return f'"{escaped}"'
 
 
 def housing_type_from_string(value: str) -> HousingType:
