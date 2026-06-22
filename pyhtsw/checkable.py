@@ -702,6 +702,10 @@ class Checkable(BaseObject):
         self,
         other: T,
     ) -> ComparisonCondition[Self, T]:
+        # Comparing to None is not a housing condition; defer to identity so
+        # equality checks (e.g. Enum value de-duplication) don't blow up.
+        if other is None:
+            return NotImplemented  # type: ignore[return-value]
         return ComparisonCondition(
             self,
             other,
@@ -712,6 +716,8 @@ class Checkable(BaseObject):
         self,
         other: T,
     ) -> ComparisonCondition[Self, T]:
+        if other is None:
+            return NotImplemented  # type: ignore[return-value]
         return ~self.__eq__(other)
 
     def __gt__[T: 'Checkable | HousingType'](
