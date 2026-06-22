@@ -1,0 +1,8 @@
+[book]
+title = "PyHTSW Documentation"
+authors = ["Jesse Janssen"]
+language = "en"
+src = "."
+
+[build]
+build-dir = "book"

@@ -1,4 +1,4 @@
-from pyhtsl import (
+from pyhtsw import (
     PlayerStat,
     RandomWhole,
     chat,

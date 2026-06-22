@@ -1,5 +1,5 @@
-# can be replaced with `from pyhtsl import *`
-from pyhtsl import (
+# can be replaced with `from pyhtsw import *`
+from pyhtsw import (
     Else,
     IfAll,
     PlayerStat,
@@ -18,7 +18,7 @@ for letter in ('A', 'B', 'C', 'D', 'E', 'F'):
 
 """Output:
 
-// Generated with PyHTSL https://github.com/69Jesse/PyHTSL
+// Generated with PyHTSW https://github.com/69Jesse/PyHTSW
 chat "&aChecking for empty teams.."
 if and (stat team_A_players == 0) {
     chat "&eTeam A is empty!"

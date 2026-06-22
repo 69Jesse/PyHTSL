@@ -1,5 +1,5 @@
-# can be replaced with `from pyhtsl import *`
-from pyhtsl import (
+# can be replaced with `from pyhtsw import *`
+from pyhtsw import (
     Else,
     GlobalStat,
     IfAll,
@@ -29,7 +29,7 @@ with Else:
 
 """Output:
 
-// Generated with PyHTSL https://github.com/69Jesse/PyHTSL
+// Generated with PyHTSW https://github.com/69Jesse/PyHTSW
 stat temp1 = "%stat.player/reward%"
 stat temp1 *= "%stat.player/multiplier%"
 stat temp1 *= "%stat.global/multiplier%"

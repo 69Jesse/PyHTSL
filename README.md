@@ -1,37 +1,39 @@
-# PyHTSL
-PyHTSL is a Python wrapper for [HTSL](https://github.com/BusterBrown1218/HTSL) created to simplify the process of making housings on [Hypixel](https://hypixel.net/)
+# PyHTSW
+*(formerly PyHTSL)*
+
+PyHTSW is a Python frontend for [HTSW](https://github.com/LGHousing/htsw) created to simplify the process of making housings on [Hypixel](https://hypixel.net/)
 
 ## Prerequisites
-- [ChatTriggers](https://www.chattriggers.com/) and [HTSL](https://github.com/BusterBrown1218/HTSL)
-- [Python](https://www.python.org/) 3.12 or newer
+- [HTSW](https://github.com/LGHousing/htsw)
+- [Python](https://www.python.org/) 3.13 or newer
 
 ## Installation
-To install PyHTSL, make sure Git is available in your system's PATH, then run the following command:
+To install PyHTSW, make sure Git is available in your system's PATH, then run the following command:
 ```bash
-pip install "git+https://github.com/69Jesse/PyHTSL.git" --upgrade
+pip install "git+https://github.com/69Jesse/PyHTSW.git" --upgrade
 ```
 
 ## Usage
-To use PyHTSL, you need to import anything from the package (examples below) and run your Python file like you would with any other Python file.
+To use PyHTSW, you need to import anything from the package (examples below) and run your Python file like you would with any other Python file.
 ```
 python file.py
 ```
-This will create a file named `file.htsl` in the `imports` folder of HTSL, you can now import the generated file with HTSL by using the name `file`.
+This generates an htsw project folder named `file` in your HTSW projects folder, which you can then import with HTSW.
 
 ## Example
-The following Python file named `example.py`:
+The following Python file named `experience.py`:
 ```python
-from pyhtsl import *  # You can import everything you need individually if you want
+from pyhtsw import Else, GlobalStat, IfAll, PlayerStat, chat
 
-experience = PlayerStat('experience').as_long()
-reward = PlayerStat('reward').as_double()
-multiplier = PlayerStat('multiplier').as_double()
-global_multiplier = GlobalStat('multiplier').as_double()
+experience = PlayerStat('experience')
+reward = PlayerStat('reward')
+multiplier = PlayerStat('multiplier')
+global_multiplier = GlobalStat('multiplier')
 
 experience += reward * multiplier * global_multiplier
-chat(f'&eYour EXP has been updated to &a{experience}&e!')
+chat(f'&aYour EXP has been updated to &6{experience}g')
 
-level = PlayerStat('level').as_long()
+level = PlayerStat('level')
 EXP_TO_LEVEL_UP = 100  # Python variable, ! not ! a stat
 
 with IfAll(experience >= EXP_TO_LEVEL_UP):
@@ -42,21 +44,31 @@ with Else:
     chat(f'&eOnly &a{EXP_TO_LEVEL_UP - experience} EXP&e left to level up!')
 ```
 ```
-python example.py
+python experience.py
 ```
-Will generate the following HTSL code in `example.htsl`:
+Generates the project `experience/` with this `import.json`:
+```json
+{
+  "functions": [
+    {
+      "name": "experience",
+      "actions": "functions/experience.htsl"
+    }
+  ]
+}
 ```
-var "tmp0" = "%var.player/reward 0.0%D" false
-var "tmp0" *= "%var.player/multiplier 0.0%D" false
-var "tmp0" *= "%var.global/multiplier 0.0%D" false
-var "experience" += "%var.player/tmp0 0%L" true
-
-chat "&eYour EXP has been updated to &a%var.player/experience 0%&e!"
-
-if and (var "experience" >= 100 0) {
+and this `functions/experience.htsl`:
+```
+// Generated with PyHTSW (https://github.com/69Jesse/PyHTSW)
+var "tmp0" = %var.player/reward% false
+var "tmp0" *= %var.player/multiplier% false
+var "tmp0" *= %var.global/multiplier% false
+var "experience" += %var.player/tmp0% true
+chat "&aYour EXP has been updated to &6%var.player/experience%g"
+if and (var "experience" >= 100) {
     var "experience" -= 100 true
     var "level" += 1 true
-    chat "&eYou leveled up to &dLevel %var.player/level 0%&e!"
+    chat "&eYou leveled up to &dLevel %var.player/level%&e!"
 } else {
     var "tmp0" = 100 false
     var "tmp0" -= "%var.player/experience 0%L" false
