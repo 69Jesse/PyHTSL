@@ -23,7 +23,7 @@ class UnsetExpression(Expression):
         return self.target.equals(other.target)
 
     def into_htsl(self) -> str:
-        return f'unset {self.target.into_string_lhs()}'
+        return f'{self.target.into_string_lhs()} unset'
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}<{repr(self.target)}>'

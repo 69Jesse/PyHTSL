@@ -120,7 +120,9 @@ def _resolve_click_handlers(
     on_right_click: 'ItemHandler | None',
 ) -> tuple['ItemHandler | None', 'ItemHandler | None']:
     """on_click applies to both buttons; an explicit side overrides it."""
-    if on_click is not None and (on_left_click is not None or on_right_click is not None):
+    if on_click is not None and (
+        on_left_click is not None or on_right_click is not None
+    ):
         from ..utils.log import log
 
         log(
