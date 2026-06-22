@@ -9,6 +9,7 @@ from types import TracebackType
 from typing import TYPE_CHECKING, ClassVar, NamedTuple, NoReturn, Self
 
 from .config import (
+    get_project_name,
     get_projects_folder,
     should_disable_global_export,
     should_display_htsl,
@@ -550,7 +551,7 @@ def on_program_exit() -> None:
             '\x1b[38;2;255;0;0mGlobal export is disabled. No .htsl file will be written.\x1b[0m',
         )
     else:
-        container.export(GLOBAL_NAME)
+        container.export(get_project_name() or GLOBAL_NAME)
 
     from .execute.decorator import run_saved_execution_contexts
 

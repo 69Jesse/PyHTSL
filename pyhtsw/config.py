@@ -10,6 +10,8 @@ __all__ = (
     'should_disable_global_export',
     'display_htsl',
     'should_display_htsl',
+    'set_project_name',
+    'get_project_name',
 )
 
 
@@ -102,3 +104,18 @@ def display_htsl(value: bool = True) -> None:
 
 def should_display_htsl() -> bool:
     return DISPLAY_HTSL
+
+
+PROJECT_NAME: str | None = None
+
+
+def set_project_name(name: str) -> None:
+    """Name the global export. Call this once (e.g. in main.py); the program's
+    global container is then exported under this name instead of the script's
+    filename."""
+    global PROJECT_NAME
+    PROJECT_NAME = name
+
+
+def get_project_name() -> str | None:
+    return PROJECT_NAME
