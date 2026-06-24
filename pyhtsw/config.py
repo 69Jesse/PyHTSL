@@ -36,11 +36,21 @@ def _default_projects_folder() -> Path | None:
     return None
 
 
-def set_projects_folder(folder: Path | str) -> None:
+_PROJECTS_FOLDER_OVERRIDE: Path | None = None
+
+
+def set_projects_folder(folder: Path | str, *, save: bool = True) -> None:
     if isinstance(folder, str):
         folder = Path(folder)
     folder = folder.resolve()
     folder.mkdir(parents=True, exist_ok=True)
+
+    global _PROJECTS_FOLDER_OVERRIDE
+    _PROJECTS_FOLDER_OVERRIDE = folder
+
+    if not save:
+        return
+
     new_content = folder.as_posix()
     content = (
         CACHED_PROJECTS_FOLDER_PATH.read_text()
@@ -56,6 +66,8 @@ def set_projects_folder(folder: Path | str) -> None:
 
 
 def get_projects_folder() -> Path:
+    if _PROJECTS_FOLDER_OVERRIDE is not None:
+        return _PROJECTS_FOLDER_OVERRIDE
     if CACHED_PROJECTS_FOLDER_PATH.exists():
         raw_path = CACHED_PROJECTS_FOLDER_PATH.read_text().strip()
         if raw_path:
