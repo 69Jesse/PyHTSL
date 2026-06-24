@@ -131,7 +131,12 @@ class Block(BaseObject):
 
     def finalize(self, container: 'Container', index: int) -> None:
         self.maybe_run_callback()
-        container.finalize_expressions(self.expressions)
+        # An overflow block holds a tail that `fix_action_limits` carved off an
+        # already-finalized block, so its expressions are finalized too — a
+        # second pass is a no-op. Skipping it avoids quadratic finalize work
+        # (a big split-up function would otherwise re-finalize each tail).
+        if self._overflow_root_ref is None:
+            container.finalize_expressions(self.expressions)
         if not self.container.ignore_action_limits:
             self.fix_action_limits(container, index)
 
