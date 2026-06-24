@@ -14,7 +14,13 @@ from pyhtsw import set_projects_folder
 set_projects_folder('/path/to/.minecraft/htsw/projects')
 ```
 
-The chosen folder is cached so you only set it once.
+The chosen folder is cached so you only set it once. Pass `save=False` to point
+exports at a folder for the current run **without** writing it to that cache —
+handy for tests and benchmarks that must not disturb your real projects folder:
+
+```python
+set_projects_folder('/tmp/throwaway', save=False)
+```
 
 The project name is derived from your script filename, or set it explicitly with
 `set_project_name('my house')` (call it once, e.g. in `main.py`). The folder is
