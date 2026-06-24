@@ -160,13 +160,8 @@ cython_debug/
 #.idea/
 
 # Debugging
-install.bat
-package.bat
 test/
-htsl-imports.lnk
-playing-around.lnk
 pyhtsw/cached_projects_folder.txt
-CLAUDE.md
 
 # mdBook build output
 docs/book/
