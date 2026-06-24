@@ -40,6 +40,25 @@ __all__ = (
 SET_STRING_MAX_LENGTH = 32
 
 
+# Below this block size the quadratic peephole scans are cheaper than building
+# the per-pass index; above it the index wins by orders of magnitude.
+_OPT_INDEX_THRESHOLD = 128
+
+_BARRIER_TYPES: tuple[type, ...] | None = None
+
+
+def _barrier_types() -> tuple[type, ...]:
+    """Concrete expression types that act as execution barriers, cached once to
+    avoid re-importing on every optimizer call."""
+    global _BARRIER_TYPES
+    if _BARRIER_TYPES is None:
+        from ..actions.pause_execution import PauseExecutionExpression
+        from ..actions.trigger_function import TriggerFunctionExpression
+
+        _BARRIER_TYPES = (PauseExecutionExpression, TriggerFunctionExpression)
+    return _BARRIER_TYPES
+
+
 def _is_single_placeholder(value: str) -> bool:
     return any(
         pattern.fullmatch(value) is not None
@@ -283,13 +302,74 @@ class BinaryExpression[
 
     @staticmethod
     def _is_execution_barrier(expression: Expression) -> bool:
-        from ..actions.pause_execution import PauseExecutionExpression
-        from ..actions.trigger_function import TriggerFunctionExpression
+        types = _barrier_types()
+        for expr in expression.walk_expressions():
+            if isinstance(expr, types):
+                return True
+        return False
 
-        return any(
-            isinstance(expr, PauseExecutionExpression | TriggerFunctionExpression)
-            for expr in expression.walk_expressions()
-        )
+    @staticmethod
+    def _stat_query_keys(stat: Stat) -> tuple[tuple, tuple]:
+        """The (direct, string-placeholder) keys used to test `is_using_stat`
+        for `stat`. A temp's placeholder is matched as its player-stat form."""
+        direct = (type(stat), stat.name)
+        if isinstance(stat, TemporaryStat):
+            player = stat.into_player_stat()
+            return direct, (type(player), player.name)
+        return direct, direct
+
+    @staticmethod
+    def _expr_used_keys(expression: Expression) -> tuple[set, set]:
+        """(direct stat keys, string-placeholder stat keys) used anywhere in
+        `expression` — the structural data behind `is_using_stat`."""
+        direct: set = set()
+        string: set = set()
+        for expr in expression.walk_expressions():
+            for s, _ in expr.get_all_stats_used():
+                direct.add((type(s), s.name))
+            for value in expr._get_all_values().values():
+                if not isinstance(value, str):
+                    continue
+                for ref in Checkable.iter_in_string(value):
+                    if isinstance(ref, Stat):
+                        string.add((type(ref), ref.name))
+        return direct, string
+
+    @staticmethod
+    def _compute_pass_index(
+        expressions: list[Expression],
+    ) -> tuple[list[int | None], list[int | None]]:
+        """One reverse sweep giving, per index `i`, the first index after `i`
+        that uses the stat written at `i` (`next_use`) and the first execution
+        barrier after `i` (`next_barrier`). This replaces the per-`i` forward
+        scans that made the peephole passes quadratic."""
+        n = len(expressions)
+        next_use: list[int | None] = [None] * n
+        next_barrier: list[int | None] = [None] * n
+        direct_last: dict[tuple, int] = {}
+        string_last: dict[tuple, int] = {}
+        last_barrier: int | None = None
+        for i in range(n - 1, -1, -1):
+            expr = expressions[i]
+            next_barrier[i] = last_barrier
+            if isinstance(expr, BinaryExpression) and isinstance(expr.left, Stat):
+                dkey, skey = BinaryExpression._stat_query_keys(expr.left)
+                d = direct_last.get(dkey)
+                s = string_last.get(skey)
+                if d is None:
+                    next_use[i] = s
+                elif s is None:
+                    next_use[i] = d
+                else:
+                    next_use[i] = d if d < s else s
+            dset, sset = BinaryExpression._expr_used_keys(expr)
+            for k in dset:
+                direct_last[k] = i
+            for k in sset:
+                string_last[k] = i
+            if BinaryExpression._is_execution_barrier(expr):
+                last_barrier = i
+        return next_use, next_barrier
 
     @staticmethod
     def _remove_no_op_expressions(expressions: list[Expression]) -> bool:
@@ -377,6 +457,11 @@ class BinaryExpression[
     def _merge_identity_set_with_op(expressions: list[Expression]) -> bool:
         """`lhs = identity; lhs OP rhs` -> `lhs = rhs` (covers +, *, |, ^, &)."""
         has_changed = False
+        use_index = len(expressions) > _OPT_INDEX_THRESHOLD
+        next_use: list[int | None] = []
+        next_barrier: list[int | None] = []
+        if use_index:
+            next_use, next_barrier = BinaryExpression._compute_pass_index(expressions)
         i = 0
         while i < len(expressions) - 1:
             expr_i = expressions[i]
@@ -392,26 +477,46 @@ class BinaryExpression[
             lhs = expr_i.left
             init_value = expr_i.right
 
-            j = i + 1
+            # The first expression that touches lhs after i must be the identity
+            # op, with no execution barrier reached before it.
             merge_target: BinaryExpression[Any, Any] | None = None
-            while j < len(expressions):
-                expr_j = expressions[j]
-                if BinaryExpression._is_execution_barrier(expr_j):
-                    break
+            if use_index:
+                j = next_use[i]
+                jb = next_barrier[i]
+                if j is None or (jb is not None and jb < j):
+                    i += 1
+                    continue
+                candidate = expressions[j]
                 if (
-                    isinstance(expr_j, BinaryExpression)
-                    and isinstance(expr_j.left, Stat)
-                    and expr_j.left.is_same_stat(lhs)
+                    isinstance(candidate, BinaryExpression)
+                    and isinstance(candidate.left, Stat)
+                    and candidate.left.is_same_stat(lhs)
                     and BinaryExpression._is_left_identity_for(
-                        expr_j.operator,
+                        candidate.operator,
                         init_value,
                     )
                 ):
-                    merge_target = expr_j
-                    break
-                if expr_j.is_using_stat(lhs):
-                    break
-                j += 1
+                    merge_target = candidate
+            else:
+                j = i + 1
+                while j < len(expressions):
+                    expr_j = expressions[j]
+                    if BinaryExpression._is_execution_barrier(expr_j):
+                        break
+                    if (
+                        isinstance(expr_j, BinaryExpression)
+                        and isinstance(expr_j.left, Stat)
+                        and expr_j.left.is_same_stat(lhs)
+                        and BinaryExpression._is_left_identity_for(
+                            expr_j.operator,
+                            init_value,
+                        )
+                    ):
+                        merge_target = expr_j
+                        break
+                    if expr_j.is_using_stat(lhs):
+                        break
+                    j += 1
 
             if merge_target is None:
                 i += 1
@@ -438,6 +543,11 @@ class BinaryExpression[
             )
             del expressions[j]
             has_changed = True
+            if use_index:
+                # The list changed; recompute the forward index before continuing.
+                next_use, next_barrier = BinaryExpression._compute_pass_index(
+                    expressions,
+                )
             i += 1
 
         return has_changed
@@ -579,12 +689,9 @@ class BinaryExpression[
         return has_changed
 
     @staticmethod
-    def _eliminate_dead_stores(expressions: list[Expression]) -> bool:
-        """`lhs OP a; ... (lhs unread) ...; lhs = b` (b doesn't read lhs) -> drop first.
-
-        Any op that writes to lhs (Set, Increment, Multiply, ...) is dead if the
-        next expression that touches lhs is a full overwrite without reading it.
-        """
+    def _eliminate_dead_stores_scan(expressions: list[Expression]) -> bool:
+        """Quadratic forward-scan dead-store elimination, used for small blocks
+        where building the index would cost more than it saves."""
         has_changed = False
         i = 0
         while i < len(expressions):
@@ -623,6 +730,54 @@ class BinaryExpression[
                 i += 1
 
         return has_changed
+
+    @staticmethod
+    def _eliminate_dead_stores(expressions: list[Expression]) -> bool:
+        """`lhs OP a; ... (lhs unread) ...; lhs = b` (b doesn't read lhs) -> drop first.
+
+        Any op that writes to lhs (Set, Increment, Multiply, ...) is dead if the
+        next expression that touches lhs is a full overwrite without reading it.
+        """
+        if len(expressions) <= _OPT_INDEX_THRESHOLD:
+            return BinaryExpression._eliminate_dead_stores_scan(expressions)
+
+        next_use, next_barrier = BinaryExpression._compute_pass_index(expressions)
+        dead: list[int] = []
+        for i in range(len(expressions)):
+            expr_i = expressions[i]
+            if not (
+                isinstance(expr_i, BinaryExpression)
+                and isinstance(expr_i.left, Stat)
+                and not expr_i.is_intentional_self_assignment
+            ):
+                continue
+
+            lhs = expr_i.left
+            j = next_use[i]
+            jb = next_barrier[i]
+            # A barrier (or the end of the block) reached before anything reads
+            # or overwrites lhs leaves this store live.
+            if j is None or (jb is not None and jb <= j):
+                continue
+
+            expr_j = expressions[j]
+            if (
+                isinstance(expr_j, BinaryExpression)
+                and isinstance(expr_j.left, Stat)
+                and expr_j.left.is_same_stat(lhs)
+                and expr_j.operator is BinaryOperator.Set
+                and not expr_j.is_intentional_self_assignment
+                and not _rhs_references_stat(expr_j.right, lhs)
+            ):
+                dead.append(i)
+
+        if not dead:
+            return False
+        # Deleting a dead store never changes another store's first-touch, so the
+        # whole batch computed from one index is safe to drop at once.
+        for i in reversed(dead):
+            del expressions[i]
+        return True
 
     @staticmethod
     def rename_temporary_stats(

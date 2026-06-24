@@ -14,6 +14,25 @@ if TYPE_CHECKING:
 __all__ = ('Expression',)
 
 
+# Lazily cached to dodge import cycles; these are only touched well after every
+# module is loaded, and resolving them once avoids re-running `from` import
+# machinery on the millions of calls the optimizer makes.
+_Stat: type | None = None
+_Checkable: type | None = None
+_TemporaryStat: type | None = None
+
+
+def _stat_refs() -> tuple[type, type, type]:
+    global _Stat, _Checkable, _TemporaryStat
+    if _Stat is None:
+        from ..checkable import Checkable
+        from ..stats.stat import Stat
+        from ..stats.temporary_stat import TemporaryStat
+
+        _Stat, _Checkable, _TemporaryStat = Stat, Checkable, TemporaryStat
+    return _Stat, _Checkable, _TemporaryStat  # type: ignore[return-value]
+
+
 class Expression(BaseObject):
     def into_executable_expressions(self) -> Generator['Expression']:
         yield self
@@ -44,18 +63,16 @@ class Expression(BaseObject):
     def get_all_stats_used(
         self,
     ) -> Generator[tuple['Stat', Callable[['Stat'], None]]]:
-        from ..stats.stat import Stat
+        Stat, _, _ = _stat_refs()
 
         for key, value in self._get_all_values().items():
             if isinstance(value, Stat):
                 yield (value, lambda new, _key=key: setattr(self, _key, new))
 
     def is_using_stat(self, stat: 'Stat') -> bool:
-        from ..checkable import Checkable
-        from ..stats.stat import Stat
-        from ..stats.temporary_stat import TemporaryStat
+        Stat, Checkable, TemporaryStat = _stat_refs()
 
-        string_stat: Stat = (
+        string_stat = (
             stat.into_player_stat() if isinstance(stat, TemporaryStat) else stat
         )
 
