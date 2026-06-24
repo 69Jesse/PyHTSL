@@ -60,23 +60,28 @@ def setup() -> None:
     chat('hello')  # belongs to the Setup function, no warning
 ```
 
-## Building and validating
+## Building and checking
 
-Run the script to build:
+To check the result of your code — i.e. confirm it produces a valid project —
+build it, then run the htsw checker on what it built. There is no separate
+"check" step in pyhtsw: you always build first, because the checker validates the
+generated `import.json`.
 
-```sh
-uv run python main.py     # or: python main.py
-```
+1. Build by running the script:
 
-The run prints, near the end, the absolute path it wrote the project to. Validate
-that output with the htsw CLI before importing it in-game (see the
-[HTSW tooling reference](./htsw/tooling.md)):
+   ```sh
+   uv run python main.py     # or: python main.py
+   ```
 
-```sh
-htsw check <printed-path>/import.json
-```
+2. The run prints, near the end, the absolute path it wrote the project to. Run
+   the htsw checker on that project's `import.json` (see the
+   [HTSW tooling reference](./htsw/tooling.md)):
 
-A clean project reports `OK`. Note:
+   ```sh
+   htsw check <printed-path>/import.json
+   ```
+
+A clean project reports `OK`; otherwise the checker lists the problems. Note:
 
 - Functions that exceed the per-block action limit are **split automatically**
   into `Foo`, `Foo 2`, `Foo 3`, … — this is expected, not an error.
