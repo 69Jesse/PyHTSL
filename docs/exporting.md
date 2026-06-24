@@ -16,8 +16,9 @@ set_projects_folder('/path/to/.minecraft/htsw/projects')
 
 The chosen folder is cached so you only set it once.
 
-The project name is derived from your script filename. The folder is written to
-`<projects-folder>/<kebab-name>/`.
+The project name is derived from your script filename, or set it explicitly with
+`set_project_name('my house')` (call it once, e.g. in `main.py`). The folder is
+written to `<projects-folder>/<kebab-name>/`.
 
 ## Generated folder layout
 
@@ -58,6 +59,38 @@ from pyhtsw import create_function, chat
 def setup() -> None:
     chat('hello')  # belongs to the Setup function, no warning
 ```
+
+## Building and validating
+
+Run the script to build:
+
+```sh
+uv run python main.py     # or: python main.py
+```
+
+The run prints, near the end, the absolute path it wrote the project to. Validate
+that output with the htsw CLI before importing it in-game (see the
+[HTSW tooling reference](./htsw/tooling.md)):
+
+```sh
+htsw check <printed-path>/import.json
+```
+
+A clean project reports `OK`. Note:
+
+- Functions that exceed the per-block action limit are **split automatically**
+  into `Foo`, `Foo 2`, `Foo 3`, … — this is expected, not an error.
+- Large projects can take a while to build; the optimizer does most of the work.
+
+## Refactoring safely
+
+When reorganising a project, the goal is byte-equivalent output. Confirm it by
+diffing a build against a baseline taken *before* the change:
+
+- The set of importable names in `import.json` (functions, events, items, menus,
+  …) must be **identical** — a missing name means a module is no longer imported
+  by `main.py`.
+- The `htsw check` result must not gain any new errors.
 
 ## Disabling export
 

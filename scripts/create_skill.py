@@ -28,7 +28,8 @@ DESCRIPTION = (
 PAGE_BLURBS = {
     'overview.md': 'What PyHTSW is and how it relates to htsw.',
     'installation.md': 'Installing the package and where output goes.',
-    'exporting.md': 'The project model: projects folder, import.json, layout.',
+    'project-structure.md': 'Laying out a multi-file project: the uv project, flat modules, main.py wiring, asset paths.',
+    'exporting.md': 'The project model: projects folder, import.json, building and validating.',
     'importables.md': 'Functions, events, items, regions, menus and NPCs.',
     'items.md': 'Defining items, referencing them, and SNBT.',
     'locations.md': 'The Location type used by location-taking actions.',
@@ -83,6 +84,11 @@ memory, and prefer it over guessing API shapes.
   `@Menu.element(item=, x=row, y=col, xy_check=)`, negatives allowed.
 - Location actions take a `Location` (`Location.custom/house_spawn/invokers/current`).
 - Running a script exports a project folder into the htsw projects folder.
+- Importables register at **import time**, so a multi-file project's `main.py`
+  must import every feature module; `@create_function`/`@create_event` bodies run
+  lazily at export, so cross-module references resolve regardless of import order.
+  Beyond a one-off script, follow [project-structure](reference/project-structure.md)
+  and validate the build with `htsw check` (see [exporting](reference/exporting.md)).
 
 ## Reference
 
