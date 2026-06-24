@@ -436,7 +436,16 @@ class Item:
         return self._get_item_data()['name']
 
     def into_snbt(self, indent: int | None = 4) -> str:
-        return self.into_nbt().into_snbt(indent=indent)
+        # An item's fields are fixed after construction (`cloned` makes a fresh
+        # one), so the default render is memoised — finalize references the same
+        # item many times (e.g. for its `.snbt` path hash).
+        if indent != 4:
+            return self.into_nbt().into_snbt(indent=indent)
+        cached = self.__dict__.get('_snbt_cache')
+        if cached is None:
+            cached = self.into_nbt().into_snbt(indent=4)
+            self.__dict__['_snbt_cache'] = cached
+        return cached
 
     def into_nbt(self, data: ItemJsonData | None = None) -> NBTCompound[NBT]:
         if data is None:
