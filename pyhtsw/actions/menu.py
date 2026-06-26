@@ -62,7 +62,10 @@ class Menu:
         cls.__htsw_size__ = size
 
         importable = MenuImportable(
-            name=cls.__name__, size=size, slots=[], menu_cls=cls
+            name=cls.__name__,
+            size=size,
+            slots=[],
+            menu_cls=cls,
         )
         cls.__htsw_importable__ = importable
 

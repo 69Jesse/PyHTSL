@@ -3,7 +3,7 @@ import hashlib
 import json
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any, ClassVar, TypedDict, cast, get_args
+from typing import TYPE_CHECKING, Any, ClassVar, TypedDict, cast, get_args
 
 from ..config import HERE
 from ..nbt import NBT, NBTByte, NBTCompound, NBTInt, NBTList, NBTShort, NBTString
@@ -19,6 +19,9 @@ from ..types import (
 from ..utils.formatting import normalize_formatting, remove_formatting
 from ..utils.kebab import into_kebab
 from .enchantment import Enchantment
+
+if TYPE_CHECKING:
+    from ..importable import ItemImportable
 
 __all__ = (
     'normalize_item_key',
@@ -139,6 +142,7 @@ class Item:
     # Subclasses become items[] importables; the class name is the htsw reference.
     __htsw_name__: ClassVar[str | None] = None
     __htsw_item_defaults__: ClassVar[dict[str, Any]] = {}
+    __htsw_importable__: ClassVar['ItemImportable']
 
     left_click = staticmethod(left_click)
     right_click = staticmethod(right_click)
@@ -335,7 +339,12 @@ class Item:
                 right_fn = value
 
         left_fn, right_fn = _resolve_click_handlers(both_fn, left_fn, right_fn)
-        _register_item_instance_importable(cls.__name__, cls(), left_fn, right_fn)
+        cls.__htsw_importable__ = _register_item_instance_importable(
+            cls.__name__,
+            cls(),
+            left_fn,
+            right_fn,
+        )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Item):
@@ -603,7 +612,7 @@ def _register_item_instance_importable(
     item: 'Item',
     left_fn: 'ItemHandler | None',
     right_fn: 'ItemHandler | None',
-) -> None:
+) -> 'ItemImportable':
     from ..block import NamedBlock
     from ..container import get_current_container
     from ..importable import ItemImportable, call_with_args
@@ -623,9 +632,14 @@ def _register_item_instance_importable(
         )
         container.add_block(right_block)
 
-    container.register_importable(
-        ItemImportable(name=name, item=item, left=left_block, right=right_block),
+    importable = ItemImportable(
+        name=name,
+        item=item,
+        left=left_block,
+        right=right_block,
     )
+    container.register_importable(importable)
+    return importable
 
 
 def normalize_item(value: 'Item | type[Item]') -> Item:

@@ -183,6 +183,33 @@ class Project:
         return data
 
 
+def _block_replayer(block: 'Block') -> Callable[[], None]:
+    """A callback that reproduces `block` in the current container: re-runs its
+    own callback if it has one, else replays its already-built expressions."""
+    if block.callback is not None:
+        return block.callback
+
+    expressions = block.expressions
+
+    def replay() -> None:
+        for expr in expressions:
+            expr.cloned().write()
+
+    return replay
+
+
+def _clone_block_into_current(block: 'Block | None') -> 'Block | None':
+    """Add a fresh copy of `block` to the current container (for reexport)."""
+    if block is None:
+        return None
+    from .block import NamedBlock
+    from .container import get_current_container
+
+    fresh = NamedBlock(block.get_name(), callback=_block_replayer(block))
+    get_current_container().add_block(fresh)
+    return fresh
+
+
 class Importable(ABC):
     kind: ClassVar[str]
 
@@ -192,6 +219,13 @@ class Importable(ABC):
 
     @abstractmethod
     def build(self, project: Project) -> dict[str, Any]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def reexport(self) -> None:
+        """Re-register an equivalent importable into the current container,
+        re-running this one's action callbacks there. Used by `pyhtsw.export`
+        to gather importables from a module into a fresh project container."""
         raise NotImplementedError
 
 
@@ -213,6 +247,15 @@ class FunctionImportable(Importable):
 
     def identifier(self) -> str:
         return self.name
+
+    def reexport(self) -> None:
+        from .actions.create_function import create_function
+
+        create_function(
+            name=self.name,
+            repeat_ticks=self.repeat_ticks,
+            icon=self.icon,
+        )(_block_replayer(self.block))
 
     def build(self, project: Project) -> dict[str, Any]:
         entry: dict[str, Any] = {'name': self.name}
@@ -237,6 +280,11 @@ class EventImportable(Importable):
 
     def identifier(self) -> str:
         return self.event
+
+    def reexport(self) -> None:
+        from .actions.create_event import create_event
+
+        create_event(self.event)(_block_replayer(self.block))  # type: ignore[arg-type]
 
     def build(self, project: Project) -> dict[str, Any]:
         return {
@@ -266,6 +314,18 @@ class ItemImportable(Importable):
 
     def identifier(self) -> str:
         return self.name
+
+    def reexport(self) -> None:
+        from .container import get_current_container
+
+        get_current_container().register_importable(
+            ItemImportable(
+                name=self.name,
+                item=self.item,
+                left=_clone_block_into_current(self.left),
+                right=_clone_block_into_current(self.right),
+            ),
+        )
 
     def build(self, project: Project) -> dict[str, Any]:
         entry: dict[str, Any] = {
@@ -301,6 +361,18 @@ class RegionImportable(Importable):
 
     def identifier(self) -> str:
         return self.name
+
+    def reexport(self) -> None:
+        from .container import get_current_container
+
+        get_current_container().register_importable(
+            RegionImportable(
+                name=self.name,
+                bounds=self.bounds,
+                on_enter=_clone_block_into_current(self.on_enter),
+                on_exit=_clone_block_into_current(self.on_exit),
+            ),
+        )
 
     def build(self, project: Project) -> dict[str, Any]:
         entry: dict[str, Any] = {'name': self.name}
@@ -387,6 +459,28 @@ class MenuImportable(Importable):
 
     def identifier(self) -> str:
         return self.name
+
+    def reexport(self) -> None:
+        from .container import get_current_container
+
+        slots = [
+            MenuSlot(
+                item=slot.item,
+                x=slot.x,
+                y=slot.y,
+                xy_check=slot.xy_check,
+                block=_clone_block_into_current(slot.block),
+            )
+            for slot in self.slots
+        ]
+        get_current_container().register_importable(
+            MenuImportable(
+                name=self.name,
+                size=self.size,
+                slots=slots,
+                menu_cls=self.menu_cls,
+            ),
+        )
 
     def _resolve(self) -> dict[int, MenuSlot]:
         rows = self.size
@@ -488,6 +582,22 @@ class NpcImportable(Importable):
 
     def identifier(self) -> str:
         return self.name
+
+    def reexport(self) -> None:
+        from .container import get_current_container
+
+        get_current_container().register_importable(
+            NpcImportable(
+                name=self.name,
+                pos=self.pos,
+                left=_clone_block_into_current(self.left),
+                right=_clone_block_into_current(self.right),
+                look_at_players=self.look_at_players,
+                hide_name_tag=self.hide_name_tag,
+                skin=self.skin,
+                equipment=self.equipment,
+            ),
+        )
 
     def build(self, project: Project) -> dict[str, Any]:
         x, y, z = self.pos

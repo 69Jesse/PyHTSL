@@ -14,7 +14,9 @@ def create_event(
         block = NamedBlock(f'event {event}', callback=callback)
         container = get_current_container()
         container.add_block(block)
-        container.register_importable(EventImportable(block, event=event))
+        importable = EventImportable(block, event=event)
+        container.register_importable(importable)
+        callback.__htsw_importable__ = importable  # type: ignore[attr-defined]
         return callback
 
     return decorator

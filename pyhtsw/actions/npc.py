@@ -19,6 +19,7 @@ class NPC:
     Equipment = NpcEquipment
 
     __htsw_name__: ClassVar[str | None] = None
+    __htsw_importable__: ClassVar[NpcImportable]
 
     left_click = staticmethod(left_click)
     right_click = staticmethod(right_click)
@@ -62,15 +63,15 @@ class NPC:
             )
             container.add_block(right_block)
 
-        container.register_importable(
-            NpcImportable(
-                name=cls.__name__,
-                pos=pos,
-                left=left_block,
-                right=right_block,
-                look_at_players=look_at_players,
-                hide_name_tag=hide_name_tag,
-                skin=skin,
-                equipment=equipment,
-            ),
+        importable = NpcImportable(
+            name=cls.__name__,
+            pos=pos,
+            left=left_block,
+            right=right_block,
+            look_at_players=look_at_players,
+            hide_name_tag=hide_name_tag,
+            skin=skin,
+            equipment=equipment,
         )
+        container.register_importable(importable)
+        cls.__htsw_importable__ = importable

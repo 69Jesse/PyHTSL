@@ -20,6 +20,7 @@ def _on_exit(func: Callable[..., Any]) -> Callable[..., Any]:
 
 class Region:
     __htsw_name__: ClassVar[str | None] = None
+    __htsw_importable__: ClassVar[RegionImportable]
 
     on_enter = staticmethod(_on_enter)
     on_exit = staticmethod(_on_exit)
@@ -59,11 +60,11 @@ class Region:
             )
             container.add_block(exit_block)
 
-        container.register_importable(
-            RegionImportable(
-                name=cls.__name__,
-                bounds=bounds,
-                on_enter=enter_block,
-                on_exit=exit_block,
-            ),
+        importable = RegionImportable(
+            name=cls.__name__,
+            bounds=bounds,
+            on_enter=enter_block,
+            on_exit=exit_block,
         )
+        container.register_importable(importable)
+        cls.__htsw_importable__ = importable

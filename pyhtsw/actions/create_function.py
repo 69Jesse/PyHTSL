@@ -24,14 +24,14 @@ def create_function(
 
         container = get_current_container()
         container.add_block(block)
-        container.register_importable(
-            FunctionImportable(
-                block,
-                name=name,
-                repeat_ticks=repeat_ticks,
-                icon=icon,
-            ),
+        importable = FunctionImportable(
+            block,
+            name=name,
+            repeat_ticks=repeat_ticks,
+            icon=icon,
         )
+        container.register_importable(importable)
+        function.__htsw_importable__ = importable
         return function
 
     return decorator
