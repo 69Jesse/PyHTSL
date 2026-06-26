@@ -1,6 +1,7 @@
 import difflib
 import hashlib
 import json
+import sys
 from collections.abc import Callable
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, TypedDict, cast, get_args
@@ -138,11 +139,24 @@ def _resolve_click_handlers(
     return left, right
 
 
+def _caller_module() -> str | None:
+    """The dotted name of the first frame outside the pyhtsw package — the user
+    module that constructed an item. Drives per-module .snbt placement."""
+    frame = sys._getframe(1)
+    while frame is not None:
+        name = frame.f_globals.get('__name__') or ''
+        if name != 'pyhtsw' and not name.startswith('pyhtsw.'):
+            return name
+        frame = frame.f_back
+    return None
+
+
 class Item:
     # Subclasses become items[] importables; the class name is the htsw reference.
     __htsw_name__: ClassVar[str | None] = None
     __htsw_item_defaults__: ClassVar[dict[str, Any]] = {}
     __htsw_importable__: ClassVar['ItemImportable']
+    __htsw_module__: 'str | None'
 
     left_click = staticmethod(left_click)
     right_click = staticmethod(right_click)
@@ -189,6 +203,7 @@ class Item:
         on_right_click: 'ItemHandler | None' = None,
         importable_name: str | None = None,
     ) -> None:
+        self.__htsw_module__ = _caller_module()
         defaults = type(self).__htsw_item_defaults__
         explicit: dict[str, Any] = {
             'name': name,
@@ -263,6 +278,7 @@ class Item:
                 self,
                 left_fn,
                 right_fn,
+                module=self.__htsw_module__,
             )
 
     def __init_subclass__(
@@ -350,7 +366,10 @@ class Item:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Item):
             return False
-        return vars(self) == vars(other)
+        ignore = {'__htsw_module__'}
+        return {k: v for k, v in vars(self).items() if k not in ignore} == {
+            k: v for k, v in vars(other).items() if k not in ignore
+        }
 
     @classmethod
     def from_path(cls, path: Path | str) -> 'Item':
