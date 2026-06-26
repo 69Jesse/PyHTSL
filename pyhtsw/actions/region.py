@@ -66,5 +66,6 @@ class Region:
             on_enter=enter_block,
             on_exit=exit_block,
         )
+        importable.module = cls.__module__
         container.register_importable(importable)
         cls.__htsw_importable__ = importable

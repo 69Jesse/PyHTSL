@@ -30,6 +30,7 @@ def create_function(
             repeat_ticks=repeat_ticks,
             icon=icon,
         )
+        importable.module = getattr(callback, '__module__', None)
         container.register_importable(importable)
         function.__htsw_importable__ = importable
         return function

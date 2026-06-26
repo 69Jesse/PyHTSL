@@ -124,7 +124,15 @@ class Block(BaseObject):
         new_block._overflow_root_ref = root
         new_block._overflow_counter = next_counter
         container.add_block(new_block, index=index + 1)
-        container.register_importable(FunctionImportable(new_block, name=function.name))
+        overflow_importable = FunctionImportable(new_block, name=function.name)
+        root_function = getattr(root, 'function', None)
+        if root_function is not None:
+            overflow_importable.module = getattr(
+                root_function.__htsw_importable__,
+                'module',
+                None,
+            )
+        container.register_importable(overflow_importable)
         log(
             f'Created a new function \x1b[38;2;255;0;0m"{function.name}"\x1b[0m to avoid hitting the action limit in block \x1b[38;2;0;255;0m"{self.get_name()}"\x1b[0m',
         )

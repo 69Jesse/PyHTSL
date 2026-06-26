@@ -67,6 +67,7 @@ class Menu:
             slots=[],
             menu_cls=cls,
         )
+        importable.module = cls.__module__
         cls.__htsw_importable__ = importable
 
         for value in vars(cls).values():

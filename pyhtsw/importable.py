@@ -212,6 +212,7 @@ def _clone_block_into_current(block: 'Block | None') -> 'Block | None':
 
 class Importable(ABC):
     kind: ClassVar[str]
+    module: str | None = None
 
     @abstractmethod
     def identifier(self) -> str:
@@ -251,11 +252,12 @@ class FunctionImportable(Importable):
     def reexport(self) -> None:
         from .actions.create_function import create_function
 
-        create_function(
+        function = create_function(
             name=self.name,
             repeat_ticks=self.repeat_ticks,
             icon=self.icon,
         )(_block_replayer(self.block))
+        function.__htsw_importable__.module = self.module
 
     def build(self, project: Project) -> dict[str, Any]:
         entry: dict[str, Any] = {'name': self.name}
@@ -284,7 +286,8 @@ class EventImportable(Importable):
     def reexport(self) -> None:
         from .actions.create_event import create_event
 
-        create_event(self.event)(_block_replayer(self.block))  # type: ignore[arg-type]
+        callback = create_event(self.event)(_block_replayer(self.block))  # type: ignore[arg-type]
+        callback.__htsw_importable__.module = self.module  # type: ignore[attr-defined]
 
     def build(self, project: Project) -> dict[str, Any]:
         return {

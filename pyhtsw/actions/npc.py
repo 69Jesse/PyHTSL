@@ -73,5 +73,6 @@ class NPC:
             skin=skin,
             equipment=equipment,
         )
+        importable.module = cls.__module__
         container.register_importable(importable)
         cls.__htsw_importable__ = importable
