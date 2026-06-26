@@ -14,7 +14,11 @@ def caller_module() -> str | None:
     frame = sys._getframe(1)
     while frame is not None:
         name = frame.f_globals.get('__name__') or ''
-        if name != 'pyhtsw' and not name.startswith('pyhtsw.') and name not in _SKIP_MODULES:
+        if (
+            name != 'pyhtsw'
+            and not name.startswith('pyhtsw.')
+            and name not in _SKIP_MODULES
+        ):
             return name
         frame = frame.f_back
     return None

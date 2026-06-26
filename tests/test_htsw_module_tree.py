@@ -39,7 +39,9 @@ with Container() as container:
     @create_function('Cookie')
     def cookie() -> None:
         chat('tick')
-        trigger_function(ability)  # cross-module edge: features.cookie -> items.abilities
+        trigger_function(
+            ability
+        )  # cross-module edge: features.cookie -> items.abilities
         give_item(potion)
 
     # Mutually-recursive functions in two modules -> an include cycle that must

@@ -1,5 +1,4 @@
 import hashlib
-import json
 import posixpath
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Sequence
@@ -18,6 +17,7 @@ def module_to_folder(dotted: str | None) -> str:
     if not dotted or dotted == '__main__':
         return ''
     return '/'.join(f'modules/{into_kebab(part)}' for part in dotted.split('.'))
+
 
 if TYPE_CHECKING:
     from .actions.item import Item
@@ -679,8 +679,3 @@ def build_import_json(
         if entries[kind]:
             data[kind] = entries[kind]
     return data
-
-
-def export_import_json(project: Project, importables: list[Importable]) -> None:
-    data = build_import_json(project, importables)
-    project.write('import.json', json.dumps(data, indent=2) + '\n')
