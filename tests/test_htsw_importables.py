@@ -80,4 +80,5 @@ with Container() as c:
 c.export('Ref Test')
 text = (tmp / 'ref-test' / 'functions' / 'ref-test.htsl').read_text()
 assert 'giveItem "Sword"' in text
-assert 'giveItem "items/apple-' in text  # anonymous .snbt path
+# anonymous .snbt path, resolved relative to the action file (in functions/)
+assert 'giveItem "../items/apple-' in text
