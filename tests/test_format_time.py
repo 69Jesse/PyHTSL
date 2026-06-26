@@ -23,15 +23,44 @@ check_time(65, '', '1m5s')
 check_time(3661, '', '1h1m1s')
 check_time(90061, '', '1d1h1m')  # seconds dropped once days appear
 
+# Many days — the days unit must keep counting, not roll into hours
+check_time(604800, '', '7d0h0m')  # exactly one week
+check_time(2243760, '', '25d23h16m')  # 25d23h16m (the regression-report value)
+check_time(1000000, '', '11d13h46m')
+
 # With a space separator (between unit groups only)
 check_time(0, ' ', '0s')
 check_time(5, ' ', '5s')
 check_time(65, ' ', '1m 5s')
 check_time(3661, ' ', '1h 1m 1s')
 check_time(90061, ' ', '1d 1h 1m')
+check_time(2243760, ' ', '25d 23h 16m')
 
 # Negative clamps to zero
 check_time(-100, ' ', '0s')
+
+
+# A computed input (the real-world call shape) works, and a consumer stat the
+# helper's managed temps could once have clobbered survives untouched.
+def check_computed() -> None:
+    with ExecutionContext() as ctx:
+        ending_at = PlayerStat('ENDING_AT').as_long()
+        now = PlayerStat('DateUnix').as_long()
+        tmp0 = PlayerStat('tmp0').as_long()  # consumer's own tmp0
+        out = PlayerStat('out').as_string()
+        ctx.put(ending_at, 2243760, ignore_warning=True)
+        ctx.put(now, 0, ignore_warning=True)
+        tmp0.value = 777
+        format_time_string(abs(ending_at - now), output=out)
+
+        def verify(_o=out, _t=tmp0) -> None:
+            assert ctx.get_raw(_o) == '25d23h16m', repr(ctx.get_raw(_o))
+            assert int(ctx.get_raw(_t)) == 777, ctx.get_raw(_t)
+
+        ctx.assert_all(verify)
+
+
+check_computed()
 
 
 def check_ordinal(n: int, expected: str) -> None:

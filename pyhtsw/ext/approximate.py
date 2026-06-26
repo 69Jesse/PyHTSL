@@ -3,8 +3,8 @@ from typing import Literal, overload
 from ..actions.conditional.statements import Else, IfAll
 from ..checkable import Checkable
 from ..editable import Editable
-from ..stats.player_stat import PlayerStat
 from ..stats.stat import Stat
+from ..stats.temporary_stat import TemporaryStat
 
 __all__ = (
     'approximate_sqrt',
@@ -52,12 +52,12 @@ def approximate_sqrt(
     if x.equals(assign_to):
         raise ValueError('Cannot assign to the same stat as input')
 
-    temp0 = PlayerStat('tmp0').as_double().without_auto_unset()
-    temp1 = PlayerStat('tmp1').as_double().without_auto_unset()
-    temp2 = PlayerStat('tmp2').as_double().without_auto_unset()
-    temp3 = PlayerStat('tmp3').as_double().without_auto_unset()
+    temp0 = TemporaryStat().as_double()
+    temp1 = TemporaryStat().as_double()
+    temp2 = TemporaryStat().as_double()
+    temp3 = TemporaryStat().as_double()
     if not can_modify_x:
-        x_or_temp4 = PlayerStat('tmp4').as_double().without_auto_unset()
+        x_or_temp4 = TemporaryStat().as_double()
     else:
         assert isinstance(x, Editable)
         x_or_temp4 = x.as_double()
@@ -169,17 +169,15 @@ def approximate_sin_cos(
     """
 
     x = x.as_double()
-    temp0 = PlayerStat('tmp0').as_double().without_auto_unset()
+    temp0 = TemporaryStat().as_double()
     if not can_modify_x:
-        x_or_temp1 = PlayerStat('tmp1').as_double().without_auto_unset()
+        x_or_temp1 = TemporaryStat().as_double()
     else:
         assert isinstance(x, Editable)
         x_or_temp1 = x.as_double()
         if isinstance(x_or_temp1, Stat):
             x_or_temp1 = x_or_temp1.without_auto_unset()
-    original_x = (
-        PlayerStat('tmp1' if can_modify_x else 'tmp2').as_double().without_auto_unset()
-    )
+    original_x = TemporaryStat().as_double()
 
     if certain_x_in_range != 90:
         if certain_x_in_range != 180:

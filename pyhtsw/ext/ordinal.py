@@ -1,7 +1,7 @@
 from ..actions.conditional.statements import IfAll
 from ..checkable import Checkable
 from ..editable import Editable
-from ..stats.player_stat import PlayerStat
+from ..stats.temporary_stat import TemporaryStat
 
 __all__ = ('set_ordinal_inline',)
 
@@ -12,14 +12,11 @@ def set_ordinal_inline(
 ) -> None:
     """Set ``output_stat`` to the English ordinal suffix ('st'/'nd'/'rd'/'th')
     for ``checking_stat``."""
-    # Explicit modulo via named scratch stats only — using ``.remainder`` would
-    # spawn anonymous tmp<number> temporaries that the optimizer could merge
-    # with these result stats.
-    last_two_digits = PlayerStat('tmp0').as_long().without_auto_unset()
-    last_digit = PlayerStat('tmp1').as_long().without_auto_unset()
-    scratch = PlayerStat('tmp2').as_long().without_auto_unset()
+    last_two_digits = TemporaryStat().as_long()
+    last_digit = TemporaryStat().as_long()
+    scratch = TemporaryStat().as_long()
 
-    def assign_modulo(into: PlayerStat, value: Checkable, divisor: int) -> None:
+    def assign_modulo(into: TemporaryStat, value: Checkable, divisor: int) -> None:
         into.value = value
         scratch.value = into
         scratch.value //= divisor

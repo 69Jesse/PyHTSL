@@ -2,6 +2,7 @@ from ..actions.conditional.statements import IfAll, IfAny
 from ..checkable import Checkable
 from ..stats.player_stat import PlayerStat
 from ..stats.stat import Stat
+from ..stats.temporary_stat import TemporaryStat
 
 __all__ = ('format_time_string',)
 
@@ -16,17 +17,13 @@ def format_time_string(
     ``1h 12m`` with ``separator=' '``). Seconds are dropped once days are
     present. ``separator`` goes between unit groups only — no leading or
     trailing separator."""
-    # Explicit ops on named scratch stats only, so no anonymous optimizer
-    # temporaries (which also live in the tmp<number> namespace) are created.
-    # The two string scratch stats use short names so that concatenating two of
-    # their placeholders (plus a separator) stays under the 32-char set limit.
-    seconds = PlayerStat('tmp0').as_long().without_auto_unset()
-    days = PlayerStat('tmp1').as_long().without_auto_unset()
-    hours = PlayerStat('tmp2').as_long().without_auto_unset()
-    minutes = PlayerStat('tmp3').as_long().without_auto_unset()
-    scratch = PlayerStat('tmp4').as_long().without_auto_unset()
-    show = PlayerStat('tmp5').as_long().without_auto_unset()
-    has_content = PlayerStat('tmp6').as_long().without_auto_unset()
+    seconds = TemporaryStat().as_long()
+    days = TemporaryStat().as_long()
+    hours = TemporaryStat().as_long()
+    minutes = TemporaryStat().as_long()
+    scratch = TemporaryStat().as_long()
+    show = TemporaryStat().as_long()
+    has_content = TemporaryStat().as_long()
     buffer = PlayerStat('s0').as_string().without_auto_unset()
     piece = PlayerStat('s1').as_string().without_auto_unset()
 
@@ -34,7 +31,7 @@ def format_time_string(
     with IfAll(seconds < 0):
         seconds.value = 0
 
-    def split(into: PlayerStat, divisor: int) -> None:
+    def split(into: TemporaryStat, divisor: int) -> None:
         into.value = seconds
         into.value //= divisor
         scratch.value = into

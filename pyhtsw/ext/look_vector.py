@@ -4,7 +4,7 @@ from ..actions.player_position_pitch import PlayerPositionPitch
 from ..actions.player_position_yaw import PlayerPositionYaw
 from ..checkable import Checkable
 from ..editable import Editable
-from ..stats.player_stat import PlayerStat
+from ..stats.temporary_stat import TemporaryStat
 from .approximate import approximate_sin_cos
 
 __all__ = ('approximate_look_vector',)
@@ -35,7 +35,7 @@ def approximate_look_vector(
         certain_x_in_range=180,
         sin_sign=-1,
     )
-    xz_multiplier = PlayerStat('tmp3').as_double().without_auto_unset()
+    xz_multiplier = TemporaryStat().as_double()
     approximate_sin_cos(
         pitch,
         assign_to_sin=assign_to_y,
