@@ -24,7 +24,11 @@ from ..execute.exception import (
 from ..internal_type import InternalType
 from ..logger import log
 from ..stats.stat import Stat
-from ..stats.temporary_stat import Number, TemporaryStat
+from ..stats.temporary_stat import (
+    Number,
+    TemporaryStat,
+    currently_reserved_temp_numbers,
+)
 from .compound_expression import CompoundExpression
 from .condition.comparison_condition import ComparisonCondition
 from .expression import Expression
@@ -262,7 +266,7 @@ class BinaryExpression[
             right: Checkable | HousingType = minimize(expr.right)
 
             internal_type = BinaryExpression._operand_result_type(left, right)
-            stat = TemporaryStat(internal_type)
+            stat = TemporaryStat.transient().as_type(internal_type)
             expressions.append(
                 BinaryExpression(
                     left=stat,
@@ -805,7 +809,7 @@ class BinaryExpression[
         *,
         finalize: bool = False,
     ) -> None:
-        reserved: set[int] = set()
+        reserved: set[int] = set(currently_reserved_temp_numbers())
         first_uses: list[TemporaryStat] = []
         seen: set[Number] = set()
         for expression in expressions:
@@ -855,6 +859,8 @@ class BinaryExpression[
                 if not isinstance(expression.left, Stat):
                     continue
                 if not isinstance(expression.right, TemporaryStat):
+                    continue
+                if expression.right._number.persistent:
                     continue
                 if expression.operator is not BinaryOperator.Set:
                     continue
@@ -941,7 +947,7 @@ class BinaryExpression[
         yield from expressions
 
     def create_temp_stat_and_write(self) -> TemporaryStat:
-        stat = TemporaryStat(self.internal_type)
+        stat = TemporaryStat.transient().as_type(self.internal_type)
 
         expressions = BinaryExpression(
             left=stat,
@@ -958,7 +964,7 @@ class BinaryExpression[
         return stat
 
     def materialize(self) -> tuple[list[Expression], TemporaryStat]:
-        stat = TemporaryStat(self.internal_type)
+        stat = TemporaryStat.transient().as_type(self.internal_type)
         expressions = BinaryExpression(
             left=stat,
             right=self.cloned(),

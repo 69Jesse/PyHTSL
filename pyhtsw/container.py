@@ -83,6 +83,7 @@ class Container:
     importables: list['Importable']
     importable_keys: set[tuple[str, str]]
     project: 'Project | None'
+    _reserved_temp_numbers: set[int]
 
     is_finalized: bool
     ignore_action_limits: bool
@@ -103,6 +104,7 @@ class Container:
         self.importables = []
         self.importable_keys = set()
         self.project = None
+        self._reserved_temp_numbers = set()
 
         self.is_finalized = False
         self.allow_nested_expressions = allow_nested_expressions
@@ -224,7 +226,7 @@ class Container:
         BinaryExpression.rename_temporary_stats(setup, finalize=True)
 
         placeholders = {
-            deferred_id: result.into_inside_string(include_fallback_value)
+            deferred_id: result.resolved_inside_string(include_fallback_value)
             for deferred_id, result, include_fallback_value in results
         }
         editables = {deferred_id: result for deferred_id, result, _ in results}
@@ -312,10 +314,51 @@ class Container:
                             _format_nested_compound_error(child, offender, expression),
                         )
 
+    def _pin_held_temps(self, expressions: list['Expression']) -> None:
+        """A `TemporaryStat` a consumer/helper holds across statements must keep
+        one stable `tmp<n>` name for all its reads and writes. Assign it now,
+        reserving it so the per-statement transient temps skip it. Transient
+        flatten temps don't exist yet (created later), so the only temps visible
+        here are the held ones."""
+        from .stats.temporary_stat import TemporaryStat
+
+        held: list[TemporaryStat] = []
+        seen: set[object] = set()
+
+        def visit(exprs: list['Expression']) -> None:
+            for expression in exprs:
+                for nested in expression.nested_expressions_refs():
+                    visit(nested)
+                for expr in expression.walk_expressions():
+                    for stat, _ in expr.get_all_stats_used():
+                        if (
+                            isinstance(stat, TemporaryStat)
+                            and stat._number.persistent
+                            and stat._number not in seen
+                        ):
+                            seen.add(stat._number)
+                            held.append(stat)
+
+        visit(expressions)
+
+        reserved = self._reserved_temp_numbers
+        next_number = 0
+        for stat in held:
+            if stat._number.finalized:
+                reserved.add(stat.number)
+                continue
+            while next_number in reserved:
+                next_number += 1
+            reserved.add(next_number)
+            stat.number = next_number
+            stat._number.finalized = True
+            next_number += 1
+
     def finalize_expressions(self, expressions: list['Expression']) -> None:
         from .actions.no_optimization import no_optimization
         from .expression.binary_expression import BinaryExpression
 
+        self._pin_held_temps(expressions)
         self._resolve_deferred_expressions(expressions)
         self._verify_no_nested_blocks(expressions)
 
@@ -334,11 +377,47 @@ class Container:
         if not no_optimization():
             BinaryExpression.optimize_binary_expressions(expressions)
 
+    def _collect_reserved_temp_numbers(
+        self,
+        expressions: list['Expression'],
+        numbers: set[int],
+    ) -> None:
+        from .checkable import Checkable
+        from .stats.stat import Stat
+        from .stats.temporary_stat import TemporaryStat
+
+        def consider(stat: object) -> None:
+            if isinstance(stat, Stat) and not isinstance(stat, TemporaryStat):
+                n = TemporaryStat.extract_number_from_name(stat.name)
+                if n is not None:
+                    numbers.add(n)
+
+        for expression in expressions:
+            for nested in expression.nested_expressions_refs():
+                self._collect_reserved_temp_numbers(nested, numbers)
+            for expr in expression.walk_expressions():
+                for stat, _ in expr.get_all_stats_used():
+                    consider(stat)
+                for value in expr._get_all_values().values():
+                    if isinstance(value, str):
+                        for ref in Checkable.iter_in_string(value):
+                            consider(ref)
+
+    def compute_reserved_temp_numbers(self) -> set[int]:
+        numbers: set[int] = set()
+        for block in self.blocks:
+            self._collect_reserved_temp_numbers(block.expressions, numbers)
+        return numbers
+
     def finalize(self) -> None:
+        from .stats.temporary_stat import reserved_temp_numbers
+
         if self.is_finalized:
             raise RuntimeError('Container is already finalized')
-        for index, block in enumerate(self.blocks):
-            block.finalize(self, index)
+        self._reserved_temp_numbers = self.compute_reserved_temp_numbers()
+        with reserved_temp_numbers(self._reserved_temp_numbers):
+            for index, block in enumerate(self.blocks):
+                block.finalize(self, index)
         self.is_finalized = True
 
     @staticmethod
@@ -348,12 +427,17 @@ class Container:
                 lines.pop(i)
 
     def into_htsl(self) -> str:
+        from .stats.temporary_stat import reserved_temp_numbers
+
         if not self.is_finalized:
             raise RuntimeError(
                 'Unable to transform Container into htsl: Container is not finalized. Either exit the container context or call "finalize()" manually',
             )
 
-        with override_write_expression(lambda _: None):
+        with (
+            reserved_temp_numbers(self._reserved_temp_numbers),
+            override_write_expression(lambda _: None),
+        ):
             lines = (
                 '\n\n\n'.join(
                     block.into_htsl() for block in self.blocks if not block.is_empty()

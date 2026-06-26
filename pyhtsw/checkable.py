@@ -130,6 +130,12 @@ class Checkable(BaseObject):
         """
         raise NotImplementedError
 
+    def resolved_inside_string(self, include_fallback_value: bool = True) -> str:
+        """The final placeholder, never deferred. `into_inside_string` may defer
+        (e.g. a held `TemporaryStat` or a computed expression); deferred
+        resolution calls this to read the real placeholder once numbers settle."""
+        return self.into_inside_string(include_fallback_value)
+
     def materialize(self) -> 'tuple[list[Expression], Editable]':
         raise NotImplementedError
 
@@ -390,7 +396,7 @@ class Checkable(BaseObject):
         from .expression.expression import Expression
         from .stats.temporary_stat import TemporaryStat
 
-        tmp = TemporaryStat(self.internal_type)
+        tmp = TemporaryStat.transient().as_type(self.internal_type)
 
         def build_ops(n: int) -> list[Expression]:
             if n == 1:
@@ -431,7 +437,7 @@ class Checkable(BaseObject):
 
         expressions: list[Expression] = []
 
-        temporary_stat_1 = TemporaryStat(self.internal_type)
+        temporary_stat_1 = TemporaryStat.transient().as_type(self.internal_type)
         expressions.append(
             BinaryExpression(
                 left=temporary_stat_1,
@@ -471,7 +477,7 @@ class Checkable(BaseObject):
             ),
         )
 
-        temporary_stat_2 = TemporaryStat(self.internal_type)
+        temporary_stat_2 = TemporaryStat.transient().as_type(self.internal_type)
         expressions.append(
             BinaryExpression(
                 left=temporary_stat_2,
@@ -676,7 +682,7 @@ class Checkable(BaseObject):
         from .expression.expression import Expression
         from .stats.temporary_stat import TemporaryStat
 
-        tmp = TemporaryStat(self.internal_type)
+        tmp = TemporaryStat.transient().as_type(self.internal_type)
         expressions: list[Expression] = [
             BinaryExpression(tmp, self, BinaryOperator.Set),
             ConditionalExpression(

@@ -1,26 +1,52 @@
-from typing import ClassVar, final
+from collections.abc import Generator
+from contextlib import contextmanager
+from typing import TYPE_CHECKING, ClassVar, final
 
-from ..internal_type import InternalType
 from .player_stat import PlayerStat
 from .stat import Stat
 
-__all__ = ('TemporaryStat',)
+if TYPE_CHECKING:
+    from ..expression.expression import Expression
+
+__all__ = (
+    'TemporaryStat',
+    'reserved_temp_numbers',
+    'currently_reserved_temp_numbers',
+)
+
+
+_RESERVED_NUMBER_STACK: list[set[int]] = []
+
+
+@contextmanager
+def reserved_temp_numbers(numbers: set[int]) -> Generator[None]:
+    _RESERVED_NUMBER_STACK.append(numbers)
+    try:
+        yield
+    finally:
+        _RESERVED_NUMBER_STACK.pop()
+
+
+def currently_reserved_temp_numbers() -> set[int]:
+    return _RESERVED_NUMBER_STACK[-1] if _RESERVED_NUMBER_STACK else set()
 
 
 class Number:
     counter: ClassVar[int] = 1_000_000
 
     @staticmethod
-    def new() -> 'Number':
+    def new(*, persistent: bool) -> 'Number':
         Number.counter += 1
-        return Number(Number.counter)
+        return Number(Number.counter, persistent=persistent)
 
     value: int
     finalized: bool
+    persistent: bool
 
-    def __init__(self, value: int) -> None:
+    def __init__(self, value: int, *, persistent: bool) -> None:
         self.value = value
         self.finalized = False
+        self.persistent = persistent
 
 
 @final
@@ -29,19 +55,40 @@ class TemporaryStat(Stat):
 
     _number: Number
 
-    def __init__(
-        self,
-        internal_type: InternalType,
-    ) -> None:
+    def __init__(self) -> None:
         super().__init__('', auto_unset=False)
-        self.internal_type = internal_type
-        self._number = Number.new()
+        self._number = Number.new(persistent=True)
+
+    @classmethod
+    def transient(cls) -> 'TemporaryStat':
+        stat = cls()
+        stat._number.persistent = False
+        return stat
 
     def into_player_stat(self) -> PlayerStat:
         return PlayerStat(self.name, internal_type=self.internal_type)
 
     def into_hashable(self) -> tuple[object, ...]:
         return self.into_player_stat().into_hashable()
+
+    def resolved_inside_string(self, include_fallback_value: bool = True) -> str:
+        return Stat.into_inside_string(self, include_fallback_value)
+
+    def into_inside_string(self, include_fallback_value: bool = True) -> str:
+        if self._number.finalized:
+            return self.resolved_inside_string(include_fallback_value)
+        from ..deferred import register_deferred
+
+        return register_deferred(self, include_fallback_value)
+
+    def into_string_rhs(self, *, include_internal_type: bool = True) -> str:
+        return self.format_with_internal_type(
+            self.resolved_inside_string(),
+            include_internal_type=include_internal_type,
+        )
+
+    def materialize(self) -> 'tuple[list[Expression], TemporaryStat]':
+        return [], self
 
     @property
     def number(self) -> int:
@@ -85,7 +132,7 @@ class TemporaryStat(Stat):
         return self.number == other.number
 
     def cloned_raw(self) -> 'TemporaryStat':
-        stat = TemporaryStat(self.internal_type)
+        stat = TemporaryStat()
         stat._number = self._number
         return stat
 

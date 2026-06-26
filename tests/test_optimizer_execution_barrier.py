@@ -20,7 +20,6 @@ from pyhtsw import (
 )
 from pyhtsw.actions.pause_execution import PauseExecutionExpression
 from pyhtsw.expression.binary_expression import BinaryExpression, BinaryOperator
-from pyhtsw.internal_type import InternalType
 from pyhtsw.stats.temporary_stat import TemporaryStat
 
 # --- Dead-store elimination ------------------------------------------------
@@ -163,7 +162,7 @@ a = PlayerStat('a').as_long()
 b = PlayerStat('b').as_long()
 x = PlayerStat('x').as_long()
 
-tmp = TemporaryStat(InternalType.LONG)
+tmp = TemporaryStat.transient().as_long()
 expressions = [
     BinaryExpression(left=tmp, right=a, operator=BinaryOperator.Set),
     BinaryExpression(left=tmp, right=b, operator=BinaryOperator.Increment),
@@ -183,7 +182,7 @@ assert (
 
 
 # Control: the same shape without a barrier *does* merge the temp away.
-tmp = TemporaryStat(InternalType.LONG)
+tmp = TemporaryStat.transient().as_long()
 expressions = [
     BinaryExpression(left=tmp, right=a, operator=BinaryOperator.Set),
     BinaryExpression(left=tmp, right=b, operator=BinaryOperator.Increment),
