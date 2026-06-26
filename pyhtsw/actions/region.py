@@ -4,6 +4,7 @@ from typing import Any, ClassVar
 from ..block import NamedBlock
 from ..container import get_current_container
 from ..importable import Bounds, Handler, RegionImportable, call_with_args
+from ..utils.caller import caller_module
 
 __all__ = ('Region',)
 
@@ -66,6 +67,6 @@ class Region:
             on_enter=enter_block,
             on_exit=exit_block,
         )
-        importable.module = cls.__module__
+        importable.module = caller_module()
         container.register_importable(importable)
         cls.__htsw_importable__ = importable

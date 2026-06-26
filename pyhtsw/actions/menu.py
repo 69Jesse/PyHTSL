@@ -4,6 +4,7 @@ from typing import Any, ClassVar, Literal
 from ..block import NamedBlock
 from ..container import get_current_container
 from ..importable import MenuImportable, MenuSlot, XYCheck
+from ..utils.caller import caller_module
 from .item import Item
 
 __all__ = ('Menu',)
@@ -67,7 +68,7 @@ class Menu:
             slots=[],
             menu_cls=cls,
         )
-        importable.module = cls.__module__
+        importable.module = caller_module()
         cls.__htsw_importable__ = importable
 
         for value in vars(cls).values():

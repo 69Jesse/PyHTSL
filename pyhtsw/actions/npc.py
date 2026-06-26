@@ -10,6 +10,7 @@ from ..importable import (
     NpcSkin,
     call_with_args,
 )
+from ..utils.caller import caller_module
 from .item import left_click, right_click
 
 __all__ = ('NPC',)
@@ -73,6 +74,6 @@ class NPC:
             skin=skin,
             equipment=equipment,
         )
-        importable.module = cls.__module__
+        importable.module = caller_module()
         container.register_importable(importable)
         cls.__htsw_importable__ = importable

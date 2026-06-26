@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from ..block import FunctionBlock
 from ..container import get_current_container
 from ..importable import FunctionImportable
+from ..utils.caller import caller_module
 from .function import Function
 
 if TYPE_CHECKING:
@@ -30,7 +31,7 @@ def create_function(
             repeat_ticks=repeat_ticks,
             icon=icon,
         )
-        importable.module = getattr(callback, '__module__', None)
+        importable.module = caller_module()
         container.register_importable(importable)
         function.__htsw_importable__ = importable
         return function

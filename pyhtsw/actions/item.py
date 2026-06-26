@@ -1,7 +1,6 @@
 import difflib
 import hashlib
 import json
-import sys
 from collections.abc import Callable
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, TypedDict, cast, get_args
@@ -17,6 +16,7 @@ from ..types import (
     PLAYER_SKULL_ITEM_KEY,
     ColorType,
 )
+from ..utils.caller import caller_module
 from ..utils.formatting import normalize_formatting, remove_formatting
 from ..utils.kebab import into_kebab
 from .enchantment import Enchantment
@@ -139,18 +139,6 @@ def _resolve_click_handlers(
     return left, right
 
 
-def _caller_module() -> str | None:
-    """The dotted name of the first frame outside the pyhtsw package — the user
-    module that constructed an item. Drives per-module .snbt placement."""
-    frame = sys._getframe(1)
-    while frame is not None:
-        name = frame.f_globals.get('__name__') or ''
-        if name != 'pyhtsw' and not name.startswith('pyhtsw.'):
-            return name
-        frame = frame.f_back
-    return None
-
-
 class Item:
     # Subclasses become items[] importables; the class name is the htsw reference.
     __htsw_name__: ClassVar[str | None] = None
@@ -203,7 +191,7 @@ class Item:
         on_right_click: 'ItemHandler | None' = None,
         importable_name: str | None = None,
     ) -> None:
-        self.__htsw_module__ = _caller_module()
+        self.__htsw_module__ = caller_module()
         defaults = type(self).__htsw_item_defaults__
         explicit: dict[str, Any] = {
             'name': name,
@@ -360,7 +348,7 @@ class Item:
             cls(),
             left_fn,
             right_fn,
-            module=cls.__module__,
+            module=caller_module(),
         )
 
     def __eq__(self, other: object) -> bool:
