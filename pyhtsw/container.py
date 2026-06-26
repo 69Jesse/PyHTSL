@@ -412,9 +412,11 @@ class Container:
         root = self.project_path(name)
         project = Project(root)
         self.project = project
+        CONTAINERS.append(self)
         try:
             export_project(project, importables)
         finally:
+            CONTAINERS.pop()
             self.project = None
 
         if should_display_htsl():
