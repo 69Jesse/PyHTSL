@@ -43,6 +43,13 @@ class GiveItemExpression(Expression):
             f' {slot} {self.inline(self.replace_existing_item)}'
         )
 
+    def referenced_importables(self) -> list[tuple[str, str]]:
+        if isinstance(self.item, type):
+            name = self.item.__htsw_name__
+            return [('items', name)] if name is not None else []
+        name = getattr(self.item, '_importable_name', None)
+        return [('items', name)] if name is not None else []
+
     def cloned(self) -> Self:
         return self.__class__(
             item=self.item,

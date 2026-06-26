@@ -384,7 +384,8 @@ class Container:
         return importables
 
     def export(self, name: str) -> None:
-        from .importable import Project, export_import_json
+        from .importable import Project
+        from .module_export import export_project
 
         importables = self._collect_importables(name)
         if not importables:
@@ -412,7 +413,7 @@ class Container:
         project = Project(root)
         self.project = project
         try:
-            export_import_json(project, importables)
+            export_project(project, importables)
         finally:
             self.project = None
 

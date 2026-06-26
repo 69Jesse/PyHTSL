@@ -1,5 +1,6 @@
 import hashlib
 import json
+import posixpath
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Sequence
 from pathlib import Path
@@ -7,6 +8,16 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
 from .utils.kebab import into_kebab
 from .utils.log import log
+
+
+def module_to_folder(dotted: str | None) -> str:
+    """Root-relative folder for a Python module in the multi-folder export. The
+    entry script (`None`/`__main__`) is the project root (''); every other
+    module nests one `modules/<kebab>` segment per dotted component, e.g.
+    `features.general.combat` -> `modules/features/modules/general/modules/combat`."""
+    if not dotted or dotted == '__main__':
+        return ''
+    return '/'.join(f'modules/{into_kebab(part)}' for part in dotted.split('.'))
 
 if TYPE_CHECKING:
     from .actions.item import Item
@@ -103,14 +114,26 @@ class Project:
 
     root: Path
     used_paths: set[str]
-    item_paths: dict[str, str]
+    item_paths: dict[tuple[str, str], str]
     current_block_relpath: str | None
+    node_folder: str
+    module_folder: Callable[[str | None], str]
 
     def __init__(self, root: Path) -> None:
         self.root = root
         self.used_paths = set()
         self.item_paths = {}
         self.current_block_relpath = None
+        self.node_folder = ''
+        self.module_folder = module_to_folder
+
+    def relative_to_node(self, root_relpath: str) -> str:
+        """A root-relative path rewritten relative to the current node's folder,
+        for use in that node's import.json (htsw resolves entry paths relative to
+        the import.json that declares them)."""
+        if not self.node_folder:
+            return root_relpath
+        return posixpath.relpath(root_relpath, self.node_folder)
 
     def _unique(self, base: str, ext: str) -> str:
         candidate = f'{base}{ext}'
@@ -126,24 +149,22 @@ class Project:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content, encoding='utf-8')
 
+    def _node_base(self, base: str) -> str:
+        return posixpath.join(self.node_folder, base) if self.node_folder else base
+
     def write_block(self, base: str, block: 'Block') -> str:
-        relpath = self._unique(base, '.htsl')
-        # Render with this block as the "current" file so anonymous item
-        # references resolve relative to it (htsw resolves .snbt paths relative
-        # to the HTSL file that contains them).
+        relpath = self._unique(self._node_base(base), '.htsl')
         self.current_block_relpath = relpath
         try:
             content = block.into_htsl()
         finally:
             self.current_block_relpath = None
         self.write(relpath, f'{HEADER}\n{content}\n')
-        return relpath
+        return self.relative_to_node(relpath)
 
     def item_reference(self, root_relpath: str) -> str:
         """A root-relative item path rewritten relative to the block currently
         being rendered (for direct .snbt references inside actions)."""
-        import posixpath
-
         if self.current_block_relpath is None:
             return root_relpath
         block_dir = posixpath.dirname(self.current_block_relpath)
@@ -152,20 +173,32 @@ class Project:
         return posixpath.relpath(root_relpath, block_dir)
 
     def item_path(self, item: 'Item | type[Item]', *, name: str | None = None) -> str:
+        """Write `item`'s .snbt under its *owning* module's folder and return the
+        root-relative path. Anonymous items dedupe by (owner folder, snbt)."""
         from .actions.item import normalize_item
+
+        if isinstance(item, type):
+            owner = getattr(item, '__module__', None)
+        else:
+            owner = getattr(item, '__htsw_module__', None)
+        owner_folder = self.module_folder(owner)
 
         resolved = normalize_item(item)
         snbt = resolved.into_snbt()
-        if name is None and snbt in self.item_paths:
-            return self.item_paths[snbt]
+        key = (owner_folder, snbt)
+        if name is None and key in self.item_paths:
+            return self.item_paths[key]
         if name is not None:
             base = f'items/{into_kebab(name)}'
         else:
             suffix = hashlib.md5(snbt.encode()).hexdigest()[:8]
             base = f'items/{into_kebab(resolved.key)}-{suffix}'
-        relpath = self._unique(base, '.snbt')
+        relpath = self._unique(
+            posixpath.join(owner_folder, base) if owner_folder else base,
+            '.snbt',
+        )
         self.write(relpath, snbt + '\n')
-        self.item_paths[snbt] = relpath
+        self.item_paths[key] = relpath
         return relpath
 
     def icon(self, item: 'Item | type[Item]') -> dict[str, Any]:
@@ -333,7 +366,9 @@ class ItemImportable(Importable):
     def build(self, project: Project) -> dict[str, Any]:
         entry: dict[str, Any] = {
             'name': self.name,
-            'nbt': project.item_path(self.item, name=self.name),
+            'nbt': project.relative_to_node(
+                project.item_path(self.item, name=self.name),
+            ),
         }
         folder = f'items/{into_kebab(self.name)}'
         if self.left is not None and not self.left.is_empty():
@@ -521,7 +556,7 @@ class MenuImportable(Importable):
             element = grid[slot]
             entry: dict[str, Any] = {
                 'slot': slot,
-                'nbt': project.item_path(element.item),
+                'nbt': project.relative_to_node(project.item_path(element.item)),
             }
             if element.block is not None and not element.block.is_empty():
                 entry['actions'] = project.write_block(
@@ -555,7 +590,7 @@ class NpcEquipment:
         for slot in self.SLOTS:
             item = getattr(self, slot)
             if item is not None:
-                out[slot] = project.item_path(item)
+                out[slot] = project.relative_to_node(project.item_path(item))
         return out
 
 
