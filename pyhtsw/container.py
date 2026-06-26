@@ -383,7 +383,12 @@ class Container:
             importables.insert(0, FunctionImportable(global_block, name=name))
         return importables
 
-    def export(self, name: str) -> None:
+    def export(
+        self,
+        name: str,
+        *,
+        module_prefix: tuple[str, ...] | None = None,
+    ) -> None:
         from .importable import Project
         from .module_export import export_project
 
@@ -414,7 +419,7 @@ class Container:
         self.project = project
         CONTAINERS.append(self)
         try:
-            export_project(project, importables)
+            export_project(project, importables, module_prefix)
         finally:
             CONTAINERS.pop()
             self.project = None

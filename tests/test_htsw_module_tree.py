@@ -6,7 +6,9 @@ is explicit; real `__module__` capture is exercised by the example projects."""
 import json
 import tempfile
 from pathlib import Path
+from types import ModuleType
 
+import pyhtsw
 from pyhtsw import (
     Container,
     Item,
@@ -113,5 +115,37 @@ assert snbts, 'potion .snbt was not placed under the owning module'
 give = (cookie_dir / 'functions/cookie.htsl').read_text(encoding='utf-8')
 ref = next(line.split('"')[1] for line in give.splitlines() if '.snbt' in line)
 assert (cookie_dir / 'functions' / ref).resolve() == snbts[0].resolve()
+
+# Exporting a single module roots it at the project root, with anything it pulls
+# in from another package nesting as a referenced sub-project.
+with Container():
+
+    @create_function('Leaf')
+    def leaf() -> None:
+        trigger_function('Dep')
+
+    @create_function('Dep')
+    def dep() -> None:
+        chat('dep')
+
+
+leaf.__htsw_importable__.module = 'pkg.leaf'
+dep.__htsw_importable__.module = 'other.dep'
+
+module = ModuleType('pkg.leaf')
+module.leaf = leaf  # type: ignore[attr-defined]
+module.dep = dep  # type: ignore[attr-defined]
+pyhtsw.export(module, 'Mod Root')
+
+mod_root = tmp / 'mod-root'
+mod_data = json.loads((mod_root / 'import.json').read_text(encoding='utf-8'))
+# the exported module's own function is at the root...
+assert {fn['name'] for fn in mod_data['functions']} == {'Leaf'}
+# ...and its out-of-package dependency nests under its real path.
+assert 'modules/other/import.json' in mod_data.get('include', [])
+dep_data = json.loads(
+    (mod_root / 'modules/other/modules/dep/import.json').read_text(encoding='utf-8'),
+)
+assert {fn['name'] for fn in dep_data['functions']} == {'Dep'}
 
 print('test_htsw_module_tree passed')

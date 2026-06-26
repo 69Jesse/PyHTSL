@@ -70,7 +70,13 @@ def export(
             f'menus, regions or npcs.',
         )
 
+    module_prefix = (
+        tuple(exportable.__name__.split('.'))
+        if isinstance(exportable, ModuleType)
+        else None
+    )
+
     with Container() as container:
         for apply in applies:
             apply()
-    container.export(name)
+    container.export(name, module_prefix=module_prefix)
