@@ -113,6 +113,12 @@ class Expression(BaseObject):
     def walk_expressions(self) -> Generator['Expression']:
         yield self
 
+    def referenced_importables(self) -> list[tuple[str, str]]:
+        """`(kind, name)` of every other importable this expression refers to
+        (a triggered function, an opened menu, ...). Drives the cross-module
+        include graph in the multi-folder export. Empty for most expressions."""
+        return []
+
     def finalize(self, container: Container) -> None:
         self.into_htsl()
 

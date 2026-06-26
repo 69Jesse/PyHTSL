@@ -29,6 +29,9 @@ class TriggerFunctionExpression(Expression):
     def into_htsl(self) -> str:
         return f'function {self.inline_quoted(self.function.name)} {self.inline(self.trigger_for_all_players)}'
 
+    def referenced_importables(self) -> list[tuple[str, str]]:
+        return [('functions', self.function.name)]
+
     def cloned(self) -> Self:
         return self.__class__(
             function=self.function,

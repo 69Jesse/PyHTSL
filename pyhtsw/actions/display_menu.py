@@ -27,6 +27,9 @@ class DisplayMenuExpression(Expression):
     def into_htsl(self) -> str:
         return f'displayMenu {self.inline_quoted(self.name)}'
 
+    def referenced_importables(self) -> list[tuple[str, str]]:
+        return [('menus', self.name)]
+
     def cloned(self) -> Self:
         return self.__class__(menu=self.name)
 
