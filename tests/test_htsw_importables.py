@@ -18,7 +18,7 @@ from pyhtsw import (
 from pyhtsw.location import resolve_location
 
 tmp = Path(tempfile.mkdtemp())
-set_projects_folder(tmp)
+set_projects_folder(tmp, save=False)
 
 
 # Duplicate importable names raise.

@@ -22,7 +22,7 @@ from pyhtsw import (
 )
 
 tmp = Path(tempfile.mkdtemp())
-set_projects_folder(tmp)
+set_projects_folder(tmp, save=False)
 
 
 # Define every importable kind in a throwaway container (so nothing lands in the
