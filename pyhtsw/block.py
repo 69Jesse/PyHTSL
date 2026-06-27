@@ -90,7 +90,14 @@ class Block(BaseObject):
         return len(self.expressions) == 0
 
     def into_htsl(self) -> str:
-        return '\n'.join(expr.into_htsl() for expr in self.expressions)
+        # Activate the container's temp reservation for *every* HTSL render path
+        # transient temps never reuse a `tmp<n>` a consumer named or a held temp
+        # was pinned to. This is the single chokepoint — don't rely on callers.
+        from .stats.temporary_stat import reserved_temp_numbers
+
+        reserved = getattr(self.container, '_reserved_temp_numbers', set())
+        with reserved_temp_numbers(reserved):
+            return '\n'.join(expr.into_htsl() for expr in self.expressions)
 
     def maybe_run_callback(self) -> None:
         if self.callback is None or self.callback_ran:

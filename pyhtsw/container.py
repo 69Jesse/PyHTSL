@@ -427,17 +427,12 @@ class Container:
                 lines.pop(i)
 
     def into_htsl(self) -> str:
-        from .stats.temporary_stat import reserved_temp_numbers
-
         if not self.is_finalized:
             raise RuntimeError(
                 'Unable to transform Container into htsl: Container is not finalized. Either exit the container context or call "finalize()" manually',
             )
 
-        with (
-            reserved_temp_numbers(self._reserved_temp_numbers),
-            override_write_expression(lambda _: None),
-        ):
+        with override_write_expression(lambda _: None):
             lines = (
                 '\n\n\n'.join(
                     block.into_htsl() for block in self.blocks if not block.is_empty()
