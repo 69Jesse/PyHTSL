@@ -25,7 +25,7 @@ def append_x(suffix: str, value: int) -> str:
             captured['v'] = ctx.get_raw(_o)
 
         ctx.run(grab)
-    return captured['v']
+    return str(captured['v'])
 
 
 # d / l (any case) read as double/long literal suffixes -> swallowed.
