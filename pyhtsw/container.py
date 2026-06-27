@@ -503,13 +503,17 @@ class Container:
             CONTAINERS.pop()
             self.project = None
 
+        # Remove generated files left over from a previous export of this project
+        # (hand-placed files like .txt are kept). Do this before the display so it
+        # only ever shows what this run actually produced.
+        project.cleanup_stale()
+
         if should_display_htsl():
-            log((root / 'import.json').read_text(encoding='utf-8'))
-            for htsl_path in sorted(root.rglob('*.htsl')):
-                rel = htsl_path.relative_to(root).as_posix()
+            for written in sorted(project.written_paths):
+                rel = written.relative_to(root).as_posix()
                 log(
                     f'\n\x1b[38;2;0;255;0m// {rel}\x1b[0m\n'
-                    + htsl_path.read_text(encoding='utf-8'),
+                    + written.read_text(encoding='utf-8'),
                 )
 
         self.logger.publish()

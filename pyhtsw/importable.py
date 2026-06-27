@@ -114,6 +114,8 @@ class Project:
 
     root: Path
     used_paths: set[str]
+    # display_htsl output (so neither touches leftover or hand-placed files).
+    written_paths: set[Path]
     item_paths: dict[tuple[str, str], str]
     current_block_relpath: str | None
     node_folder: str
@@ -122,6 +124,7 @@ class Project:
     def __init__(self, root: Path) -> None:
         self.root = root
         self.used_paths = set()
+        self.written_paths = set()
         self.item_paths = {}
         self.current_block_relpath = None
         self.node_folder = ''
@@ -148,6 +151,32 @@ class Project:
         path = self.root / relpath
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content, encoding='utf-8')
+        self.written_paths.add(path)
+
+    OWNED_SUFFIXES: ClassVar[frozenset[str]] = frozenset({'.htsl', '.snbt'})
+
+    def _is_owned(self, path: Path) -> bool:
+        return path.suffix.lower() in self.OWNED_SUFFIXES or path.name == 'import.json'
+
+    def cleanup_stale(self) -> None:
+        """Delete owned files this export did not (re)write, then prune the empty
+        directories that leaves. Non-owned files and their folders survive."""
+        if not self.root.exists():
+            return
+        for path in self.root.rglob('*'):
+            if (
+                path.is_file()
+                and self._is_owned(path)
+                and path not in self.written_paths
+            ):
+                path.unlink()
+        for path in sorted(
+            self.root.rglob('*'),
+            key=lambda p: len(p.parts),
+            reverse=True,
+        ):
+            if path.is_dir() and not any(path.iterdir()):
+                path.rmdir()
 
     def _node_base(self, base: str) -> str:
         return posixpath.join(self.node_folder, base) if self.node_folder else base
