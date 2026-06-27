@@ -364,7 +364,8 @@ class Container:
                         if isinstance(value, str):
                             for did in deferred.find_deferred_ids(value):
                                 mark_deferred(
-                                    deferred.lookup_deferred(did).checkable, idx
+                                    deferred.lookup_deferred(did).checkable,
+                                    idx,
                                 )
                 for nested in expression.nested_expressions_refs():
                     visit(nested)
