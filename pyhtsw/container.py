@@ -505,6 +505,12 @@ class Container:
 
         if should_display_htsl():
             log((root / 'import.json').read_text(encoding='utf-8'))
+            for htsl_path in sorted(root.rglob('*.htsl')):
+                rel = htsl_path.relative_to(root).as_posix()
+                log(
+                    f'\n\x1b[38;2;0;255;0m// {rel}\x1b[0m\n'
+                    + htsl_path.read_text(encoding='utf-8'),
+                )
 
         self.logger.publish()
 
