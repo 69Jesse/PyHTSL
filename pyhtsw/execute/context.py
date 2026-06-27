@@ -272,10 +272,19 @@ class ExecutionContext(Container):
         return text
 
     def _maybe_cast_to_backend(self, text: str) -> BackendType | None:
-        if text.endswith('L'):
-            return cast_to_backend_long(text[:-1])
-        elif text.endswith('D'):
-            return cast_to_backend_double(text[:-1])
+        last = text[-1:].upper()
+        base = text[:-1]
+        if (
+            base
+            and last in ('L', 'D')
+            and (
+                cast_to_backend_long(base) is not None
+                or cast_to_backend_double(base) is not None
+            )
+        ):
+            if last == 'L':
+                return cast_to_backend_long(base.split('.')[0])
+            return cast_to_backend_double(base)
         if (new_value := cast_to_backend_long(text)) is not None:
             return new_value
         if (new_value := cast_to_backend_double(text)) is not None:
