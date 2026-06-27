@@ -11,7 +11,6 @@ from ..expression.condition.condition import Condition
 from ..expression.condition.conditional_expression import ConditionalMode
 from ..expression.expression import Expression
 from ..expression.housing_type import HousingType
-from ..stats.temporary_stat import reserved_temp_numbers
 from ..utils.log import log
 from ..utils.warn import warn
 from .backend_type import (
@@ -127,10 +126,7 @@ class ExecutionContext(Container):
         self.started_execution = True
         # This context is already popped off the stack; swallow any stray
         # `write()` during the run so it does not leak into the global container.
-        with (
-            reserved_temp_numbers(self._reserved_temp_numbers),
-            override_write_expression(lambda _: None),
-        ):
+        with override_write_expression(lambda _: None):
             for block in self.blocks:
                 block.execute(self)
             self.run_tick_loop()

@@ -21,6 +21,7 @@ class Block(BaseObject):
     callback_ran: bool
     _overflow_root_ref: 'Block | None'
     _overflow_counter: int
+    _reserved_temp_numbers: set[int]
 
     def __init__(
         self,
@@ -33,6 +34,7 @@ class Block(BaseObject):
         self.callback_ran = False
         self._overflow_root_ref = None
         self._overflow_counter = 1
+        self._reserved_temp_numbers = set()
 
     def expression_counts(
         self,
@@ -90,13 +92,9 @@ class Block(BaseObject):
         return len(self.expressions) == 0
 
     def into_htsl(self) -> str:
-        # Activate the container's temp reservation for *every* HTSL render path
-        # transient temps never reuse a `tmp<n>` a consumer named or a held temp
-        # was pinned to. This is the single chokepoint — don't rely on callers.
         from .stats.temporary_stat import reserved_temp_numbers
 
-        reserved = getattr(self.container, '_reserved_temp_numbers', set())
-        with reserved_temp_numbers(reserved):
+        with reserved_temp_numbers(self._reserved_temp_numbers):
             return '\n'.join(expr.into_htsl() for expr in self.expressions)
 
     def maybe_run_callback(self) -> None:
@@ -130,6 +128,7 @@ class Block(BaseObject):
         )
         new_block._overflow_root_ref = root
         new_block._overflow_counter = next_counter
+        new_block._reserved_temp_numbers = root._reserved_temp_numbers
         container.add_block(new_block, index=index + 1)
         overflow_importable = FunctionImportable(new_block, name=function.name)
         root_function = getattr(root, 'function', None)
@@ -149,28 +148,31 @@ class Block(BaseObject):
         # An overflow block holds a tail that `fix_action_limits` carved off an
         # already-finalized block, so its expressions are finalized too — a
         # second pass is a no-op. Skipping it avoids quadratic finalize work
-        # (a big split-up function would otherwise re-finalize each tail).
         if self._overflow_root_ref is None:
-            container.finalize_expressions(self.expressions)
+            self._reserved_temp_numbers = container.finalize_expressions(
+                self.expressions,
+            )
         if not self.container.ignore_action_limits:
             self.fix_action_limits(container, index)
 
     def execute_all_expressions(self, context: 'ExecutionContext') -> None:
         from .execute.signal import ExitSignal, PauseSignal
+        from .stats.temporary_stat import reserved_temp_numbers
 
         self.maybe_run_callback()
-        context.finalize_expressions(self.expressions)
+        block_reserved = context.finalize_expressions(self.expressions)
 
-        flat: list[Expression] = []
-        for expression in self.expressions:
-            flat.extend(expression.into_executable_expressions())
+        with reserved_temp_numbers(block_reserved):
+            flat: list[Expression] = []
+            for expression in self.expressions:
+                flat.extend(expression.into_executable_expressions())
 
-        try:
-            context.run_expressions(flat)
-        except ExitSignal:
-            pass
-        except PauseSignal as sig:
-            context.schedule_continuation(sig.continuation, sig.ticks)
+            try:
+                context.run_expressions(flat)
+            except ExitSignal:
+                pass
+            except PauseSignal as sig:
+                context.schedule_continuation(sig.continuation, sig.ticks)
 
     def execute(self, context: 'ExecutionContext') -> None:
         pass  # Do nothing on purpose, since most of the time this is but a definition

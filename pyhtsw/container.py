@@ -84,7 +84,7 @@ class Container:
     importables: list['Importable']
     importable_keys: set[tuple[str, str]]
     project: 'Project | None'
-    _reserved_temp_numbers: set[int]
+    _consumer_reserved: set[int]
 
     is_finalized: bool
     ignore_action_limits: bool
@@ -105,7 +105,7 @@ class Container:
         self.importables = []
         self.importable_keys = set()
         self.project = None
-        self._reserved_temp_numbers = set()
+        self._consumer_reserved = set()
 
         self.is_finalized = False
         self.allow_nested_expressions = allow_nested_expressions
@@ -315,68 +315,113 @@ class Container:
                             _format_nested_compound_error(child, offender, expression),
                         )
 
-    def _pin_held_temps(self, expressions: list['Expression']) -> None:
+    def _pin_held_temps(self, expressions: list['Expression']) -> set[int]:
         """A `TemporaryStat` a consumer/helper holds across statements must keep
-        one stable `tmp<n>` name for all its reads and writes. Assign it now,
-        reserving it so the per-statement transient temps skip it. Transient
-        flatten temps don't exist yet (created later), so the only temps visible
-        here are the held ones."""
-        from .stats.temporary_stat import TemporaryStat
+        one stable `tmp<n>` name for all its reads and writes. Number them per
+        block via greedy interval colouring over each temp's live range (first to
+        last use in a pre-order walk): a number is reused as soon as every temp
+        holding it is past its last use. That packs each function to the fewest
+        `tmp<n>` names — names are scarce and we deliberately overwrite old stats
+        — e.g. four helper calls in a loop reuse one set of temps instead of four.
 
-        held: list[TemporaryStat] = []
-        seen: set[object] = set()
+        Returns this block's reserved set (consumer names + held numbers) so the
+        per-statement transient temps skip exactly these. Transient flatten temps
+        don't exist yet (created later), so the only temps visible here are held
+        ones; a held temp already finalized in an earlier block (used across
+        functions) keeps its number and is reserved block-wide."""
+        from . import deferred
+        from .expression.expression import Expression
+        from .stats.temporary_stat import Number, TemporaryStat
+
+        first: dict[Number, int] = {}
+        last: dict[Number, int] = {}
+        counter = 0
+
+        def mark(stat: object, idx: int) -> None:
+            if isinstance(stat, TemporaryStat) and stat._number.persistent:
+                num = stat._number
+                if num not in first:
+                    first[num] = idx
+                last[num] = idx
+
+        def mark_deferred(checkable: object, idx: int) -> None:
+            if isinstance(checkable, Expression):
+                for expr in checkable.walk_expressions():
+                    for stat, _ in expr.get_all_stats_used():
+                        mark(stat, idx)
+            else:
+                mark(checkable, idx)
 
         def visit(exprs: list['Expression']) -> None:
+            nonlocal counter
             for expression in exprs:
-                for nested in expression.nested_expressions_refs():
-                    visit(nested)
+                idx = counter
+                counter += 1
                 for expr in expression.walk_expressions():
                     for stat, _ in expr.get_all_stats_used():
-                        if (
-                            isinstance(stat, TemporaryStat)
-                            and stat._number.persistent
-                            and stat._number not in seen
-                        ):
-                            seen.add(stat._number)
-                            held.append(stat)
+                        mark(stat, idx)
+                    for value in expr._get_all_values().values():
+                        if isinstance(value, str):
+                            for did in deferred.find_deferred_ids(value):
+                                mark_deferred(
+                                    deferred.lookup_deferred(did).checkable, idx
+                                )
+                for nested in expression.nested_expressions_refs():
+                    visit(nested)
 
         visit(expressions)
 
-        reserved = self._reserved_temp_numbers
-        next_number = 0
-        for stat in held:
-            if stat._number.finalized:
-                reserved.add(stat.number)
-                continue
-            while next_number in reserved:
-                next_number += 1
-            reserved.add(next_number)
-            stat.number = next_number
-            stat._number.finalized = True
-            next_number += 1
+        consumer = self._consumer_reserved
+        fixed = {num.value for num in first if num.finalized}
+        base_reserved = consumer | fixed
 
-    def finalize_expressions(self, expressions: list['Expression']) -> None:
+        order = sorted(
+            (num for num in first if not num.finalized),
+            key=lambda n: first[n],
+        )
+        active: list[tuple[int, int]] = []  # (last_index, number) still live
+        assigned: set[int] = set(fixed)
+        for num in order:
+            start = first[num]
+            active = [(end, n) for (end, n) in active if end >= start]
+            live = {n for (_, n) in active} | base_reserved
+            number = 0
+            while number in live:
+                number += 1
+            num.value = number
+            num.finalized = True
+            active.append((last[num], number))
+            assigned.add(number)
+        return consumer | assigned
+
+    def finalize_expressions(self, expressions: list['Expression']) -> set[int]:
+        """Finalize one block's expressions. Returns the block's reserved temp
+        numbers (consumer names + this block's held temps) so the caller can
+        activate the same set while rendering/executing the block."""
         from .actions.no_optimization import no_optimization
         from .expression.binary_expression import BinaryExpression
+        from .stats.temporary_stat import reserved_temp_numbers
 
-        self._pin_held_temps(expressions)
-        self._resolve_deferred_expressions(expressions)
-        self._verify_no_nested_blocks(expressions)
+        block_reserved = self._pin_held_temps(expressions)
+        with reserved_temp_numbers(block_reserved):
+            self._resolve_deferred_expressions(expressions)
+            self._verify_no_nested_blocks(expressions)
 
-        def on_new_expression(expression: 'Expression') -> None:
-            nonlocal index
-            expressions.insert(index, expression)
-            index += 1
+            def on_new_expression(expression: 'Expression') -> None:
+                nonlocal index
+                expressions.insert(index, expression)
+                index += 1
 
-        index = len(expressions) - 1
-        with override_write_expression(on_new_expression):
-            while index >= 0:
-                expression = expressions[index]
-                expression.finalize(self)
-                index -= 1
+            index = len(expressions) - 1
+            with override_write_expression(on_new_expression):
+                while index >= 0:
+                    expression = expressions[index]
+                    expression.finalize(self)
+                    index -= 1
 
-        if not no_optimization():
-            BinaryExpression.optimize_binary_expressions(expressions)
+            if not no_optimization():
+                BinaryExpression.optimize_binary_expressions(expressions)
+        return block_reserved
 
     def _collect_reserved_temp_numbers(
         self,
@@ -411,14 +456,11 @@ class Container:
         return numbers
 
     def finalize(self) -> None:
-        from .stats.temporary_stat import reserved_temp_numbers
-
         if self.is_finalized:
             raise RuntimeError('Container is already finalized')
-        self._reserved_temp_numbers = self.compute_reserved_temp_numbers()
-        with reserved_temp_numbers(self._reserved_temp_numbers):
-            for index, block in enumerate(self.blocks):
-                block.finalize(self, index)
+        self._consumer_reserved = self.compute_reserved_temp_numbers()
+        for index, block in enumerate(self.blocks):
+            block.finalize(self, index)
         self.is_finalized = True
 
     @staticmethod
