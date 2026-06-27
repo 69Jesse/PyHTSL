@@ -8,8 +8,8 @@ __all__ = (
     'get_projects_folder',
     'disable_global_export',
     'should_disable_global_export',
-    'display_htsl',
-    'should_display_htsl',
+    'display_output',
+    'should_display_output',
     'cleanup_stale_files',
     'should_cleanup_stale_files',
     'set_project_name',
@@ -108,16 +108,18 @@ def should_disable_global_export() -> bool:
     return DISABLE_GLOBAL_EXPORT
 
 
-DISPLAY_HTSL: bool = False
+DISPLAY_OUTPUT: bool = False
 
 
-def display_htsl(value: bool = True) -> None:
-    global DISPLAY_HTSL
-    DISPLAY_HTSL = value
+def display_output(value: bool = True) -> None:
+    """On export, print every generated file's contents (`.htsl`, `import.json`,
+    `.snbt`) to the console."""
+    global DISPLAY_OUTPUT
+    DISPLAY_OUTPUT = value
 
 
-def should_display_htsl() -> bool:
-    return DISPLAY_HTSL
+def should_display_output() -> bool:
+    return DISPLAY_OUTPUT
 
 
 CLEANUP_STALE_FILES: bool = False

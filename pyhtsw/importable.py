@@ -114,7 +114,6 @@ class Project:
 
     root: Path
     used_paths: set[str]
-    # display_htsl output (so neither touches leftover or hand-placed files).
     written_paths: set[Path]
     item_paths: dict[tuple[str, str], str]
     current_block_relpath: str | None

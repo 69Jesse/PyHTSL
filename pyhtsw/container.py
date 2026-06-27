@@ -13,7 +13,7 @@ from .config import (
     get_projects_folder,
     should_cleanup_stale_files,
     should_disable_global_export,
-    should_display_htsl,
+    should_display_output,
 )
 from .logger import AntiSpamLogger
 from .utils.kebab import into_kebab
@@ -507,7 +507,7 @@ class Container:
         if should_cleanup_stale_files():
             project.cleanup_stale()
 
-        if should_display_htsl():
+        if should_display_output():
             for written in sorted(project.written_paths):
                 rel = written.relative_to(root).as_posix()
                 log(

@@ -349,7 +349,7 @@ from .actions.within_region import WithinRegion as WithinRegion
 from .checkable import Checkable as Checkable
 from .config import cleanup_stale_files as cleanup_stale_files
 from .config import disable_global_export as disable_global_export
-from .config import display_htsl as display_htsl
+from .config import display_output as display_output
 from .config import get_project_name as get_project_name
 from .config import get_projects_folder as get_projects_folder
 from .config import set_project_name as set_project_name
