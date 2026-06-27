@@ -8,12 +8,14 @@ from pathlib import Path
 from pyhtsw import (
     Container,
     chat,
+    cleanup_stale_files,
     create_function,
     set_projects_folder,
 )
 
 tmp = Path(tempfile.mkdtemp())
 set_projects_folder(tmp, save=False)
+cleanup_stale_files()  # opt in — off by default
 
 root = tmp / 'cleanup-test'
 
@@ -60,3 +62,5 @@ remaining_owned = {
     if p.is_file() and (p.suffix in {'.htsl', '.snbt'} or p.name == 'import.json')
 }
 assert remaining_owned == {'import.json', 'functions/foo.htsl'}, remaining_owned
+
+cleanup_stale_files(False)  # reset the process-global flag for other tests

@@ -10,6 +10,8 @@ __all__ = (
     'should_disable_global_export',
     'display_htsl',
     'should_display_htsl',
+    'cleanup_stale_files',
+    'should_cleanup_stale_files',
     'set_project_name',
     'get_project_name',
 )
@@ -116,6 +118,21 @@ def display_htsl(value: bool = True) -> None:
 
 def should_display_htsl() -> bool:
     return DISPLAY_HTSL
+
+
+CLEANUP_STALE_FILES: bool = False
+
+
+def cleanup_stale_files(value: bool = True) -> None:
+    """Opt in to deleting generated files (`.htsl`/`.snbt`/`import.json`) a prior
+    export wrote into this project's folder that are no longer produced. Off by
+    default; hand-placed files (e.g. `.txt`) are never touched either way."""
+    global CLEANUP_STALE_FILES
+    CLEANUP_STALE_FILES = value
+
+
+def should_cleanup_stale_files() -> bool:
+    return CLEANUP_STALE_FILES
 
 
 PROJECT_NAME: str | None = None

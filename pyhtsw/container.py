@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, ClassVar, NamedTuple, NoReturn, Self
 from .config import (
     get_project_name,
     get_projects_folder,
+    should_cleanup_stale_files,
     should_disable_global_export,
     should_display_htsl,
 )
@@ -503,10 +504,8 @@ class Container:
             CONTAINERS.pop()
             self.project = None
 
-        # Remove generated files left over from a previous export of this project
-        # (hand-placed files like .txt are kept). Do this before the display so it
-        # only ever shows what this run actually produced.
-        project.cleanup_stale()
+        if should_cleanup_stale_files():
+            project.cleanup_stale()
 
         if should_display_htsl():
             for written in sorted(project.written_paths):
