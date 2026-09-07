@@ -8,6 +8,7 @@ from pyhtsw import (
     IfAll,
     Item,
     Location,
+    NoTypeCasting,
     PlayerStat,
     TeamStat,
     apply_potion_effect,
@@ -85,6 +86,43 @@ with Container() as container:
 assert container.into_htsl() == ('var "t" = "%var.global/fourteen_chars 0.0%D" true'), (
     container.into_htsl()
 )
+
+
+# The cap is on a *quoted* value only. A bare placeholder is accepted at any
+# length, so dropping the type suffix that forces the quotes lifts it.
+with NoTypeCasting():
+    with Container() as container:
+        PlayerStat('t').as_double().value = GlobalStat('sixteen_chars_xx').as_double()
+        with IfAll(
+            PlayerStat('t').as_double() < GlobalStat('sixteen_chars_xx').as_double(),
+        ):
+            chat('hi')
+    htsl = container.into_htsl()
+
+assert htsl == (
+    'var "t" = %var.global/sixteen_chars_xx 0.0% true\n'
+    'if and (var "t" < %var.global/sixteen_chars_xx 0.0% 0.0) {\n'
+    '    chat "hi"\n'
+    '}'
+), htsl
+
+
+# A quoted value is measured the way htsw's parser reads it back, so an escaped
+# quote counts as the one character it is typed as.
+with Container() as container:
+    PlayerStat('s').as_string().value = '"' * 32
+
+assert container.into_htsl() == 'var "s" = "{}" true'.format('\\"' * 32), (
+    container.into_htsl()
+)
+
+
+def escaped_quotes_over_limit() -> None:
+    with Container():
+        PlayerStat('s').as_string().value = '"' * 33
+
+
+rejects(ValueError, 'over-long escaped string value', escaped_quotes_over_limit)
 
 
 def over_chat_limit(call) -> None:

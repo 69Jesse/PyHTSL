@@ -47,13 +47,19 @@ def housing_type_from_string(value: str) -> HousingType:
 
 
 def check_value_length(text: str, *, field: str) -> str:
-    length = exceeds_java_length(text, VALUE_MAX_LENGTH)
+    """The cap applies only to a quoted value; a bare placeholder or number is
+    accepted at any length (htsw `parseValue`, and Housing itself)."""
+    if not (len(text) >= 2 and text.startswith('"') and text.endswith('"')):
+        return text
+    typed = text[1:-1].replace('\\"', '"')
+    length = exceeds_java_length(typed, VALUE_MAX_LENGTH)
     if length is None:
         return text
     raise ValueError(
         f'{field} renders {length} characters, over the '
-        f'{VALUE_MAX_LENGTH}-character limit Housing puts on a value: {text}. '
-        f'Shorten the stat name, or drop the fallback with "with NoFallbackValues():".',
+        f'{VALUE_MAX_LENGTH}-character limit Housing puts on a quoted value: {text}. '
+        f'Shorten the stat name, drop the fallback with "with NoFallbackValues():", '
+        f'or render it as a bare placeholder with "with NoTypeCasting():".',
     )
 
 

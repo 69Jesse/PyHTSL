@@ -12,9 +12,6 @@ def java_string_length(value: str) -> int:
 
 
 def exceeds_java_length(value: str, limit: int) -> int | None:
-    """The measured length when `value` is over `limit`, else None. Surrounding
-    double quotes are stripped first, matching htsw's `parseValue`."""
-    if len(value) >= 2 and value.startswith('"') and value.endswith('"'):
-        value = value[1:-1]
+    """The measured length when `value` is over `limit`, else None."""
     length = java_string_length(value)
     return length if length > limit else None
