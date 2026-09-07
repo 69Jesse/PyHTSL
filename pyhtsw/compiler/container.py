@@ -19,10 +19,10 @@ from pyhtsw.compiler.settings import (
     setting,
 )
 from pyhtsw.config import get_projects_folder
-from pyhtsw.logger import AntiSpamLogger
 from pyhtsw.utils.callback import call_with_optional_args
 from pyhtsw.utils.kebab import into_kebab
 from pyhtsw.utils.log import log
+from pyhtsw.utils.warn import SourceSite, consumer_site, warn_at
 
 if TYPE_CHECKING:
     from pyhtsw.compiler.block import Block
@@ -99,7 +99,6 @@ class ActionLimitViolation(NamedTuple):
 
 
 class Container:
-    logger: AntiSpamLogger
     blocks: list['Block']
     contexts: list[ExpressionContext]
     importables: list['Importable']
@@ -109,6 +108,7 @@ class Container:
     item_plan: 'ItemPlan | None'
     _consumer_reserved: set[int]
     _action_limit_violations: list['ActionLimitViolation']
+    _global_site: SourceSite | None
     _settings: dict[str, Any]
 
     is_finalized: bool
@@ -135,7 +135,6 @@ class Container:
         from pyhtsw.compiler.block import GlobalBlock
 
         self._settings = {}
-        self.logger = AntiSpamLogger()
         self.blocks = []
         self.add_block(GlobalBlock())
         self.contexts = []
@@ -146,6 +145,7 @@ class Container:
         self.item_plan = None
         self._consumer_reserved = set()
         self._action_limit_violations = []
+        self._global_site = None
 
         self.is_finalized = False
         self.configure(**settings)
@@ -309,6 +309,8 @@ class Container:
 
         tag_strict_order_region(expression, current_strict_order_region())
         tag_preserved(expression, currently_preserved())
+        if not self.contexts and self._global_site is None:
+            self._global_site = consumer_site()
         self.get_expressions_ref_in_context().append(expression)
 
     def add_block(self, block: 'Block', *, index: int | None = None) -> None:
@@ -626,6 +628,7 @@ class Container:
 
         if self.is_finalized:
             raise RuntimeError('Container is already finalized')
+        self._wrap_global_block()
         self._raise_action_limit_violations()
         self._consumer_reserved = self.compute_reserved_temp_numbers()
         for index, block in enumerate(self.blocks):
@@ -668,19 +671,23 @@ class Container:
     def is_empty(self) -> bool:
         return all(block.is_empty() for block in self.blocks)
 
-    def _collect_importables(self, name: str) -> list['Importable']:
+    def _wrap_global_block(self) -> None:
         from pyhtsw.compiler.importable import FunctionImportable
 
-        importables = list(self.importables)
         global_block = self.blocks[0]
-        if not global_block.is_empty():
-            log(
-                f'\x1b[38;2;255;191;0mActions were written outside of any importable; '
-                f'wrapping them into a function named "{name}". Put them inside an '
-                f'importable (e.g. @function) to silence this.\x1b[0m',
-            )
-            importables.insert(0, FunctionImportable(global_block, name=name))
-        return importables
+        if global_block.is_empty():
+            return
+        name = global_block.get_name()
+        existing = self.find_importable('functions', name)
+        if isinstance(existing, FunctionImportable) and existing.block is global_block:
+            return
+        warn_at(
+            f'Actions were written outside of any importable; wrapping them into '
+            f'a function named "{name}". Put them inside an importable '
+            f'(e.g. @function) to silence this.',
+            self._global_site,
+        )
+        self.register_importable(FunctionImportable(global_block, name=name))
 
     def resolve_project_name(self, name: str | None = None) -> str:
         """One name-resolution rule for both the explicit and the exit-hook
@@ -709,7 +716,7 @@ class Container:
                 'every block is still empty. Either exit the container context '
                 'or call "finalize()" manually.',
             )
-        importables = self._collect_importables(name)
+        importables = list(self.importables)
         # Replanned here rather than reusing finalize's: which module owns an
         # item decides where its .snbt is written, and a module may still be
         # (re)assigned between finalize and export. Naming is content-determined,
@@ -761,8 +768,6 @@ class Container:
                     f'\n\x1b[38;2;0;255;0m// {rel}\x1b[0m\n'
                     + written.read_text(encoding='utf-8'),
                 )
-
-        self.logger.publish()
 
         log(
             '\n\x1b[38;2;0;255;0mAll done! Your HTSW project is written to:\x1b[0m'

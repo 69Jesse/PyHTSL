@@ -135,6 +135,9 @@ class EmulatedHouse(Container):
                 block.execute(self)
             self.run_tick_loop()
 
+    def _wrap_global_block(self) -> None:
+        pass
+
     def schedule_continuation(self, continuation: list[Expression], ticks: int) -> None:
         self.schedulers.append(DelayedActionScheduler(continuation, ticks))
 
@@ -421,10 +424,10 @@ class EmulatedHouse(Container):
             return
         cooldowns[function.name] = 4
         if function.block is None or function.block.is_empty():
-            log(
-                f'Function \x1b[38;2;255;0;0m"{function.name}"\x1b[0m has no expressions '
-                'to execute. If this is unexpected, consider using the '
-                '\x1b[38;2;255;0;0memulate\x1b[0m decorator so it is finalized first.',
+            warn(
+                f'Function "{function.name}" has no expressions to execute. If this '
+                'is unexpected, consider using the emulate decorator so it is '
+                'finalized first.',
             )
             return
         function.block.execute_all_expressions(self)

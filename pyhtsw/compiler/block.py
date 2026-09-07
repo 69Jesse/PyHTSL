@@ -255,7 +255,7 @@ class GlobalBlock(Block):
         return isinstance(other, GlobalBlock)
 
     def get_name(self) -> str:
-        return 'Rename Me !!!'
+        return self.container.resolve_project_name()
 
     def execute(self, context: 'EmulatedHouse') -> None:
         self.execute_all_expressions(context)

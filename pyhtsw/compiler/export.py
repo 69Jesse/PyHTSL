@@ -78,6 +78,7 @@ def export(
         else None
     )
 
+    settings.setdefault('project_name', name)
     with Container(**settings) as container:
         for apply in applies:
             apply()

@@ -1,12 +1,12 @@
 import sys
 from types import FrameType
 
-__all__ = ('caller_module',)
+__all__ = ('caller_module', 'is_user_frame')
 
 _SKIP_MODULES = frozenset({'types', 'abc'})
 
 
-def _is_user_frame(frame: FrameType) -> bool:
+def is_user_frame(frame: FrameType) -> bool:
     name = frame.f_globals.get('__name__') or ''
     return (
         name != 'pyhtsw'
@@ -29,7 +29,7 @@ def caller_module() -> str | None:
     running at export has no such frame outside it, so it keeps its own module.
     """
     frame: FrameType | None = sys._getframe(1)
-    while frame is not None and not _is_user_frame(frame):
+    while frame is not None and not is_user_frame(frame):
         frame = frame.f_back
     if frame is None:
         return None
@@ -37,7 +37,7 @@ def caller_module() -> str | None:
         outer = frame.f_back
         if (
             outer is not None
-            and _is_user_frame(outer)
+            and is_user_frame(outer)
             and outer.f_code.co_name == '<module>'
         ):
             return outer.f_globals.get('__name__') or ''

@@ -2,6 +2,7 @@ import importlib.util
 import sys
 import time
 import traceback
+import warnings
 from pathlib import Path
 
 # Test the repo's pyhtsw, not whatever happens to be installed: running as
@@ -9,9 +10,15 @@ from pathlib import Path
 # silently resolves `import pyhtsw` to site-packages.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pyhtsw import disable_global_export
+from pyhtsw import PyHTSWWarning, disable_global_export
 
 disable_global_export()
+warnings.simplefilter('error', PyHTSWWarning)
+warnings.filterwarnings(
+    'ignore',
+    message='Actions were written outside',
+    category=PyHTSWWarning,
+)
 
 
 def _fmt(seconds: float) -> str:

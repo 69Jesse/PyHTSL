@@ -290,7 +290,7 @@ def buy() -> None:
   cell is — `0` on the outer ring, `1` on the next — which is what makes a
   two-tone glass border one line each.
 - Later elements override earlier ones per cell. Overriding a cell that a
-  fully-explicit element (both `x` and `y` given) already set logs a warning.
+  fully-explicit element (both `x` and `y` given) already set raises a `PyHTSWWarning` at the later placement.
 
 A menu built from data — one page per shop category, one per reward tier — is
 just the same call in a loop:

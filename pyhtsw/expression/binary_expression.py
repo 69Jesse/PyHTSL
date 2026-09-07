@@ -36,13 +36,13 @@ from pyhtsw.expression.housing_type import (
     housing_type_as_rhs,
 )
 from pyhtsw.internal_type import InternalType
-from pyhtsw.logger import log
 from pyhtsw.stats.stat import Stat
 from pyhtsw.stats.temporary_stat import (
     Number,
     TemporaryStat,
     currently_reserved_temp_numbers,
 )
+from pyhtsw.utils.log import log
 
 __all__ = (
     'BinaryOperator',

@@ -1,3 +1,6 @@
+import warnings
+from pathlib import Path
+
 from helpers import expect_exception
 
 from pyhtsw import (
@@ -170,3 +173,17 @@ with Container():
     def _exit_in_conditional() -> None:
         with IfAll(flag == 1):
             exit_function()
+
+
+# Top-level actions are wrapped into the project function at finalize, so the
+# warning precedes the scope error, names the real function, and points at the
+# line that wrote the first top-level action.
+with warnings.catch_warnings(record=True) as caught:
+    warnings.simplefilter('always')
+    with expect_exception(ScopeError):
+        with Container(project_name='Top Level'):
+            close_menu()
+(wrap,) = [w for w in caught if 'wrapping them into a function' in str(w.message)]
+assert 'named "Top Level"' in str(wrap.message)
+assert Path(wrap.filename).name == Path(__file__).name, wrap.filename
+assert 'close_menu()' in Path(__file__).read_text().splitlines()[wrap.lineno - 1]

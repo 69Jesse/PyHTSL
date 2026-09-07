@@ -1,4 +1,5 @@
 import io
+import warnings
 from contextlib import redirect_stdout
 
 from pyhtsw import (
@@ -123,8 +124,10 @@ assert container.into_htsl() == (
 ), container.into_htsl()
 
 
-# The originally reported bug: averages dashboard
-with Container() as container:
+# The originally reported bug: averages dashboard (true division on LONGs is
+# what was reported, so its warning is expected here).
+with warnings.catch_warnings(), Container() as container:
+    warnings.filterwarnings('ignore', message='Dividing a LONG')
     n = GlobalStat('totalcounts').as_long()
     playersum = GlobalStat('totalplayersum').as_long()
     currentafk = GlobalStat('currentafk').as_long()

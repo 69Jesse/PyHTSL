@@ -23,7 +23,7 @@ from pyhtsw.generated.enums import (
     Permission,
 )
 from pyhtsw.utils.kebab import into_kebab
-from pyhtsw.utils.log import log
+from pyhtsw.utils.warn import SourceSite, warn_at
 
 _ILLEGAL_HTSL_CHARS = frozenset(chr(code) for code in range(0x20)) | {
     '\x7f',
@@ -534,12 +534,14 @@ class MenuSlot:
         y: MenuAxis,
         xy_check: XYCheck | None,
         block: 'Block | None',
+        site: SourceSite | None = None,
     ) -> None:
         self.item = item
         self.x = x
         self.y = y
         self.xy_check = xy_check
         self.block = block
+        self.site = site
 
     @property
     def specific(self) -> bool:
@@ -597,6 +599,7 @@ class MenuImportable(Importable):
                 y=slot.y,
                 xy_check=slot.xy_check,
                 block=_clone_block_into_current(slot.block),
+                site=slot.site,
             )
             for slot in self.slots
         ]
@@ -627,8 +630,9 @@ class MenuImportable(Importable):
                         continue
                     slot = r * self.COLS + c
                     if slot in specific:
-                        log(
-                            f'\x1b[38;2;255;191;0mMenu "{self.name}": slot {slot} set with explicit x and y is being overridden.\x1b[0m',
+                        warn_at(
+                            f'Menu "{self.name}": slot {slot} set with explicit x and y is being overridden.',
+                            element.site,
                         )
                     grid[slot] = element
                     if element.specific:

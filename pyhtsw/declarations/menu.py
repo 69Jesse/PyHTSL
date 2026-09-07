@@ -6,6 +6,7 @@ from pyhtsw.compiler.container import get_current_container
 from pyhtsw.compiler.importable import MenuImportable, MenuSlot, XYCheck
 from pyhtsw.declarations.declared import Declared, declared_field, register_importable
 from pyhtsw.declarations.item import Item
+from pyhtsw.utils.warn import consumer_site
 
 __all__ = ('Menu',)
 
@@ -91,7 +92,14 @@ class Menu(Declared):
             )
             get_current_container().add_block(block)
         self.declared.slots.append(
-            MenuSlot(item=item, x=x, y=y, xy_check=xy_check, block=block),
+            MenuSlot(
+                item=item,
+                x=x,
+                y=y,
+                xy_check=xy_check,
+                block=block,
+                site=consumer_site(),
+            ),
         )
 
     def _placement(

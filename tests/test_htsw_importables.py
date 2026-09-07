@@ -34,9 +34,9 @@ with Container():
 
 
 # Top-level actions get wrapped into a function named after the project.
-with Container(projects_folder=tmp) as wrap:
+with Container(projects_folder=tmp, project_name='Wrap Test') as wrap:
     chat('written outside any importable')
-wrap.export('Wrap Test')
+wrap.export()
 data = json.loads((tmp / 'wrap-test' / 'import.json').read_text())
 assert any(fn['name'] == 'Wrap Test' for fn in data['functions'])
 
@@ -65,7 +65,7 @@ assert Location.custom(1, 2, 3).into_htsl() == '"custom_coordinates" "1 2 3"'
 
 # A declared item references by its declared name; a plain one is promoted to
 # an items[] entry and referenced by a derived name, never by path.
-with Container(projects_folder=tmp) as c:
+with Container(projects_folder=tmp, project_name='Ref Test') as c:
     sword = Item('diamond_sword', name='&bSword')
 
     give_item(sword)  # by declared name
@@ -73,7 +73,7 @@ with Container(projects_folder=tmp) as c:
     give_item(Item('apple', count=3))  # ...plus the stack size
     give_item(Item('gold_ingot', name='&6Coin'))  # display name wins
     give_item(Item('bone', name='&fSecret', importable=False))  # opted out
-c.export('Ref Test')
+c.export()
 ref_root = tmp / 'ref-test'
 text = (ref_root / 'functions' / 'ref-test.htsl').read_text()
 assert 'giveItem "Sword"' in text

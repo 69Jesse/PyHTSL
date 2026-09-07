@@ -11,7 +11,7 @@ from pyhtsw.actions.flow import PauseExecutionExpression
 from pyhtsw.actions.world import PlaySoundExpression
 from pyhtsw.expression.expression import Expression
 from pyhtsw.generated.enums import SOUND_NAME_TO_PATH, Sound
-from pyhtsw.utils.log import log
+from pyhtsw.utils.warn import warn
 
 __all__ = (
     'NoteEvent',
@@ -145,9 +145,9 @@ def _resolve_custom_instrument(
         return cast(Sound, candidate)
     fuzzy = _fuzzy_match(normalized)
     if fuzzy is not None:
-        log(f'\x1b[38;2;255;0;0mNote:\x1b[0m using {fuzzy} for custom sound {name!r}')
+        warn(f'Using {fuzzy} for custom sound {name!r}')
         return fuzzy
-    log(f'\x1b[38;2;255;0;0mWarning:\x1b[0m could not find {name!r}')
+    warn(f'Could not find sound {name!r}, falling back to note.harp')
     return 'note.harp'
 
 

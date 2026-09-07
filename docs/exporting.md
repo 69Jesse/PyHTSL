@@ -104,8 +104,9 @@ schema.
 
 Actions written outside any importable (not inside a `@function`,
 `@event`, item handler, etc.) get wrapped into a single function named
-after the project, and PyHTSW logs a warning. Put them inside an importable to
-silence it:
+after the project (the `project_name` setting, else the script filename), and
+PyHTSW raises a `PyHTSWWarning` pointing at the first such line. Put them
+inside an importable to silence it:
 
 ```python
 from pyhtsw import function, chat

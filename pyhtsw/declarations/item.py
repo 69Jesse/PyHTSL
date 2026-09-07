@@ -22,6 +22,7 @@ from pyhtsw.utils.bounds import check_bounds
 from pyhtsw.utils.caller import caller_module
 from pyhtsw.utils.formatting import normalize_formatting, remove_formatting
 from pyhtsw.utils.kebab import into_kebab
+from pyhtsw.utils.warn import warn
 
 __all__ = (
     'Enchantment',
@@ -133,12 +134,10 @@ def _resolve_click_handlers(
     if on_click is not None and (
         on_left_click is not None or on_right_click is not None
     ):
-        from pyhtsw.utils.log import log
-
-        log(
-            '\x1b[38;2;255;191;0mItem given both "on_click" and an explicit '
+        warn(
+            'Item given both "on_click" and an explicit '
             '"on_left_click"/"on_right_click"; the explicit side overrides '
-            '"on_click".\x1b[0m',
+            '"on_click".',
         )
     left = on_left_click if on_left_click is not None else on_click
     right = on_right_click if on_right_click is not None else on_click
