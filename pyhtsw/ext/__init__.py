@@ -1,3 +1,12 @@
+from pyhtsw.ext.announce import (
+    Announcer as Announcer,
+)
+from pyhtsw.ext.announce import (
+    Num as Num,
+)
+from pyhtsw.ext.announce import (
+    Text as Text,
+)
 from pyhtsw.ext.approximate import (
     approximate_acos as approximate_acos,
 )
