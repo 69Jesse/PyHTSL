@@ -367,7 +367,8 @@ class _BitPackedBase:
                 *lower,
                 self.counter < upper,
             ):
-                shift_amount = (self.counter - h * cap) * bits
+                shift_amount = TemporaryStat().as_long()
+                shift_amount.value = (self.counter - h * cap) * bits
                 for w in range(self.width):
                     self.holders[w][h].value |= values[w] << shift_amount
                 self.counter.value += 1
