@@ -109,4 +109,7 @@ def clone_with(obj: 'BaseObject', overrides: dict[str, Any]) -> Any:
         if value is MISSING:
             value = _copied(getattr(obj, name), base)
         setattr(clone, name, value)
+    from pyhtsw.compiler.reemission import note_clone
+
+    note_clone(obj, clone)
     return clone

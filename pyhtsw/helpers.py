@@ -8,6 +8,7 @@ from pyhtsw.actions.flow import (
 )
 from pyhtsw.compiler.container import get_current_container, override_write_expression
 from pyhtsw.compiler.limits import Counter
+from pyhtsw.compiler.reemission import suppress_reemission
 from pyhtsw.expression.condition.conditional_expression import ConditionalExpression
 
 if TYPE_CHECKING:
@@ -92,11 +93,12 @@ def chunked(
     _assert_flat(captured)
     chunks = chunk_expressions(captured)
 
-    if isinstance(block, ElseContextManager):
-        _fill_else_chunks(chunks)
-    else:
-        container = get_current_container()
-        for chunk in chunks:
-            with block.cloned():
-                for expression in chunk:
-                    container.write_expression(expression)
+    with suppress_reemission():
+        if isinstance(block, ElseContextManager):
+            _fill_else_chunks(chunks)
+        else:
+            container = get_current_container()
+            for chunk in chunks:
+                with block.cloned():
+                    for expression in chunk:
+                        container.write_expression(expression)

@@ -307,8 +307,11 @@ class Container:
         if self.is_finalized:
             return
 
+        from pyhtsw.compiler.reemission import check_reemission
+
         tag_strict_order_region(expression, current_strict_order_region())
         tag_preserved(expression, currently_preserved())
+        check_reemission(expression)
         if not self.contexts and self._global_site is None:
             self._global_site = consumer_site()
         self.get_expressions_ref_in_context().append(expression)
