@@ -76,6 +76,9 @@ from pyhtsw.ext.music import (
 from pyhtsw.ext.music import (
     note_events_into_expressions as note_events_into_expressions,
 )
+from pyhtsw.ext.nesting import (
+    Nestable as Nestable,
+)
 from pyhtsw.ext.ordinal import set_ordinal_inline as set_ordinal_inline
 from pyhtsw.ext.ordinal import (
     set_ordinal_suffix as set_ordinal_suffix,

@@ -43,6 +43,7 @@ __all__ = (
 
 
 WRITE_EXPRESSION_OVERRIDE_STACK: list[Callable[['Expression'], None]] = []
+NESTING_ALLOWED_STACK: list[bool] = []
 
 CONTAINERS: list['Container'] = []
 EXPORTED_ROOTS: set[Path] = set()
@@ -69,6 +70,15 @@ def _format_nested_compound_error(
         ' the block, then use "tmp" inside), or restructure your conditionals.',
     ]
     return '\n'.join(lines)
+
+
+@contextmanager
+def nesting_allowed() -> Generator[None]:
+    NESTING_ALLOWED_STACK.append(True)
+    try:
+        yield
+    finally:
+        NESTING_ALLOWED_STACK.pop()
 
 
 @contextmanager
@@ -832,6 +842,7 @@ class ContainerContextManager(ABC):
             context.parent_expression is not None
             and not context.parent_expression.can_be_nested()
             and not container.allow_nested_expressions
+            and not NESTING_ALLOWED_STACK
         ):
             # A function body starts a fresh nesting scope. Entering a block
             # pushes a context with `parent_expression is None`; an if/random
