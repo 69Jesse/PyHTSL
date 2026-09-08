@@ -58,6 +58,21 @@ from pyhtsw.ext.compute_layout import (
 from pyhtsw.ext.format_time import (
     format_time_string as format_time_string,
 )
+from pyhtsw.ext.gather import (
+    Gatherer as Gatherer,
+)
+from pyhtsw.ext.gather import (
+    gather_from_all_players as gather_from_all_players,
+)
+from pyhtsw.ext.geometry import (
+    distance_squared as distance_squared,
+)
+from pyhtsw.ext.geometry import (
+    player_position as player_position,
+)
+from pyhtsw.ext.geometry import (
+    within_distance as within_distance,
+)
 from pyhtsw.ext.leaderboard import (
     SortedTopN as SortedTopN,
 )
@@ -121,6 +136,15 @@ from pyhtsw.ext.raycast import (
 )
 from pyhtsw.ext.round import (
     round_double as round_double,
+)
+from pyhtsw.ext.select import (
+    nearest_position as nearest_position,
+)
+from pyhtsw.ext.select import (
+    select_max as select_max,
+)
+from pyhtsw.ext.select import (
+    select_min as select_min,
 )
 from pyhtsw.ext.set_string import (
     set_string as set_string,
