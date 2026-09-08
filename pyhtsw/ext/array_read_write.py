@@ -258,17 +258,37 @@ def _column_internal_type(
     return first.internal_type
 
 
+def _column_fallback(
+    items: Sequence[Sequence[Checkable | HousingType]],
+    k: int,
+) -> str | None:
+    """The rendered fallback every slot of column ``k`` agrees on, if any."""
+    first = items[0][k]
+    if not isinstance(first, Stat) or first.fallback_value is None:
+        return None
+    for item in items:
+        slot = item[k]
+        if not isinstance(slot, Stat) or slot.fallback_value != first.fallback_value:
+            return None
+    formatted = first.get_formatted_fallback_value()
+    if not formatted or '%' in formatted or ' ' in formatted:
+        return None
+    return formatted
+
+
 def _composed_reference_parts(
     cls: type[Stat],
     prefix: str,
     suffix: str,
     column_type: InternalType,
+    fallback: str | None = None,
 ) -> tuple[str, str]:
     if column_type is InternalType.LONG:
         return f'%stat.{cls.right_side_keyword()}/{prefix}', f'{suffix}%L'
     if column_type is InternalType.DOUBLE:
         return f'%var.{cls.right_side_keyword()}/{prefix}', f'{suffix} 0%D'
-    return f'%var.{cls.right_side_keyword()}/{prefix}', f'{suffix}%'
+    tail = f' {fallback}' if fallback is not None else ''
+    return f'%var.{cls.right_side_keyword()}/{prefix}', f'{suffix}{tail}%'
 
 
 def _emit_fast_read(
@@ -277,6 +297,7 @@ def _emit_fast_read(
     index: Editable,
     output: Sequence[Editable],
     column_types: Sequence[InternalType],
+    column_fallbacks: Sequence[str | None] | None = None,
 ) -> None:
     width = len(pattern)
     names = _fast_names_pool(pattern)
@@ -300,6 +321,7 @@ def _emit_fast_read(
             prefix,
             suffix,
             column_types[k],
+            column_fallbacks[k] if column_fallbacks is not None else None,
         )
         p_k = _get_or_bake_composed_prefix(p_value, names)
 
@@ -749,6 +771,7 @@ def array_read(
             index=index,
             output=output,
             column_types=[_column_internal_type(items, k) for k in range(width)],
+            column_fallbacks=[_column_fallback(items, k) for k in range(width)],
         )
         return
 
